@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('onboarding.title') }} - {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-12"
+     x-data="{
+        step: 1,
+        loading: false,
+        profile: {
+            display_name: '',
+            city: '',
+            country_code: '',
+            bio: '',
+            telegram_username: '',
+        },
+        workshop: {
+            workshop_name: '',
+            workshop_type: 'garage',
+            tagline: '',
+        },
+        languages: [{ language_code: 'en', proficiency: 'B2' }],
+        item: {
+            name: '',
+            description: '',
+            category: 'tools',
+            item_type: 'physical',
+        },
+
+        addLanguage() {
+            this.languages.push({ language_code: '', proficiency: 'A2' });
+        },
+        removeLanguage(i) {
+            this.languages.splice(i, 1);
+        },
+
+        async finish(skipItem) {
+            this.loading = true;
+            try {
+                // Save profile
+                const profileData = {
+                    ...this.profile,
+                    ...this.workshop,
+                    languages: this.languages.filter(l => l.language_code),
+                };
+                const profResp = await fetch('/api/v1/onboarding/profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(profileData),
+                });
+                if (!profResp.ok) throw new Error('Profile save failed');
+
+                // Optionally save first item
+                if (!skipItem && this.item.name) {
+                    const itemResp = await fetch('/api/v1/items', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(this.item),
+                    });
+                    // Non-critical: don't block onboarding if item fails
+                }
+
+                window.dispatchEvent(new CustomEvent('toast', {
+                    detail: { type: 'success', message: '{{ t('onboarding.success') }}' }
+                }));
+                setTimeout(() => window.location.href = '/dashboard', 1500);
+            } catch (e) {
+                window.dispatchEvent(new CustomEvent('toast', {
+                    detail: { type: 'error', message: e.message || '{{ t('common.error') }}' }
+                }));
+            } finally {
+                this.loading = false;
+            }
+        }
+     }">
+
+    <!-- Header -->
+    <div class="text-center mb-10">
+        <h1 class="text-3xl font-bold text-gray-900">{{ t('onboarding.title') }}</h1>
+        <p class="mt-2 text-gray-600">{{ t('onboarding.subtitle') }}</p>
+    </div>
+
+    <!-- Step indicators -->
+    <div class="flex items-center justify-center mb-10">
+        <template x-for="s in [1,2,3]" :key="s">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors"
+                     :class="step >= s ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'"
+                     x-text="s"></div>
+                <div x-show="s < 3" class="w-16 h-0.5 mx-2"
+                     :class="step > s ? 'bg-indigo-600' : 'bg-gray-200'"></div>
+            </div>
+        </template>
+    </div>
+
+    <!-- Step 1: About You -->
+    <div x-show="step === 1" x-transition>
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ t('onboarding.step_1') }}</h2>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('onboarding.display_name') }} *</label>
+                <input x-model="profile.display_name" type="text" required
+                       class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                       placeholder="{{ t('onboarding.display_name_placeholder') }}">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('onboarding.city') }}</label>
+                    <input x-model="profile.city" type="text"
+                           class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                           placeholder="{{ t('onboarding.city_placeholder') }}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('onboarding.country') }}</label>
+                    <input x-model="profile.country_code" type="text" maxlength="2"
+                           class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 uppercase"
+                           placeholder="{{ t('onboarding.country_placeholder') }}">
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('onboarding.bio') }}</label>
+                <textarea x-model="profile.bio" rows="3"
+                          class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          placeholder="{{ t('onboarding.bio_placeholder') }}"></textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('onboarding.telegram') }}</label>
+                <input x-model="profile.telegram_username" type="text"
+                       class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                       placeholder="{{ t('onboarding.telegram_placeholder') }}">
+            </div>
+        </div>
+
+        <div class="mt-8 flex justify-end">
+            <button @click="if(profile.display_name) step = 2"
+                    :disabled="!profile.display_name"
+                    class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                Next &rarr;
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 2: Your Workshop -->
+    <div x-show="step === 2" x-cloak x-transition>
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ t('onboarding.step_2') }}</h2>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('onboarding.workshop_name') }}</label>
+                <input x-model="workshop.workshop_name" type="text"
+                       class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                       placeholder="{{ t('onboarding.workshop_name_placeholder') }}">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('onboarding.workshop_type') }}</label>
+                <select x-model="workshop.workshop_type"
+                        class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="garage">{{ t('onboarding.workshop_types.garage') }}</option>
+                    <option value="kitchen">{{ t('onboarding.workshop_types.kitchen') }}</option>
+                    <option value="studio">{{ t('onboarding.workshop_types.studio') }}</option>
+                    <option value="garden">{{ t('onboarding.workshop_types.garden') }}</option>
+                    <option value="office">{{ t('onboarding.workshop_types.office') }}</option>
+                    <option value="mobile">{{ t('onboarding.workshop_types.mobile') }}</option>
+                    <option value="other">{{ t('onboarding.workshop_types.other') }}</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('onboarding.tagline') }}</label>
+                <input x-model="workshop.tagline" type="text"
+                       class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                       placeholder="{{ t('onboarding.tagline_placeholder') }}">
+            </div>
+
+            <!-- Languages -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('onboarding.language') }}</label>
+                <template x-for="(lang, i) in languages" :key="i">
+                    <div class="flex items-center gap-3 mb-2">
+                        <input x-model="lang.language_code" type="text" maxlength="5"
+                               class="w-20 rounded-lg border border-gray-300 px-3 py-2 text-sm uppercase"
+                               placeholder="en">
+                        <select x-model="lang.proficiency"
+                                class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm">
+                            <option value="A1">A1 - {{ t('cefr.A1') }}</option>
+                            <option value="A2">A2 - {{ t('cefr.A2') }}</option>
+                            <option value="B1">B1 - {{ t('cefr.B1') }}</option>
+                            <option value="B2">B2 - {{ t('cefr.B2') }}</option>
+                            <option value="C1">C1 - {{ t('cefr.C1') }}</option>
+                            <option value="C2">C2 - {{ t('cefr.C2') }}</option>
+                            <option value="native">{{ t('cefr.native') }}</option>
+                        </select>
+                        <button x-show="languages.length > 1" @click="removeLanguage(i)"
+                                class="text-red-500 hover:text-red-700 text-sm">&times;</button>
+                    </div>
+                </template>
+                <button @click="addLanguage()" class="text-sm text-indigo-600 hover:underline mt-1">
+                    + {{ t('onboarding.add_language') }}
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-8 flex justify-between">
+            <button @click="step = 1"
+                    class="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors">
+                &larr; {{ t('common.back') }}
+            </button>
+            <button @click="step = 3"
+                    class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
+                Next &rarr;
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 3: First Item (optional) -->
+    <div x-show="step === 3" x-cloak x-transition>
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ t('onboarding.step_3') }}</h2>
+        <p class="text-sm text-gray-500 mb-4">{{ t('list_item.step_1') }}</p>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('list_item.name') }}</label>
+                <input x-model="item.name" type="text"
+                       class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                       placeholder="{{ t('list_item.name_placeholder') }}">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('list_item.description') }}</label>
+                <textarea x-model="item.description" rows="3"
+                          class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          placeholder="{{ t('list_item.description_placeholder') }}"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('list_item.category') }}</label>
+                    <select x-model="item.category"
+                            class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="tools">{{ t('categories.tools') }}</option>
+                        <option value="kitchen">{{ t('categories.kitchen') }}</option>
+                        <option value="garden">{{ t('categories.garden') }}</option>
+                        <option value="electronics">{{ t('categories.electronics') }}</option>
+                        <option value="sports">{{ t('categories.sports') }}</option>
+                        <option value="music">{{ t('categories.music') }}</option>
+                        <option value="vehicles">{{ t('categories.vehicles') }}</option>
+                        <option value="cleaning">{{ t('categories.cleaning') }}</option>
+                        <option value="crafts">{{ t('categories.crafts') }}</option>
+                        <option value="other">{{ t('categories.other') }}</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('list_item.item_type') }}</label>
+                    <select x-model="item.item_type"
+                            class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="physical">{{ t('item_types.physical') }}</option>
+                        <option value="digital">{{ t('item_types.digital') }}</option>
+                        <option value="service">{{ t('item_types.service') }}</option>
+                        <option value="space">{{ t('item_types.space') }}</option>
+                        <option value="made_to_order">{{ t('item_types.made_to_order') }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 flex justify-between">
+            <button @click="step = 2"
+                    class="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors">
+                &larr; {{ t('common.back') }}
+            </button>
+            <div class="flex gap-3">
+                <button @click="finish(true)" :disabled="loading"
+                        class="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors">
+                    {{ t('onboarding.skip_item') }}
+                </button>
+                <button @click="finish(false)" :disabled="loading"
+                        class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+                    <span x-show="!loading">{{ t('onboarding.finish') }}</span>
+                    <span x-show="loading" x-cloak>{{ t('common.loading') }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -274,6 +274,14 @@ async def dashboard(request: Request,
     return _render("pages/dashboard.html", ctx)
 
 
+@router.get("/onboarding", response_class=HTMLResponse)
+async def onboarding_page(request: Request,
+                          token: Optional[dict] = Depends(get_current_user_token)):
+    """Onboarding wizard for new users."""
+    ctx = _ctx(request, token)
+    return _render("pages/onboarding.html", ctx)
+
+
 @router.get("/terms", response_class=HTMLResponse)
 async def terms(request: Request,
                 token: Optional[dict] = Depends(get_current_user_token)):
