@@ -168,7 +168,7 @@
                             <p x-show="review.title" class="text-sm font-semibold text-gray-900 mt-2" x-text="review.title"></p>
                             <p x-show="review.body" class="text-sm text-gray-600 mt-1" x-text="review.body"></p>
                             <div x-show="review.reviewer_tier" class="mt-2">
-                                <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full" x-text="review.reviewer_tier"></span>
+                                <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full" x-text="review.reviewer_tier.charAt(0).toUpperCase() + review.reviewer_tier.slice(1)"></span>
                             </div>
                         </div>
                     </template>

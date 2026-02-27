@@ -1,5 +1,6 @@
 """Pydantic schemas for review endpoints."""
 
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
@@ -20,6 +21,7 @@ class ReviewOut(BaseModel):
     reviewer_tier: str
     weight: float
     visible: bool
+    created_at: datetime
 
     class Config:
         from_attributes = True

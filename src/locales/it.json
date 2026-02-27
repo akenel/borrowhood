@@ -197,6 +197,13 @@
     "crafts": "Artigianato",
     "other": "Altro"
   },
+  "condition": {
+    "new": "Nuovo",
+    "like_new": "Come Nuovo",
+    "good": "Buono",
+    "fair": "Discreto",
+    "worn": "Usato"
+  },
   "badges": {
     "newcomer": "Nuovo Arrivato",
     "active": "Attivo",
