@@ -89,6 +89,47 @@
                     {% endfor %}
 
                     {% if user %}
+                    <!-- Notification bell -->
+                    <div class="relative hidden md:block"
+                         x-data="{ open: false, unread: 0, notifications: [],
+                                   async loadSummary() {
+                                       try { const r = await fetch('/api/v1/notifications/summary'); if(r.ok) { const d = await r.json(); this.unread = d.unread; } } catch(e) {}
+                                   },
+                                   async loadNotifications() {
+                                       try { const r = await fetch('/api/v1/notifications?limit=5'); if(r.ok) { this.notifications = await r.json(); } } catch(e) {}
+                                   },
+                                   async markAllRead() {
+                                       await fetch('/api/v1/notifications/read-all', { method: 'POST' }); this.unread = 0; this.notifications.forEach(n => n.read = true);
+                                   }
+                         }"
+                         x-init="loadSummary(); setInterval(() => loadSummary(), 30000)">
+                        <button @click="open = !open; if(open) loadNotifications()"
+                                class="relative min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 hover:text-indigo-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                            <span x-show="unread > 0" x-cloak
+                                  class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center"
+                                  x-text="unread > 9 ? '9+' : unread"></span>
+                        </button>
+                        <!-- Dropdown -->
+                        <div x-show="open" x-cloak @click.outside="open = false"
+                             class="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg border border-gray-200 shadow-lg z-50">
+                            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                                <span class="text-sm font-semibold text-gray-900">Notifications</span>
+                                <button @click="markAllRead()" x-show="unread > 0" class="text-xs text-indigo-600 hover:underline">Mark all read</button>
+                            </div>
+                            <div class="max-h-64 overflow-y-auto">
+                                <template x-for="n in notifications" :key="n.id">
+                                    <a :href="n.link || '#'" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-50" :class="!n.read ? 'bg-indigo-50/50' : ''">
+                                        <p class="text-sm text-gray-900" :class="!n.read ? 'font-semibold' : ''" x-text="n.title"></p>
+                                        <p class="text-xs text-gray-400 mt-0.5" x-text="new Date(n.created_at).toLocaleDateString()"></p>
+                                    </a>
+                                </template>
+                                <p x-show="notifications.length === 0" class="px-4 py-6 text-sm text-gray-400 text-center">No notifications yet</p>
+                            </div>
+                        </div>
+                    </div>
                     <a href="/profile" class="text-sm text-gray-700 hover:text-indigo-600 hidden md:block">{{ user.get('preferred_username', t('nav.profile')) }}</a>
                     <a href="/logout" class="text-sm text-gray-500 hover:text-red-600 hidden md:block">{{ t('nav.logout') }}</a>
                     {% else %}
