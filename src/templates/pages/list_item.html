@@ -18,6 +18,9 @@
     <div x-data="{
         step: 1,
         submitting: false,
+        aiGenerating: false,
+        aiUsed: false,
+        aiTags: [],
         form: {
             name: '',
             description: '',
@@ -33,6 +36,36 @@
             deposit: '',
             delivery_available: false,
             notes: ''
+        },
+        async aiSuggest() {
+            if (!this.form.name.trim()) return;
+            this.aiGenerating = true;
+            try {
+                const resp = await fetch('/api/v1/ai/generate-listing', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: this.form.name,
+                        category: this.form.category,
+                        item_type: this.form.item_type,
+                        language: this.form.content_language
+                    })
+                });
+                if (!resp.ok) {
+                    const err = await resp.json();
+                    throw new Error(err.detail || 'AI generation failed');
+                }
+                const data = await resp.json();
+                if (data.title) this.form.name = data.title;
+                if (data.description) this.form.description = data.description;
+                this.aiTags = data.tags || [];
+                this.aiUsed = true;
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'AI suggestion ready! Review and edit as needed.' } }));
+            } catch (err) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: err.message } }));
+            } finally {
+                this.aiGenerating = false;
+            }
         },
         async submitItem() {
             this.submitting = true;
@@ -106,18 +139,30 @@
         <!-- Step 1: Item Details -->
         <div x-show="step === 1" class="bg-white rounded-lg border border-gray-200 p-6 space-y-5">
 
+            <!-- AI Assist Banner -->
+            <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-4">
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-semibold text-purple-900">
+                            {% if lang == 'it' %}Assistente AI{% else %}AI Assistant{% endif %}
+                        </p>
+                        <p class="text-xs text-purple-700 mt-0.5">
+                            {% if lang == 'it' %}Scrivi il nome, scegli la categoria, clicca il bottone. L'AI scrive la descrizione per te.{% else %}Type the name, pick a category, click the button. AI writes the description for you.{% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700 mb-1">{{ t('list_item.name') }} *</label>
                 <input id="name" type="text" x-model="form.name" required
                        placeholder="{{ t('list_item.name_placeholder') }}"
                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[44px]">
-            </div>
-
-            <div>
-                <label for="description" class="block text-sm font-medium text-gray-700 mb-1">{{ t('list_item.description') }}</label>
-                <textarea id="description" x-model="form.description" rows="4"
-                          placeholder="{{ t('list_item.description_placeholder') }}"
-                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -138,6 +183,55 @@
                         <option value="{{ itype }}">{{ t('item_types.' + itype) }}</option>
                         {% endfor %}
                     </select>
+                </div>
+            </div>
+
+            <!-- AI Generate Button -->
+            <div>
+                <button @click="aiSuggest()" :disabled="!form.name.trim() || aiGenerating"
+                        class="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all min-h-[44px] shadow-sm">
+                    <template x-if="!aiGenerating">
+                        <span class="flex items-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            <span>{% if lang == 'it' %}Genera Descrizione con AI{% else %}Generate Description with AI{% endif %}</span>
+                        </span>
+                    </template>
+                    <template x-if="aiGenerating">
+                        <span class="flex items-center space-x-2">
+                            <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>{% if lang == 'it' %}Generazione in corso...{% else %}Generating...{% endif %}</span>
+                        </span>
+                    </template>
+                </button>
+            </div>
+
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ t('list_item.description') }}
+                    <span x-show="aiUsed" x-cloak class="ml-2 text-xs text-purple-600 font-normal">
+                        {% if lang == 'it' %}(generata da AI -- modifica liberamente){% else %}(AI generated -- feel free to edit){% endif %}
+                    </span>
+                </label>
+                <textarea id="description" x-model="form.description" rows="4"
+                          placeholder="{{ t('list_item.description_placeholder') }}"
+                          class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          :class="aiUsed && form.description ? 'border-purple-300 bg-purple-50/30' : 'border-gray-300'"></textarea>
+            </div>
+
+            <!-- AI-suggested tags -->
+            <div x-show="aiTags.length > 0" x-cloak>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    {% if lang == 'it' %}Tag suggeriti{% else %}Suggested Tags{% endif %}
+                </label>
+                <div class="flex flex-wrap gap-2">
+                    <template x-for="tag in aiTags" :key="tag">
+                        <span class="text-xs px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-full font-medium" x-text="tag"></span>
+                    </template>
                 </div>
             </div>
 
