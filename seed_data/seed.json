@@ -15,19 +15,55 @@
       "longitude": 12.537,
       "badge_tier": "trusted",
       "languages": [
-        {"language_code": "en", "proficiency": "native"},
-        {"language_code": "it", "proficiency": "B1"}
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "it",
+          "proficiency": "B1"
+        }
       ],
       "skills": [
-        {"skill_name": "Pastry Making", "category": "baking", "self_rating": 5, "years_experience": 40},
-        {"skill_name": "Cake Decorating", "category": "baking", "self_rating": 5, "years_experience": 35},
-        {"skill_name": "Bread Baking", "category": "baking", "self_rating": 4, "years_experience": 30}
+        {
+          "skill_name": "Pastry Making",
+          "category": "baking",
+          "self_rating": 5,
+          "years_experience": 40
+        },
+        {
+          "skill_name": "Cake Decorating",
+          "category": "baking",
+          "self_rating": 5,
+          "years_experience": 35
+        },
+        {
+          "skill_name": "Bread Baking",
+          "category": "baking",
+          "self_rating": 4,
+          "years_experience": 30
+        }
       ],
       "social_links": [
-        {"platform": "youtube", "url": "https://youtube.com/@sallyskitchen", "label": "Sally's Kitchen Channel"},
-        {"platform": "instagram", "url": "https://instagram.com/sallyskitchen", "label": "Daily Bakes"}
+        {
+          "platform": "youtube",
+          "url": "https://youtube.com/@sallyskitchen",
+          "label": "Sally's Kitchen Channel"
+        },
+        {
+          "platform": "instagram",
+          "url": "https://instagram.com/sallyskitchen",
+          "label": "Daily Bakes"
+        }
       ],
-      "points": {"total_points": 340, "rentals_completed": 12, "reviews_given": 8, "reviews_received": 15, "items_listed": 18, "helpful_flags": 5}
+      "points": {
+        "total_points": 340,
+        "rentals_completed": 12,
+        "reviews_given": 8,
+        "reviews_received": 15,
+        "items_listed": 18,
+        "helpful_flags": 5
+      }
     },
     {
       "slug": "mikes-garage",
@@ -44,17 +80,48 @@
       "longitude": 12.545,
       "badge_tier": "pillar",
       "languages": [
-        {"language_code": "en", "proficiency": "native"},
-        {"language_code": "de", "proficiency": "C1"},
-        {"language_code": "it", "proficiency": "A2"}
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "de",
+          "proficiency": "C1"
+        },
+        {
+          "language_code": "it",
+          "proficiency": "A2"
+        }
       ],
       "skills": [
-        {"skill_name": "Auto Repair", "category": "mechanics", "self_rating": 5, "years_experience": 25},
-        {"skill_name": "Welding", "category": "metalwork", "self_rating": 4, "years_experience": 15},
-        {"skill_name": "Woodworking", "category": "woodworking", "self_rating": 3, "years_experience": 10}
+        {
+          "skill_name": "Auto Repair",
+          "category": "mechanics",
+          "self_rating": 5,
+          "years_experience": 25
+        },
+        {
+          "skill_name": "Welding",
+          "category": "metalwork",
+          "self_rating": 4,
+          "years_experience": 15
+        },
+        {
+          "skill_name": "Woodworking",
+          "category": "woodworking",
+          "self_rating": 3,
+          "years_experience": 10
+        }
       ],
       "social_links": [],
-      "points": {"total_points": 580, "rentals_completed": 28, "reviews_given": 15, "reviews_received": 22, "items_listed": 45, "helpful_flags": 12}
+      "points": {
+        "total_points": 580,
+        "rentals_completed": 28,
+        "reviews_given": 15,
+        "reviews_received": 22,
+        "items_listed": 45,
+        "helpful_flags": 12
+      }
     },
     {
       "slug": "angel-hq",
@@ -71,20 +138,58 @@
       "longitude": 12.644,
       "badge_tier": "legend",
       "languages": [
-        {"language_code": "en", "proficiency": "native"},
-        {"language_code": "de", "proficiency": "C2"},
-        {"language_code": "fr", "proficiency": "B2"},
-        {"language_code": "it", "proficiency": "A2"}
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "de",
+          "proficiency": "C2"
+        },
+        {
+          "language_code": "fr",
+          "proficiency": "B2"
+        },
+        {
+          "language_code": "it",
+          "proficiency": "A2"
+        }
       ],
       "skills": [
-        {"skill_name": "Software Development", "category": "technology", "self_rating": 5, "years_experience": 25},
-        {"skill_name": "SAP Integration", "category": "technology", "self_rating": 5, "years_experience": 20},
-        {"skill_name": "Photography", "category": "creative", "self_rating": 3, "years_experience": 5}
+        {
+          "skill_name": "Software Development",
+          "category": "technology",
+          "self_rating": 5,
+          "years_experience": 25
+        },
+        {
+          "skill_name": "SAP Integration",
+          "category": "technology",
+          "self_rating": 5,
+          "years_experience": 20
+        },
+        {
+          "skill_name": "Photography",
+          "category": "creative",
+          "self_rating": 3,
+          "years_experience": 5
+        }
       ],
       "social_links": [
-        {"platform": "github", "url": "https://github.com/akenel", "label": "GitHub"}
+        {
+          "platform": "github",
+          "url": "https://github.com/akenel",
+          "label": "GitHub"
+        }
       ],
-      "points": {"total_points": 1200, "rentals_completed": 5, "reviews_given": 20, "reviews_received": 18, "items_listed": 8, "helpful_flags": 30}
+      "points": {
+        "total_points": 1200,
+        "rentals_completed": 5,
+        "reviews_given": 20,
+        "reviews_received": 18,
+        "items_listed": 8,
+        "helpful_flags": 30
+      }
     },
     {
       "slug": "ninos-campers",
@@ -92,26 +197,53 @@
       "email": "nino@borrowhood.local",
       "workshop_name": "Camper & Tour",
       "workshop_type": "garage",
-      "tagline": "Casa è dove parcheggi",
+      "tagline": "Casa \u00e8 dove parcheggi",
       "bio": "Family camper business since the 90s. We rent, repair, and sell camper vans. Camping accessories for every adventure. Based at Palazzo Asia, Trapani.",
       "telegram_username": "nino_camper",
       "city": "Trapani",
       "country_code": "IT",
       "latitude": 38.003,
-      "longitude": 12.540,
+      "longitude": 12.54,
       "badge_tier": "trusted",
       "languages": [
-        {"language_code": "it", "proficiency": "native"},
-        {"language_code": "en", "proficiency": "C1"}
+        {
+          "language_code": "it",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "en",
+          "proficiency": "C1"
+        }
       ],
       "skills": [
-        {"skill_name": "Camper Repair", "category": "mechanics", "self_rating": 5, "years_experience": 15},
-        {"skill_name": "Camping Equipment", "category": "outdoor", "self_rating": 5, "years_experience": 15}
+        {
+          "skill_name": "Camper Repair",
+          "category": "mechanics",
+          "self_rating": 5,
+          "years_experience": 15
+        },
+        {
+          "skill_name": "Camping Equipment",
+          "category": "outdoor",
+          "self_rating": 5,
+          "years_experience": 15
+        }
       ],
       "social_links": [
-        {"platform": "website", "url": "https://www.camperandtour.it", "label": "Camper & Tour"}
+        {
+          "platform": "website",
+          "url": "https://www.camperandtour.it",
+          "label": "Camper & Tour"
+        }
       ],
-      "points": {"total_points": 290, "rentals_completed": 15, "reviews_given": 5, "reviews_received": 18, "items_listed": 22, "helpful_flags": 3}
+      "points": {
+        "total_points": 290,
+        "rentals_completed": 15,
+        "reviews_given": 5,
+        "reviews_received": 18,
+        "items_listed": 22,
+        "helpful_flags": 3
+      }
     },
     {
       "slug": "marias-garden",
@@ -120,24 +252,52 @@
       "workshop_name": "Il Giardino di Maria",
       "workshop_type": "garden",
       "tagline": "Ogni giardino racconta una storia",
-      "bio": "Ho 72 anni e il mio giardino è la mia vita. Coltivo pomodori, basilico, e limoni. Posso insegnarti tutto quello che so -- ma devi portare i tuoi guanti!",
+      "bio": "Ho 72 anni e il mio giardino \u00e8 la mia vita. Coltivo pomodori, basilico, e limoni. Posso insegnarti tutto quello che so -- ma devi portare i tuoi guanti!",
       "telegram_username": "maria_garden",
       "city": "Trapani",
       "country_code": "IT",
       "latitude": 38.025,
-      "longitude": 12.530,
+      "longitude": 12.53,
       "badge_tier": "pillar",
       "languages": [
-        {"language_code": "it", "proficiency": "native"},
-        {"language_code": "en", "proficiency": "A1"}
+        {
+          "language_code": "it",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "en",
+          "proficiency": "A1"
+        }
       ],
       "skills": [
-        {"skill_name": "Vegetable Gardening", "category": "gardening", "self_rating": 5, "years_experience": 50},
-        {"skill_name": "Herb Growing", "category": "gardening", "self_rating": 5, "years_experience": 50},
-        {"skill_name": "Canning & Preserving", "category": "food", "self_rating": 4, "years_experience": 40}
+        {
+          "skill_name": "Vegetable Gardening",
+          "category": "gardening",
+          "self_rating": 5,
+          "years_experience": 50
+        },
+        {
+          "skill_name": "Herb Growing",
+          "category": "gardening",
+          "self_rating": 5,
+          "years_experience": 50
+        },
+        {
+          "skill_name": "Canning & Preserving",
+          "category": "food",
+          "self_rating": 4,
+          "years_experience": 40
+        }
       ],
       "social_links": [],
-      "points": {"total_points": 510, "rentals_completed": 20, "reviews_given": 18, "reviews_received": 25, "items_listed": 15, "helpful_flags": 20}
+      "points": {
+        "total_points": 510,
+        "rentals_completed": 20,
+        "reviews_given": 18,
+        "reviews_received": 25,
+        "items_listed": 15,
+        "helpful_flags": 20
+      }
     },
     {
       "slug": "marcos-workshop",
@@ -151,23 +311,62 @@
       "city": "Trapani",
       "country_code": "IT",
       "latitude": 38.015,
-      "longitude": 12.550,
+      "longitude": 12.55,
       "badge_tier": "legend",
       "languages": [
-        {"language_code": "it", "proficiency": "native"},
-        {"language_code": "en", "proficiency": "B2"},
-        {"language_code": "de", "proficiency": "A1"}
+        {
+          "language_code": "it",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "en",
+          "proficiency": "B2"
+        },
+        {
+          "language_code": "de",
+          "proficiency": "A1"
+        }
       ],
       "skills": [
-        {"skill_name": "Woodworking", "category": "woodworking", "self_rating": 5, "years_experience": 30},
-        {"skill_name": "Furniture Making", "category": "woodworking", "self_rating": 5, "years_experience": 25},
-        {"skill_name": "Wood Turning", "category": "woodworking", "self_rating": 5, "years_experience": 20}
+        {
+          "skill_name": "Woodworking",
+          "category": "woodworking",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Furniture Making",
+          "category": "woodworking",
+          "self_rating": 5,
+          "years_experience": 25
+        },
+        {
+          "skill_name": "Wood Turning",
+          "category": "woodworking",
+          "self_rating": 5,
+          "years_experience": 20
+        }
       ],
       "social_links": [
-        {"platform": "youtube", "url": "https://youtube.com/@marcolegno", "label": "Woodworking Videos"},
-        {"platform": "instagram", "url": "https://instagram.com/marcolegno", "label": "Workshop Photos"}
+        {
+          "platform": "youtube",
+          "url": "https://youtube.com/@marcolegno",
+          "label": "Woodworking Videos"
+        },
+        {
+          "platform": "instagram",
+          "url": "https://instagram.com/marcolegno",
+          "label": "Workshop Photos"
+        }
       ],
-      "points": {"total_points": 1050, "rentals_completed": 35, "reviews_given": 25, "reviews_received": 30, "items_listed": 28, "helpful_flags": 15}
+      "points": {
+        "total_points": 1050,
+        "rentals_completed": 35,
+        "reviews_given": 25,
+        "reviews_received": 30,
+        "items_listed": 28,
+        "helpful_flags": 15
+      }
     },
     {
       "slug": "jakes-electronics",
@@ -180,22 +379,54 @@
       "telegram_username": "jake_tech",
       "city": "Trapani",
       "country_code": "IT",
-      "latitude": 38.020,
+      "latitude": 38.02,
       "longitude": 12.535,
       "badge_tier": "active",
       "languages": [
-        {"language_code": "en", "proficiency": "native"},
-        {"language_code": "it", "proficiency": "B1"}
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "it",
+          "proficiency": "B1"
+        }
       ],
       "skills": [
-        {"skill_name": "Electronics Repair", "category": "technology", "self_rating": 5, "years_experience": 12},
-        {"skill_name": "3D Printing", "category": "technology", "self_rating": 4, "years_experience": 5},
-        {"skill_name": "Soldering", "category": "technology", "self_rating": 5, "years_experience": 10}
+        {
+          "skill_name": "Electronics Repair",
+          "category": "technology",
+          "self_rating": 5,
+          "years_experience": 12
+        },
+        {
+          "skill_name": "3D Printing",
+          "category": "technology",
+          "self_rating": 4,
+          "years_experience": 5
+        },
+        {
+          "skill_name": "Soldering",
+          "category": "technology",
+          "self_rating": 5,
+          "years_experience": 10
+        }
       ],
       "social_links": [
-        {"platform": "youtube", "url": "https://youtube.com/@jakefixesit", "label": "Repair Tutorials"}
+        {
+          "platform": "youtube",
+          "url": "https://youtube.com/@jakefixesit",
+          "label": "Repair Tutorials"
+        }
       ],
-      "points": {"total_points": 120, "rentals_completed": 6, "reviews_given": 4, "reviews_received": 8, "items_listed": 12, "helpful_flags": 2}
+      "points": {
+        "total_points": 120,
+        "rentals_completed": 6,
+        "reviews_given": 4,
+        "reviews_received": 8,
+        "items_listed": 12,
+        "helpful_flags": 2
+      }
     },
     {
       "slug": "lunas-studio",
@@ -212,19 +443,54 @@
       "longitude": 12.542,
       "badge_tier": "trusted",
       "languages": [
-        {"language_code": "en", "proficiency": "C2"},
-        {"language_code": "zh", "proficiency": "native"},
-        {"language_code": "it", "proficiency": "B2"}
+        {
+          "language_code": "en",
+          "proficiency": "C2"
+        },
+        {
+          "language_code": "zh",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "it",
+          "proficiency": "B2"
+        }
       ],
       "skills": [
-        {"skill_name": "Watercolor Painting", "category": "art", "self_rating": 5, "years_experience": 15},
-        {"skill_name": "Pottery", "category": "crafts", "self_rating": 4, "years_experience": 8},
-        {"skill_name": "Art Teaching", "category": "teaching", "self_rating": 4, "years_experience": 10}
+        {
+          "skill_name": "Watercolor Painting",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 15
+        },
+        {
+          "skill_name": "Pottery",
+          "category": "crafts",
+          "self_rating": 4,
+          "years_experience": 8
+        },
+        {
+          "skill_name": "Art Teaching",
+          "category": "teaching",
+          "self_rating": 4,
+          "years_experience": 10
+        }
       ],
       "social_links": [
-        {"platform": "instagram", "url": "https://instagram.com/lunasart", "label": "Art Portfolio"}
+        {
+          "platform": "instagram",
+          "url": "https://instagram.com/lunasart",
+          "label": "Art Portfolio"
+        }
       ],
-      "points": {"total_points": 250, "rentals_completed": 10, "reviews_given": 12, "reviews_received": 14, "items_listed": 8, "helpful_flags": 8}
+      "points": {
+        "total_points": 250,
+        "rentals_completed": 10,
+        "reviews_given": 12,
+        "reviews_received": 14,
+        "items_listed": 8,
+        "helpful_flags": 8
+      }
     },
     {
       "slug": "rosas-home",
@@ -233,7 +499,7 @@
       "workshop_name": "Casa Rosa",
       "workshop_type": "kitchen",
       "tagline": "La nonna sa sempre cosa fare",
-      "bio": "Ho 84 anni. Non uso il computer. Mio nipote Marco ha fatto questo profilo per me. Ma so fare la pasta migliore di Trapani e ho una macchina per la pasta che chiunque può usare.",
+      "bio": "Ho 84 anni. Non uso il computer. Mio nipote Marco ha fatto questo profilo per me. Ma so fare la pasta migliore di Trapani e ho una macchina per la pasta che chiunque pu\u00f2 usare.",
       "telegram_username": null,
       "city": "Trapani",
       "country_code": "IT",
@@ -241,14 +507,34 @@
       "longitude": 12.549,
       "badge_tier": "pillar",
       "languages": [
-        {"language_code": "it", "proficiency": "native"}
+        {
+          "language_code": "it",
+          "proficiency": "native"
+        }
       ],
       "skills": [
-        {"skill_name": "Pasta Making", "category": "cooking", "self_rating": 5, "years_experience": 65},
-        {"skill_name": "Sicilian Cooking", "category": "cooking", "self_rating": 5, "years_experience": 65}
+        {
+          "skill_name": "Pasta Making",
+          "category": "cooking",
+          "self_rating": 5,
+          "years_experience": 65
+        },
+        {
+          "skill_name": "Sicilian Cooking",
+          "category": "cooking",
+          "self_rating": 5,
+          "years_experience": 65
+        }
       ],
       "social_links": [],
-      "points": {"total_points": 680, "rentals_completed": 0, "reviews_given": 0, "reviews_received": 35, "items_listed": 3, "helpful_flags": 45}
+      "points": {
+        "total_points": 680,
+        "rentals_completed": 0,
+        "reviews_given": 0,
+        "reviews_received": 35,
+        "items_listed": 3,
+        "helpful_flags": 45
+      }
     },
     {
       "slug": "daves-sports",
@@ -261,19 +547,42 @@
       "telegram_username": "dave_sports",
       "city": "Trapani",
       "country_code": "IT",
-      "latitude": 38.030,
+      "latitude": 38.03,
       "longitude": 12.525,
       "badge_tier": "active",
       "languages": [
-        {"language_code": "en", "proficiency": "native"},
-        {"language_code": "it", "proficiency": "A2"}
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "it",
+          "proficiency": "A2"
+        }
       ],
       "skills": [
-        {"skill_name": "Bike Repair", "category": "sports", "self_rating": 4, "years_experience": 20},
-        {"skill_name": "Surfing Instruction", "category": "sports", "self_rating": 3, "years_experience": 10}
+        {
+          "skill_name": "Bike Repair",
+          "category": "sports",
+          "self_rating": 4,
+          "years_experience": 20
+        },
+        {
+          "skill_name": "Surfing Instruction",
+          "category": "sports",
+          "self_rating": 3,
+          "years_experience": 10
+        }
       ],
       "social_links": [],
-      "points": {"total_points": 95, "rentals_completed": 8, "reviews_given": 3, "reviews_received": 6, "items_listed": 15, "helpful_flags": 1}
+      "points": {
+        "total_points": 95,
+        "rentals_completed": 8,
+        "reviews_given": 3,
+        "reviews_received": 6,
+        "items_listed": 15,
+        "helpful_flags": 1
+      }
     },
     {
       "slug": "johns-cleaning",
@@ -290,16 +599,42 @@
       "longitude": 12.538,
       "badge_tier": "newcomer",
       "languages": [
-        {"language_code": "en", "proficiency": "C1"},
-        {"language_code": "it", "proficiency": "B2"},
-        {"language_code": "mt", "proficiency": "native"}
+        {
+          "language_code": "en",
+          "proficiency": "C1"
+        },
+        {
+          "language_code": "it",
+          "proficiency": "B2"
+        },
+        {
+          "language_code": "mt",
+          "proficiency": "native"
+        }
       ],
       "skills": [
-        {"skill_name": "Industrial Cleaning", "category": "cleaning", "self_rating": 5, "years_experience": 15},
-        {"skill_name": "Pressure Washing", "category": "cleaning", "self_rating": 5, "years_experience": 10}
+        {
+          "skill_name": "Industrial Cleaning",
+          "category": "cleaning",
+          "self_rating": 5,
+          "years_experience": 15
+        },
+        {
+          "skill_name": "Pressure Washing",
+          "category": "cleaning",
+          "self_rating": 5,
+          "years_experience": 10
+        }
       ],
       "social_links": [],
-      "points": {"total_points": 25, "rentals_completed": 2, "reviews_given": 1, "reviews_received": 2, "items_listed": 6, "helpful_flags": 0}
+      "points": {
+        "total_points": 25,
+        "rentals_completed": 2,
+        "reviews_given": 1,
+        "reviews_received": 2,
+        "items_listed": 6,
+        "helpful_flags": 0
+      }
     }
   ],
   "items": [
@@ -315,11 +650,34 @@
       "condition": "good",
       "brand": "Various",
       "needs_equipment": "Baking sheets, rolling pin",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/cookie-cutters.svg", "alt_text": "200-piece professional cookie cutter set laid out on a wooden table"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/cookie-cutters.svg",
+          "alt_text": "200-piece professional cookie cutter set laid out on a wooden table"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 5.0, "price_unit": "per_day", "currency": "EUR", "deposit": 20.0, "delivery_available": true, "pickup_only": false, "notes": "I'll include a recipe booklet with every rental. Ship & return within Italy."},
-        {"listing_type": "training", "price": 15.0, "price_unit": "per_hour", "currency": "EUR", "notes": "I'll teach you how to make perfect cookies. 2-hour minimum session."}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 5.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 20.0,
+          "delivery_available": true,
+          "pickup_only": false,
+          "notes": "I'll include a recipe booklet with every rental. Ship & return within Italy."
+        },
+        {
+          "listing_type": "training",
+          "price": 15.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "I'll teach you how to make perfect cookies. 2-hour minimum session."
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.537
     },
     {
       "owner_slug": "sallys-kitchen",
@@ -333,10 +691,25 @@
       "condition": "good",
       "brand": "KitchenAid",
       "model": "Artisan 5KSM175",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/kitchenaid.svg", "alt_text": "Red KitchenAid Artisan stand mixer on kitchen counter"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/kitchenaid.svg",
+          "alt_text": "Red KitchenAid Artisan stand mixer on kitchen counter"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 10.0, "price_unit": "per_day", "currency": "EUR", "deposit": 50.0, "pickup_only": true}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 10.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 50.0,
+          "pickup_only": true
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.538
     },
     {
       "owner_slug": "sallys-kitchen",
@@ -347,10 +720,24 @@
       "item_type": "digital",
       "category": "kitchen",
       "subcategory": "recipes",
-      "media": [{"media_type": "digital_download", "url": "/static/images/seed/recipe-book.svg", "alt_text": "Cover of Sally's Secret Cookie Recipe Collection PDF"}],
+      "media": [
+        {
+          "media_type": "digital_download",
+          "url": "/static/images/seed/recipe-book.svg",
+          "alt_text": "Cover of Sally's Secret Cookie Recipe Collection PDF"
+        }
+      ],
       "listings": [
-        {"listing_type": "sell", "price": 8.0, "price_unit": "flat", "currency": "EUR", "notes": "Instant PDF download. 85 recipes, 120 pages."}
-      ]
+        {
+          "listing_type": "sell",
+          "price": 8.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "Instant PDF download. 85 recipes, 120 pages."
+        }
+      ],
+      "latitude": 38.019,
+      "longitude": 12.536
     },
     {
       "owner_slug": "mikes-garage",
@@ -365,10 +752,26 @@
       "brand": "Bosch Professional",
       "model": "GSR 18V-60",
       "compatible_with": "All Bosch 18V batteries (ProCORE, Compact)",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/bosch-drill.svg", "alt_text": "Bosch professional drill driver set in blue L-BOXX case"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/bosch-drill.svg",
+          "alt_text": "Bosch professional drill driver set in blue L-BOXX case"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 8.0, "price_unit": "per_day", "currency": "EUR", "deposit": 30.0, "max_rental_days": 14, "pickup_only": true}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 8.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 30.0,
+          "max_rental_days": 14,
+          "pickup_only": true
+        }
+      ],
+      "latitude": 38.022,
+      "longitude": 12.545
     },
     {
       "owner_slug": "mikes-garage",
@@ -382,11 +785,32 @@
       "condition": "good",
       "brand": "Torin",
       "needs_equipment": "Flat, level surface. Never use on gravel.",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/floor-jack.svg", "alt_text": "Red 3-ton floor jack with two jack stands"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/floor-jack.svg",
+          "alt_text": "Red 3-ton floor jack with two jack stands"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 12.0, "price_unit": "per_day", "currency": "EUR", "deposit": 30.0, "pickup_only": true},
-        {"listing_type": "service", "price": 25.0, "price_unit": "per_hour", "currency": "EUR", "notes": "I'll do the job for you. Brake pads, oil change, tire rotation. You buy parts, I bring tools and labor."}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 12.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 30.0,
+          "pickup_only": true
+        },
+        {
+          "listing_type": "service",
+          "price": 25.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "I'll do the job for you. Brake pads, oil change, tire rotation. You buy parts, I bring tools and labor."
+        }
+      ],
+      "latitude": 38.023,
+      "longitude": 12.544
     },
     {
       "owner_slug": "mikes-garage",
@@ -400,11 +824,33 @@
       "condition": "good",
       "brand": "Parkside",
       "needs_equipment": "Welding helmet, gloves, welding wire, gas bottle (if MIG)",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/welder.svg", "alt_text": "Parkside MIG 200A welding machine with helmet and gloves"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/welder.svg",
+          "alt_text": "Parkside MIG 200A welding machine with helmet and gloves"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 20.0, "price_unit": "per_day", "currency": "EUR", "deposit": 100.0, "pickup_only": true, "notes": "Proof of welding experience required. Or book a training session first."},
-        {"listing_type": "training", "price": 30.0, "price_unit": "per_hour", "currency": "EUR", "notes": "Intro to MIG welding. 3-hour session. You'll weld a small project by the end."}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 20.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 100.0,
+          "pickup_only": true,
+          "notes": "Proof of welding experience required. Or book a training session first."
+        },
+        {
+          "listing_type": "training",
+          "price": 30.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "Intro to MIG welding. 3-hour session. You'll weld a small project by the end."
+        }
+      ],
+      "latitude": 38.021,
+      "longitude": 12.546
     },
     {
       "owner_slug": "ninos-campers",
@@ -417,11 +863,30 @@
       "subcategory": "camping",
       "condition": "good",
       "brand": "Brunner",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/camping-table.svg", "alt_text": "Folding camping table with four chairs set up outdoors"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/camping-table.svg",
+          "alt_text": "Folding camping table with four chairs set up outdoors"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 5.0, "price_unit": "per_day", "currency": "EUR", "pickup_only": true},
-        {"listing_type": "sell", "price": 45.0, "price_unit": "flat", "currency": "EUR"}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 5.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "pickup_only": true
+        },
+        {
+          "listing_type": "sell",
+          "price": 45.0,
+          "price_unit": "flat",
+          "currency": "EUR"
+        }
+      ],
+      "latitude": 38.077,
+      "longitude": 12.644
     },
     {
       "owner_slug": "marias-garden",
@@ -433,10 +898,24 @@
       "category": "garden",
       "subcategory": "hand_tools",
       "condition": "fair",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/garden-tools.svg", "alt_text": "Set of garden tools including spade rake hoe and shears"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/garden-tools.svg",
+          "alt_text": "Set of garden tools including spade rake hoe and shears"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 3.0, "price_unit": "per_day", "currency": "EUR", "pickup_only": true}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 3.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "pickup_only": true
+        }
+      ],
+      "latitude": 38.076,
+      "longitude": 12.643
     },
     {
       "owner_slug": "marias-garden",
@@ -447,10 +926,24 @@
       "item_type": "service",
       "category": "garden",
       "subcategory": "teaching",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/garden-lesson.svg", "alt_text": "Maria teaching gardening in her vegetable garden"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/garden-lesson.svg",
+          "alt_text": "Maria teaching gardening in her vegetable garden"
+        }
+      ],
       "listings": [
-        {"listing_type": "training", "price": 10.0, "price_unit": "per_hour", "currency": "EUR", "notes": "Minimo 2 ore. Pranzo incluso se restiamo più di 3 ore!"}
-      ]
+        {
+          "listing_type": "training",
+          "price": 10.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "Minimo 2 ore. Pranzo incluso se restiamo pi\u00f9 di 3 ore!"
+        }
+      ],
+      "latitude": 38.025,
+      "longitude": 12.54
     },
     {
       "owner_slug": "marcos-workshop",
@@ -461,11 +954,31 @@
       "item_type": "space",
       "category": "crafts",
       "subcategory": "woodworking",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/wood-lathe.svg", "alt_text": "Professional wood lathe in Marco's workshop"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/wood-lathe.svg",
+          "alt_text": "Professional wood lathe in Marco's workshop"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 15.0, "price_unit": "per_hour", "currency": "EUR", "notes": "Esperienza richiesta. Oppure prenota una lezione prima."},
-        {"listing_type": "training", "price": 25.0, "price_unit": "per_hour", "currency": "EUR", "notes": "Lezione di tornitura del legno. 3 ore minimo. Fai il tuo primo progetto."}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 15.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "Esperienza richiesta. Oppure prenota una lezione prima."
+        },
+        {
+          "listing_type": "training",
+          "price": 25.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "Lezione di tornitura del legno. 3 ore minimo. Fai il tuo primo progetto."
+        }
+      ],
+      "latitude": 38.024,
+      "longitude": 12.539
     },
     {
       "owner_slug": "marcos-workshop",
@@ -480,10 +993,25 @@
       "brand": "Makita",
       "model": "HS7611",
       "needs_equipment": "Occhiali protettivi, guanti, banco da lavoro",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/circular-saw.svg", "alt_text": "Makita circular saw with guide and spare blade"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/circular-saw.svg",
+          "alt_text": "Makita circular saw with guide and spare blade"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 10.0, "price_unit": "per_day", "currency": "EUR", "deposit": 40.0, "pickup_only": true}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 10.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 40.0,
+          "pickup_only": true
+        }
+      ],
+      "latitude": 38.02,
+      "longitude": 12.542
     },
     {
       "owner_slug": "jakes-electronics",
@@ -497,11 +1025,31 @@
       "condition": "like_new",
       "brand": "Creality",
       "model": "Ender 3 V3",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/3d-printer.svg", "alt_text": "Creality Ender 3 V3 3D printer on workbench"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/3d-printer.svg",
+          "alt_text": "Creality Ender 3 V3 3D printer on workbench"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 8.0, "price_unit": "per_hour", "currency": "EUR", "notes": "Filament not included (I sell PLA at EUR 20/kg). I'll help calibrate your first print."},
-        {"listing_type": "commission", "price": null, "price_unit": "negotiable", "currency": "EUR", "notes": "Send me your STL file, I'll quote you. Small prints from EUR 5, large from EUR 20."}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 8.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "Filament not included (I sell PLA at EUR 20/kg). I'll help calibrate your first print."
+        },
+        {
+          "listing_type": "commission",
+          "price": null,
+          "price_unit": "negotiable",
+          "currency": "EUR",
+          "notes": "Send me your STL file, I'll quote you. Small prints from EUR 5, large from EUR 20."
+        }
+      ],
+      "latitude": 38.019,
+      "longitude": 12.543
     },
     {
       "owner_slug": "jakes-electronics",
@@ -512,10 +1060,24 @@
       "item_type": "service",
       "category": "electronics",
       "subcategory": "repair",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/phone-repair.svg", "alt_text": "Phone screen being replaced on Jake's workbench with precision tools"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/phone-repair.svg",
+          "alt_text": "Phone screen being replaced on Jake's workbench with precision tools"
+        }
+      ],
       "listings": [
-        {"listing_type": "service", "price": 20.0, "price_unit": "flat", "currency": "EUR", "notes": "Labor only. Screen cost varies by model (EUR 15-80). I'll tell you exactly which part to order."}
-      ]
+        {
+          "listing_type": "service",
+          "price": 20.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "Labor only. Screen cost varies by model (EUR 15-80). I'll tell you exactly which part to order."
+        }
+      ],
+      "latitude": 38.026,
+      "longitude": 12.541
     },
     {
       "owner_slug": "lunas-studio",
@@ -526,11 +1088,31 @@
       "item_type": "space",
       "category": "crafts",
       "subcategory": "pottery",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/pottery-wheel.svg", "alt_text": "Pottery wheel with clay and finished bowls in Luna's studio"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/pottery-wheel.svg",
+          "alt_text": "Pottery wheel with clay and finished bowls in Luna's studio"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 20.0, "price_unit": "flat", "currency": "EUR", "notes": "2-hour session. Clay included. Firing included. Take home your creation in 1 week."},
-        {"listing_type": "training", "price": 35.0, "price_unit": "flat", "currency": "EUR", "notes": "2-hour guided pottery class. All materials included. Perfect for date nights!"}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 20.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "2-hour session. Clay included. Firing included. Take home your creation in 1 week."
+        },
+        {
+          "listing_type": "training",
+          "price": 35.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "2-hour guided pottery class. All materials included. Perfect for date nights!"
+        }
+      ],
+      "latitude": 38.017,
+      "longitude": 12.535
     },
     {
       "owner_slug": "lunas-studio",
@@ -543,10 +1125,26 @@
       "subcategory": "painting",
       "condition": "good",
       "brand": "Winsor & Newton",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/watercolor-kit.svg", "alt_text": "Winsor and Newton watercolor set with brushes and paper pad"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/watercolor-kit.svg",
+          "alt_text": "Winsor and Newton watercolor set with brushes and paper pad"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 8.0, "price_unit": "per_day", "currency": "EUR", "deposit": 20.0, "delivery_available": true, "pickup_only": false}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 8.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 20.0,
+          "delivery_available": true,
+          "pickup_only": false
+        }
+      ],
+      "latitude": 38.021,
+      "longitude": 12.538
     },
     {
       "owner_slug": "rosas-home",
@@ -559,10 +1157,25 @@
       "subcategory": "appliances",
       "condition": "fair",
       "brand": "Imperia",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/pasta-machine.svg", "alt_text": "Vintage Imperia pasta machine clamped to kitchen table"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/pasta-machine.svg",
+          "alt_text": "Vintage Imperia pasta machine clamped to kitchen table"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 3.0, "price_unit": "per_day", "currency": "EUR", "pickup_only": true, "notes": "Marco vi mostrerà come funziona. Portate la vostra farina e le uova."}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 3.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "pickup_only": true,
+          "notes": "Marco vi mostrer\u00e0 come funziona. Portate la vostra farina e le uova."
+        }
+      ],
+      "latitude": 38.023,
+      "longitude": 12.543
     },
     {
       "owner_slug": "daves-sports",
@@ -577,10 +1190,27 @@
       "brand": "Specialized",
       "model": "Rockhopper Sport 29",
       "needs_equipment": "Helmet included. Bring your own water bottle.",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/mountain-bike.svg", "alt_text": "Red Specialized Rockhopper mountain bike leaning against a stone wall"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/mountain-bike.svg",
+          "alt_text": "Red Specialized Rockhopper mountain bike leaning against a stone wall"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 15.0, "price_unit": "per_day", "currency": "EUR", "deposit": 50.0, "delivery_available": true, "pickup_only": false, "notes": "I deliver within 5km of Trapani center. Helmet and lock included."}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 15.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 50.0,
+          "delivery_available": true,
+          "pickup_only": false,
+          "notes": "I deliver within 5km of Trapani center. Helmet and lock included."
+        }
+      ],
+      "latitude": 38.02,
+      "longitude": 12.54
     },
     {
       "owner_slug": "daves-sports",
@@ -593,10 +1223,25 @@
       "subcategory": "watersports",
       "condition": "good",
       "needs_equipment": "Wetsuit (I have one for rent too). Sunscreen.",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/surfboard.svg", "alt_text": "White and blue funboard surfboard standing on sandy beach"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/surfboard.svg",
+          "alt_text": "White and blue funboard surfboard standing on sandy beach"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 12.0, "price_unit": "per_day", "currency": "EUR", "deposit": 30.0, "pickup_only": true}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 12.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 30.0,
+          "pickup_only": true
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.541
     },
     {
       "owner_slug": "johns-cleaning",
@@ -610,11 +1255,33 @@
       "condition": "good",
       "brand": "Karcher",
       "model": "Puzzi 10/1",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/carpet-cleaner.svg", "alt_text": "Yellow Karcher Puzzi professional carpet cleaner machine"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/carpet-cleaner.svg",
+          "alt_text": "Yellow Karcher Puzzi professional carpet cleaner machine"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 20.0, "price_unit": "per_day", "currency": "EUR", "deposit": 50.0, "pickup_only": true, "notes": "Cleaning solution included for first use. I'll show you how to use it -- 5 minutes."},
-        {"listing_type": "service", "price": 15.0, "price_unit": "per_hour", "currency": "EUR", "notes": "I'll clean your carpets for you. Minimum 2 hours. You'll think they're new."}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 20.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 50.0,
+          "pickup_only": true,
+          "notes": "Cleaning solution included for first use. I'll show you how to use it -- 5 minutes."
+        },
+        {
+          "listing_type": "service",
+          "price": 15.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "I'll clean your carpets for you. Minimum 2 hours. You'll think they're new."
+        }
+      ],
+      "latitude": 38.025,
+      "longitude": 12.538
     },
     {
       "owner_slug": "johns-cleaning",
@@ -629,10 +1296,26 @@
       "brand": "Karcher",
       "model": "K5 Premium",
       "needs_equipment": "Garden hose connection, outdoor power outlet",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/pressure-washer.svg", "alt_text": "Yellow Karcher K5 pressure washer with accessories"}],
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/pressure-washer.svg",
+          "alt_text": "Yellow Karcher K5 pressure washer with accessories"
+        }
+      ],
       "listings": [
-        {"listing_type": "rent", "price": 15.0, "price_unit": "per_day", "currency": "EUR", "deposit": 40.0, "delivery_available": true, "pickup_only": false}
-      ]
+        {
+          "listing_type": "rent",
+          "price": 15.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 40.0,
+          "delivery_available": true,
+          "pickup_only": false
+        }
+      ],
+      "latitude": 38.022,
+      "longitude": 12.542
     }
   ],
   "teams": [

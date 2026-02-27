@@ -2,6 +2,13 @@
 
 {% block title %}{{ item.name }} - {{ t('app.name') }}{% endblock %}
 
+{% block head %}
+{% if item.latitude and item.longitude %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+{% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
@@ -266,13 +273,11 @@
             </div>
             {% endif %}
 
-            <!-- Map placeholder -->
+            <!-- Location map -->
             {% if item.latitude and item.longitude %}
             <div class="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">{{ t('item.location') }}</h3>
-                <div class="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center text-sm text-gray-400">
-                    <p>Map</p>
-                </div>
+                <div id="item-map" class="w-full h-48 rounded-lg z-0"></div>
                 <p class="text-xs text-gray-400 mt-2">{{ t('item.map_note') }}</p>
             </div>
             {% endif %}
@@ -286,4 +291,20 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{% if item.latitude and item.longitude %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var map = L.map('item-map', { scrollWheelZoom: false }).setView([{{ item.latitude }}, {{ item.longitude }}], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+        L.circle([{{ item.latitude }}, {{ item.longitude }}], {
+            radius: 500, color: '#4F46E5', fillColor: '#4F46E5', fillOpacity: 0.15, weight: 2
+        }).addTo(map);
+    });
+</script>
+{% endif %}
 {% endblock %}

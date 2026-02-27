@@ -75,7 +75,11 @@ async def home(request: Request,
 
     result = await db.execute(
         select(BHItem)
-        .options(selectinload(BHItem.media), selectinload(BHItem.owner))
+        .options(
+            selectinload(BHItem.media),
+            selectinload(BHItem.owner),
+            selectinload(BHItem.listings),
+        )
         .join(BHListing, BHItem.id == BHListing.item_id)
         .where(BHListing.status == ListingStatus.ACTIVE)
         .order_by(BHItem.created_at.desc())
@@ -102,7 +106,11 @@ async def browse(request: Request,
     """Browse and search items with filters."""
     query = (
         select(BHItem)
-        .options(selectinload(BHItem.media), selectinload(BHItem.owner).selectinload(BHUser.languages))
+        .options(
+            selectinload(BHItem.media),
+            selectinload(BHItem.owner).selectinload(BHUser.languages),
+            selectinload(BHItem.listings),
+        )
         .join(BHListing, BHItem.id == BHListing.item_id)
         .where(BHListing.status == ListingStatus.ACTIVE)
         .where(BHItem.deleted_at.is_(None))

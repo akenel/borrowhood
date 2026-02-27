@@ -8,8 +8,31 @@
     <!-- Page header -->
     <h1 class="text-2xl font-bold text-gray-900">{{ t('browse.title') }}</h1>
 
+    <!-- Category quick-filters -->
+    <div class="mt-4 flex flex-wrap gap-2">
+        {% set category_icons = {
+            'tools': '&#128295;', 'kitchen': '&#127860;', 'garden': '&#127793;',
+            'electronics': '&#128268;', 'sports': '&#9917;', 'crafts': '&#127912;',
+            'cleaning': '&#129529;', 'vehicles': '&#128663;', 'music': '&#127925;', 'other': '&#128230;'
+        } %}
+        {% for cat in categories %}
+        <a href="/browse?category={{ cat }}"
+           class="inline-flex items-center px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]
+                  {% if selected_category == cat %}bg-indigo-600 text-white{% else %}bg-white text-gray-700 border border-gray-200 hover:bg-indigo-50 hover:border-indigo-200{% endif %}">
+            <span class="mr-1.5">{{ category_icons.get(cat, '&#128230;') }}</span>
+            {{ t('categories.' + cat) }}
+        </a>
+        {% endfor %}
+        {% if selected_category %}
+        <a href="/browse{% if q %}?q={{ q }}{% endif %}"
+           class="inline-flex items-center px-3 py-2 rounded-full text-sm font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors min-h-[36px]">
+            &#10005; {{ t('browse.clear') }}
+        </a>
+        {% endif %}
+    </div>
+
     <!-- Search + Filters (Rule 3: every list has search and filters) -->
-    <div class="mt-6" x-data="{ filtersOpen: false }">
+    <div class="mt-4" x-data="{ filtersOpen: false }">
 
         <!-- Search bar -->
         <form method="GET" action="/browse" class="flex gap-2">
@@ -98,25 +121,63 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for item in items %}
             <a href="/items/{{ item.slug }}"
-               class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group">
-                {% if item.media %}
-                <img src="{{ item.media[0].url }}" alt="{{ item.media[0].alt_text }}"
-                     class="w-full h-48 object-cover" loading="lazy">
-                {% else %}
-                <div class="w-full h-48 bg-gray-100 flex items-center justify-center">
-                    <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
+               class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group flex flex-col">
+                <div class="relative">
+                    {% if item.media %}
+                    <img src="{{ item.media[0].url }}" alt="{{ item.media[0].alt_text }}"
+                         class="w-full h-48 object-cover" loading="lazy">
+                    {% else %}
+                    <div class="w-full h-48 bg-gray-100 flex items-center justify-center">
+                        <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    {% endif %}
+                    <!-- Listing type badges -->
+                    {% if item.listings %}
+                    <div class="absolute top-2 left-2 flex flex-wrap gap-1">
+                        {% set type_colors = {
+                            'rent': 'bg-blue-600', 'sell': 'bg-green-600', 'auction': 'bg-amber-600',
+                            'commission': 'bg-purple-600', 'offer': 'bg-pink-600', 'service': 'bg-teal-600',
+                            'training': 'bg-cyan-600'
+                        } %}
+                        {% for listing in item.listings if listing.status.value == 'active' %}
+                        <span class="text-xs px-2 py-0.5 {{ type_colors.get(listing.listing_type.value, 'bg-gray-600') }} text-white rounded-full font-medium shadow-sm">
+                            {{ t('listing_types.' + listing.listing_type.value) }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-                <div class="p-4">
+                <div class="p-4 flex-1 flex flex-col">
                     <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ item.name }}</h3>
-                    <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ item.description or t('browse.no_description') }}</p>
+                    <p class="text-sm text-gray-500 mt-1 line-clamp-2 flex-1">{{ item.description or t('browse.no_description') }}</p>
+
+                    <!-- Price -->
+                    {% if item.listings %}
+                    {% set active_listing = item.listings | selectattr('status.value', 'equalto', 'active') | first %}
+                    {% if active_listing and active_listing.price %}
+                    <div class="mt-2">
+                        <span class="text-lg font-bold text-gray-900">&euro;{{ "%.0f" | format(active_listing.price) }}</span>
+                        {% if active_listing.price_unit %}
+                        <span class="text-sm text-gray-500">{{ t('common.' + active_listing.price_unit) }}</span>
+                        {% endif %}
+                        {% if active_listing.deposit %}
+                        <span class="text-xs text-gray-400 ml-1">(+&euro;{{ "%.0f" | format(active_listing.deposit) }} {{ t('item.deposit') }})</span>
+                        {% endif %}
+                    </div>
+                    {% elif active_listing and active_listing.listing_type.value == 'offer' %}
+                    <div class="mt-2">
+                        <span class="text-lg font-bold text-green-600">{{ t('common.free') }}</span>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+
                     <div class="mt-3 flex items-center justify-between">
                         <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">{{ t('categories.' + item.category) }}</span>
                         {% if item.owner %}
                         <div class="flex items-center space-x-2">
-                            <!-- CEFR language badges -->
+                            <span class="text-xs text-gray-500">{{ item.owner.display_name }}</span>
                             {% for ulang in item.owner.languages[:2] %}
                             <span class="text-xs px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded font-medium">
                                 {{ ulang.language_code | upper }} {{ ulang.proficiency.value }}

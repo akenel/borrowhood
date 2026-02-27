@@ -87,21 +87,48 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for item in featured_items %}
             <a href="/items/{{ item.slug }}"
-               class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group">
-                {% if item.media %}
-                <img src="{{ item.media[0].url }}" alt="{{ item.media[0].alt_text }}"
-                     class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                     loading="lazy">
-                {% else %}
-                <div class="w-full h-48 bg-gray-100 flex items-center justify-center">
-                    <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
+               class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group flex flex-col">
+                <div class="relative overflow-hidden">
+                    {% if item.media %}
+                    <img src="{{ item.media[0].url }}" alt="{{ item.media[0].alt_text }}"
+                         class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                         loading="lazy">
+                    {% else %}
+                    <div class="w-full h-48 bg-gray-100 flex items-center justify-center">
+                        <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    {% endif %}
+                    {% if item.listings %}
+                    <div class="absolute top-2 left-2 flex flex-wrap gap-1">
+                        {% set type_colors = {
+                            'rent': 'bg-blue-600', 'sell': 'bg-green-600', 'auction': 'bg-amber-600',
+                            'commission': 'bg-purple-600', 'offer': 'bg-pink-600', 'service': 'bg-teal-600',
+                            'training': 'bg-cyan-600'
+                        } %}
+                        {% for listing in item.listings if listing.status.value == 'active' %}
+                        <span class="text-xs px-2 py-0.5 {{ type_colors.get(listing.listing_type.value, 'bg-gray-600') }} text-white rounded-full font-medium shadow-sm">
+                            {{ t('listing_types.' + listing.listing_type.value) }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-                <div class="p-4">
+                <div class="p-4 flex-1 flex flex-col">
                     <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ item.name }}</h3>
-                    <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ item.description or '' }}</p>
+                    <p class="text-sm text-gray-500 mt-1 line-clamp-2 flex-1">{{ item.description or '' }}</p>
+                    {% if item.listings %}
+                    {% set active_listing = item.listings | selectattr('status.value', 'equalto', 'active') | first %}
+                    {% if active_listing and active_listing.price %}
+                    <div class="mt-2">
+                        <span class="text-lg font-bold text-gray-900">&euro;{{ "%.0f" | format(active_listing.price) }}</span>
+                        {% if active_listing.price_unit %}
+                        <span class="text-sm text-gray-500">{{ t('common.' + active_listing.price_unit) }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% endif %}
                     <div class="mt-3 flex items-center justify-between">
                         <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">{{ t('categories.' + item.category) }}</span>
                         {% if item.owner %}

@@ -164,7 +164,8 @@
     "commission": "Commissione",
     "offer": "Fai un'Offerta",
     "service": "Servizio",
-    "training": "Formazione"
+    "training": "Formazione",
+    "auction": "Asta"
   },
   "item_types": {
     "physical": "Fisico",
