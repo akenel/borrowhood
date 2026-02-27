@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: borrowhood
+          POSTGRES_PASSWORD: borrowhood_pass
+          POSTGRES_DB: borrowhood
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      BH_DATABASE_URL: postgresql+asyncpg://borrowhood:borrowhood_pass@localhost:5432/borrowhood
+      BH_DEBUG: "true"
+      BH_SECRET_KEY: ci-test-key
+      BH_KC_URL: https://keycloak.example.com
+      BH_KC_REALM: borrowhood
+      BH_KC_CLIENT_ID: borrowhood-web
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Seed database
+        run: python -c "
+          import asyncio
+          from src.main import app
+          from src.database import create_tables, async_session
+          from src.services.seeding import seed_database
+          async def setup():
+              await create_tables()
+              async with async_session() as db:
+                  await seed_database(db)
+          asyncio.run(setup())
+          "
+
+      - name: Run tests
+        run: python -m pytest tests/ -v --tb=short
