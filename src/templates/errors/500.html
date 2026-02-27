@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Error - BorrowHood{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-24 text-center">
+    <p class="text-6xl font-bold text-red-600">500</p>
+    <h1 class="mt-4 text-2xl font-bold text-gray-900">Something went wrong</h1>
+    <p class="mt-2 text-gray-500">We're working on it. Please try again in a moment.</p>
+    <div class="mt-8">
+        <a href="/"
+           class="inline-flex px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors min-h-[44px]">
+            Go Home
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,150 @@
+{
+  "app": {
+    "name": "BorrowHood",
+    "tagline": "Noleggia. Presta. Condividi. Insegna.",
+    "description": "La piattaforma di noleggio del tuo quartiere. Senza commissioni. Open source."
+  },
+  "nav": {
+    "home": "Home",
+    "browse": "Esplora",
+    "my_workshop": "Il Mio Laboratorio",
+    "messages": "Messaggi",
+    "login": "Accedi",
+    "logout": "Esci",
+    "profile": "Profilo",
+    "settings": "Impostazioni"
+  },
+  "home": {
+    "hero_title": "Ogni Garage Diventa un Negozio di Noleggio",
+    "hero_subtitle": "Noleggia attrezzi, condividi competenze, costruisci comunità. Senza commissioni.",
+    "cta_browse": "Esplora Oggetti",
+    "cta_list": "Pubblica i Tuoi Oggetti",
+    "stats_listings": "Annunci Attivi",
+    "stats_members": "Membri",
+    "featured_title": "Aggiunti di Recente",
+    "how_it_works": "Come Funziona",
+    "step_1_title": "Pubblica i Tuoi Oggetti",
+    "step_1_desc": "Attrezzi, utensili da cucina, attrezzature -- tutto ciò che prende polvere.",
+    "step_2_title": "Stabilisci le Tue Condizioni",
+    "step_2_desc": "Noleggia, vendi, fai un'offerta o scambia servizi.",
+    "step_3_title": "Connettiti",
+    "step_3_desc": "Trova vicini che hanno bisogno di ciò che hai. Costruisci relazioni."
+  },
+  "browse": {
+    "title": "Esplora Oggetti",
+    "search_placeholder": "Cerca attrezzi, servizi, spazi...",
+    "filters": "Filtri",
+    "category": "Categoria",
+    "type": "Tipo",
+    "language": "Il proprietario parla",
+    "sort": "Ordina per",
+    "sort_newest": "Più recenti",
+    "sort_oldest": "Più vecchi",
+    "sort_closest": "Più vicini",
+    "sort_name": "Nome (A-Z)",
+    "no_results": "Nessun oggetto trovato. Prova ad ampliare la ricerca.",
+    "clear_filters": "Cancella Filtri",
+    "all_categories": "Tutte le Categorie",
+    "all_types": "Tutti i Tipi"
+  },
+  "item": {
+    "details": "Dettagli",
+    "condition": "Condizione",
+    "category": "Categoria",
+    "type": "Tipo",
+    "listed_by": "Pubblicato da",
+    "languages": "Parla",
+    "location": "Posizione",
+    "rent_this": "Noleggia Questo Oggetto",
+    "contact_owner": "Contatta il Proprietario",
+    "needs_equipment": "Attrezzatura Necessaria",
+    "compatible_with": "Compatibile Con",
+    "report": "Segnala Questo Oggetto"
+  },
+  "rental": {
+    "request_title": "Richiesta di Noleggio",
+    "start_date": "Data di Ritiro",
+    "end_date": "Data di Restituzione",
+    "message": "Messaggio al Proprietario",
+    "message_placeholder": "Ciao! Vorrei noleggiare questo per...",
+    "submit": "Invia Richiesta",
+    "status": {
+      "pending": "In Attesa",
+      "approved": "Approvato",
+      "declined": "Rifiutato",
+      "picked_up": "Ritirato",
+      "returned": "Restituito",
+      "completed": "Completato",
+      "cancelled": "Annullato",
+      "disputed": "Contestato"
+    }
+  },
+  "workshop": {
+    "items": "Oggetti",
+    "reviews": "Recensioni",
+    "team": "Squadra",
+    "skills": "Competenze",
+    "languages": "Lingue",
+    "member_since": "Membro da",
+    "no_items": "Nessun oggetto pubblicato.",
+    "edit_profile": "Modifica Profilo"
+  },
+  "review": {
+    "leave_review": "Lascia una Recensione",
+    "rating": "Valutazione",
+    "title": "Titolo",
+    "body": "La Tua Recensione",
+    "submit": "Invia Recensione"
+  },
+  "common": {
+    "save": "Salva",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "back": "Indietro",
+    "loading": "Caricamento...",
+    "error": "Qualcosa è andato storto. Riprova.",
+    "success": "Successo!",
+    "confirm_delete": "Sei sicuro di voler eliminare questo?",
+    "per_day": "al giorno",
+    "per_hour": "all'ora",
+    "flat": "tariffa fissa",
+    "negotiable": "trattabile",
+    "free": "Gratis"
+  },
+  "categories": {
+    "tools": "Attrezzi",
+    "kitchen": "Cucina",
+    "garden": "Giardino",
+    "electronics": "Elettronica",
+    "sports": "Sport",
+    "music": "Musica",
+    "vehicles": "Veicoli",
+    "cleaning": "Pulizia",
+    "crafts": "Artigianato",
+    "other": "Altro"
+  },
+  "badges": {
+    "newcomer": "Nuovo Arrivato",
+    "active": "Attivo",
+    "trusted": "Fidato",
+    "pillar": "Pilastro",
+    "legend": "Leggenda"
+  },
+  "cefr": {
+    "A1": "Principiante",
+    "A2": "Elementare",
+    "B1": "Intermedio",
+    "B2": "Intermedio Superiore",
+    "C1": "Avanzato",
+    "C2": "Competente",
+    "native": "Madrelingua"
+  },
+  "footer": {
+    "tagline": "Libero come la libertà. Open source. Nessuna commissione. Per sempre.",
+    "github": "GitHub",
+    "about": "Chi Siamo",
+    "privacy": "Privacy",
+    "terms": "Termini"
+  }
+}

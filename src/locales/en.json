@@ -1,0 +1,150 @@
+{
+  "app": {
+    "name": "BorrowHood",
+    "tagline": "Rent it. Lend it. Share it. Teach it.",
+    "description": "Your neighborhood rental platform. No fees. Open source."
+  },
+  "nav": {
+    "home": "Home",
+    "browse": "Browse",
+    "my_workshop": "My Workshop",
+    "messages": "Messages",
+    "login": "Log In",
+    "logout": "Log Out",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "home": {
+    "hero_title": "Every Garage Becomes a Rental Shop",
+    "hero_subtitle": "Rent tools, share skills, build community. No fees. No middlemen.",
+    "cta_browse": "Browse Items",
+    "cta_list": "List Your Stuff",
+    "stats_listings": "Active Listings",
+    "stats_members": "Members",
+    "featured_title": "Recently Listed",
+    "how_it_works": "How It Works",
+    "step_1_title": "List Your Stuff",
+    "step_1_desc": "Tools, kitchen gear, equipment -- anything collecting dust.",
+    "step_2_title": "Set Your Terms",
+    "step_2_desc": "Rent, sell, make an offer, or trade services.",
+    "step_3_title": "Connect",
+    "step_3_desc": "Find neighbors who need what you have. Build relationships."
+  },
+  "browse": {
+    "title": "Browse Items",
+    "search_placeholder": "Search tools, services, spaces...",
+    "filters": "Filters",
+    "category": "Category",
+    "type": "Type",
+    "language": "Owner speaks",
+    "sort": "Sort by",
+    "sort_newest": "Newest",
+    "sort_oldest": "Oldest",
+    "sort_closest": "Closest",
+    "sort_name": "Name (A-Z)",
+    "no_results": "No items found. Try broadening your search.",
+    "clear_filters": "Clear Filters",
+    "all_categories": "All Categories",
+    "all_types": "All Types"
+  },
+  "item": {
+    "details": "Details",
+    "condition": "Condition",
+    "category": "Category",
+    "type": "Type",
+    "listed_by": "Listed by",
+    "languages": "Speaks",
+    "location": "Location",
+    "rent_this": "Rent This Item",
+    "contact_owner": "Contact Owner",
+    "needs_equipment": "Required Equipment",
+    "compatible_with": "Compatible With",
+    "report": "Report This Item"
+  },
+  "rental": {
+    "request_title": "Rental Request",
+    "start_date": "Pickup Date",
+    "end_date": "Return Date",
+    "message": "Message to Owner",
+    "message_placeholder": "Hi! I'd like to rent this for...",
+    "submit": "Send Request",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "declined": "Declined",
+      "picked_up": "Picked Up",
+      "returned": "Returned",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "disputed": "Disputed"
+    }
+  },
+  "workshop": {
+    "items": "Items",
+    "reviews": "Reviews",
+    "team": "Team",
+    "skills": "Skills",
+    "languages": "Languages",
+    "member_since": "Member since",
+    "no_items": "No items listed yet.",
+    "edit_profile": "Edit Profile"
+  },
+  "review": {
+    "leave_review": "Leave a Review",
+    "rating": "Rating",
+    "title": "Title",
+    "body": "Your Review",
+    "submit": "Submit Review"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "loading": "Loading...",
+    "error": "Something went wrong. Please try again.",
+    "success": "Success!",
+    "confirm_delete": "Are you sure you want to delete this?",
+    "per_day": "per day",
+    "per_hour": "per hour",
+    "flat": "flat rate",
+    "negotiable": "negotiable",
+    "free": "Free"
+  },
+  "categories": {
+    "tools": "Tools",
+    "kitchen": "Kitchen",
+    "garden": "Garden",
+    "electronics": "Electronics",
+    "sports": "Sports",
+    "music": "Music",
+    "vehicles": "Vehicles",
+    "cleaning": "Cleaning",
+    "crafts": "Crafts",
+    "other": "Other"
+  },
+  "badges": {
+    "newcomer": "Newcomer",
+    "active": "Active",
+    "trusted": "Trusted",
+    "pillar": "Pillar",
+    "legend": "Legend"
+  },
+  "cefr": {
+    "A1": "Beginner",
+    "A2": "Elementary",
+    "B1": "Intermediate",
+    "B2": "Upper Intermediate",
+    "C1": "Advanced",
+    "C2": "Proficient",
+    "native": "Native"
+  },
+  "footer": {
+    "tagline": "Free as in freedom. Open source. No platform fees. Forever.",
+    "github": "GitHub",
+    "about": "About",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  }
+}

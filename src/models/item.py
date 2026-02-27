@@ -1,0 +1,94 @@
+"""Item and ItemMedia models.
+
+Items are the things people list: tools, kitchen gear, equipment,
+digital goods, services, spaces, and made-to-order products.
+"""
+
+import enum
+import uuid
+from typing import List, Optional
+
+from sqlalchemy import Enum, Float, ForeignKey, Integer, String, Text
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from src.database import Base, BHBase
+
+
+class ItemType(str, enum.Enum):
+    PHYSICAL = "physical"           # Tools, equipment, kitchen gear
+    DIGITAL = "digital"             # PDFs, templates, recipes
+    SERVICE = "service"             # "I'll deliver it", "I'll teach you"
+    SPACE = "space"                 # Workshop, kitchen, garage rental
+    MADE_TO_ORDER = "made_to_order" # Custom items (Sally's cookies)
+
+
+class ItemCondition(str, enum.Enum):
+    NEW = "new"
+    LIKE_NEW = "like_new"
+    GOOD = "good"
+    FAIR = "fair"
+    WORN = "worn"
+
+
+class MediaType(str, enum.Enum):
+    PHOTO = "photo"
+    VIDEO_EMBED = "video_embed"     # YouTube URL
+    DIGITAL_DOWNLOAD = "digital_download"
+
+
+class BHItem(BHBase, Base):
+    """An item that can be listed for rent, sale, or service."""
+
+    __tablename__ = "bh_item"
+
+    # Owner
+    owner_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_user.id"), nullable=False, index=True
+    )
+
+    # Identity
+    name: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
+    slug: Mapped[str] = mapped_column(String(220), unique=True, nullable=False, index=True)
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    content_language: Mapped[str] = mapped_column(String(5), default="en")  # Language of the description
+
+    # Classification
+    item_type: Mapped[ItemType] = mapped_column(Enum(ItemType), nullable=False, index=True)
+    category: Mapped[str] = mapped_column(String(50), nullable=False, index=True)  # "tools", "kitchen", "garden"
+    subcategory: Mapped[Optional[str]] = mapped_column(String(50))
+
+    # Physical item attributes
+    condition: Mapped[Optional[ItemCondition]] = mapped_column(Enum(ItemCondition))
+    brand: Mapped[Optional[str]] = mapped_column(String(100))
+    model: Mapped[Optional[str]] = mapped_column(String(100))
+
+    # Location (inherits from owner if not set)
+    latitude: Mapped[Optional[float]] = mapped_column(Float)
+    longitude: Mapped[Optional[float]] = mapped_column(Float)
+
+    # Relationships & compatibility
+    needs_equipment: Mapped[Optional[str]] = mapped_column(Text)  # "Requires safety goggles, hearing protection"
+    compatible_with: Mapped[Optional[str]] = mapped_column(Text)  # "Works with Bosch 18V batteries"
+
+    # Relationships
+    owner: Mapped["BHUser"] = relationship(back_populates="items")
+    media: Mapped[List["BHItemMedia"]] = relationship(back_populates="item", cascade="all, delete-orphan")
+    listings: Mapped[List["BHListing"]] = relationship(back_populates="item")
+
+
+class BHItemMedia(BHBase, Base):
+    """Photos, video embeds, and digital downloads for items."""
+
+    __tablename__ = "bh_item_media"
+
+    item_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_item.id"), nullable=False, index=True
+    )
+    media_type: Mapped[MediaType] = mapped_column(Enum(MediaType), nullable=False)
+    url: Mapped[str] = mapped_column(String(500), nullable=False)
+    thumbnail_url: Mapped[Optional[str]] = mapped_column(String(500))
+    alt_text: Mapped[str] = mapped_column(String(200), nullable=False)  # Required -- accessibility rule
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
+
+    item: Mapped["BHItem"] = relationship(back_populates="media")
