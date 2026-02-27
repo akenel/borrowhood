@@ -254,3 +254,36 @@ async def test_dashboard_has_tabs(client):
     """Dashboard should have item and rental tabs."""
     resp = await client.get("/dashboard")
     assert "My Items" in resp.text or "My Dashboard" in resp.text
+
+
+# --- Terms Page ---
+
+@pytest.mark.asyncio
+async def test_terms_returns_200(client):
+    """Terms page should return 200."""
+    resp = await client.get("/terms")
+    assert resp.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_terms_has_sections(client):
+    """Terms page should have all 12 sections."""
+    resp = await client.get("/terms")
+    assert "What BorrowHood Is" in resp.text
+    assert "Community Code of Conduct" in resp.text
+    assert "Prohibited Content" in resp.text
+    assert "Privacy" in resp.text
+
+
+@pytest.mark.asyncio
+async def test_terms_i18n_it(client):
+    """Terms page in Italian should use Italian text."""
+    resp = await client.get("/terms?lang=it")
+    assert "Codice di Condotta della Comunità" in resp.text
+
+
+@pytest.mark.asyncio
+async def test_terms_has_acceptance(client):
+    """Terms page should have the acceptance statement."""
+    resp = await client.get("/terms")
+    assert "By creating an account" in resp.text

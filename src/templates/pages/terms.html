@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('terms.title') }} - {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Breadcrumb -->
+    <nav class="text-sm text-gray-500 mb-6">
+        <a href="/" class="hover:text-indigo-600">{{ t('nav.home') }}</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-900">{{ t('terms.title') }}</span>
+    </nav>
+
+    <div class="bg-white rounded-lg border border-gray-200 p-6 sm:p-10">
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ t('terms.title') }}</h1>
+        <p class="text-sm text-gray-500 mb-8">{{ t('terms.last_updated') }}: February 27, 2026</p>
+
+        <div class="prose prose-gray max-w-none space-y-8">
+
+            <!-- Section 1 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900">{{ t('terms.section_1_title') }}</h2>
+                <p class="mt-2 text-gray-700 leading-relaxed">{{ t('terms.section_1_text') }}</p>
+            </section>
+
+            <!-- Section 2 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900">{{ t('terms.section_2_title') }}</h2>
+                <p class="mt-2 text-gray-700 leading-relaxed">{{ t('terms.section_2_text') }}</p>
+            </section>
+
+            <!-- Section 3 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900">{{ t('terms.section_3_title') }}</h2>
+                <p class="mt-2 text-gray-700 leading-relaxed">{{ t('terms.section_3_text') }}</p>
+            </section>
+
+            <!-- Section 4 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900">{{ t('terms.section_4_title') }}</h2>
+                <p class="mt-2 text-gray-700 leading-relaxed">{{ t('terms.section_4_text') }}</p>
+            </section>
+
+            <!-- Section 5 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900">{{ t('terms.section_5_title') }}</h2>
+                <p class="mt-2 text-gray-700 leading-relaxed">{{ t('terms.section_5_text') }}</p>
+            </section>
+
+            <!-- Section 6 - Prohibited -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900">{{ t('terms.section_6_title') }}</h2>
+                <ul class="mt-2 list-disc list-inside text-gray-700 space-y-1">
+                    {% for item in t('terms.section_6_items').split(';') %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <!-- Section 7 - Code of Conduct -->
+            <section class="bg-indigo-50 rounded-lg p-6 border border-indigo-100">
+                <h2 class="text-lg font-semibold text-indigo-900">{{ t('terms.section_7_title') }}</h2>
+                <p class="mt-2 text-indigo-800">{{ t('terms.section_7_text') }}</p>
+                <ul class="mt-3 list-disc list-inside text-indigo-700 space-y-1.5">
+                    {% for item in t('terms.section_7_items').split(';') %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <!-- Section 8 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900">{{ t('terms.section_8_title') }}</h2>
+                <p class="mt-2 text-gray-700 leading-relaxed">{{ t('terms.section_8_text') }}</p>
+            </section>
+
+            <!-- Section 9 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900">{{ t('terms.section_9_title') }}</h2>
+                <p class="mt-2 text-gray-700 leading-relaxed">{{ t('terms.section_9_text') }}</p>
+            </section>
+
+            <!-- Section 10 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900">{{ t('terms.section_10_title') }}</h2>
+                <p class="mt-2 text-gray-700 leading-relaxed">{{ t('terms.section_10_text') }}</p>
+            </section>
+
+            <!-- Section 11 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900">{{ t('terms.section_11_title') }}</h2>
+                <p class="mt-2 text-gray-700 leading-relaxed">{{ t('terms.section_11_text') }}</p>
+            </section>
+
+            <!-- Section 12 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900">{{ t('terms.section_12_title') }}</h2>
+                <p class="mt-2 text-gray-700 leading-relaxed">{{ t('terms.section_12_text') }}</p>
+            </section>
+
+            <!-- Acceptance -->
+            <div class="border-t border-gray-200 pt-6">
+                <p class="text-sm font-semibold text-gray-900">{{ t('terms.acceptance') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

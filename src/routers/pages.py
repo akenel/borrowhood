@@ -272,3 +272,11 @@ async def dashboard(request: Request,
         owner_rentals=owner_rentals,
     )
     return _render("pages/dashboard.html", ctx)
+
+
+@router.get("/terms", response_class=HTMLResponse)
+async def terms(request: Request,
+                token: Optional[dict] = Depends(get_current_user_token)):
+    """Terms of Service and Community Code of Conduct."""
+    ctx = _ctx(request, token)
+    return _render("pages/terms.html", ctx)
