@@ -24,12 +24,11 @@ router = APIRouter(tags=["pages"])
 templates = Jinja2Templates(directory="src/templates")
 
 
-def _ctx(request: Request, response: Response, token: Optional[dict] = None, **kwargs) -> dict:
+def _ctx(request: Request, token: Optional[dict] = None, **kwargs) -> dict:
     """Build template context with i18n, lang, and common vars.
 
-    Every page gets: request, user, t(), lang, supported_languages.
+    Every page gets: request, user, t(), lang, supported_languages, _set_lang_cookie.
     Language detection: ?lang= query param > bh_lang cookie > Accept-Language > default.
-    Sets bh_lang cookie when language changes.
     """
     query_lang = request.query_params.get("lang")
     cookie_lang = request.cookies.get("bh_lang")
@@ -38,9 +37,8 @@ def _ctx(request: Request, response: Response, token: Optional[dict] = None, **k
     lang = detect_language(query_lang, cookie_lang, accept_lang)
     t = get_translator(lang)
 
-    # Set cookie if changed via query param
-    if query_lang and query_lang != cookie_lang:
-        response.set_cookie("bh_lang", lang, max_age=365 * 24 * 3600, samesite="lax")
+    # Flag for routes to set cookie on the actual response
+    set_lang_cookie = query_lang and query_lang != cookie_lang
 
     ctx = {
         "request": request,
@@ -48,13 +46,24 @@ def _ctx(request: Request, response: Response, token: Optional[dict] = None, **k
         "t": t,
         "lang": lang,
         "supported_languages": SUPPORTED_LANGUAGES,
+        "_set_lang_cookie": set_lang_cookie,
     }
     ctx.update(kwargs)
     return ctx
 
 
+def _render(template_name: str, ctx: dict, status_code: int = 200):
+    """Render template and set lang cookie if needed."""
+    set_cookie = ctx.pop("_set_lang_cookie", False)
+    lang = ctx.get("lang", "en")
+    response = templates.TemplateResponse(template_name, ctx, status_code=status_code)
+    if set_cookie:
+        response.set_cookie("bh_lang", lang, max_age=365 * 24 * 3600, samesite="lax")
+    return response
+
+
 @router.get("/", response_class=HTMLResponse)
-async def home(request: Request, response: Response,
+async def home(request: Request,
                db: AsyncSession = Depends(get_db),
                token: Optional[dict] = Depends(get_current_user_token)):
     """Landing page with featured items and stats."""
@@ -73,16 +82,16 @@ async def home(request: Request, response: Response,
     )
     featured_items = result.scalars().unique().all()
 
-    ctx = _ctx(request, response, token,
+    ctx = _ctx(request, token,
         listing_count=listing_count or 0,
         user_count=user_count or 0,
         featured_items=featured_items,
     )
-    return templates.TemplateResponse("pages/home.html", ctx)
+    return _render("pages/home.html", ctx)
 
 
 @router.get("/browse", response_class=HTMLResponse)
-async def browse(request: Request, response: Response,
+async def browse(request: Request,
                  q: Optional[str] = None,
                  category: Optional[str] = None,
                  item_type: Optional[str] = None,
@@ -124,7 +133,7 @@ async def browse(request: Request, response: Response,
     )
     categories = [row[0] for row in cat_result.all()]
 
-    ctx = _ctx(request, response, token,
+    ctx = _ctx(request, token,
         items=items,
         categories=categories,
         q=q or "",
@@ -132,11 +141,11 @@ async def browse(request: Request, response: Response,
         selected_type=item_type,
         selected_sort=sort,
     )
-    return templates.TemplateResponse("pages/browse.html", ctx)
+    return _render("pages/browse.html", ctx)
 
 
 @router.get("/items/{slug}", response_class=HTMLResponse)
-async def item_detail(slug: str, request: Request, response: Response,
+async def item_detail(slug: str, request: Request,
                       db: AsyncSession = Depends(get_db),
                       token: Optional[dict] = Depends(get_current_user_token)):
     """Item detail page with listings, owner info, and location map."""
@@ -153,20 +162,20 @@ async def item_detail(slug: str, request: Request, response: Response,
     item = result.scalars().first()
 
     if not item:
-        ctx = _ctx(request, response, token)
-        return templates.TemplateResponse("errors/404.html", ctx, status_code=404)
+        ctx = _ctx(request, token)
+        return _render("errors/404.html", ctx, status_code=404)
 
-    ctx = _ctx(request, response, token,
+    ctx = _ctx(request, token,
         item=item,
         og_title=f"{item.name} - BorrowHood",
         og_description=item.description[:160] if item.description else "Available on BorrowHood",
         og_image=item.media[0].url if item.media else None,
     )
-    return templates.TemplateResponse("pages/item_detail.html", ctx)
+    return _render("pages/item_detail.html", ctx)
 
 
 @router.get("/workshop/{slug}", response_class=HTMLResponse)
-async def workshop_profile(slug: str, request: Request, response: Response,
+async def workshop_profile(slug: str, request: Request,
                            db: AsyncSession = Depends(get_db),
                            token: Optional[dict] = Depends(get_current_user_token)):
     """Workshop profile page with owner info, items, and reviews."""
@@ -184,12 +193,12 @@ async def workshop_profile(slug: str, request: Request, response: Response,
     workshop_owner = result.scalars().first()
 
     if not workshop_owner:
-        ctx = _ctx(request, response, token)
-        return templates.TemplateResponse("errors/404.html", ctx, status_code=404)
+        ctx = _ctx(request, token)
+        return _render("errors/404.html", ctx, status_code=404)
 
-    ctx = _ctx(request, response, token,
+    ctx = _ctx(request, token,
         workshop=workshop_owner,
         og_title=f"{workshop_owner.workshop_name or workshop_owner.display_name} - BorrowHood",
         og_description=workshop_owner.tagline or "Workshop on BorrowHood",
     )
-    return templates.TemplateResponse("pages/workshop.html", ctx)
+    return _render("pages/workshop.html", ctx)
