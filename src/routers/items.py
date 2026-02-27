@@ -8,6 +8,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel, Field
 from slugify import slugify
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -201,3 +202,54 @@ async def delete_item(
     from datetime import datetime, timezone
     item.deleted_at = datetime.now(timezone.utc)
     await db.commit()
+
+
+class MediaAdd(BaseModel):
+    url: str = Field(..., max_length=500)
+    alt_text: str = Field(default="Item photo", max_length=200)
+    media_type: str = Field(default="photo", max_length=20)
+
+
+class MediaOut(BaseModel):
+    id: UUID
+    url: str
+    alt_text: str
+    media_type: str
+
+    class Config:
+        from_attributes = True
+
+
+@router.post("/{item_id}/media", response_model=MediaOut, status_code=201)
+async def add_item_media(
+    item_id: UUID,
+    data: MediaAdd,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Add a media URL to an item. Only the owner can add media."""
+    user = await _get_user(db, token["sub"])
+
+    result = await db.execute(
+        select(BHItem)
+        .where(BHItem.id == item_id)
+        .where(BHItem.deleted_at.is_(None))
+    )
+    item = result.scalars().first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    if item.owner_id != user.id:
+        raise HTTPException(status_code=403, detail="Not your item")
+
+    from src.models.item import MediaType
+    media = BHItemMedia(
+        item_id=item.id,
+        url=data.url,
+        alt_text=data.alt_text,
+        media_type=MediaType(data.media_type) if data.media_type in [e.value for e in MediaType] else MediaType.PHOTO,
+        sort_order=0,
+    )
+    db.add(media)
+    await db.commit()
+    await db.refresh(media)
+    return media

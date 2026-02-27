@@ -1,7 +1,10 @@
 """AI service for BorrowHood.
 
-Uses Pollinations.ai free text API (no key required) for listing generation.
-Falls back to Ollama if OLLAMA_URL is configured.
+Uses Pollinations.ai free APIs (no key required):
+- Text API: listing description generation
+- Image API: product image generation for listings
+
+Falls back to Ollama for text if OLLAMA_URL is configured.
 Falls back to template-based generation if both are unavailable.
 """
 
@@ -9,6 +12,7 @@ import json
 import logging
 import os
 from typing import Optional
+from urllib.parse import quote
 
 import httpx
 
@@ -267,3 +271,14 @@ def _template_fallback(name: str, category: str, item_type: str, language: str) 
         "description": description,
         "tags": tag_map.get(category, ["community", "sharing", "local"]),
     }
+
+
+def generate_image_url(name: str, category: str) -> str:
+    """Generate a Pollinations.ai image URL for a listing.
+
+    Returns a URL that generates an image on-demand when accessed.
+    No API call needed -- the URL IS the API.
+    """
+    prompt = f"Professional product photo of {name}, {category} category, clean white background, studio lighting, marketplace listing photo, high quality"
+    encoded = quote(prompt)
+    return f"https://image.pollinations.ai/prompt/{encoded}?width=800&height=600&nologo=true"

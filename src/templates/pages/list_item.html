@@ -21,6 +21,8 @@
         aiGenerating: false,
         aiUsed: false,
         aiTags: [],
+        aiImageUrl: '',
+        aiImageGenerating: false,
         form: {
             name: '',
             description: '',
@@ -90,6 +92,19 @@
                     throw new Error(err.detail || 'Failed to create item');
                 }
                 const item = await itemResp.json();
+
+                // Save AI image if generated
+                if (this.aiImageUrl) {
+                    await fetch('/api/v1/items/' + item.id + '/media', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            url: this.aiImageUrl,
+                            alt_text: this.form.name + ' - AI generated preview',
+                            media_type: 'photo'
+                        })
+                    });
+                }
 
                 // Step 2: Create listing
                 const listingResp = await fetch('/api/v1/listings', {
@@ -232,6 +247,51 @@
                     <template x-for="tag in aiTags" :key="tag">
                         <span class="text-xs px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-full font-medium" x-text="tag"></span>
                     </template>
+                </div>
+            </div>
+
+            <!-- AI Image Generation -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    {% if lang == 'it' %}Immagine Anteprima{% else %}Preview Image{% endif %}
+                </label>
+                <div x-show="!aiImageUrl" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <svg class="mx-auto w-10 h-10 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <button @click="async () => {
+                                if (!form.name.trim()) return;
+                                aiImageGenerating = true;
+                                try {
+                                    const resp = await fetch('/api/v1/ai/generate-image', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ name: form.name, category: form.category })
+                                    });
+                                    if (resp.ok) {
+                                        const data = await resp.json();
+                                        aiImageUrl = data.image_url;
+                                    }
+                                } catch(e) {} finally { aiImageGenerating = false; }
+                            }"
+                            :disabled="!form.name.trim() || aiImageGenerating"
+                            class="text-sm text-purple-600 hover:text-purple-800 font-medium disabled:opacity-50">
+                        <span x-show="!aiImageGenerating" class="flex items-center justify-center space-x-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            <span>{% if lang == 'it' %}Genera Immagine con AI{% else %}Generate Image with AI{% endif %}</span>
+                        </span>
+                        <span x-show="aiImageGenerating" x-cloak>{% if lang == 'it' %}Generazione...{% else %}Generating...{% endif %}</span>
+                    </button>
+                    <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Powered by Pollinations.ai{% else %}Powered by Pollinations.ai{% endif %}</p>
+                </div>
+                <div x-show="aiImageUrl" x-cloak class="relative">
+                    <img :src="aiImageUrl" alt="AI-generated preview" class="w-full h-48 object-cover rounded-lg border border-purple-200">
+                    <div class="absolute top-2 right-2 flex space-x-1">
+                        <span class="text-xs px-2 py-1 bg-purple-600 text-white rounded-full">AI Preview</span>
+                        <button @click="aiImageUrl = ''" class="text-xs px-2 py-1 bg-red-500 text-white rounded-full hover:bg-red-600">&times;</button>
+                    </div>
                 </div>
             </div>
 
