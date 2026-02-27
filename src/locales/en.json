@@ -33,6 +33,7 @@
   "browse": {
     "title": "Browse Items",
     "search_placeholder": "Search tools, services, spaces...",
+    "search": "Search",
     "filters": "Filters",
     "category": "Category",
     "type": "Type",
@@ -42,13 +43,18 @@
     "sort_oldest": "Oldest",
     "sort_closest": "Closest",
     "sort_name": "Name (A-Z)",
-    "no_results": "No items found. Try broadening your search.",
-    "clear_filters": "Clear Filters",
+    "apply": "Apply",
+    "clear": "Clear",
+    "no_results_title": "No items found",
+    "no_results": "Try broadening your search or changing your filters.",
+    "no_description": "No description",
+    "clear_filters": "Clear All Filters",
     "all_categories": "All Categories",
     "all_types": "All Types"
   },
   "item": {
     "details": "Details",
+    "description": "Description",
     "condition": "Condition",
     "category": "Category",
     "type": "Type",
@@ -57,9 +63,15 @@
     "location": "Location",
     "rent_this": "Rent This Item",
     "contact_owner": "Contact Owner",
+    "contact_telegram": "Contact on Telegram",
+    "available_as": "Available As",
+    "delivery_available": "Delivery available",
+    "deposit": "deposit",
     "needs_equipment": "Required Equipment",
     "compatible_with": "Compatible With",
-    "report": "Report This Item"
+    "written_in": "Written in",
+    "map_note": "Exact location shared after booking confirmed.",
+    "report": "Report this item"
   },
   "rental": {
     "request_title": "Rental Request",
@@ -80,14 +92,20 @@
     }
   },
   "workshop": {
+    "about": "About",
     "items": "Items",
     "reviews": "Reviews",
     "team": "Team",
     "skills": "Skills",
     "languages": "Languages",
+    "links": "Links",
+    "location": "Location",
     "member_since": "Member since",
     "no_items": "No items listed yet.",
-    "edit_profile": "Edit Profile"
+    "edit_profile": "Edit Profile",
+    "message_telegram": "Message on Telegram",
+    "report": "Report this profile",
+    "verified": "verified"
   },
   "review": {
     "leave_review": "Leave a Review",
@@ -139,6 +157,28 @@
     "C1": "Advanced",
     "C2": "Proficient",
     "native": "Native"
+  },
+  "listing_types": {
+    "rent": "Rent",
+    "sell": "Buy",
+    "commission": "Commission",
+    "offer": "Make an Offer",
+    "service": "Service",
+    "training": "Training"
+  },
+  "item_types": {
+    "physical": "Physical",
+    "digital": "Digital",
+    "service": "Service",
+    "space": "Space",
+    "made_to_order": "Made to Order"
+  },
+  "errors": {
+    "not_found_title": "Page not found",
+    "not_found_text": "The page you're looking for doesn't exist or has been moved.",
+    "server_error_title": "Something went wrong",
+    "server_error_text": "We're working on it. Please try again in a moment.",
+    "go_home": "Go Home"
   },
   "footer": {
     "tagline": "Free as in freedom. Open source. No platform fees. Forever.",

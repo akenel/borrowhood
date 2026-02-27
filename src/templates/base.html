@@ -1,22 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="{{ lang | default('en') }}" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}BorrowHood{% endblock %}</title>
+    <title>{% block title %}{{ t('app.name') }}{% endblock %}</title>
 
     <!-- SEO & Open Graph (Rule 30) -->
-    <meta name="description" content="{{ meta_description | default('Community rental platform. No fees. Open source.') }}">
+    <meta name="description" content="{{ meta_description | default(t('app.description')) }}">
     <link rel="canonical" href="{{ request.url }}">
-    <meta property="og:site_name" content="BorrowHood">
+    <meta property="og:site_name" content="{{ t('app.name') }}">
     <meta property="og:type" content="{{ og_type | default('website') }}">
-    <meta property="og:title" content="{{ og_title | default('BorrowHood') }}">
-    <meta property="og:description" content="{{ og_description | default('Rent it. Lend it. Share it. Teach it.') }}">
+    <meta property="og:title" content="{{ og_title | default(t('app.name')) }}">
+    <meta property="og:description" content="{{ og_description | default(t('app.tagline')) }}">
     <meta property="og:image" content="{{ og_image | default('/static/images/og-default.png') }}">
     <meta property="og:url" content="{{ request.url }}">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ og_title | default('BorrowHood') }}">
-    <meta name="twitter:description" content="{{ og_description | default('Rent it. Lend it. Share it. Teach it.') }}">
+    <meta name="twitter:title" content="{{ og_title | default(t('app.name')) }}">
+    <meta name="twitter:description" content="{{ og_description | default(t('app.tagline')) }}">
 
     <!-- Tailwind CSS (FULL CDN -- Rule 1: NEVER a bundled subset) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -48,7 +48,7 @@
     {% block head %}{% endblock %}
 </head>
 <body class="h-full bg-gray-50 font-sans text-gray-900"
-      x-data="{ mobileMenuOpen: false, lang: localStorage.getItem('bh_lang') || 'en' }">
+      x-data="{ mobileMenuOpen: false }">
 
     <!-- Skip link (Rule 19: Accessibility) -->
     <a href="#main-content"
@@ -64,38 +64,40 @@
                 <!-- Logo + Desktop Nav -->
                 <div class="flex items-center">
                     <a href="/" class="flex items-center space-x-2">
-                        <span class="text-xl font-bold text-indigo-600">BorrowHood</span>
+                        <span class="text-xl font-bold text-indigo-600">{{ t('app.name') }}</span>
                     </a>
                     <div class="hidden md:flex md:ml-8 md:space-x-6">
-                        <a href="/" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">Home</a>
-                        <a href="/browse" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">Browse</a>
+                        <a href="/" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.home') }}</a>
+                        <a href="/browse" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.browse') }}</a>
                         {% if user %}
-                        <a href="/workshop/me" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">My Workshop</a>
+                        <a href="/workshop/me" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.my_workshop') }}</a>
                         {% endif %}
                     </div>
                 </div>
 
                 <!-- Right side: lang switch + auth -->
                 <div class="flex items-center space-x-3">
-                    <!-- Language toggle -->
-                    <button @click="lang = lang === 'en' ? 'it' : 'en'; localStorage.setItem('bh_lang', lang)"
-                            class="text-sm font-medium text-gray-500 hover:text-indigo-600 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
-                            x-text="lang === 'en' ? 'IT' : 'EN'"
-                            title="Switch language">
-                    </button>
+                    <!-- Language toggle (server-side via ?lang= query param) -->
+                    {% for supported_lang in supported_languages %}
+                    {% if supported_lang != lang %}
+                    <a href="?lang={{ supported_lang }}"
+                       class="text-sm font-medium text-gray-500 hover:text-indigo-600 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
+                       title="Switch to {{ supported_lang | upper }}">
+                        {{ supported_lang | upper }}
+                    </a>
+                    {% endif %}
+                    {% endfor %}
 
                     {% if user %}
-                    <!-- Logged in -->
-                    <a href="/profile" class="text-sm text-gray-700 hover:text-indigo-600 hidden md:block">{{ user.get('preferred_username', 'Profile') }}</a>
-                    <a href="/logout" class="text-sm text-gray-500 hover:text-red-600 hidden md:block">Logout</a>
+                    <a href="/profile" class="text-sm text-gray-700 hover:text-indigo-600 hidden md:block">{{ user.get('preferred_username', t('nav.profile')) }}</a>
+                    <a href="/logout" class="text-sm text-gray-500 hover:text-red-600 hidden md:block">{{ t('nav.logout') }}</a>
                     {% else %}
-                    <!-- Not logged in -->
                     <a href="/login" class="hidden md:inline-flex px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors min-h-[44px] items-center">
-                        Log In
+                        {{ t('nav.login') }}
                     </a>
                     {% endif %}
 
-                    <!-- Mobile menu button (Rule 2: hamburger on mobile) -->
+                    <!-- Mobile menu button -->
                     <button @click="mobileMenuOpen = !mobileMenuOpen"
                             class="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 hover:text-gray-700"
                             aria-label="Toggle menu">
@@ -108,7 +110,7 @@
             </div>
         </div>
 
-        <!-- Mobile menu (Rule 2: slide-out) -->
+        <!-- Mobile menu -->
         <div x-show="mobileMenuOpen" x-cloak
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 -translate-y-1"
@@ -118,15 +120,25 @@
              x-transition:leave-end="opacity-0 -translate-y-1"
              class="md:hidden border-t border-gray-200 bg-white">
             <div class="px-4 py-3 space-y-1">
-                <a href="/" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">Home</a>
-                <a href="/browse" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">Browse</a>
+                <a href="/" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.home') }}</a>
+                <a href="/browse" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.browse') }}</a>
                 {% if user %}
-                <a href="/workshop/me" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">My Workshop</a>
-                <a href="/profile" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">Profile</a>
-                <a href="/logout" class="block px-3 py-3 text-base font-medium text-red-600 hover:bg-red-50 rounded-lg min-h-[44px]">Logout</a>
+                <a href="/workshop/me" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.my_workshop') }}</a>
+                <a href="/profile" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.profile') }}</a>
+                <a href="/logout" class="block px-3 py-3 text-base font-medium text-red-600 hover:bg-red-50 rounded-lg min-h-[44px]">{{ t('nav.logout') }}</a>
                 {% else %}
-                <a href="/login" class="block px-3 py-3 text-base font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg min-h-[44px]">Log In</a>
+                <a href="/login" class="block px-3 py-3 text-base font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg min-h-[44px]">{{ t('nav.login') }}</a>
                 {% endif %}
+                <!-- Mobile language switch -->
+                <div class="flex space-x-2 px-3 py-3">
+                    {% for supported_lang in supported_languages %}
+                    <a href="?lang={{ supported_lang }}"
+                       class="px-3 py-2 text-sm font-medium rounded-lg min-h-[44px] flex items-center
+                              {% if supported_lang == lang %}bg-indigo-100 text-indigo-700{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
+                        {{ supported_lang | upper }}
+                    </a>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </nav>
@@ -160,14 +172,14 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                 <div class="text-center md:text-left">
-                    <p class="text-sm font-semibold text-gray-900">BorrowHood</p>
-                    <p class="text-xs text-gray-500 mt-1">Free as in freedom. Open source. No platform fees. Forever.</p>
+                    <p class="text-sm font-semibold text-gray-900">{{ t('app.name') }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ t('footer.tagline') }}</p>
                 </div>
                 <div class="flex space-x-6 text-sm text-gray-500">
                     <a href="https://github.com/akenel/borrowhood" target="_blank" rel="noopener"
-                       class="hover:text-indigo-600 transition-colors">GitHub</a>
-                    <a href="/about" class="hover:text-indigo-600 transition-colors">About</a>
-                    <a href="/privacy" class="hover:text-indigo-600 transition-colors">Privacy</a>
+                       class="hover:text-indigo-600 transition-colors">{{ t('footer.github') }}</a>
+                    <a href="/about" class="hover:text-indigo-600 transition-colors">{{ t('footer.about') }}</a>
+                    <a href="/privacy" class="hover:text-indigo-600 transition-colors">{{ t('footer.privacy') }}</a>
                 </div>
             </div>
         </div>

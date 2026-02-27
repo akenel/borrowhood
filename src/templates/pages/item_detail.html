@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}{{ item.name }} - BorrowHood{% endblock %}
+{% block title %}{{ item.name }} - {{ t('app.name') }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <!-- Breadcrumb (Rule 36) -->
     <nav class="text-sm text-gray-500 mb-6">
-        <a href="/" class="hover:text-indigo-600">Home</a>
+        <a href="/" class="hover:text-indigo-600">{{ t('nav.home') }}</a>
         <span class="mx-2">/</span>
-        <a href="/browse" class="hover:text-indigo-600">Browse</a>
+        <a href="/browse" class="hover:text-indigo-600">{{ t('nav.browse') }}</a>
         <span class="mx-2">/</span>
         <span class="text-gray-900">{{ item.name }}</span>
     </nav>
@@ -40,10 +40,10 @@
                 <!-- Tags row -->
                 <div class="mt-3 flex flex-wrap gap-2">
                     <span class="text-xs px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full font-medium">
-                        {{ item.item_type.value | replace('_', ' ') | title }}
+                        {{ t('item_types.' + item.item_type.value) }}
                     </span>
                     <span class="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full">
-                        {{ item.category | title }}
+                        {{ t('categories.' + item.category) }}
                     </span>
                     {% if item.condition %}
                     <span class="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full">
@@ -60,23 +60,23 @@
                 <!-- Description -->
                 {% if item.description %}
                 <div class="mt-6">
-                    <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Description</h2>
+                    <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">{{ t('item.description') }}</h2>
                     <p class="mt-2 text-gray-700 leading-relaxed">{{ item.description }}</p>
-                    <span class="text-xs text-gray-400 mt-1 inline-block">Written in {{ item.content_language | upper }}</span>
+                    <span class="text-xs text-gray-400 mt-1 inline-block">{{ t('item.written_in') }} {{ item.content_language | upper }}</span>
                 </div>
                 {% endif %}
 
                 <!-- Requirements -->
                 {% if item.needs_equipment %}
                 <div class="mt-6">
-                    <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Required Equipment</h2>
+                    <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">{{ t('item.needs_equipment') }}</h2>
                     <p class="mt-2 text-sm text-gray-600">{{ item.needs_equipment }}</p>
                 </div>
                 {% endif %}
 
                 {% if item.compatible_with %}
                 <div class="mt-4">
-                    <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Compatible With</h2>
+                    <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">{{ t('item.compatible_with') }}</h2>
                     <p class="mt-2 text-sm text-gray-600">{{ item.compatible_with }}</p>
                 </div>
                 {% endif %}
@@ -84,7 +84,7 @@
 
             <!-- Listings / Offers -->
             <div class="bg-white rounded-lg border border-gray-200 p-6">
-                <h2 class="text-lg font-semibold text-gray-900">Available As</h2>
+                <h2 class="text-lg font-semibold text-gray-900">{{ t('item.available_as') }}</h2>
                 <div class="mt-4 space-y-4">
                     {% for listing in item.listings %}
                     {% if listing.status.value == 'active' %}
@@ -92,16 +92,10 @@
                         <div class="flex-1">
                             <div class="flex items-center space-x-2">
                                 <span class="text-sm font-semibold text-gray-900">
-                                    {% if listing.listing_type.value == 'rent' %}Rent
-                                    {% elif listing.listing_type.value == 'sell' %}Buy
-                                    {% elif listing.listing_type.value == 'commission' %}Commission
-                                    {% elif listing.listing_type.value == 'offer' %}Make an Offer
-                                    {% elif listing.listing_type.value == 'service' %}Service
-                                    {% elif listing.listing_type.value == 'training' %}Training
-                                    {% endif %}
+                                    {{ t('listing_types.' + listing.listing_type.value) }}
                                 </span>
                                 {% if listing.delivery_available %}
-                                <span class="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full">Delivery available</span>
+                                <span class="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full">{{ t('item.delivery_available') }}</span>
                                 {% endif %}
                             </div>
                             {% if listing.notes %}
@@ -117,10 +111,10 @@
                                 {% endif %}
                             </p>
                             {% if listing.deposit %}
-                            <p class="text-xs text-gray-400">{{ listing.currency }} {{ "%.2f"|format(listing.deposit) }} deposit</p>
+                            <p class="text-xs text-gray-400">{{ listing.currency }} {{ "%.2f"|format(listing.deposit) }} {{ t('item.deposit') }}</p>
                             {% endif %}
                             {% else %}
-                            <p class="text-lg font-bold text-gray-900">Negotiable</p>
+                            <p class="text-lg font-bold text-gray-900">{{ t('common.negotiable') | title }}</p>
                             {% endif %}
                         </div>
                     </div>
@@ -137,12 +131,12 @@
             <div class="bg-white rounded-lg border border-gray-200 p-6">
                 <a href="#"
                    class="w-full flex items-center justify-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors min-h-[44px]">
-                    Rent This Item
+                    {{ t('item.rent_this') }}
                 </a>
                 {% if item.owner and item.owner.telegram_username %}
                 <a href="https://t.me/{{ item.owner.telegram_username }}" target="_blank" rel="noopener"
                    class="w-full flex items-center justify-center px-6 py-3 mt-3 bg-white text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px]">
-                    Contact on Telegram
+                    {{ t('item.contact_telegram') }}
                 </a>
                 {% endif %}
             </div>
@@ -150,7 +144,7 @@
             <!-- Owner card -->
             {% if item.owner %}
             <div class="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Listed By</h3>
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">{{ t('item.listed_by') }}</h3>
                 <a href="/workshop/{{ item.owner.slug }}" class="flex items-center space-x-3 group">
                     <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
                         <span class="text-lg font-bold text-indigo-600">{{ item.owner.display_name[0] }}</span>
@@ -173,18 +167,18 @@
                         {% elif item.owner.badge_tier.value == 'trusted' %}bg-emerald-100 text-emerald-700
                         {% elif item.owner.badge_tier.value == 'active' %}bg-blue-100 text-blue-700
                         {% else %}bg-gray-100 text-gray-700{% endif %}">
-                        {{ item.owner.badge_tier.value | title }}
+                        {{ t('badges.' + item.owner.badge_tier.value) }}
                     </span>
                 </div>
 
                 <!-- Languages (CEFR badges) -->
                 {% if item.owner.languages %}
                 <div class="mt-4">
-                    <p class="text-xs font-medium text-gray-500 mb-2">Speaks</p>
+                    <p class="text-xs font-medium text-gray-500 mb-2">{{ t('item.languages') }}</p>
                     <div class="flex flex-wrap gap-1.5">
-                        {% for lang in item.owner.languages %}
+                        {% for ulang in item.owner.languages %}
                         <span class="text-xs px-2 py-1 bg-indigo-50 text-indigo-600 rounded font-medium">
-                            {{ lang.language_code | upper }} {{ lang.proficiency.value }}
+                            {{ ulang.language_code | upper }} {{ ulang.proficiency.value }}
                         </span>
                         {% endfor %}
                     </div>
@@ -194,7 +188,7 @@
                 <!-- Location -->
                 {% if item.owner.city %}
                 <div class="mt-4">
-                    <p class="text-xs font-medium text-gray-500 mb-1">Location</p>
+                    <p class="text-xs font-medium text-gray-500 mb-1">{{ t('item.location') }}</p>
                     <p class="text-sm text-gray-700">{{ item.owner.city }}{% if item.owner.country_code %}, {{ item.owner.country_code }}{% endif %}</p>
                 </div>
                 {% endif %}
@@ -204,18 +198,18 @@
             <!-- Map placeholder -->
             {% if item.latitude and item.longitude %}
             <div class="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Location</h3>
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">{{ t('item.location') }}</h3>
                 <div class="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center text-sm text-gray-400">
-                    <p>Map: ~500m radius around item</p>
+                    <p>Map</p>
                 </div>
-                <p class="text-xs text-gray-400 mt-2">Exact location shared after booking confirmed.</p>
+                <p class="text-xs text-gray-400 mt-2">{{ t('item.map_note') }}</p>
             </div>
             {% endif %}
 
             <!-- Report button (Rule 31) -->
             <div class="text-center">
                 <button class="text-xs text-gray-400 hover:text-red-500 transition-colors min-h-[44px]">
-                    Report this item
+                    {{ t('item.report') }}
                 </button>
             </div>
         </div>

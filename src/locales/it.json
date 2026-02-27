@@ -33,6 +33,7 @@
   "browse": {
     "title": "Esplora Oggetti",
     "search_placeholder": "Cerca attrezzi, servizi, spazi...",
+    "search": "Cerca",
     "filters": "Filtri",
     "category": "Categoria",
     "type": "Tipo",
@@ -42,13 +43,18 @@
     "sort_oldest": "Più vecchi",
     "sort_closest": "Più vicini",
     "sort_name": "Nome (A-Z)",
-    "no_results": "Nessun oggetto trovato. Prova ad ampliare la ricerca.",
-    "clear_filters": "Cancella Filtri",
+    "apply": "Applica",
+    "clear": "Cancella",
+    "no_results_title": "Nessun oggetto trovato",
+    "no_results": "Prova ad ampliare la ricerca o a cambiare i filtri.",
+    "no_description": "Nessuna descrizione",
+    "clear_filters": "Cancella Tutti i Filtri",
     "all_categories": "Tutte le Categorie",
     "all_types": "Tutti i Tipi"
   },
   "item": {
     "details": "Dettagli",
+    "description": "Descrizione",
     "condition": "Condizione",
     "category": "Categoria",
     "type": "Tipo",
@@ -57,9 +63,15 @@
     "location": "Posizione",
     "rent_this": "Noleggia Questo Oggetto",
     "contact_owner": "Contatta il Proprietario",
+    "contact_telegram": "Contatta su Telegram",
+    "available_as": "Disponibile Come",
+    "delivery_available": "Consegna disponibile",
+    "deposit": "cauzione",
     "needs_equipment": "Attrezzatura Necessaria",
     "compatible_with": "Compatibile Con",
-    "report": "Segnala Questo Oggetto"
+    "written_in": "Scritto in",
+    "map_note": "Posizione esatta condivisa dopo la conferma della prenotazione.",
+    "report": "Segnala questo oggetto"
   },
   "rental": {
     "request_title": "Richiesta di Noleggio",
@@ -80,14 +92,20 @@
     }
   },
   "workshop": {
+    "about": "Chi Sono",
     "items": "Oggetti",
     "reviews": "Recensioni",
     "team": "Squadra",
     "skills": "Competenze",
     "languages": "Lingue",
+    "links": "Link",
+    "location": "Posizione",
     "member_since": "Membro da",
     "no_items": "Nessun oggetto pubblicato.",
-    "edit_profile": "Modifica Profilo"
+    "edit_profile": "Modifica Profilo",
+    "message_telegram": "Messaggio su Telegram",
+    "report": "Segnala questo profilo",
+    "verified": "verificato"
   },
   "review": {
     "leave_review": "Lascia una Recensione",
@@ -139,6 +157,28 @@
     "C1": "Avanzato",
     "C2": "Competente",
     "native": "Madrelingua"
+  },
+  "listing_types": {
+    "rent": "Noleggio",
+    "sell": "Acquista",
+    "commission": "Commissione",
+    "offer": "Fai un'Offerta",
+    "service": "Servizio",
+    "training": "Formazione"
+  },
+  "item_types": {
+    "physical": "Fisico",
+    "digital": "Digitale",
+    "service": "Servizio",
+    "space": "Spazio",
+    "made_to_order": "Su Ordinazione"
+  },
+  "errors": {
+    "not_found_title": "Pagina non trovata",
+    "not_found_text": "La pagina che stai cercando non esiste o è stata spostata.",
+    "server_error_title": "Qualcosa è andato storto",
+    "server_error_text": "Ci stiamo lavorando. Riprova tra un momento.",
+    "go_home": "Vai alla Home"
   },
   "footer": {
     "tagline": "Libero come la libertà. Open source. Nessuna commissione. Per sempre.",
