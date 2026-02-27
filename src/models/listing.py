@@ -5,9 +5,10 @@ One item can have multiple listings (e.g., available for rent AND sale).
 
 import enum
 import uuid
+from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Enum, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import DateTime, Enum, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -21,6 +22,7 @@ class ListingType(str, enum.Enum):
     OFFER = "offer"           # Free / "make an offer"
     SERVICE = "service"       # "I'll do it for you"
     TRAINING = "training"     # "I'll teach you"
+    AUCTION = "auction"       # Timed bidding
 
 
 class ListingStatus(str, enum.Enum):
@@ -61,9 +63,16 @@ class BHListing(BHBase, Base):
     pickup_only: Mapped[bool] = mapped_column(default=True)
     notes: Mapped[Optional[str]] = mapped_column(Text)
 
+    # Auction fields (only used when listing_type == AUCTION)
+    auction_end: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    starting_bid: Mapped[Optional[float]] = mapped_column(Float)
+    reserve_price: Mapped[Optional[float]] = mapped_column(Float)  # Hidden minimum
+    bid_increment: Mapped[Optional[float]] = mapped_column(Float, default=1.0)
+
     # Version for optimistic locking (Rule 28)
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 
     # Relationships
     item: Mapped["BHItem"] = relationship(back_populates="listings")
     rentals: Mapped[list["BHRental"]] = relationship(back_populates="listing")
+    bids: Mapped[list["BHBid"]] = relationship(back_populates="listing")

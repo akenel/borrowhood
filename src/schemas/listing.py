@@ -22,6 +22,9 @@ class ListingOut(BaseModel):
     delivery_available: bool
     pickup_only: bool
     notes: Optional[str] = None
+    auction_end: Optional[str] = None
+    starting_bid: Optional[float] = None
+    bid_increment: Optional[float] = None
 
     class Config:
         from_attributes = True
@@ -39,6 +42,10 @@ class ListingCreate(BaseModel):
     delivery_available: bool = False
     pickup_only: bool = True
     notes: Optional[str] = None
+    auction_end: Optional[str] = None  # ISO datetime for auction listings
+    starting_bid: Optional[float] = Field(None, ge=0)
+    reserve_price: Optional[float] = Field(None, ge=0)
+    bid_increment: Optional[float] = Field(None, ge=0)
 
 
 class ListingUpdate(BaseModel):

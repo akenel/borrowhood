@@ -12,6 +12,8 @@ from src.models.review import BHReview
 from src.models.workshop import BHWorkshopMember
 from src.models.audit import BHAuditLog
 from src.models.report import BHReport
+from src.models.bid import BHBid
+from src.models.notification import BHNotification
 
 __all__ = [
     "BHUser",
@@ -27,4 +29,6 @@ __all__ = [
     "BHWorkshopMember",
     "BHAuditLog",
     "BHReport",
+    "BHBid",
+    "BHNotification",
 ]
