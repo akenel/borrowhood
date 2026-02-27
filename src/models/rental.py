@@ -74,6 +74,9 @@ class BHRental(BHBase, Base):
     # Relationships
     listing: Mapped["BHListing"] = relationship(back_populates="rentals")
     renter: Mapped["BHUser"] = relationship(foreign_keys=[renter_id])
+    lockbox: Mapped[Optional["BHLockBoxAccess"]] = relationship(
+        back_populates="rental", uselist=False, cascade="all, delete-orphan"
+    )
 
 
 def validate_rental_transition(current: RentalStatus, new: RentalStatus) -> bool:

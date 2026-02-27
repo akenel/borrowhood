@@ -143,6 +143,27 @@
     "based_on": "basato su",
     "weighted": "media ponderata"
   },
+  "lockbox": {
+    "title": "Cassetta di Sicurezza",
+    "generate_codes": "Genera Codici di Accesso",
+    "codes_ready": "Codici di Accesso Pronti",
+    "pickup_code": "Codice di Ritiro",
+    "return_code": "Codice di Restituzione",
+    "location_hint": "Posizione Cassetta",
+    "location_placeholder": "es. Sotto lo zerbino sul portico",
+    "instructions": "Istruzioni",
+    "instructions_placeholder": "es. La combinazione è 4-7-2-9, gira a sinistra",
+    "code_used": "Codice Utilizzato",
+    "verify_code": "Inserisci Codice",
+    "verify": "Verifica",
+    "pickup_confirmed": "Ritiro confermato!",
+    "return_confirmed": "Restituzione confermata!",
+    "invalid_code": "Codice non valido. Controlla e riprova.",
+    "waiting_for_codes": "In attesa che il proprietario generi i codici...",
+    "no_meetup_needed": "Nessun incontro necessario -- usa il codice alla cassetta.",
+    "one_time_code": "Uso singolo",
+    "how_it_works": "Il proprietario mette l'oggetto nella cassetta. Usi il codice per aprirla. Restituisci allo stesso modo."
+  },
   "common": {
     "save": "Salva",
     "cancel": "Annulla",

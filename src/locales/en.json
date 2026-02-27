@@ -143,6 +143,27 @@
     "based_on": "based on",
     "weighted": "weighted average"
   },
+  "lockbox": {
+    "title": "Lock Box",
+    "generate_codes": "Generate Access Codes",
+    "codes_ready": "Access Codes Ready",
+    "pickup_code": "Pickup Code",
+    "return_code": "Return Code",
+    "location_hint": "Lock Box Location",
+    "location_placeholder": "e.g., Under the mat on the porch",
+    "instructions": "Instructions",
+    "instructions_placeholder": "e.g., Combo is 4-7-2-9, turn handle left",
+    "code_used": "Code Used",
+    "verify_code": "Enter Code",
+    "verify": "Verify",
+    "pickup_confirmed": "Pickup confirmed!",
+    "return_confirmed": "Return confirmed!",
+    "invalid_code": "Invalid code. Please check and try again.",
+    "waiting_for_codes": "Waiting for owner to generate access codes...",
+    "no_meetup_needed": "No meetup needed -- use the code at the lock box.",
+    "one_time_code": "One-time use only",
+    "how_it_works": "Owner puts item in lock box. You use the code to open it. Return the same way."
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",

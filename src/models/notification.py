@@ -30,6 +30,9 @@ class NotificationType(str, enum.Enum):
     BID_OUTBID = "bid_outbid"                 # You've been outbid
     AUCTION_WON = "auction_won"              # You won an auction
     AUCTION_ENDED = "auction_ended"           # Your auction ended
+    LOCKBOX_CODES_READY = "lockbox_codes_ready"   # Pickup code is ready for renter
+    LOCKBOX_PICKUP_CONFIRMED = "lockbox_pickup_confirmed"  # Renter confirmed pickup
+    LOCKBOX_RETURN_CONFIRMED = "lockbox_return_confirmed"  # Return confirmed
     BADGE_EARNED = "badge_earned"               # You earned a badge
     SYSTEM = "system"                         # Platform announcement
 
