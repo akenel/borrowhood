@@ -282,6 +282,67 @@ async def onboarding_page(request: Request,
     return _render("pages/onboarding.html", ctx)
 
 
+@router.get("/profile", response_class=HTMLResponse)
+async def profile(request: Request,
+                  db: AsyncSession = Depends(get_db),
+                  token: Optional[dict] = Depends(get_current_user_token)):
+    """User profile page with stats, badges, languages, skills."""
+    profile_user = None
+    languages = []
+    skills = []
+    stats = {"items": 0, "rentals": 0, "reviews": 0, "points": 0}
+
+    if token:
+        result = await db.execute(
+            select(BHUser)
+            .options(
+                selectinload(BHUser.languages),
+                selectinload(BHUser.skills),
+                selectinload(BHUser.points),
+            )
+            .where(BHUser.keycloak_id == token.get("sub", ""))
+        )
+        profile_user = result.scalars().first()
+
+        if profile_user:
+            languages = profile_user.languages
+            skills = profile_user.skills
+
+            # Count stats
+            item_count = await db.scalar(
+                select(func.count(BHItem.id))
+                .where(BHItem.owner_id == profile_user.id)
+                .where(BHItem.deleted_at.is_(None))
+            ) or 0
+
+            rental_count = await db.scalar(
+                select(func.count(BHRental.id))
+                .where(BHRental.renter_id == profile_user.id)
+            ) or 0
+
+            from src.models.review import BHReview
+            review_count = await db.scalar(
+                select(func.count(BHReview.id))
+                .where(BHReview.reviewer_id == profile_user.id)
+            ) or 0
+
+            pts = profile_user.points
+            stats = {
+                "items": item_count,
+                "rentals": rental_count,
+                "reviews": review_count,
+                "points": pts.total_points if pts else 0,
+            }
+
+    ctx = _ctx(request, token,
+        profile_user=profile_user,
+        languages=languages,
+        skills=skills,
+        stats=stats,
+    )
+    return _render("pages/profile.html", ctx)
+
+
 @router.get("/terms", response_class=HTMLResponse)
 async def terms(request: Request,
                 token: Optional[dict] = Depends(get_current_user_token)):

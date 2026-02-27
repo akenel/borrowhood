@@ -281,6 +281,19 @@
       "other": "Altro"
     }
   },
+  "profile": {
+    "login_required": "Accesso Richiesto",
+    "login_prompt": "Accedi per vedere il tuo profilo, badge e reputazione.",
+    "items_listed": "Oggetti Inseriti",
+    "rentals": "Noleggi",
+    "reviews": "Recensioni",
+    "points": "Punti",
+    "languages": "Lingue",
+    "skills": "Competenze",
+    "badges": "Badge",
+    "no_badges": "Nessun badge guadagnato ancora. Inizia a noleggiare e recensire!",
+    "about": "Chi Sono"
+  },
   "footer": {
     "tagline": "Libero come la libertà. Open source. Nessuna commissione. Per sempre.",
     "github": "GitHub",

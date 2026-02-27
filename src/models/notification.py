@@ -30,6 +30,7 @@ class NotificationType(str, enum.Enum):
     BID_OUTBID = "bid_outbid"                 # You've been outbid
     AUCTION_WON = "auction_won"              # You won an auction
     AUCTION_ENDED = "auction_ended"           # Your auction ended
+    BADGE_EARNED = "badge_earned"               # You earned a badge
     SYSTEM = "system"                         # Platform announcement
 
 

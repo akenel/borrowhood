@@ -17,6 +17,7 @@ from src.models.deposit import BHDeposit
 from src.models.dispute import BHDispute
 from src.models.payment import BHPayment
 from src.models.notification import BHNotification
+from src.models.badge import BHBadge
 
 __all__ = [
     "BHUser",
@@ -37,4 +38,5 @@ __all__ = [
     "BHDispute",
     "BHPayment",
     "BHNotification",
+    "BHBadge",
 ]

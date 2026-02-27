@@ -281,6 +281,19 @@
       "other": "Other"
     }
   },
+  "profile": {
+    "login_required": "Login Required",
+    "login_prompt": "Sign in to view your profile, badges, and reputation.",
+    "items_listed": "Items Listed",
+    "rentals": "Rentals",
+    "reviews": "Reviews",
+    "points": "Points",
+    "languages": "Languages",
+    "skills": "Skills",
+    "badges": "Badges",
+    "no_badges": "No badges earned yet. Start renting and reviewing to earn your first!",
+    "about": "About"
+  },
   "footer": {
     "tagline": "Free as in freedom. Open source. No platform fees. Forever.",
     "github": "GitHub",

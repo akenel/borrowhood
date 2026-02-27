@@ -4,7 +4,7 @@ Place bids on AUCTION-type listings, view bid history, and get auction summaries
 Includes automatic outbid notifications and auction-end resolution.
 """
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import List
 from uuid import UUID
 
@@ -128,6 +128,14 @@ async def place_bid(
     )
     db.add(bid)
 
+    # Anti-snipe: extend auction by 2 minutes if bid in last 60 seconds
+    extended = False
+    if listing.auction_end:
+        time_remaining = (listing.auction_end - datetime.now(timezone.utc)).total_seconds()
+        if 0 < time_remaining <= 60:
+            listing.auction_end = listing.auction_end + timedelta(minutes=2)
+            extended = True
+
     # Notify item owner of new bid
     await create_notification(
         db=db,
@@ -142,7 +150,7 @@ async def place_bid(
     await db.flush()
     await db.commit()
 
-    return BidOut(
+    result = BidOut(
         id=bid.id,
         listing_id=bid.listing_id,
         bidder_id=bid.bidder_id,
@@ -152,6 +160,12 @@ async def place_bid(
         is_winning=bid.is_winning,
         created_at=bid.created_at.isoformat(),
     )
+    # Include extension info in response headers
+    response_data = result.model_dump()
+    if extended:
+        response_data["auction_extended"] = True
+        response_data["new_auction_end"] = listing.auction_end.isoformat()
+    return response_data
 
 
 @router.get("", response_model=List[BidOut])
