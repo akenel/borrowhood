@@ -141,5 +141,11 @@ async def setup_profile(
                     proficiency=proficiency,
                 ))
 
+    await db.flush()
+
+    # Check badges (WORKSHOP_PRO, MULTILINGUAL, EARLY_ADOPTER)
+    from src.services.badges import check_and_award_badges
+    await check_and_award_badges(db, user.id)
+
     await db.commit()
     return {"status": "ok", "user_id": str(user.id), "slug": user.slug}

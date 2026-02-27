@@ -215,6 +215,14 @@ async def update_rental_status(
     elif data.status == RentalStatus.RETURNED:
         rental.actual_return = now
 
+    await db.flush()
+
+    # Award badges on rental completion
+    if data.status == RentalStatus.COMPLETED:
+        from src.services.badges import check_and_award_badges
+        await check_and_award_badges(db, rental.renter_id)
+        await check_and_award_badges(db, rental.listing.item.owner_id)
+
     await db.commit()
     await db.refresh(rental)
     return rental

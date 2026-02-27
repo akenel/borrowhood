@@ -315,7 +315,7 @@
       "condition": "good",
       "brand": "Various",
       "needs_equipment": "Baking sheets, rolling pin",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/cookie-cutters.jpg", "alt_text": "200-piece professional cookie cutter set laid out on a wooden table"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/cookie-cutters.svg", "alt_text": "200-piece professional cookie cutter set laid out on a wooden table"}],
       "listings": [
         {"listing_type": "rent", "price": 5.0, "price_unit": "per_day", "currency": "EUR", "deposit": 20.0, "delivery_available": true, "pickup_only": false, "notes": "I'll include a recipe booklet with every rental. Ship & return within Italy."},
         {"listing_type": "training", "price": 15.0, "price_unit": "per_hour", "currency": "EUR", "notes": "I'll teach you how to make perfect cookies. 2-hour minimum session."}
@@ -333,7 +333,7 @@
       "condition": "good",
       "brand": "KitchenAid",
       "model": "Artisan 5KSM175",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/kitchenaid.jpg", "alt_text": "Red KitchenAid Artisan stand mixer on kitchen counter"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/kitchenaid.svg", "alt_text": "Red KitchenAid Artisan stand mixer on kitchen counter"}],
       "listings": [
         {"listing_type": "rent", "price": 10.0, "price_unit": "per_day", "currency": "EUR", "deposit": 50.0, "pickup_only": true}
       ]
@@ -347,7 +347,7 @@
       "item_type": "digital",
       "category": "kitchen",
       "subcategory": "recipes",
-      "media": [{"media_type": "digital_download", "url": "/static/images/seed/recipe-book.jpg", "alt_text": "Cover of Sally's Secret Cookie Recipe Collection PDF"}],
+      "media": [{"media_type": "digital_download", "url": "/static/images/seed/recipe-book.svg", "alt_text": "Cover of Sally's Secret Cookie Recipe Collection PDF"}],
       "listings": [
         {"listing_type": "sell", "price": 8.0, "price_unit": "flat", "currency": "EUR", "notes": "Instant PDF download. 85 recipes, 120 pages."}
       ]
@@ -365,7 +365,7 @@
       "brand": "Bosch Professional",
       "model": "GSR 18V-60",
       "compatible_with": "All Bosch 18V batteries (ProCORE, Compact)",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/bosch-drill.jpg", "alt_text": "Bosch professional drill driver set in blue L-BOXX case"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/bosch-drill.svg", "alt_text": "Bosch professional drill driver set in blue L-BOXX case"}],
       "listings": [
         {"listing_type": "rent", "price": 8.0, "price_unit": "per_day", "currency": "EUR", "deposit": 30.0, "max_rental_days": 14, "pickup_only": true}
       ]
@@ -382,7 +382,7 @@
       "condition": "good",
       "brand": "Torin",
       "needs_equipment": "Flat, level surface. Never use on gravel.",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/floor-jack.jpg", "alt_text": "Red 3-ton floor jack with two jack stands"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/floor-jack.svg", "alt_text": "Red 3-ton floor jack with two jack stands"}],
       "listings": [
         {"listing_type": "rent", "price": 12.0, "price_unit": "per_day", "currency": "EUR", "deposit": 30.0, "pickup_only": true},
         {"listing_type": "service", "price": 25.0, "price_unit": "per_hour", "currency": "EUR", "notes": "I'll do the job for you. Brake pads, oil change, tire rotation. You buy parts, I bring tools and labor."}
@@ -400,7 +400,7 @@
       "condition": "good",
       "brand": "Parkside",
       "needs_equipment": "Welding helmet, gloves, welding wire, gas bottle (if MIG)",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/welder.jpg", "alt_text": "Parkside MIG 200A welding machine with helmet and gloves"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/welder.svg", "alt_text": "Parkside MIG 200A welding machine with helmet and gloves"}],
       "listings": [
         {"listing_type": "rent", "price": 20.0, "price_unit": "per_day", "currency": "EUR", "deposit": 100.0, "pickup_only": true, "notes": "Proof of welding experience required. Or book a training session first."},
         {"listing_type": "training", "price": 30.0, "price_unit": "per_hour", "currency": "EUR", "notes": "Intro to MIG welding. 3-hour session. You'll weld a small project by the end."}
@@ -417,7 +417,7 @@
       "subcategory": "camping",
       "condition": "good",
       "brand": "Brunner",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/camping-table.jpg", "alt_text": "Folding camping table with four chairs set up outdoors"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/camping-table.svg", "alt_text": "Folding camping table with four chairs set up outdoors"}],
       "listings": [
         {"listing_type": "rent", "price": 5.0, "price_unit": "per_day", "currency": "EUR", "pickup_only": true},
         {"listing_type": "sell", "price": 45.0, "price_unit": "flat", "currency": "EUR"}
@@ -433,7 +433,7 @@
       "category": "garden",
       "subcategory": "hand_tools",
       "condition": "fair",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/garden-tools.jpg", "alt_text": "Set of garden tools including spade rake hoe and shears"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/garden-tools.svg", "alt_text": "Set of garden tools including spade rake hoe and shears"}],
       "listings": [
         {"listing_type": "rent", "price": 3.0, "price_unit": "per_day", "currency": "EUR", "pickup_only": true}
       ]
@@ -447,7 +447,7 @@
       "item_type": "service",
       "category": "garden",
       "subcategory": "teaching",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/garden-lesson.jpg", "alt_text": "Maria teaching gardening in her vegetable garden"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/garden-lesson.svg", "alt_text": "Maria teaching gardening in her vegetable garden"}],
       "listings": [
         {"listing_type": "training", "price": 10.0, "price_unit": "per_hour", "currency": "EUR", "notes": "Minimo 2 ore. Pranzo incluso se restiamo più di 3 ore!"}
       ]
@@ -461,7 +461,7 @@
       "item_type": "space",
       "category": "crafts",
       "subcategory": "woodworking",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/wood-lathe.jpg", "alt_text": "Professional wood lathe in Marco's workshop"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/wood-lathe.svg", "alt_text": "Professional wood lathe in Marco's workshop"}],
       "listings": [
         {"listing_type": "rent", "price": 15.0, "price_unit": "per_hour", "currency": "EUR", "notes": "Esperienza richiesta. Oppure prenota una lezione prima."},
         {"listing_type": "training", "price": 25.0, "price_unit": "per_hour", "currency": "EUR", "notes": "Lezione di tornitura del legno. 3 ore minimo. Fai il tuo primo progetto."}
@@ -480,7 +480,7 @@
       "brand": "Makita",
       "model": "HS7611",
       "needs_equipment": "Occhiali protettivi, guanti, banco da lavoro",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/circular-saw.jpg", "alt_text": "Makita circular saw with guide and spare blade"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/circular-saw.svg", "alt_text": "Makita circular saw with guide and spare blade"}],
       "listings": [
         {"listing_type": "rent", "price": 10.0, "price_unit": "per_day", "currency": "EUR", "deposit": 40.0, "pickup_only": true}
       ]
@@ -497,7 +497,7 @@
       "condition": "like_new",
       "brand": "Creality",
       "model": "Ender 3 V3",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/3d-printer.jpg", "alt_text": "Creality Ender 3 V3 3D printer on workbench"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/3d-printer.svg", "alt_text": "Creality Ender 3 V3 3D printer on workbench"}],
       "listings": [
         {"listing_type": "rent", "price": 8.0, "price_unit": "per_hour", "currency": "EUR", "notes": "Filament not included (I sell PLA at EUR 20/kg). I'll help calibrate your first print."},
         {"listing_type": "commission", "price": null, "price_unit": "negotiable", "currency": "EUR", "notes": "Send me your STL file, I'll quote you. Small prints from EUR 5, large from EUR 20."}
@@ -512,7 +512,7 @@
       "item_type": "service",
       "category": "electronics",
       "subcategory": "repair",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/phone-repair.jpg", "alt_text": "Phone screen being replaced on Jake's workbench with precision tools"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/phone-repair.svg", "alt_text": "Phone screen being replaced on Jake's workbench with precision tools"}],
       "listings": [
         {"listing_type": "service", "price": 20.0, "price_unit": "flat", "currency": "EUR", "notes": "Labor only. Screen cost varies by model (EUR 15-80). I'll tell you exactly which part to order."}
       ]
@@ -526,7 +526,7 @@
       "item_type": "space",
       "category": "crafts",
       "subcategory": "pottery",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/pottery-wheel.jpg", "alt_text": "Pottery wheel with clay and finished bowls in Luna's studio"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/pottery-wheel.svg", "alt_text": "Pottery wheel with clay and finished bowls in Luna's studio"}],
       "listings": [
         {"listing_type": "rent", "price": 20.0, "price_unit": "flat", "currency": "EUR", "notes": "2-hour session. Clay included. Firing included. Take home your creation in 1 week."},
         {"listing_type": "training", "price": 35.0, "price_unit": "flat", "currency": "EUR", "notes": "2-hour guided pottery class. All materials included. Perfect for date nights!"}
@@ -543,7 +543,7 @@
       "subcategory": "painting",
       "condition": "good",
       "brand": "Winsor & Newton",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/watercolor-kit.jpg", "alt_text": "Winsor and Newton watercolor set with brushes and paper pad"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/watercolor-kit.svg", "alt_text": "Winsor and Newton watercolor set with brushes and paper pad"}],
       "listings": [
         {"listing_type": "rent", "price": 8.0, "price_unit": "per_day", "currency": "EUR", "deposit": 20.0, "delivery_available": true, "pickup_only": false}
       ]
@@ -559,7 +559,7 @@
       "subcategory": "appliances",
       "condition": "fair",
       "brand": "Imperia",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/pasta-machine.jpg", "alt_text": "Vintage Imperia pasta machine clamped to kitchen table"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/pasta-machine.svg", "alt_text": "Vintage Imperia pasta machine clamped to kitchen table"}],
       "listings": [
         {"listing_type": "rent", "price": 3.0, "price_unit": "per_day", "currency": "EUR", "pickup_only": true, "notes": "Marco vi mostrerà come funziona. Portate la vostra farina e le uova."}
       ]
@@ -577,7 +577,7 @@
       "brand": "Specialized",
       "model": "Rockhopper Sport 29",
       "needs_equipment": "Helmet included. Bring your own water bottle.",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/mountain-bike.jpg", "alt_text": "Red Specialized Rockhopper mountain bike leaning against a stone wall"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/mountain-bike.svg", "alt_text": "Red Specialized Rockhopper mountain bike leaning against a stone wall"}],
       "listings": [
         {"listing_type": "rent", "price": 15.0, "price_unit": "per_day", "currency": "EUR", "deposit": 50.0, "delivery_available": true, "pickup_only": false, "notes": "I deliver within 5km of Trapani center. Helmet and lock included."}
       ]
@@ -593,7 +593,7 @@
       "subcategory": "watersports",
       "condition": "good",
       "needs_equipment": "Wetsuit (I have one for rent too). Sunscreen.",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/surfboard.jpg", "alt_text": "White and blue funboard surfboard standing on sandy beach"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/surfboard.svg", "alt_text": "White and blue funboard surfboard standing on sandy beach"}],
       "listings": [
         {"listing_type": "rent", "price": 12.0, "price_unit": "per_day", "currency": "EUR", "deposit": 30.0, "pickup_only": true}
       ]
@@ -610,7 +610,7 @@
       "condition": "good",
       "brand": "Karcher",
       "model": "Puzzi 10/1",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/carpet-cleaner.jpg", "alt_text": "Yellow Karcher Puzzi professional carpet cleaner machine"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/carpet-cleaner.svg", "alt_text": "Yellow Karcher Puzzi professional carpet cleaner machine"}],
       "listings": [
         {"listing_type": "rent", "price": 20.0, "price_unit": "per_day", "currency": "EUR", "deposit": 50.0, "pickup_only": true, "notes": "Cleaning solution included for first use. I'll show you how to use it -- 5 minutes."},
         {"listing_type": "service", "price": 15.0, "price_unit": "per_hour", "currency": "EUR", "notes": "I'll clean your carpets for you. Minimum 2 hours. You'll think they're new."}
@@ -629,7 +629,7 @@
       "brand": "Karcher",
       "model": "K5 Premium",
       "needs_equipment": "Garden hose connection, outdoor power outlet",
-      "media": [{"media_type": "photo", "url": "/static/images/seed/pressure-washer.jpg", "alt_text": "Yellow Karcher K5 pressure washer with accessories"}],
+      "media": [{"media_type": "photo", "url": "/static/images/seed/pressure-washer.svg", "alt_text": "Yellow Karcher K5 pressure washer with accessories"}],
       "listings": [
         {"listing_type": "rent", "price": 15.0, "price_unit": "per_day", "currency": "EUR", "deposit": 40.0, "delivery_available": true, "pickup_only": false}
       ]

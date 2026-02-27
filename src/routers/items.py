@@ -131,6 +131,12 @@ async def create_item(
         longitude=data.longitude or user.longitude,
     )
     db.add(item)
+    await db.flush()
+
+    # Check and award badges (e.g., FIRST_LISTING, SUPER_LENDER)
+    from src.services.badges import check_and_award_badges
+    await check_and_award_badges(db, user.id)
+
     await db.commit()
     await db.refresh(item)
 

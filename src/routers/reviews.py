@@ -141,6 +141,13 @@ async def create_review(
         user.points.reviews_given += 1
         user.points.total_points += 5  # 5 pts for giving a review
 
+    await db.flush()
+
+    # Check and award badges for both parties
+    from src.services.badges import check_and_award_badges
+    await check_and_award_badges(db, user.id)
+    await check_and_award_badges(db, data.reviewee_id)
+
     await db.commit()
     await db.refresh(review)
     return review
