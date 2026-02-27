@@ -128,17 +128,88 @@
         <div class="space-y-6">
 
             <!-- Rent / Contact CTA -->
-            <div class="bg-white rounded-lg border border-gray-200 p-6">
-                <a href="#"
+            {% set active_listing_id = namespace(val='') %}
+            {% for listing in item.listings %}
+            {% if listing.status.value == 'active' and not active_listing_id.val %}
+            {% set active_listing_id.val = listing.id | string %}
+            {% endif %}
+            {% endfor %}
+            <div class="bg-white rounded-lg border border-gray-200 p-6"
+                 x-data="{ showRentalModal: false, submitting: false,
+                           listingId: '{{ active_listing_id.val }}',
+                           rentalForm: { start: '', end: '', message: '' },
+                           async submitRental() {
+                               this.submitting = true;
+                               if (!this.listingId) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'No active listing' } })); this.submitting = false; return; }
+                               try {
+                                   const resp = await fetch('/api/v1/rentals', {
+                                       method: 'POST',
+                                       headers: { 'Content-Type': 'application/json' },
+                                       body: JSON.stringify({
+                                           listing_id: this.listingId,
+                                           requested_start: this.rentalForm.start ? new Date(this.rentalForm.start).toISOString() : null,
+                                           requested_end: this.rentalForm.end ? new Date(this.rentalForm.end).toISOString() : null,
+                                           renter_message: this.rentalForm.message || null,
+                                           idempotency_key: crypto.randomUUID()
+                                       })
+                                   });
+                                   if (!resp.ok) { const err = await resp.json(); throw new Error(err.detail || 'Request failed'); }
+                                   window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{{ t('common.success') }}' } }));
+                                   this.showRentalModal = false;
+                               } catch (err) {
+                                   window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: err.message } }));
+                               } finally { this.submitting = false; }
+                           }
+                 }">
+                <button @click="showRentalModal = true"
                    class="w-full flex items-center justify-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors min-h-[44px]">
                     {{ t('item.rent_this') }}
-                </a>
+                </button>
                 {% if item.owner and item.owner.telegram_username %}
                 <a href="https://t.me/{{ item.owner.telegram_username }}" target="_blank" rel="noopener"
                    class="w-full flex items-center justify-center px-6 py-3 mt-3 bg-white text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px]">
                     {{ t('item.contact_telegram') }}
                 </a>
                 {% endif %}
+
+                <!-- Rental request modal -->
+                <div x-show="showRentalModal" x-cloak
+                     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+                     @keydown.escape.window="showRentalModal = false">
+                    <div class="bg-white rounded-lg max-w-md w-full p-6 space-y-4" @click.outside="showRentalModal = false">
+                        <h2 class="text-lg font-bold text-gray-900">{{ t('rental.request_title') }}</h2>
+                        <p class="text-sm text-gray-500">{{ item.name }}</p>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('rental.start_date') }}</label>
+                            <input type="date" x-model="rentalForm.start"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 min-h-[44px]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('rental.end_date') }}</label>
+                            <input type="date" x-model="rentalForm.end"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 min-h-[44px]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('rental.message') }}</label>
+                            <textarea x-model="rentalForm.message" rows="3"
+                                      placeholder="{{ t('rental.message_placeholder') }}"
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+
+                        <div class="flex justify-end space-x-3 pt-2">
+                            <button @click="showRentalModal = false"
+                                    class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 min-h-[44px]">
+                                {{ t('common.cancel') }}
+                            </button>
+                            <button @click="submitRental()" :disabled="submitting"
+                                    class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 min-h-[44px]">
+                                <span x-show="!submitting">{{ t('rental.submit') }}</span>
+                                <span x-show="submitting" x-cloak>{{ t('common.loading') }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Owner card -->

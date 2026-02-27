@@ -18,6 +18,7 @@ from src.dependencies import get_current_user_token
 from src.i18n import detect_language, get_translator, SUPPORTED_LANGUAGES
 from src.models.item import BHItem
 from src.models.listing import BHListing, ListingStatus
+from src.models.rental import BHRental
 from src.models.user import BHUser
 
 router = APIRouter(tags=["pages"])
@@ -202,3 +203,72 @@ async def workshop_profile(slug: str, request: Request,
         og_description=workshop_owner.tagline or "Workshop on BorrowHood",
     )
     return _render("pages/workshop.html", ctx)
+
+
+@router.get("/list", response_class=HTMLResponse)
+async def list_item_page(request: Request,
+                         token: Optional[dict] = Depends(get_current_user_token)):
+    """Form to list a new item. Requires authentication (enforced client-side)."""
+    ctx = _ctx(request, token)
+    return _render("pages/list_item.html", ctx)
+
+
+@router.get("/dashboard", response_class=HTMLResponse)
+async def dashboard(request: Request,
+                    db: AsyncSession = Depends(get_db),
+                    token: Optional[dict] = Depends(get_current_user_token)):
+    """User dashboard with items, rentals, and incoming requests."""
+    items = []
+    renter_rentals = []
+    owner_rentals = []
+
+    if token:
+        # Find user in DB by keycloak_id
+        user_result = await db.execute(
+            select(BHUser).where(BHUser.keycloak_id == token.get("sub", ""))
+        )
+        db_user = user_result.scalars().first()
+
+        if db_user:
+            # User's items
+            items_result = await db.execute(
+                select(BHItem)
+                .options(selectinload(BHItem.media), selectinload(BHItem.listings))
+                .where(BHItem.owner_id == db_user.id)
+                .where(BHItem.deleted_at.is_(None))
+                .order_by(BHItem.created_at.desc())
+            )
+            items = items_result.scalars().unique().all()
+
+            # Rentals as renter
+            renter_result = await db.execute(
+                select(BHRental)
+                .options(
+                    selectinload(BHRental.listing).selectinload(BHListing.item)
+                )
+                .where(BHRental.renter_id == db_user.id)
+                .order_by(BHRental.created_at.desc())
+                .limit(20)
+            )
+            renter_rentals = renter_result.scalars().unique().all()
+
+            # Rentals on user's items (incoming requests)
+            owner_result = await db.execute(
+                select(BHRental)
+                .options(
+                    selectinload(BHRental.listing).selectinload(BHListing.item)
+                )
+                .join(BHListing)
+                .join(BHItem, BHListing.item_id == BHItem.id)
+                .where(BHItem.owner_id == db_user.id)
+                .order_by(BHRental.created_at.desc())
+                .limit(20)
+            )
+            owner_rentals = owner_result.scalars().unique().all()
+
+    ctx = _ctx(request, token,
+        items=items,
+        renter_rentals=renter_rentals,
+        owner_rentals=owner_rentals,
+    )
+    return _render("pages/dashboard.html", ctx)

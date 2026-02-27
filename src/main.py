@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
 from src.database import create_tables, get_db
-from src.routers import auth, health, pages
+from src.routers import auth, health, items, listings, pages, rentals, reviews
 from src.services.seeding import seed_database
 
 # Configure logging
@@ -40,6 +40,10 @@ def create_app() -> FastAPI:
 
     # API routers
     app.include_router(health.router)
+    app.include_router(items.router)
+    app.include_router(listings.router)
+    app.include_router(rentals.router)
+    app.include_router(reviews.router)
 
     # Auth routers (login/logout/callback)
     app.include_router(auth.router)

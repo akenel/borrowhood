@@ -214,3 +214,43 @@ async def test_workshop_i18n_it(client):
     """Workshop page in Italian should use Italian labels."""
     resp = await client.get("/workshop/sallys-kitchen?lang=it")
     assert "Chi Sono" in resp.text or "Oggetti" in resp.text
+
+
+# --- List Item Page ---
+
+@pytest.mark.asyncio
+async def test_list_item_returns_200(client):
+    """List item page should return 200."""
+    resp = await client.get("/list")
+    assert resp.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_list_item_has_form(client):
+    """List item page should have the form fields."""
+    resp = await client.get("/list")
+    assert "name" in resp.text
+    assert "category" in resp.text
+
+
+@pytest.mark.asyncio
+async def test_list_item_i18n_it(client):
+    """List item page in Italian should use Italian labels."""
+    resp = await client.get("/list?lang=it")
+    assert "Pubblica un Oggetto" in resp.text
+
+
+# --- Dashboard Page ---
+
+@pytest.mark.asyncio
+async def test_dashboard_returns_200(client):
+    """Dashboard page should return 200."""
+    resp = await client.get("/dashboard")
+    assert resp.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_dashboard_has_tabs(client):
+    """Dashboard should have item and rental tabs."""
+    resp = await client.get("/dashboard")
+    assert "My Items" in resp.text or "My Dashboard" in resp.text

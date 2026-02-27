@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('dashboard.title') }} - {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">{{ t('dashboard.title') }}</h1>
+        <a href="/list"
+           class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px]">
+            + {{ t('home.cta_list') }}
+        </a>
+    </div>
+
+    <!-- Tabs -->
+    <div x-data="{ tab: 'items' }" class="space-y-6">
+        <div class="border-b border-gray-200">
+            <nav class="flex space-x-6">
+                <button @click="tab = 'items'"
+                        :class="tab === 'items' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
+                    {{ t('dashboard.my_items') }}
+                </button>
+                <button @click="tab = 'renting'"
+                        :class="tab === 'renting' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
+                    {{ t('dashboard.my_rentals') }}
+                </button>
+                <button @click="tab = 'requests'"
+                        :class="tab === 'requests' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
+                    {{ t('dashboard.incoming_requests') }}
+                </button>
+            </nav>
+        </div>
+
+        <!-- My Items tab -->
+        <div x-show="tab === 'items'">
+            {% if items %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for item in items %}
+                <a href="/items/{{ item.slug }}" class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group">
+                    {% if item.media %}
+                    <img src="{{ item.media[0].url }}" alt="{{ item.media[0].alt_text }}" class="w-full h-40 object-cover">
+                    {% else %}
+                    <div class="w-full h-40 bg-gray-100 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    {% endif %}
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ item.name }}</h3>
+                        <div class="flex items-center space-x-2 mt-2">
+                            <span class="text-xs px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full">{{ t('item_types.' + item.item_type.value) }}</span>
+                            <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">{{ t('categories.' + item.category) }}</span>
+                        </div>
+                        {% if item.listings %}
+                        <div class="mt-2">
+                            {% for listing in item.listings %}
+                            <span class="text-xs px-2 py-0.5 rounded-full
+                                {% if listing.status.value == 'active' %}bg-emerald-50 text-emerald-700
+                                {% elif listing.status.value == 'draft' %}bg-gray-100 text-gray-500
+                                {% else %}bg-amber-50 text-amber-700{% endif %}">
+                                {{ listing.status.value | title }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
+                <p class="text-gray-500 mb-4">{{ t('dashboard.no_items') }}</p>
+                <a href="/list" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 min-h-[44px]">
+                    {{ t('dashboard.list_first_item') }}
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- My Rentals tab (as renter) -->
+        <div x-show="tab === 'renting'" x-cloak>
+            {% if renter_rentals %}
+            <div class="space-y-3">
+                {% for rental in renter_rentals %}
+                <div class="bg-white rounded-lg border border-gray-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between">
+                    <div>
+                        <p class="font-medium text-gray-900">{{ rental.listing.item.name if rental.listing and rental.listing.item else 'Item' }}</p>
+                        <p class="text-sm text-gray-500">{{ t('dashboard.as_renter') }}</p>
+                    </div>
+                    <div class="mt-2 sm:mt-0 flex items-center space-x-3">
+                        <span class="text-xs px-3 py-1 rounded-full font-medium
+                            {% if rental.status.value == 'completed' %}bg-emerald-50 text-emerald-700
+                            {% elif rental.status.value == 'pending' %}bg-amber-50 text-amber-700
+                            {% elif rental.status.value == 'approved' %}bg-blue-50 text-blue-700
+                            {% elif rental.status.value in ['declined','cancelled'] %}bg-red-50 text-red-700
+                            {% else %}bg-gray-100 text-gray-700{% endif %}">
+                            {{ t('rental.status.' + rental.status.value) }}
+                        </span>
+                        <span class="text-xs text-gray-400">{{ rental.created_at.strftime('%b %d') }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
+                <p class="text-gray-500">{{ t('dashboard.no_rentals') }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Incoming Requests tab (as owner) -->
+        <div x-show="tab === 'requests'" x-cloak>
+            {% if owner_rentals %}
+            <div class="space-y-3">
+                {% for rental in owner_rentals %}
+                <div class="bg-white rounded-lg border border-gray-200 p-4"
+                     x-data="{ processing: false,
+                               async updateStatus(status, reason) {
+                                   this.processing = true;
+                                   try {
+                                       const resp = await fetch('/api/v1/rentals/{{ rental.id }}/status', {
+                                           method: 'PATCH',
+                                           headers: { 'Content-Type': 'application/json' },
+                                           body: JSON.stringify({ status, reason })
+                                       });
+                                       if (!resp.ok) { const err = await resp.json(); throw new Error(err.detail); }
+                                       window.location.reload();
+                                   } catch (err) {
+                                       window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: err.message } }));
+                                   } finally { this.processing = false; }
+                               }
+                     }">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between">
+                        <div>
+                            <p class="font-medium text-gray-900">{{ rental.listing.item.name if rental.listing and rental.listing.item else 'Item' }}</p>
+                            <p class="text-sm text-gray-500">{{ t('dashboard.as_owner') }}</p>
+                            {% if rental.renter_message %}
+                            <p class="text-sm text-gray-600 mt-1 italic">"{{ rental.renter_message }}"</p>
+                            {% endif %}
+                        </div>
+                        <div class="mt-2 sm:mt-0 flex items-center space-x-2">
+                            <span class="text-xs px-3 py-1 rounded-full font-medium
+                                {% if rental.status.value == 'completed' %}bg-emerald-50 text-emerald-700
+                                {% elif rental.status.value == 'pending' %}bg-amber-50 text-amber-700
+                                {% elif rental.status.value == 'approved' %}bg-blue-50 text-blue-700
+                                {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                {{ t('rental.status.' + rental.status.value) }}
+                            </span>
+                            {% if rental.status.value == 'pending' %}
+                            <button @click="updateStatus('approved')" :disabled="processing"
+                                    class="text-xs px-3 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 min-h-[32px]">Approve</button>
+                            <button @click="updateStatus('declined', 'Declined by owner')" :disabled="processing"
+                                    class="text-xs px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 min-h-[32px]">Decline</button>
+                            {% elif rental.status.value == 'returned' %}
+                            <button @click="updateStatus('completed')" :disabled="processing"
+                                    class="text-xs px-3 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 min-h-[32px]">Complete</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
+                <p class="text-gray-500">{{ t('dashboard.no_rentals') }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
