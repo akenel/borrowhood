@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}{{ workshop.workshop_name or workshop.display_name }} - BorrowHood{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Breadcrumb -->
+    <nav class="text-sm text-gray-500 mb-6">
+        <a href="/" class="hover:text-indigo-600">Home</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-900">{{ workshop.workshop_name or workshop.display_name }}</span>
+    </nav>
+
+    <!-- Workshop header -->
+    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <!-- Banner -->
+        {% if workshop.banner_url %}
+        <div class="h-48 md:h-64 bg-cover bg-center" style="background-image: url('{{ workshop.banner_url }}')"></div>
+        {% else %}
+        <div class="h-32 md:h-48 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+        {% endif %}
+
+        <!-- Profile info -->
+        <div class="px-6 pb-6 -mt-12 md:-mt-16">
+            <div class="flex flex-col sm:flex-row sm:items-end sm:space-x-6">
+                <!-- Avatar -->
+                <div class="w-24 h-24 md:w-32 md:h-32 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                    {% if workshop.avatar_url %}
+                    <img src="{{ workshop.avatar_url }}" alt="{{ workshop.display_name }}" class="w-full h-full rounded-full object-cover">
+                    {% else %}
+                    <span class="text-3xl md:text-4xl font-bold text-indigo-600">{{ workshop.display_name[0] }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Name + meta -->
+                <div class="mt-4 sm:mt-0 sm:mb-2 flex-1">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">
+                                {{ workshop.workshop_name or workshop.display_name }}
+                            </h1>
+                            {% if workshop.tagline %}
+                            <p class="text-gray-500 mt-1">{{ workshop.tagline }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Badge -->
+                        <span class="mt-2 sm:mt-0 text-sm px-3 py-1.5 rounded-full font-medium w-fit
+                            {% if workshop.badge_tier.value == 'legend' %}bg-amber-100 text-amber-700
+                            {% elif workshop.badge_tier.value == 'pillar' %}bg-purple-100 text-purple-700
+                            {% elif workshop.badge_tier.value == 'trusted' %}bg-emerald-100 text-emerald-700
+                            {% elif workshop.badge_tier.value == 'active' %}bg-blue-100 text-blue-700
+                            {% else %}bg-gray-100 text-gray-700{% endif %}">
+                            {{ workshop.badge_tier.value | title }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Left: Bio + Items (2/3) -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <!-- Bio -->
+            {% if workshop.bio %}
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-900">About</h2>
+                <p class="mt-3 text-gray-700 leading-relaxed">{{ workshop.bio }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Skills -->
+            {% if workshop.skills %}
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-900">Skills</h2>
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {% for skill in workshop.skills %}
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ skill.skill_name }}</p>
+                            <p class="text-xs text-gray-500">{{ skill.category | title }}{% if skill.years_experience %} &middot; {{ skill.years_experience }}y exp{% endif %}</p>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            {% for i in range(5) %}
+                            <svg class="w-4 h-4 {% if i < skill.self_rating %}text-amber-400{% else %}text-gray-200{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            {% endfor %}
+                            {% if skill.verified_by_count > 0 %}
+                            <span class="text-xs text-emerald-600 ml-2">+{{ skill.verified_by_count }} verified</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Items -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-900">Items ({{ workshop.items | length }})</h2>
+                {% if workshop.items %}
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {% for item in workshop.items %}
+                    {% if not item.deleted_at %}
+                    <a href="/items/{{ item.slug }}"
+                       class="flex space-x-4 p-3 rounded-lg hover:bg-gray-50 transition-colors group">
+                        {% if item.media %}
+                        <img src="{{ item.media[0].url }}" alt="{{ item.media[0].alt_text }}"
+                             class="w-20 h-20 rounded-lg object-cover flex-shrink-0" loading="lazy">
+                        {% else %}
+                        <div class="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        {% endif %}
+                        <div class="min-w-0">
+                            <p class="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors truncate">{{ item.name }}</p>
+                            <p class="text-xs text-gray-500 mt-0.5">{{ item.category | title }}</p>
+                            <span class="text-xs px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded mt-1 inline-block">
+                                {{ item.item_type.value | replace('_', ' ') | title }}
+                            </span>
+                        </div>
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <!-- Empty state -->
+                <div class="text-center py-8">
+                    <p class="text-sm text-gray-500">No items listed yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right sidebar -->
+        <div class="space-y-6">
+
+            <!-- Contact -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                {% if workshop.telegram_username %}
+                <a href="https://t.me/{{ workshop.telegram_username }}" target="_blank" rel="noopener"
+                   class="w-full flex items-center justify-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors min-h-[44px]">
+                    Message on Telegram
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Languages -->
+            {% if workshop.languages %}
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">Languages</h3>
+                <div class="space-y-2">
+                    {% for lang in workshop.languages %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-700">{{ lang.language_code | upper }}</span>
+                        <span class="text-xs px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-full font-medium">
+                            {{ lang.proficiency.value }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Social links -->
+            {% if workshop.social_links %}
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">Links</h3>
+                <div class="space-y-2">
+                    {% for link in workshop.social_links %}
+                    <a href="{{ link.url }}" target="_blank" rel="noopener"
+                       class="flex items-center space-x-2 text-sm text-gray-700 hover:text-indigo-600 transition-colors min-h-[36px]">
+                        <span class="capitalize">{{ link.platform }}</span>
+                        {% if link.label %}
+                        <span class="text-gray-400">- {{ link.label }}</span>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Location -->
+            {% if workshop.city %}
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">Location</h3>
+                <p class="text-sm text-gray-700">{{ workshop.city }}{% if workshop.country_code %}, {{ workshop.country_code }}{% endif %}</p>
+            </div>
+            {% endif %}
+
+            <!-- Report -->
+            <div class="text-center">
+                <button class="text-xs text-gray-400 hover:text-red-500 transition-colors min-h-[44px]">
+                    Report this profile
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

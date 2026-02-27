@@ -9,9 +9,13 @@ import logging
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.config import settings
-from src.database import create_tables
+from src.database import create_tables, get_db
 from src.routers import health, pages
+from src.services.seeding import seed_database
 
 # Configure logging
 logging.basicConfig(
@@ -39,6 +43,16 @@ def create_app() -> FastAPI:
 
     # Page routers (HTML)
     app.include_router(pages.router)
+
+    # Seed endpoint (debug only)
+    @app.post("/api/v1/seed")
+    async def seed(db: AsyncSession = Depends(get_db)):
+        """Load seed data into database. Debug mode only."""
+        if not settings.debug:
+            from fastapi import HTTPException
+            raise HTTPException(status_code=403, detail="Seeding disabled in production")
+        result = await seed_database(db)
+        return {"status": "ok", "counts": result}
 
     @app.on_event("startup")
     async def startup():
