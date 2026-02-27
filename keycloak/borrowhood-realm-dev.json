@@ -158,7 +158,8 @@
         "https://helix.local/*",
         "http://localhost:8000/*",
         "http://localhost:3000/*",
-        "https://46.62.138.218/*"
+        "https://46.62.138.218/*",
+        "https://46.62.138.218:8443/*"
       ],
       "webOrigins": [
         "https://borrowhood.helix.local",
@@ -166,6 +167,7 @@
         "http://localhost:8000",
         "http://localhost:3000",
         "https://46.62.138.218",
+        "https://46.62.138.218:8443",
         "+"
       ],
       "defaultClientScopes": [
