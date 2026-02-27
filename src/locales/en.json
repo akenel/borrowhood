@@ -107,12 +107,41 @@
     "report": "Report this profile",
     "verified": "verified"
   },
+  "auction": {
+    "current_bid": "Current Bid",
+    "starting_bid": "Starting Bid",
+    "no_bids_yet": "No bids yet",
+    "bids": "bids",
+    "bid": "bid",
+    "time_left": "Time Left",
+    "ended": "Auction Ended",
+    "place_bid": "Place Bid",
+    "your_bid": "Your Bid",
+    "min_bid": "Minimum bid",
+    "bid_placed": "Bid placed!",
+    "anti_snipe": "Anti-snipe: +2 min extension",
+    "reserve_not_met": "Reserve not met",
+    "reserve_met": "Reserve met",
+    "you_are_winning": "You are the highest bidder!",
+    "bid_history": "Bid History",
+    "winner": "Winner",
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s",
+    "login_to_bid": "Log in to bid",
+    "ending_soon": "Ending soon!"
+  },
   "review": {
     "leave_review": "Leave a Review",
     "rating": "Rating",
     "title": "Title",
     "body": "Your Review",
-    "submit": "Submit Review"
+    "submit": "Submit Review",
+    "no_reviews": "No reviews yet.",
+    "reviews_for": "Reviews",
+    "based_on": "based on",
+    "weighted": "weighted average"
   },
   "common": {
     "save": "Save",

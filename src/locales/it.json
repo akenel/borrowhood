@@ -107,12 +107,41 @@
     "report": "Segnala questo profilo",
     "verified": "verificato"
   },
+  "auction": {
+    "current_bid": "Offerta Attuale",
+    "starting_bid": "Offerta Iniziale",
+    "no_bids_yet": "Nessuna offerta",
+    "bids": "offerte",
+    "bid": "offerta",
+    "time_left": "Tempo Rimasto",
+    "ended": "Asta Terminata",
+    "place_bid": "Fai un'Offerta",
+    "your_bid": "La Tua Offerta",
+    "min_bid": "Offerta minima",
+    "bid_placed": "Offerta inviata!",
+    "anti_snipe": "Anti-snipe: +2 min estensione",
+    "reserve_not_met": "Prezzo di riserva non raggiunto",
+    "reserve_met": "Prezzo di riserva raggiunto",
+    "you_are_winning": "Sei il miglior offerente!",
+    "bid_history": "Storico Offerte",
+    "winner": "Vincitore",
+    "days": "g",
+    "hours": "o",
+    "minutes": "m",
+    "seconds": "s",
+    "login_to_bid": "Accedi per offrire",
+    "ending_soon": "Termina presto!"
+  },
   "review": {
     "leave_review": "Lascia una Recensione",
     "rating": "Valutazione",
     "title": "Titolo",
     "body": "La Tua Recensione",
-    "submit": "Invia Recensione"
+    "submit": "Invia Recensione",
+    "no_reviews": "Nessuna recensione ancora.",
+    "reviews_for": "Recensioni",
+    "based_on": "basato su",
+    "weighted": "media ponderata"
   },
   "common": {
     "save": "Salva",

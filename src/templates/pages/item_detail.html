@@ -129,18 +129,182 @@
                     {% endfor %}
                 </div>
             </div>
+
+            <!-- Reviews section -->
+            {% if item.owner %}
+            <div class="bg-white rounded-lg border border-gray-200 p-6"
+                 x-data="reviewSection('{{ item.owner.id }}')" x-init="init()">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">{{ t('review.reviews_for') }}</h2>
+                    <div x-show="summary" x-cloak class="flex items-center space-x-2">
+                        <div class="flex items-center">
+                            <template x-for="i in 5" :key="i">
+                                <svg class="w-4 h-4" :class="i <= Math.round(summary.weighted_average || summary.average || 0) ? 'text-amber-400' : 'text-gray-200'" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                            </template>
+                        </div>
+                        <span class="text-sm text-gray-500">
+                            <span x-text="(summary.weighted_average || summary.average || 0).toFixed(1)"></span>
+                            (<span x-text="summary.count"></span>)
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Review list -->
+                <div x-show="reviews.length > 0" class="space-y-4">
+                    <template x-for="review in reviews" :key="review.id">
+                        <div class="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-1">
+                                    <template x-for="i in 5" :key="'s'+i">
+                                        <svg class="w-3.5 h-3.5" :class="i <= review.rating ? 'text-amber-400' : 'text-gray-200'" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                    </template>
+                                </div>
+                                <span class="text-xs text-gray-400" x-text="new Date(review.created_at).toLocaleDateString()"></span>
+                            </div>
+                            <p x-show="review.title" class="text-sm font-semibold text-gray-900 mt-2" x-text="review.title"></p>
+                            <p x-show="review.body" class="text-sm text-gray-600 mt-1" x-text="review.body"></p>
+                            <div x-show="review.reviewer_tier" class="mt-2">
+                                <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full" x-text="review.reviewer_tier"></span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- No reviews -->
+                <div x-show="loaded && reviews.length === 0" x-cloak class="text-center py-6">
+                    <svg class="w-10 h-10 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    <p class="text-sm text-gray-400">{{ t('review.no_reviews') }}</p>
+                </div>
+            </div>
+            {% endif %}
         </div>
 
         <!-- Right sidebar: Owner info + Actions -->
         <div class="space-y-6">
 
+            <!-- Auction panels (for each active auction listing) -->
+            {% for listing in item.listings %}
+            {% if listing.status.value == 'active' and listing.listing_type.value == 'auction' %}
+            <div class="bg-white rounded-lg border-2 border-amber-300 p-6"
+                 x-data="auctionPanel('{{ listing.id }}', {{ listing.starting_bid or 0 }}, {{ listing.bid_increment or 1 }}, '{{ listing.currency }}')"
+                 x-init="init()">
+
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-900 flex items-center">
+                        <svg class="w-5 h-5 text-amber-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {{ t('listing_types.auction') }}
+                    </h3>
+                    <span x-show="endingSoon && !ended" x-cloak
+                          class="text-xs px-2 py-1 bg-red-100 text-red-700 rounded-full font-semibold animate-pulse">
+                        {{ t('auction.ending_soon') }}
+                    </span>
+                </div>
+
+                <!-- Current bid -->
+                <div class="text-center py-4 bg-amber-50 rounded-lg mb-4">
+                    <p class="text-xs text-amber-700 uppercase tracking-wider font-medium"
+                       x-text="totalBids > 0 ? '{{ t('auction.current_bid') }}' : '{{ t('auction.starting_bid') }}'"></p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1">
+                        <span x-text="currency"></span> <span x-text="currentPrice ? currentPrice.toFixed(2) : startingBid.toFixed(2)"></span>
+                    </p>
+                    <p class="text-sm text-gray-500 mt-1">
+                        <span x-text="totalBids"></span> <span x-text="totalBids === 1 ? '{{ t('auction.bid') }}' : '{{ t('auction.bids') }}'"></span>
+                    </p>
+                </div>
+
+                <!-- Countdown timer -->
+                <div x-show="!ended" class="mb-4">
+                    <p class="text-xs text-gray-500 uppercase tracking-wider font-medium mb-2">{{ t('auction.time_left') }}</p>
+                    <div class="grid grid-cols-4 gap-2 text-center">
+                        <div class="bg-gray-100 rounded-lg py-2">
+                            <p class="text-xl font-bold text-gray-900" x-text="countdown.days"></p>
+                            <p class="text-xs text-gray-500">{{ t('auction.days') }}</p>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg py-2">
+                            <p class="text-xl font-bold text-gray-900" x-text="countdown.hours"></p>
+                            <p class="text-xs text-gray-500">{{ t('auction.hours') }}</p>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg py-2">
+                            <p class="text-xl font-bold text-gray-900" x-text="countdown.minutes"></p>
+                            <p class="text-xs text-gray-500">{{ t('auction.minutes') }}</p>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg py-2">
+                            <p class="text-xl font-bold" :class="endingSoon ? 'text-red-600' : 'text-gray-900'" x-text="countdown.seconds"></p>
+                            <p class="text-xs text-gray-500">{{ t('auction.seconds') }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ended state -->
+                <div x-show="ended" x-cloak class="mb-4 text-center py-3 bg-gray-100 rounded-lg">
+                    <p class="text-sm font-semibold text-gray-700">{{ t('auction.ended') }}</p>
+                    <template x-if="!reserveMet && totalBids > 0">
+                        <p class="text-xs text-red-600 mt-1">{{ t('auction.reserve_not_met') }}</p>
+                    </template>
+                </div>
+
+                <!-- Reserve indicator -->
+                <div x-show="totalBids > 0 && !ended" class="mb-4">
+                    <p x-show="reserveMet" class="text-xs text-emerald-600 font-medium flex items-center">
+                        <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                        {{ t('auction.reserve_met') }}
+                    </p>
+                    <p x-show="!reserveMet" class="text-xs text-amber-600 font-medium">{{ t('auction.reserve_not_met') }}</p>
+                </div>
+
+                <!-- Bid form -->
+                <div x-show="!ended" class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('auction.your_bid') }}</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" x-text="currency"></span>
+                            <input type="number" x-model.number="bidAmount" :min="minBid" step="0.01"
+                                   :placeholder="minBid.toFixed(2)"
+                                   class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 min-h-[44px]">
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">{{ t('auction.min_bid') }}: <span x-text="currency"></span> <span x-text="minBid.toFixed(2)"></span></p>
+                    </div>
+                    <button @click="placeBid()" :disabled="bidding || !bidAmount || bidAmount < minBid"
+                            class="w-full flex items-center justify-center px-6 py-3 bg-amber-500 text-white font-semibold rounded-lg hover:bg-amber-600 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-colors disabled:opacity-50 min-h-[44px]">
+                        <span x-show="!bidding">{{ t('auction.place_bid') }}</span>
+                        <span x-show="bidding" x-cloak>{{ t('common.loading') }}</span>
+                    </button>
+                    <p class="text-xs text-center text-gray-400">{{ t('auction.anti_snipe') }}</p>
+                </div>
+
+                <!-- Success feedback -->
+                <div x-show="bidSuccess" x-cloak x-transition
+                     class="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-center">
+                    <p class="text-sm font-semibold text-emerald-700">{{ t('auction.bid_placed') }}</p>
+                    <p class="text-xs text-emerald-600 mt-1">{{ t('auction.you_are_winning') }}</p>
+                </div>
+
+                <!-- Extension feedback -->
+                <div x-show="auctionExtended" x-cloak x-transition
+                     class="mt-3 p-2 bg-amber-50 border border-amber-200 rounded-lg text-center">
+                    <p class="text-xs font-medium text-amber-700">{{ t('auction.anti_snipe') }}</p>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+
             <!-- Rent / Contact CTA -->
             {% set active_listing_id = namespace(val='') %}
             {% for listing in item.listings %}
-            {% if listing.status.value == 'active' and not active_listing_id.val %}
+            {% if listing.status.value == 'active' and listing.listing_type.value != 'auction' and not active_listing_id.val %}
             {% set active_listing_id.val = listing.id | string %}
             {% endif %}
             {% endfor %}
+            {% if active_listing_id.val %}
             <div class="bg-white rounded-lg border border-gray-200 p-6"
                  x-data="{ showRentalModal: false, submitting: false,
                            listingId: '{{ active_listing_id.val }}',
@@ -218,6 +382,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
 
             <!-- Owner card -->
             {% if item.owner %}
@@ -307,4 +472,168 @@
     });
 </script>
 {% endif %}
+
+<script>
+    // Auction panel component
+    function auctionPanel(listingId, startingBid, bidIncrement, currency) {
+        return {
+            listingId,
+            startingBid,
+            bidIncrement,
+            currency,
+            currentPrice: null,
+            totalBids: 0,
+            auctionEnd: null,
+            reserveMet: true,
+            ended: false,
+            endingSoon: false,
+            bidAmount: null,
+            bidding: false,
+            bidSuccess: false,
+            auctionExtended: false,
+            minBid: startingBid || 0.01,
+            countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+            timer: null,
+
+            async init() {
+                await this.fetchSummary();
+                this.timer = setInterval(() => this.updateCountdown(), 1000);
+            },
+
+            async fetchSummary() {
+                try {
+                    const resp = await fetch(`/api/v1/bids/summary?listing_id=${this.listingId}`);
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        this.totalBids = data.total_bids;
+                        this.currentPrice = data.current_price;
+                        this.reserveMet = data.reserve_met;
+                        if (data.auction_end) {
+                            this.auctionEnd = new Date(data.auction_end);
+                        }
+                        // Calculate minimum bid
+                        if (this.currentPrice && this.totalBids > 0) {
+                            this.minBid = this.currentPrice + this.bidIncrement;
+                        } else {
+                            this.minBid = this.startingBid || 0.01;
+                        }
+                        this.bidAmount = this.minBid;
+                    }
+                } catch (e) {
+                    console.error('Failed to fetch auction summary:', e);
+                }
+            },
+
+            updateCountdown() {
+                if (!this.auctionEnd) return;
+                const now = new Date();
+                const diff = this.auctionEnd - now;
+
+                if (diff <= 0) {
+                    this.ended = true;
+                    this.endingSoon = false;
+                    this.countdown = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+                    if (this.timer) clearInterval(this.timer);
+                    return;
+                }
+
+                this.endingSoon = diff < 300000; // 5 minutes
+                this.countdown = {
+                    days: Math.floor(diff / 86400000),
+                    hours: Math.floor((diff % 86400000) / 3600000),
+                    minutes: Math.floor((diff % 3600000) / 60000),
+                    seconds: Math.floor((diff % 60000) / 1000)
+                };
+            },
+
+            async placeBid() {
+                if (!this.bidAmount || this.bidAmount < this.minBid) return;
+                this.bidding = true;
+                this.bidSuccess = false;
+                this.auctionExtended = false;
+
+                try {
+                    const resp = await fetch('/api/v1/bids', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            listing_id: this.listingId,
+                            amount: this.bidAmount
+                        })
+                    });
+
+                    if (!resp.ok) {
+                        const err = await resp.json();
+                        throw new Error(err.detail || 'Bid failed');
+                    }
+
+                    const data = await resp.json();
+                    this.bidSuccess = true;
+
+                    if (data.auction_extended) {
+                        this.auctionExtended = true;
+                        this.auctionEnd = new Date(data.new_auction_end);
+                    }
+
+                    // Refresh summary
+                    await this.fetchSummary();
+
+                    // Auto-hide success message
+                    setTimeout(() => {
+                        this.bidSuccess = false;
+                        this.auctionExtended = false;
+                    }, 5000);
+
+                } catch (err) {
+                    window.dispatchEvent(new CustomEvent('toast', {
+                        detail: { type: 'error', message: err.message }
+                    }));
+                } finally {
+                    this.bidding = false;
+                }
+            },
+
+            destroy() {
+                if (this.timer) clearInterval(this.timer);
+            }
+        };
+    }
+
+    // Review section component
+    function reviewSection(ownerId) {
+        return {
+            ownerId,
+            reviews: [],
+            summary: null,
+            loaded: false,
+
+            async init() {
+                await Promise.all([this.fetchReviews(), this.fetchSummary()]);
+                this.loaded = true;
+            },
+
+            async fetchReviews() {
+                try {
+                    const resp = await fetch(`/api/v1/reviews?reviewee_id=${this.ownerId}&limit=10`);
+                    if (resp.ok) {
+                        this.reviews = await resp.json();
+                    }
+                } catch (e) {
+                    console.error('Failed to fetch reviews:', e);
+                }
+            },
+
+            async fetchSummary() {
+                try {
+                    const resp = await fetch(`/api/v1/reviews/summary/${this.ownerId}`);
+                    if (resp.ok) {
+                        this.summary = await resp.json();
+                    }
+                } catch (e) {
+                    console.error('Failed to fetch review summary:', e);
+                }
+            }
+        };
+    }
+</script>
 {% endblock %}
