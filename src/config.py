@@ -36,6 +36,12 @@ class BHSettings(BaseSettings):
     telegram_bot_token: str = ""
     telegram_enabled: bool = False
 
+    # PayPal
+    paypal_client_id: str = ""
+    paypal_client_secret: str = ""
+    paypal_mode: str = "sandbox"  # "sandbox" or "live"
+    paypal_merchant_email: str = "angel.kenel@gmail.com"
+
     # Google
     google_maps_api_key: str = ""
 
