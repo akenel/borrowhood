@@ -16,6 +16,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.item import BHItem, BHItemMedia, ItemCondition, ItemType, MediaType
 from src.models.listing import BHListing, ListingStatus, ListingType
+from src.models.rental import BHRental, RentalStatus
+from src.models.review import BHReview
 from src.models.user import (
     AccountStatus,
     BadgeTier,
@@ -53,8 +55,9 @@ async def seed_database(db: AsyncSession) -> dict:
     with open(SEED_FILE) as f:
         data = json.load(f)
 
-    counts = {"users": 0, "items": 0, "listings": 0, "teams": 0}
+    counts = {"users": 0, "items": 0, "listings": 0, "teams": 0, "rentals": 0, "reviews": 0}
     user_map = {}  # slug -> user object
+    listing_map = {}  # item_slug -> first listing object
 
     # Create users
     for u in data["users"]:
@@ -159,7 +162,7 @@ async def seed_database(db: AsyncSession) -> dict:
 
         # Listings
         for listing in item_data.get("listings", []):
-            db.add(BHListing(
+            listing_obj = BHListing(
                 item_id=item.id,
                 listing_type=_enum_val(ListingType, listing["listing_type"]),
                 status=ListingStatus.ACTIVE,
@@ -172,7 +175,11 @@ async def seed_database(db: AsyncSession) -> dict:
                 delivery_available=listing.get("delivery_available", False),
                 pickup_only=listing.get("pickup_only", True),
                 notes=listing.get("notes"),
-            ))
+            )
+            db.add(listing_obj)
+            await db.flush()
+            if item_data["slug"] not in listing_map:
+                listing_map[item_data["slug"]] = (listing_obj, owner)
             counts["listings"] += 1
 
         counts["items"] += 1
@@ -190,6 +197,88 @@ async def seed_database(db: AsyncSession) -> dict:
                 accepted=team.get("accepted", False),
             ))
             counts["teams"] += 1
+
+    # Create seed rentals and reviews (makes the app look alive)
+    seed_reviews = [
+        {
+            "item_slug": "bosch-professional-drill-driver-set",
+            "renter_slug": "sallys-kitchen",
+            "rating": 5,
+            "title": "Perfect drill, great neighbor!",
+            "body": "Mike's drill set is professional grade. He even included extra bits and showed me how to use the torque settings. Will definitely rent again.",
+        },
+        {
+            "item_slug": "bosch-professional-drill-driver-set",
+            "renter_slug": "marias-garden",
+            "rating": 4,
+            "title": "Solid equipment, easy pickup",
+            "body": "Used this for a garden fence project. Powerful drill, batteries lasted all day. Pickup and return were smooth via lockbox.",
+        },
+        {
+            "item_slug": "professional-cookie-cutter-set-200-pieces",
+            "renter_slug": "mikes-garage",
+            "rating": 5,
+            "title": "My daughter loved these!",
+            "body": "200 shapes is no joke. We made cookies for the whole block. Sally had them perfectly organized by theme. Amazing collection.",
+        },
+        {
+            "item_slug": "kitchenaid-stand-mixer-artisan-5qt",
+            "renter_slug": "marias-garden",
+            "rating": 5,
+            "title": "Made bread like a pro",
+            "body": "First time using a stand mixer. Sally's KitchenAid is immaculate. The dough hook attachment changed my life. My focaccia finally came out right.",
+        },
+        {
+            "item_slug": "floor-jack-jack-stands-3-ton",
+            "renter_slug": "sallys-kitchen",
+            "rating": 4,
+            "title": "Heavy duty, does the job",
+            "body": "Needed this for an oil change on the van. Professional quality. Mike even dropped it off at my place. Only 4 stars because the instructions were a bit unclear.",
+        },
+    ]
+
+    all_users = list(user_map.values())
+    for rev_data in seed_reviews:
+        listing_info = listing_map.get(rev_data["item_slug"])
+        renter = user_map.get(rev_data["renter_slug"])
+        if not listing_info or not renter:
+            continue
+
+        listing_obj, owner = listing_info
+
+        # Skip if renter is the owner
+        if renter.id == owner.id:
+            continue
+
+        # Create a completed rental
+        rental = BHRental(
+            listing_id=listing_obj.id,
+            renter_id=renter.id,
+            status=RentalStatus.COMPLETED,
+            renter_message="Would love to borrow this!",
+        )
+        db.add(rental)
+        await db.flush()
+        counts["rentals"] += 1
+
+        # Create the review
+        weight = {
+            BadgeTier.NEWCOMER: 1.0, BadgeTier.ACTIVE: 2.0, BadgeTier.TRUSTED: 5.0,
+            BadgeTier.PILLAR: 8.0, BadgeTier.LEGEND: 10.0,
+        }.get(renter.badge_tier, 1.0)
+
+        review = BHReview(
+            rental_id=rental.id,
+            reviewer_id=renter.id,
+            reviewee_id=owner.id,
+            rating=rev_data["rating"],
+            title=rev_data["title"],
+            body=rev_data["body"],
+            reviewer_tier=renter.badge_tier.value,
+            weight=weight,
+        )
+        db.add(review)
+        counts["reviews"] += 1
 
     await db.commit()
     logger.info("Seed data loaded: %s", counts)

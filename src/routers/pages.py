@@ -19,6 +19,7 @@ from src.i18n import detect_language, get_translator, SUPPORTED_LANGUAGES
 from src.models.item import BHItem
 from src.models.listing import BHListing, ListingStatus
 from src.models.rental import BHRental
+from src.models.review import BHReview
 from src.models.user import BHUser
 
 router = APIRouter(tags=["pages"])
@@ -72,6 +73,10 @@ async def home(request: Request,
         select(func.count(BHListing.id)).where(BHListing.status == ListingStatus.ACTIVE)
     )
     user_count = await db.scalar(select(func.count(BHUser.id)))
+    category_count = await db.scalar(
+        select(func.count(func.distinct(BHItem.category)))
+    )
+    review_count = await db.scalar(select(func.count(BHReview.id)))
 
     result = await db.execute(
         select(BHItem)
@@ -90,6 +95,8 @@ async def home(request: Request,
     ctx = _ctx(request, token,
         listing_count=listing_count or 0,
         user_count=user_count or 0,
+        category_count=category_count or 0,
+        review_count=review_count or 0,
         featured_items=featured_items,
     )
     return _render("pages/home.html", ctx)

@@ -11,15 +11,15 @@
     <!-- Category quick-filters -->
     <div class="mt-4 flex flex-wrap gap-2">
         {% set category_icons = {
-            'tools': '&#128295;', 'kitchen': '&#127860;', 'garden': '&#127793;',
-            'electronics': '&#128268;', 'sports': '&#9917;', 'crafts': '&#127912;',
-            'cleaning': '&#129529;', 'vehicles': '&#128663;', 'music': '&#127925;', 'other': '&#128230;'
+            'tools': '🔧', 'kitchen': '🍴', 'garden': '🌱',
+            'electronics': '🔌', 'sports': '⚽', 'crafts': '🎨',
+            'cleaning': '🧹', 'vehicles': '🚗', 'music': '🎵', 'other': '📦'
         } %}
         {% for cat in categories %}
         <a href="/browse?category={{ cat }}"
            class="inline-flex items-center px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]
                   {% if selected_category == cat %}bg-indigo-600 text-white{% else %}bg-white text-gray-700 border border-gray-200 hover:bg-indigo-50 hover:border-indigo-200{% endif %}">
-            <span class="mr-1.5">{{ category_icons.get(cat, '&#128230;') }}</span>
+            <span class="mr-1.5">{{ category_icons.get(cat, '📦') }}</span>
             {{ t('categories.' + cat) }}
         </a>
         {% endfor %}

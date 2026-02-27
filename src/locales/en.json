@@ -12,7 +12,9 @@
     "login": "Log In",
     "logout": "Log Out",
     "profile": "Profile",
-    "settings": "Settings"
+    "settings": "Settings",
+    "dashboard": "Dashboard",
+    "list_item": "List Your Stuff"
   },
   "home": {
     "hero_title": "Every Garage Becomes a Rental Shop",
@@ -21,6 +23,8 @@
     "cta_list": "List Your Stuff",
     "stats_listings": "Active Listings",
     "stats_members": "Members",
+    "stats_categories": "Categories",
+    "stats_reviews": "Reviews",
     "featured_title": "Recently Listed",
     "how_it_works": "How It Works",
     "step_1_title": "List Your Stuff",
@@ -62,6 +66,7 @@
     "languages": "Speaks",
     "location": "Location",
     "rent_this": "Rent This Item",
+    "login_to_rent": "Log In to Rent",
     "contact_owner": "Contact Owner",
     "contact_telegram": "Contact on Telegram",
     "available_as": "Available As",
@@ -319,6 +324,7 @@
     "language": "Language You Speak",
     "proficiency": "Proficiency Level",
     "add_language": "Add Language",
+    "next": "Next",
     "skip_item": "Skip for now",
     "finish": "Start Exploring",
     "success": "Welcome aboard! Your workshop is live.",

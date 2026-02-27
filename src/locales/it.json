@@ -12,7 +12,9 @@
     "login": "Accedi",
     "logout": "Esci",
     "profile": "Profilo",
-    "settings": "Impostazioni"
+    "settings": "Impostazioni",
+    "dashboard": "La Mia Dashboard",
+    "list_item": "Pubblica Oggetto"
   },
   "home": {
     "hero_title": "Ogni Garage Diventa un Negozio di Noleggio",
@@ -21,6 +23,8 @@
     "cta_list": "Pubblica i Tuoi Oggetti",
     "stats_listings": "Annunci Attivi",
     "stats_members": "Membri",
+    "stats_categories": "Categorie",
+    "stats_reviews": "Recensioni",
     "featured_title": "Aggiunti di Recente",
     "how_it_works": "Come Funziona",
     "step_1_title": "Pubblica i Tuoi Oggetti",
@@ -62,6 +66,7 @@
     "languages": "Parla",
     "location": "Posizione",
     "rent_this": "Noleggia Questo Oggetto",
+    "login_to_rent": "Accedi per Noleggiare",
     "contact_owner": "Contatta il Proprietario",
     "contact_telegram": "Contatta su Telegram",
     "available_as": "Disponibile Come",
@@ -319,6 +324,7 @@
     "language": "Lingua Parlata",
     "proficiency": "Livello di Competenza",
     "add_language": "Aggiungi Lingua",
+    "next": "Avanti",
     "skip_item": "Salta per ora",
     "finish": "Inizia a Esplorare",
     "success": "Benvenuto a bordo! Il tuo laboratorio è attivo.",

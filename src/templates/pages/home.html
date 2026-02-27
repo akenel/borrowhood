@@ -30,7 +30,7 @@
 <!-- Stats -->
 <section class="bg-white border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="grid grid-cols-2 gap-8 text-center">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
                 <p class="text-3xl font-bold text-indigo-600">{{ listing_count }}</p>
                 <p class="text-sm text-gray-500 mt-1">{{ t('home.stats_listings') }}</p>
@@ -38,6 +38,14 @@
             <div>
                 <p class="text-3xl font-bold text-indigo-600">{{ user_count }}</p>
                 <p class="text-sm text-gray-500 mt-1">{{ t('home.stats_members') }}</p>
+            </div>
+            <div>
+                <p class="text-3xl font-bold text-indigo-600">{{ category_count }}</p>
+                <p class="text-sm text-gray-500 mt-1">{{ t('home.stats_categories') }}</p>
+            </div>
+            <div>
+                <p class="text-3xl font-bold text-indigo-600">{{ review_count }}</p>
+                <p class="text-sm text-gray-500 mt-1">{{ t('home.stats_reviews') }}</p>
             </div>
         </div>
     </div>

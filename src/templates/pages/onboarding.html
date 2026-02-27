@@ -164,7 +164,7 @@
             <button @click="if(profile.display_name) step = 2"
                     :disabled="!profile.display_name"
                     class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                Next &rarr;
+                {{ t('onboarding.next') }} &rarr;
             </button>
         </div>
     </div>
@@ -234,7 +234,7 @@
             </button>
             <button @click="step = 3"
                     class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
-                Next &rarr;
+                {{ t('onboarding.next') }} &rarr;
             </button>
         </div>
     </div>
