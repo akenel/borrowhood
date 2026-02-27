@@ -46,7 +46,8 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Seed database
-        run: python -c "
+        run: |
+          python -c "
           import asyncio
           from src.main import app
           from src.database import create_tables, async_session
