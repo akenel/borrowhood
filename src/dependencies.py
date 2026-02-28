@@ -90,19 +90,11 @@ async def require_auth(request: Request) -> dict:
         if request.url.path.startswith("/api/"):
             raise HTTPException(status_code=401, detail="Authentication required")
 
-        # HTML page: redirect to Keycloak login
-        redirect_uri = quote(str(request.url), safe="")
-        login_url = (
-            f"{settings.kc_url}/realms/{settings.kc_realm}"
-            f"/protocol/openid-connect/auth"
-            f"?client_id={settings.kc_client_id}"
-            f"&redirect_uri={redirect_uri}"
-            f"&response_type=code"
-            f"&scope=openid+email+profile"
-        )
+        # HTML page: redirect to /login which handles the OIDC flow properly
+        next_url = quote(request.url.path, safe="")
         raise HTTPException(
             status_code=307,
-            headers={"Location": login_url},
+            headers={"Location": f"/login?next={next_url}"},
         )
 
     return token

@@ -28,23 +28,28 @@ def _kc_base() -> str:
 @router.get("/login")
 async def login(request: Request):
     """Redirect to Keycloak login page."""
-    # Where to come back after login
-    redirect_uri = quote(f"{settings.app_url}/auth/callback", safe="")
+    next_page = request.query_params.get("next", "/")
+    # Where to come back after login -- pass next page via state param
+    callback_uri = f"{settings.app_url}/auth/callback"
+    redirect_uri = quote(callback_uri, safe="")
+    state = quote(next_page, safe="")
     login_url = (
         f"{_kc_base()}/auth"
         f"?client_id={settings.kc_client_id}"
         f"&redirect_uri={redirect_uri}"
         f"&response_type=code"
         f"&scope=openid+email+profile"
+        f"&state={state}"
     )
     return RedirectResponse(url=login_url, status_code=302)
 
 
 @router.get("/auth/callback")
-async def auth_callback(request: Request, code: str = ""):
+async def auth_callback(request: Request, code: str = "", state: str = "/"):
     """Exchange authorization code for tokens, set session cookie."""
     if not code:
         return RedirectResponse(url="/", status_code=302)
+    next_page = state if state.startswith("/") else "/"
 
     redirect_uri = f"{settings.app_url}/auth/callback"
 
@@ -75,8 +80,8 @@ async def auth_callback(request: Request, code: str = ""):
         logger.error("No access_token in response")
         return RedirectResponse(url="/?error=login_failed", status_code=302)
 
-    # Set session cookie and redirect to home
-    response = RedirectResponse(url="/", status_code=302)
+    # Set session cookie and redirect to the page user was trying to access
+    response = RedirectResponse(url=next_page, status_code=302)
     response.set_cookie(
         "bh_session",
         access_token,
