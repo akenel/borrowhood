@@ -316,7 +316,8 @@
     "offer": "Make an Offer",
     "service": "Service",
     "training": "Training",
-    "auction": "Auction"
+    "auction": "Auction",
+    "giveaway": "Give Away"
   },
   "item_types": {
     "physical": "Physical",
@@ -524,6 +525,15 @@
     "notifications_enabled": "Telegram notifications enabled",
     "notifications_disabled": "Telegram notifications disabled",
     "unlink_confirm": "Are you sure you want to unlink Telegram?"
+  },
+  "giveaway": {
+    "claim": "Claim This Item",
+    "claim_message_placeholder": "Hi! I'd love to have this. I can pick it up...",
+    "free_item": "FREE -- Pick Up Only",
+    "free_hint": "This item is free. First to claim gets it.",
+    "approved": "Approved! Go pick it up.",
+    "completed": "Giveaway complete",
+    "badge_generous": "Generous Neighbor"
   },
   "footer": {
     "tagline": "Free as in freedom. Open source. No platform fees. Forever.",

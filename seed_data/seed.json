@@ -2620,6 +2620,67 @@
           "notes": "2-hour session. Clay, glazing, and firing included. Max 2 people per session. Finished pieces ready in 2 weeks. Couples session EUR 70 (2 people). Wear clothes you don't mind getting dirty."
         }
       ]
+    },
+    {
+      "owner_slug": "mikes-garage",
+      "name": "Garden Hose (30m, old but works)",
+      "slug": "garden-hose-30m-free",
+      "description": "30-meter garden hose. Been sitting in the garage for 2 years. Still holds water, no leaks. Free to whoever picks it up. I upgraded to a retractable one.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "garden",
+      "condition": "fair",
+      "listings": [
+        {
+          "listing_type": "giveaway",
+          "pickup_only": true,
+          "notes": "Pick up from garage anytime. Just message me first."
+        }
+      ],
+      "latitude": 38.015,
+      "longitude": 12.532,
+      "story": "Bought it when we moved in. Used it exactly twice. The retractable one changed my life."
+    },
+    {
+      "owner_slug": "sallys-kitchen",
+      "name": "Bread Maker (Panasonic SD-2500)",
+      "slug": "bread-maker-panasonic-free",
+      "description": "Panasonic bread maker. Makes great bread but I went back to doing it by hand. Works perfectly, just collecting dust. Comes with manual and measuring cup.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "kitchen",
+      "condition": "good",
+      "brand": "Panasonic",
+      "listings": [
+        {
+          "listing_type": "giveaway",
+          "pickup_only": true,
+          "notes": "Free! Nothing beats hand-kneaded bread. This machine deserves someone who'll use it."
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.537,
+      "story": "I got seduced by the convenience. Then I remembered why I became a baker -- the feeling of dough under your hands. Can't automate that."
+    },
+    {
+      "owner_slug": "rosas-home",
+      "name": "Kids' Bicycle (16 inch, pink)",
+      "slug": "kids-bicycle-16-inch-free",
+      "description": "Girls' bicycle, 16 inch wheels. My granddaughter outgrew it. Training wheels included. Some scratches but rides perfectly. Free to a good home.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "cycling",
+      "condition": "fair",
+      "listings": [
+        {
+          "listing_type": "giveaway",
+          "pickup_only": true,
+          "notes": "Free! Comes with training wheels and a bell. Perfect for ages 4-6."
+        }
+      ],
+      "latitude": 38.020,
+      "longitude": 12.540,
+      "story": "Sofia learned to ride on this bike. Every scratch is a story. Now she wants a big-girl bike. Time to pass this one on."
     }
   ],
   "teams": [

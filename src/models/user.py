@@ -158,6 +158,7 @@ class BHUserPoints(BHBase, Base):
     reviews_received: Mapped[int] = mapped_column(Integer, default=0)
     items_listed: Mapped[int] = mapped_column(Integer, default=0)
     helpful_flags: Mapped[int] = mapped_column(Integer, default=0)
+    giveaways_completed: Mapped[int] = mapped_column(Integer, default=0)
 
     user: Mapped["BHUser"] = relationship(back_populates="points")
 

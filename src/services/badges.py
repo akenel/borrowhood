@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.badge import BHBadge, BadgeCode, BADGE_INFO
 from src.models.item import BHItem
-from src.models.listing import BHListing
+from src.models.listing import BHListing, ListingType
 from src.models.rental import BHRental, RentalStatus
 from src.models.review import BHReview
 from src.models.bid import BHBid, BidStatus
@@ -200,8 +200,22 @@ async def check_and_award_badges(db: AsyncSession, user_id: UUID) -> List[BHBadg
         if b:
             awarded.append(b)
 
+    # Generous Neighbor (3+ giveaways completed as owner)
+    giveaways_completed = await db.scalar(
+        select(func.count(BHRental.id))
+        .join(BHListing)
+        .join(BHItem, BHListing.item_id == BHItem.id)
+        .where(BHItem.owner_id == user_id)
+        .where(BHRental.status == RentalStatus.COMPLETED)
+        .where(BHListing.listing_type == ListingType.GIVEAWAY)
+    ) or 0
+    if giveaways_completed >= 3:
+        b = await _award_badge(db, user_id, BadgeCode.GENEROUS_NEIGHBOR, f"{giveaways_completed} giveaways")
+        if b:
+            awarded.append(b)
+
     # Update points and tier
-    await _update_points(db, user_id, item_count, rentals_as_renter, reviews_given, five_star_count)
+    await _update_points(db, user_id, item_count, rentals_as_renter, reviews_given, five_star_count, giveaways_completed)
     await _update_badge_tier(db, user_id)
 
     return awarded
@@ -209,7 +223,8 @@ async def check_and_award_badges(db: AsyncSession, user_id: UUID) -> List[BHBadg
 
 async def _update_points(
     db: AsyncSession, user_id: UUID,
-    items: int, rentals: int, reviews_given: int, five_stars: int
+    items: int, rentals: int, reviews_given: int, five_stars: int,
+    giveaways: int = 0
 ):
     """Update user points based on current stats."""
     result = await db.execute(
@@ -224,6 +239,7 @@ async def _update_points(
     points.rentals_completed = rentals
     points.reviews_given = reviews_given
     points.reviews_received = five_stars  # approximate
+    points.giveaways_completed = giveaways
 
-    # Point calculation: items*10 + rentals*20 + reviews*5 + five_stars*15
-    points.total_points = (items * 10) + (rentals * 20) + (reviews_given * 5) + (five_stars * 15)
+    # Point calculation: items*10 + rentals*20 + giveaways*25 + reviews*5 + five_stars*15
+    points.total_points = (items * 10) + (rentals * 20) + (giveaways * 25) + (reviews_given * 5) + (five_stars * 15)

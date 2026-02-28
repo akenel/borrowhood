@@ -15,7 +15,7 @@ from sqlalchemy.orm import selectinload
 
 from src.database import get_db
 from src.dependencies import require_auth
-from src.models.listing import BHListing
+from src.models.listing import BHListing, ListingType, ListingStatus
 from src.models.rental import BHRental, RentalStatus, validate_rental_transition
 from src.models.user import BHUser
 from src.schemas.rental import RentalCreate, RentalOut, RentalStatusUpdate
@@ -132,12 +132,17 @@ async def create_rental(
     if listing.item.owner_id == user.id:
         raise HTTPException(status_code=400, detail="Cannot rent your own item")
 
+    # Giveaway shortcut: auto-set dates to now (no date picking needed)
+    from datetime import datetime, timezone
+    is_giveaway = listing.listing_type == ListingType.GIVEAWAY
+    now = datetime.now(timezone.utc)
+
     rental = BHRental(
         listing_id=data.listing_id,
         renter_id=user.id,
         status=RentalStatus.PENDING,
-        requested_start=data.requested_start,
-        requested_end=data.requested_end,
+        requested_start=now if is_giveaway else data.requested_start,
+        requested_end=now if is_giveaway else data.requested_end,
         renter_message=data.renter_message,
         idempotency_key=data.idempotency_key,
     )
@@ -215,10 +220,19 @@ async def update_rental_status(
     elif data.status == RentalStatus.RETURNED:
         rental.actual_return = now
 
+    # Giveaway shortcut: APPROVED -> auto-complete, deactivate listing
+    is_giveaway = rental.listing.listing_type == ListingType.GIVEAWAY
+    if is_giveaway and data.status == RentalStatus.APPROVED:
+        rental.status = RentalStatus.COMPLETED
+        rental.actual_pickup = now
+        rental.actual_return = now
+        # Deactivate listing (one claim per giveaway)
+        rental.listing.status = ListingStatus.PAUSED
+
     await db.flush()
 
-    # Award badges on rental completion
-    if data.status == RentalStatus.COMPLETED:
+    # Award badges on rental completion (or giveaway auto-complete)
+    if rental.status == RentalStatus.COMPLETED:
         from src.services.badges import check_and_award_badges
         await check_and_award_badges(db, rental.renter_id)
         await check_and_award_badges(db, rental.listing.item.owner_id)

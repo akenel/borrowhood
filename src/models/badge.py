@@ -29,6 +29,7 @@ class BadgeCode(str, enum.Enum):
     PERFECT_RECORD = "perfect_record"         # 10+ rentals, all 5-star
     NEIGHBORHOOD_HERO = "neighborhood_hero"   # 50+ transactions
     WORKSHOP_PRO = "workshop_pro"             # Complete profile + banner + bio
+    GENEROUS_NEIGHBOR = "generous_neighbor"   # Gave away 3+ items
 
 
 # Badge metadata (display info)
@@ -116,6 +117,12 @@ BADGE_INFO = {
         "description": "Complete workshop profile with bio and banner",
         "icon": "building-storefront",
         "color": "violet",
+    },
+    BadgeCode.GENEROUS_NEIGHBOR: {
+        "name": "Generous Neighbor",
+        "description": "Gave away 3 or more items to the community",
+        "icon": "gift",
+        "color": "rose",
     },
 }
 

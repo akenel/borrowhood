@@ -23,6 +23,7 @@ class ListingType(str, enum.Enum):
     SERVICE = "service"       # "I'll do it for you"
     TRAINING = "training"     # "I'll teach you"
     AUCTION = "auction"       # Timed bidding
+    GIVEAWAY = "giveaway"     # Free, take it, no return
 
 
 class ListingStatus(str, enum.Enum):

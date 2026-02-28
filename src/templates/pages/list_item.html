@@ -49,7 +49,8 @@
             commission: { price: '', price_unit: 'flat', deposit: '' },
             offer: { price: '', price_unit: 'negotiable', deposit: '' },
             service: { price: '', price_unit: 'per_hour', deposit: '' },
-            training: { price: '', price_unit: 'per_hour', deposit: '' }
+            training: { price: '', price_unit: 'per_hour', deposit: '' },
+            giveaway: { price: '', price_unit: 'flat', deposit: '' }
         },
         toggleListingType(val) {
             if (this.selectedTypes.includes(val)) {
@@ -197,17 +198,19 @@
                 // Step 2: Create listings (one per selected type)
                 for (const lt of this.selectedTypes) {
                     const terms = this.listingPrices[lt];
+                    const isGiveaway = lt === 'giveaway';
                     const listingResp = await fetch('/api/v1/listings', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             item_id: item.id,
                             listing_type: lt,
-                            price: terms.price ? parseFloat(terms.price) : null,
-                            price_unit: terms.price_unit,
+                            price: isGiveaway ? null : (terms.price ? parseFloat(terms.price) : null),
+                            price_unit: isGiveaway ? 'flat' : terms.price_unit,
                             currency: this.form.currency,
-                            deposit: terms.deposit ? parseFloat(terms.deposit) : null,
-                            delivery_available: this.form.delivery_available,
+                            deposit: isGiveaway ? null : (terms.deposit ? parseFloat(terms.deposit) : null),
+                            delivery_available: isGiveaway ? false : this.form.delivery_available,
+                            pickup_only: isGiveaway ? true : !this.form.delivery_available,
                             notes: this.form.notes || null
                         })
                     });
@@ -529,7 +532,7 @@
                     <span class="text-xs text-gray-400 font-normal ml-1">{% if lang == 'it' %}(seleziona tutti quelli che si applicano){% else %}(select all that apply){% endif %}</span>
                 </label>
                 <div class="space-y-3">
-                    {% for ltype in ['rent','sell','commission','offer','service','training'] %}
+                    {% for ltype in ['rent','sell','commission','offer','service','training','giveaway'] %}
                     <div>
                         <label class="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer transition-colors min-h-[44px]"
                                :class="selectedTypes.includes('{{ ltype }}') ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'">
@@ -539,12 +542,15 @@
                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                             <span class="text-sm font-medium text-gray-900">{{ t('listing_types.' + ltype) }}</span>
                         </label>
-                        <!-- Per-type pricing row -->
+                        <!-- Per-type pricing row (hidden for giveaway) -->
                         <div x-show="selectedTypes.includes('{{ ltype }}')" x-cloak
                              x-transition:enter="transition ease-out duration-150"
                              x-transition:enter-start="opacity-0 -translate-y-1"
                              x-transition:enter-end="opacity-100 translate-y-0"
                              class="ml-7 mt-2 p-3 bg-gray-50 rounded-lg">
+                            {% if ltype == 'giveaway' %}
+                            <p class="text-sm text-green-700 font-medium">{{ t('giveaway.free_hint') }}</p>
+                            {% else %}
                             <div class="grid grid-cols-3 gap-3">
                                 <div>
                                     <label class="block text-xs text-gray-500 mb-1">{{ t('list_item.price') }} (EUR)</label>
@@ -569,6 +575,7 @@
                                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}

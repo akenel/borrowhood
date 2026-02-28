@@ -316,7 +316,8 @@
     "offer": "Fai un'Offerta",
     "service": "Servizio",
     "training": "Formazione",
-    "auction": "Asta"
+    "auction": "Asta",
+    "giveaway": "Regalo"
   },
   "item_types": {
     "physical": "Fisico",
@@ -524,6 +525,15 @@
     "notifications_enabled": "Notifiche Telegram attivate",
     "notifications_disabled": "Notifiche Telegram disattivate",
     "unlink_confirm": "Sei sicuro di voler scollegare Telegram?"
+  },
+  "giveaway": {
+    "claim": "Richiedi Questo Oggetto",
+    "claim_message_placeholder": "Ciao! Mi piacerebbe averlo. Posso ritirarlo...",
+    "free_item": "GRATIS -- Solo Ritiro",
+    "free_hint": "Questo oggetto è gratis. Il primo che lo richiede lo ottiene.",
+    "approved": "Approvato! Vai a ritirarlo.",
+    "completed": "Regalo completato",
+    "badge_generous": "Vicino Generoso"
   },
   "footer": {
     "tagline": "Libero come la libertà. Open source. Nessuna commissione. Per sempre.",
