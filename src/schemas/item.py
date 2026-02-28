@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from src.models.item import ItemCondition, ItemType, MediaType
+from src.models.item import ItemCategory, ItemCondition, ItemType, MediaType
 
 
 class ItemMediaOut(BaseModel):
@@ -48,7 +48,7 @@ class ItemCreate(BaseModel):
     story: Optional[str] = None
     content_language: str = Field(default="en", max_length=5)
     item_type: ItemType
-    category: str = Field(..., max_length=50)
+    category: ItemCategory
     subcategory: Optional[str] = Field(None, max_length=50)
     condition: Optional[ItemCondition] = None
     brand: Optional[str] = Field(None, max_length=100)
@@ -65,7 +65,7 @@ class ItemUpdate(BaseModel):
     description: Optional[str] = None
     story: Optional[str] = None
     content_language: Optional[str] = Field(None, max_length=5)
-    category: Optional[str] = Field(None, max_length=50)
+    category: Optional[ItemCategory] = None
     subcategory: Optional[str] = Field(None, max_length=50)
     condition: Optional[ItemCondition] = None
     brand: Optional[str] = Field(None, max_length=100)

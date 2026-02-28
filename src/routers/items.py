@@ -60,7 +60,7 @@ async def _unique_slug(db: AsyncSession, base: str) -> str:
 @router.get("", response_model=List[ItemOut])
 async def list_items(
     q: Optional[str] = None,
-    category: Optional[str] = None,
+    category: Optional[str] = None,  # accepts ItemCategory values
     item_type: Optional[str] = None,
     sort: str = Query("newest", pattern="^(newest|oldest|name_asc)$"),
     limit: int = Query(50, ge=1, le=100),

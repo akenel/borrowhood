@@ -16,7 +16,7 @@ from sqlalchemy.orm import selectinload
 from src.database import get_db
 from src.dependencies import get_current_user_token
 from src.i18n import detect_language, get_translator, SUPPORTED_LANGUAGES
-from src.models.item import BHItem
+from src.models.item import BHItem, CATEGORY_GROUPS
 from src.models.listing import BHListing, ListingStatus
 from src.models.rental import BHRental
 from src.models.review import BHReview
@@ -144,14 +144,9 @@ async def browse(request: Request,
     result = await db.execute(query)
     items = result.scalars().unique().all()
 
-    cat_result = await db.execute(
-        select(BHItem.category).distinct().where(BHItem.deleted_at.is_(None))
-    )
-    categories = [row[0] for row in cat_result.all()]
-
     ctx = _ctx(request, token,
         items=items,
-        categories=categories,
+        category_groups=CATEGORY_GROUPS,
         q=q or "",
         selected_category=category,
         selected_type=item_type,
@@ -261,7 +256,7 @@ async def export_workshop(slug: str, request: Request,
 async def list_item_page(request: Request,
                          token: Optional[dict] = Depends(get_current_user_token)):
     """Form to list a new item. Requires authentication (enforced client-side)."""
-    ctx = _ctx(request, token)
+    ctx = _ctx(request, token, category_groups=CATEGORY_GROUPS)
     return _render("pages/list_item.html", ctx)
 
 

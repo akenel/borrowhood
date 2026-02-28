@@ -31,6 +31,58 @@ class ItemCondition(str, enum.Enum):
     WORN = "worn"
 
 
+class ItemCategory(str, enum.Enum):
+    """Fixed set of item categories for the marketplace."""
+    # Tools & Workshop
+    POWER_TOOLS = "power_tools"
+    HAND_TOOLS = "hand_tools"
+    AUTOMOTIVE = "automotive"
+    WELDING = "welding"
+    WOODWORKING = "woodworking"
+    THREE_D_PRINTING = "3d_printing"
+    # Home & Living
+    KITCHEN = "kitchen"
+    CLEANING = "cleaning"
+    GARDEN = "garden"
+    FURNITURE = "furniture"
+    HOME_IMPROVEMENT = "home_improvement"
+    # Sports & Outdoors
+    SPORTS = "sports"
+    CAMPING = "camping"
+    WATER_SPORTS = "water_sports"
+    CYCLING = "cycling"
+    # Creative
+    ART = "art"
+    MUSIC = "music"
+    PHOTOGRAPHY = "photography"
+    SEWING = "sewing"
+    # Tech
+    ELECTRONICS = "electronics"
+    COMPUTERS = "computers"
+    DRONES = "drones"
+    # Spaces & Transport
+    SPACES = "spaces"
+    VEHICLES = "vehicles"
+    # Services
+    REPAIRS = "repairs"
+    TRAINING_SERVICE = "training_service"
+    CUSTOM_ORDERS = "custom_orders"
+    # Other
+    OTHER = "other"
+
+
+CATEGORY_GROUPS = {
+    "tools_workshop": ["power_tools", "hand_tools", "automotive", "welding", "woodworking", "3d_printing"],
+    "home_living": ["kitchen", "cleaning", "garden", "furniture", "home_improvement"],
+    "sports_outdoors": ["sports", "camping", "water_sports", "cycling"],
+    "creative": ["art", "music", "photography", "sewing"],
+    "tech": ["electronics", "computers", "drones"],
+    "spaces_transport": ["spaces", "vehicles"],
+    "services": ["repairs", "training_service", "custom_orders"],
+    "other": ["other"],
+}
+
+
 class MediaType(str, enum.Enum):
     PHOTO = "photo"
     VIDEO_EMBED = "video_embed"     # YouTube URL

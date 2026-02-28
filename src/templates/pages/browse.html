@@ -13,26 +13,29 @@
     <!-- Page header -->
     <h1 class="text-2xl font-bold text-gray-900">{{ t('browse.title') }}</h1>
 
-    <!-- Category quick-filters -->
-    <div class="mt-4 flex flex-wrap gap-2">
-        {% set category_icons = {
-            'tools': '🔧', 'kitchen': '🍴', 'garden': '🌱',
-            'electronics': '🔌', 'sports': '⚽', 'crafts': '🎨',
-            'cleaning': '🧹', 'vehicles': '🚗', 'music': '🎵', 'other': '📦'
-        } %}
-        {% for cat in categories %}
-        <a href="/browse?category={{ cat }}"
-           class="inline-flex items-center px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]
-                  {% if selected_category == cat %}bg-indigo-600 text-white{% else %}bg-white text-gray-700 border border-gray-200 hover:bg-indigo-50 hover:border-indigo-200{% endif %}">
-            <span class="mr-1.5">{{ category_icons.get(cat, '📦') }}</span>
-            {{ t('categories.' + cat) }}
-        </a>
+    <!-- Category quick-filters (grouped) -->
+    <div class="mt-4 space-y-2">
+        {% for group_key, cats in category_groups.items() %}
+        {% if group_key != 'other' %}
+        <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-xs text-gray-400 uppercase tracking-wide font-semibold w-24 flex-shrink-0 hidden sm:inline">{{ t('cat_groups.' + group_key) }}</span>
+            {% for cat in cats %}
+            <a href="/browse?category={{ cat }}{% if q %}&q={{ q }}{% endif %}"
+               class="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors
+                      {% if selected_category == cat %}bg-indigo-600 text-white{% else %}bg-white text-gray-700 border border-gray-200 hover:bg-indigo-50 hover:border-indigo-200{% endif %}">
+                {{ t('categories.' + cat) }}
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
         {% endfor %}
         {% if selected_category %}
-        <a href="/browse{% if q %}?q={{ q }}{% endif %}"
-           class="inline-flex items-center px-3 py-2 rounded-full text-sm font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors min-h-[36px]">
-            &#10005; {{ t('browse.clear') }}
-        </a>
+        <div>
+            <a href="/browse{% if q %}?q={{ q }}{% endif %}"
+               class="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors">
+                &#10005; {{ t('browse.clear') }}
+            </a>
+        </div>
         {% endif %}
     </div>
 
@@ -73,8 +76,12 @@
                     <select name="category" id="category"
                             class="w-full border border-gray-300 rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[44px]">
                         <option value="">{{ t('browse.all_categories') }}</option>
-                        {% for cat in categories %}
-                        <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ t('categories.' + cat) }}</option>
+                        {% for group_key, cats in category_groups.items() %}
+                        <optgroup label="{{ t('cat_groups.' + group_key) }}">
+                            {% for cat in cats %}
+                            <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ t('categories.' + cat) }}</option>
+                            {% endfor %}
+                        </optgroup>
                         {% endfor %}
                     </select>
                 </div>
