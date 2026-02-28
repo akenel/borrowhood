@@ -274,14 +274,14 @@ def _template_fallback(name: str, category: str, item_type: str, language: str) 
 
 
 def generate_image_url(name: str, category: str) -> str:
-    """Generate a Pollinations.ai image URL for a listing.
+    """Generate a product image URL for a listing.
 
-    Returns a URL that generates an image on-demand when accessed.
-    No API call needed -- the URL IS the API.
+    Uses picsum.photos with a deterministic seed based on item name,
+    so the same item always gets the same photo. Free, reliable, no API key.
     """
-    prompt = f"Professional product photo of {name}, {category} category, clean white background, studio lighting, marketplace listing photo, high quality"
-    encoded = quote(prompt)
-    return f"https://image.pollinations.ai/prompt/{encoded}?width=800&height=600&nologo=true"
+    # Use item name as seed for consistent, reproducible images
+    seed = quote(f"{name}-{category}")
+    return f"https://picsum.photos/seed/{seed}/800/600"
 
 
 async def ensure_item_has_image(db, item_id, name: str, category: str):
