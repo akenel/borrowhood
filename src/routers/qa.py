@@ -326,15 +326,33 @@ async def create_bug(
 
 @router.get("/bugs", response_model=list[BugReportRead])
 async def list_bugs(
+    severity: Optional[str] = None,
+    status_filter: Optional[str] = None,
+    category: Optional[str] = None,
     token: dict = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
-    """List all bug reports, newest first."""
-    result = await db.execute(
-        select(BHBugReport)
-        .options(selectinload(BHBugReport.commits))
-        .order_by(BHBugReport.created_at.desc())
-    )
+    """List all bug reports, newest first. Filter by severity, status, category."""
+    query = select(BHBugReport).options(selectinload(BHBugReport.commits))
+
+    if severity:
+        try:
+            query = query.where(BHBugReport.severity == BugSeverity(severity))
+        except ValueError:
+            pass
+    if status_filter:
+        try:
+            query = query.where(BHBugReport.status == BugStatus(status_filter))
+        except ValueError:
+            pass
+    if category:
+        try:
+            query = query.where(BHBugReport.category == BugCategory(category))
+        except ValueError:
+            pass
+
+    query = query.order_by(BHBugReport.created_at.desc())
+    result = await db.execute(query)
     return result.scalars().all()
 
 

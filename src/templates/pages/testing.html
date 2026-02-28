@@ -130,40 +130,262 @@
 
     <!-- Bugs Tab -->
     <div x-show="activeTab === 'bugs'" x-cloak>
-        <div x-show="bugs.length === 0" class="text-center py-12">
-            <p class="text-gray-400 text-sm">No bugs reported yet. That's either great news or nobody's testing.</p>
+
+        <!-- Filter Bar -->
+        <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Filter</span>
+                <select x-model="bugFilters.severity" @change="loadBugs()"
+                        class="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">All Severities</option>
+                    <option value="critical">Critical</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+                <select x-model="bugFilters.status" @change="loadBugs()"
+                        class="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">All Statuses</option>
+                    <option value="open">Open</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="fixed">Fixed</option>
+                    <option value="verified">Verified</option>
+                    <option value="wont_fix">Won't Fix</option>
+                </select>
+                <select x-model="bugFilters.category" @change="loadBugs()"
+                        class="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">All Categories</option>
+                    <option value="functional">Functional</option>
+                    <option value="cosmetic">Cosmetic</option>
+                    <option value="performance">Performance</option>
+                    <option value="data">Data</option>
+                    <option value="security">Security</option>
+                </select>
+                <button x-show="bugFilters.severity || bugFilters.status || bugFilters.category"
+                        @click="bugFilters = {severity:'', status:'', category:''}; loadBugs()"
+                        class="text-xs text-indigo-600 hover:text-indigo-800 font-medium whitespace-nowrap">
+                    Clear filters
+                </button>
+                <span class="ml-auto text-xs text-gray-400" x-text="bugs.length + ' bug' + (bugs.length !== 1 ? 's' : '')"></span>
+            </div>
         </div>
+
+        <!-- Empty State -->
+        <div x-show="bugs.length === 0" class="text-center py-12">
+            <p class="text-gray-400 text-sm" x-text="(bugFilters.severity || bugFilters.status || bugFilters.category) ? 'No bugs match these filters.' : 'No bugs reported yet. That\'s either great news or nobody\'s testing.'"></p>
+        </div>
+
+        <!-- Bug List -->
         <div class="space-y-3">
             <template x-for="bug in bugs" :key="bug.id">
-                <div class="bg-white rounded-lg border border-gray-200 p-4">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
-                                <span class="text-xs font-mono font-bold text-gray-500" x-text="'BUG-' + String(bug.bug_number).padStart(3, '0')"></span>
-                                <span class="text-sm font-semibold text-gray-900" x-text="bug.title"></span>
-                                <span class="px-2 py-0.5 text-xs font-medium rounded-full"
-                                      :class="{
-                                          'bg-red-100 text-red-700': bug.severity === 'critical',
-                                          'bg-orange-100 text-orange-700': bug.severity === 'high',
-                                          'bg-yellow-100 text-yellow-700': bug.severity === 'medium',
-                                          'bg-gray-100 text-gray-600': bug.severity === 'low'
-                                      }"
-                                      x-text="bug.severity"></span>
-                                <span class="px-2 py-0.5 text-xs font-medium rounded-full"
-                                      :class="{
-                                          'bg-red-50 text-red-600': bug.status === 'open',
-                                          'bg-blue-50 text-blue-600': bug.status === 'in_progress',
-                                          'bg-emerald-50 text-emerald-600': bug.status === 'fixed',
-                                          'bg-green-50 text-green-700': bug.status === 'verified',
-                                          'bg-gray-50 text-gray-500': bug.status === 'wont_fix'
-                                      }"
-                                      x-text="bug.status.replace('_', ' ')"></span>
+                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden"
+                     :class="selectedBug?.id === bug.id ? 'ring-2 ring-indigo-400' : ''">
+
+                    <!-- Bug Row (clickable) -->
+                    <div class="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                         @click="toggleBugDetail(bug)">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+                                    <span class="text-xs font-mono font-bold text-gray-500" x-text="'BUG-' + String(bug.bug_number).padStart(3, '0')"></span>
+                                    <span class="text-sm font-semibold text-gray-900" x-text="bug.title"></span>
+                                    <span class="px-2 py-0.5 text-xs font-medium rounded-full"
+                                          :class="{
+                                              'bg-red-100 text-red-700': bug.severity === 'critical',
+                                              'bg-orange-100 text-orange-700': bug.severity === 'high',
+                                              'bg-yellow-100 text-yellow-700': bug.severity === 'medium',
+                                              'bg-gray-100 text-gray-600': bug.severity === 'low'
+                                          }"
+                                          x-text="bug.severity"></span>
+                                    <span class="px-2 py-0.5 text-xs font-medium rounded-full"
+                                          :class="{
+                                              'bg-red-50 text-red-600': bug.status === 'open',
+                                              'bg-blue-50 text-blue-600': bug.status === 'in_progress',
+                                              'bg-emerald-50 text-emerald-600': bug.status === 'fixed',
+                                              'bg-green-50 text-green-700': bug.status === 'verified',
+                                              'bg-gray-50 text-gray-500': bug.status === 'wont_fix'
+                                          }"
+                                          x-text="bug.status.replace('_', ' ')"></span>
+                                    <span x-show="bug.category" class="px-2 py-0.5 text-xs font-medium rounded-full bg-indigo-50 text-indigo-600" x-text="bug.category"></span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1" :class="selectedBug?.id === bug.id ? '' : 'line-clamp-2'" x-text="bug.description"></p>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    Reported by <span x-text="bug.reported_by" class="font-medium"></span>
+                                    <span x-text="' on ' + new Date(bug.created_at).toLocaleDateString()"></span>
+                                    <span x-show="bug.assigned_to" class="ml-2">| Assigned to <span x-text="bug.assigned_to" class="font-medium text-indigo-600"></span></span>
+                                </p>
                             </div>
-                            <p class="text-xs text-gray-500 mt-1 line-clamp-2" x-text="bug.description"></p>
-                            <p class="text-xs text-gray-400 mt-1">
-                                Reported by <span x-text="bug.reported_by" class="font-medium"></span>
-                                <span x-text="' on ' + new Date(bug.created_at).toLocaleDateString()"></span>
-                            </p>
+                            <div class="ml-3 flex-shrink-0">
+                                <svg :class="selectedBug?.id === bug.id ? 'rotate-180' : ''" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bug Detail Panel (expandable) -->
+                    <div x-show="selectedBug?.id === bug.id" x-cloak
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 max-h-0"
+                         x-transition:enter-end="opacity-100"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0">
+                        <div class="border-t border-gray-200 bg-gray-50 p-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                                <!-- Left: Full Description + Screenshot -->
+                                <div class="md:col-span-2 space-y-4">
+                                    <!-- Full Description -->
+                                    <div>
+                                        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Description</h4>
+                                        <p class="text-sm text-gray-700 whitespace-pre-wrap" x-text="bug.description"></p>
+                                    </div>
+
+                                    <!-- Screenshot -->
+                                    <div x-show="bug.screenshot_data">
+                                        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Screenshot</h4>
+                                        <img :src="bug.screenshot_data" class="rounded-lg border border-gray-200 max-w-full max-h-96 object-contain" alt="Bug screenshot">
+                                    </div>
+
+                                    <!-- Linked Commits -->
+                                    <div x-show="bug.commits && bug.commits.length > 0">
+                                        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Linked Commits</h4>
+                                        <div class="space-y-1">
+                                            <template x-for="commit in (bug.commits || [])" :key="commit.id">
+                                                <div class="flex items-center space-x-2 text-xs">
+                                                    <code class="bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-mono" x-text="commit.sha.substring(0, 7)"></code>
+                                                    <span class="text-gray-600" x-text="commit.message"></span>
+                                                    <span class="text-gray-400" x-text="new Date(commit.committed_at).toLocaleDateString()"></span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <!-- Activity Trail -->
+                                    <div>
+                                        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Activity</h4>
+                                        <div x-show="bugActivities.length === 0" class="text-xs text-gray-400">No activity yet.</div>
+                                        <div class="space-y-2">
+                                            <template x-for="act in bugActivities" :key="act.id">
+                                                <div class="flex items-start space-x-2 text-xs">
+                                                    <div class="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5"
+                                                         :class="{
+                                                             'bg-blue-100 text-blue-600': act.activity_type === 'status_change',
+                                                             'bg-purple-100 text-purple-600': act.activity_type === 'assigned',
+                                                             'bg-gray-100 text-gray-600': act.activity_type === 'comment',
+                                                             'bg-emerald-100 text-emerald-600': act.activity_type === 'git_linked'
+                                                         }">
+                                                        <template x-if="act.activity_type === 'status_change'"><span class="text-xs">S</span></template>
+                                                        <template x-if="act.activity_type === 'assigned'"><span class="text-xs">A</span></template>
+                                                        <template x-if="act.activity_type === 'comment'"><span class="text-xs">C</span></template>
+                                                        <template x-if="act.activity_type === 'git_linked'"><span class="text-xs">G</span></template>
+                                                    </div>
+                                                    <div class="flex-1">
+                                                        <p class="text-gray-700">
+                                                            <span class="font-medium" x-text="act.actor"></span>
+                                                            <template x-if="act.activity_type === 'status_change'">
+                                                                <span> changed status from <span class="font-medium" x-text="act.old_value"></span> to <span class="font-medium" x-text="act.new_value"></span></span>
+                                                            </template>
+                                                            <template x-if="act.activity_type === 'assigned'">
+                                                                <span> assigned to <span class="font-medium" x-text="act.new_value || 'nobody'"></span></span>
+                                                            </template>
+                                                            <template x-if="act.activity_type === 'comment'">
+                                                                <span> commented</span>
+                                                            </template>
+                                                            <template x-if="act.activity_type === 'git_linked'">
+                                                                <span> linked commit <code class="bg-gray-200 px-1 rounded" x-text="act.new_value"></code></span>
+                                                            </template>
+                                                        </p>
+                                                        <p x-show="act.comment" class="text-gray-600 mt-0.5 whitespace-pre-wrap" x-text="act.comment"></p>
+                                                        <p class="text-gray-400 mt-0.5" x-text="new Date(act.created_at).toLocaleString()"></p>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right: Metadata + Actions -->
+                                <div class="space-y-4">
+                                    <!-- Metadata -->
+                                    <div class="bg-white rounded-lg border border-gray-200 p-3 space-y-2">
+                                        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Details</h4>
+                                        <div class="flex justify-between text-xs">
+                                            <span class="text-gray-500">Bug Number</span>
+                                            <span class="font-mono font-bold" x-text="'BUG-' + String(bug.bug_number).padStart(3, '0')"></span>
+                                        </div>
+                                        <div class="flex justify-between text-xs">
+                                            <span class="text-gray-500">Severity</span>
+                                            <span class="font-medium" x-text="bug.severity"></span>
+                                        </div>
+                                        <div class="flex justify-between text-xs">
+                                            <span class="text-gray-500">Category</span>
+                                            <span class="font-medium" x-text="bug.category || 'N/A'"></span>
+                                        </div>
+                                        <div class="flex justify-between text-xs">
+                                            <span class="text-gray-500">Status</span>
+                                            <span class="font-medium" x-text="bug.status.replace('_', ' ')"></span>
+                                        </div>
+                                        <div class="flex justify-between text-xs">
+                                            <span class="text-gray-500">Reporter</span>
+                                            <span class="font-medium" x-text="bug.reported_by"></span>
+                                        </div>
+                                        <div class="flex justify-between text-xs">
+                                            <span class="text-gray-500">Assigned To</span>
+                                            <span class="font-medium" x-text="bug.assigned_to || 'Unassigned'"></span>
+                                        </div>
+                                        <div x-show="bug.git_sha" class="flex justify-between text-xs">
+                                            <span class="text-gray-500">Git SHA</span>
+                                            <code class="font-mono text-xs" x-text="bug.git_sha ? bug.git_sha.substring(0, 7) : ''"></code>
+                                        </div>
+                                        <div x-show="bug.browser_info" class="flex justify-between text-xs">
+                                            <span class="text-gray-500">Browser</span>
+                                            <span class="text-gray-600" x-text="bug.browser_info"></span>
+                                        </div>
+                                        <div class="flex justify-between text-xs">
+                                            <span class="text-gray-500">Created</span>
+                                            <span x-text="new Date(bug.created_at).toLocaleString()"></span>
+                                        </div>
+                                        <div class="flex justify-between text-xs">
+                                            <span class="text-gray-500">Updated</span>
+                                            <span x-text="new Date(bug.updated_at).toLocaleString()"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Update Status -->
+                                    <div class="bg-white rounded-lg border border-gray-200 p-3">
+                                        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Update Status</h4>
+                                        <select x-model="bugUpdateStatus"
+                                                class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 mb-2">
+                                            <option value="open">Open</option>
+                                            <option value="in_progress">In Progress</option>
+                                            <option value="fixed">Fixed</option>
+                                            <option value="verified">Verified</option>
+                                            <option value="wont_fix">Won't Fix</option>
+                                        </select>
+                                        <button @click="updateBugStatus(bug)"
+                                                :disabled="bugUpdateStatus === bug.status"
+                                                :class="bugUpdateStatus === bug.status ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'"
+                                                class="w-full px-3 py-1.5 text-white text-sm font-medium rounded-md transition-colors min-h-[36px]">
+                                            Update Status
+                                        </button>
+                                    </div>
+
+                                    <!-- Add Comment -->
+                                    <div class="bg-white rounded-lg border border-gray-200 p-3">
+                                        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Add Comment</h4>
+                                        <textarea x-model="bugComment" rows="3" placeholder="Write a comment..."
+                                                  class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 mb-2"></textarea>
+                                        <button @click="addBugComment(bug)"
+                                                :disabled="!bugComment.trim()"
+                                                :class="!bugComment.trim() ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-700 hover:bg-gray-800'"
+                                                class="w-full px-3 py-1.5 text-white text-sm font-medium rounded-md transition-colors min-h-[36px]">
+                                            Add Comment
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -248,6 +470,13 @@ function qaDashboard() {
         showBugModal: false,
         newBug: { title: '', description: '', severity: 'medium', category: 'functional', reported_by: '{{ user.get("preferred_username", "Tester") if user else "Tester" }}' },
 
+        // Bug detail state
+        selectedBug: null,
+        bugActivities: [],
+        bugFilters: { severity: '', status: '', category: '' },
+        bugUpdateStatus: 'open',
+        bugComment: '',
+
         async api(url, options = {}) {
             const r = await fetch(url, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers } });
             if (!r.ok) throw new Error(`API error: ${r.status}`);
@@ -256,18 +485,86 @@ function qaDashboard() {
 
         async loadAll() {
             try {
-                const [s, p, t, b] = await Promise.all([
+                const [s, p, t] = await Promise.all([
                     this.api('/api/v1/testing/summary'),
                     this.api('/api/v1/testing/phases'),
                     this.api('/api/v1/testing/tests'),
-                    this.api('/api/v1/testing/bugs'),
                 ]);
                 this.summary = s;
                 this.phases = p;
                 this.tests = t;
-                this.bugs = b;
+                await this.loadBugs();
             } catch (e) {
                 console.error('Failed to load QA data:', e);
+            }
+        },
+
+        async loadBugs() {
+            try {
+                const params = new URLSearchParams();
+                if (this.bugFilters.severity) params.set('severity', this.bugFilters.severity);
+                if (this.bugFilters.status) params.set('status_filter', this.bugFilters.status);
+                if (this.bugFilters.category) params.set('category', this.bugFilters.category);
+                const qs = params.toString();
+                this.bugs = await this.api('/api/v1/testing/bugs' + (qs ? '?' + qs : ''));
+            } catch (e) {
+                console.error('Failed to load bugs:', e);
+            }
+        },
+
+        async toggleBugDetail(bug) {
+            if (this.selectedBug?.id === bug.id) {
+                this.selectedBug = null;
+                this.bugActivities = [];
+                return;
+            }
+            this.selectedBug = bug;
+            this.bugUpdateStatus = bug.status;
+            this.bugComment = '';
+            try {
+                this.bugActivities = await this.api(`/api/v1/testing/bugs/${bug.id}/activities`);
+            } catch (e) {
+                this.bugActivities = [];
+            }
+        },
+
+        async updateBugStatus(bug) {
+            if (this.bugUpdateStatus === bug.status) return;
+            try {
+                const actor = '{{ user.get("preferred_username", "Tester") if user else "Tester" }}';
+                await this.api(`/api/v1/testing/bugs/${bug.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ status: this.bugUpdateStatus, actor }),
+                });
+                await this.loadBugs();
+                // Refresh the summary too (open_bugs count changes)
+                this.summary = await this.api('/api/v1/testing/summary');
+                // Refresh detail
+                const updated = this.bugs.find(b => b.id === bug.id);
+                if (updated) {
+                    this.selectedBug = updated;
+                    this.bugUpdateStatus = updated.status;
+                    this.bugActivities = await this.api(`/api/v1/testing/bugs/${bug.id}/activities`);
+                }
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Bug status updated' } }));
+            } catch (e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Failed to update bug' } }));
+            }
+        },
+
+        async addBugComment(bug) {
+            if (!this.bugComment.trim()) return;
+            try {
+                const actor = '{{ user.get("preferred_username", "Tester") if user else "Tester" }}';
+                await this.api(`/api/v1/testing/bugs/${bug.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ comment: this.bugComment, actor }),
+                });
+                this.bugComment = '';
+                this.bugActivities = await this.api(`/api/v1/testing/bugs/${bug.id}/activities`);
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Comment added' } }));
+            } catch (e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Failed to add comment' } }));
             }
         },
 
@@ -304,7 +601,8 @@ function qaDashboard() {
                 });
                 this.showBugModal = false;
                 this.newBug = { title: '', description: '', severity: 'medium', category: 'functional', reported_by: this.newBug.reported_by };
-                await this.loadAll();
+                await this.loadBugs();
+                this.summary = await this.api('/api/v1/testing/summary');
                 this.activeTab = 'bugs';
                 window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Bug reported!' } }));
             } catch (e) {
