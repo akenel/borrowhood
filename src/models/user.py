@@ -90,6 +90,13 @@ class BHUser(BHBase, Base):
         Enum(BadgeTier), default=BadgeTier.NEWCOMER, nullable=False
     )
 
+    # Service declarations ("I offer...")
+    offers_delivery: Mapped[bool] = mapped_column(default=False)
+    offers_pickup: Mapped[bool] = mapped_column(default=False)
+    offers_training: Mapped[bool] = mapped_column(default=False)
+    offers_custom_orders: Mapped[bool] = mapped_column(default=False)
+    offers_repair: Mapped[bool] = mapped_column(default=False)
+
     # Notification preferences
     notify_telegram: Mapped[bool] = mapped_column(default=True)
     notify_email: Mapped[bool] = mapped_column(default=True)

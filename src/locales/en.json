@@ -14,7 +14,8 @@
     "profile": "Profile",
     "settings": "Settings",
     "dashboard": "Dashboard",
-    "list_item": "List Your Stuff"
+    "list_item": "List Your Stuff",
+    "helpboard": "Help Board"
   },
   "home": {
     "hero_title": "Every Garage Becomes a Rental Shop",
@@ -54,11 +55,14 @@
     "no_description": "No description",
     "clear_filters": "Clear All Filters",
     "all_categories": "All Categories",
-    "all_types": "All Types"
+    "all_types": "All Types",
+    "show_map": "Show Map",
+    "hide_map": "Hide Map"
   },
   "item": {
     "details": "Details",
     "description": "Description",
+    "story": "The Story",
     "condition": "Condition",
     "category": "Category",
     "type": "Type",
@@ -110,7 +114,14 @@
     "edit_profile": "Edit Profile",
     "message_telegram": "Message on Telegram",
     "report": "Report this profile",
-    "verified": "verified"
+    "verified": "verified",
+    "services": "Services Offered",
+    "offers_delivery": "Delivers",
+    "offers_pickup": "Pickup Available",
+    "offers_training": "Offers Training",
+    "offers_custom": "Custom Orders",
+    "offers_repair": "Repairs",
+    "export": "Export Workshop"
   },
   "auction": {
     "current_bid": "Current Bid",
@@ -183,7 +194,34 @@
     "per_hour": "per hour",
     "flat": "flat rate",
     "negotiable": "negotiable",
-    "free": "Free"
+    "free": "Free",
+    "translate": "Translate",
+    "show_original": "Show Original"
+  },
+  "helpboard": {
+    "title": "Help Board",
+    "subtitle": "Ask for help or offer your skills. Neighbors helping neighbors.",
+    "new_post": "New Post",
+    "total": "Total Posts",
+    "open": "Open",
+    "needs_count": "Needs",
+    "offers_count": "Offers",
+    "all": "All",
+    "needs": "Needs",
+    "offers": "Offers",
+    "need_label": "Need Help",
+    "offer_label": "Can Help",
+    "no_posts": "No posts yet",
+    "be_first": "Be the first to post on the Help Board!",
+    "i_need": "I Need Help",
+    "i_offer": "I Can Help",
+    "title_placeholder": "What do you need help with?",
+    "body_placeholder": "Add details about what you need or what you can offer...",
+    "neighborhood_placeholder": "Neighborhood (optional)",
+    "low": "Low",
+    "normal": "Normal",
+    "urgent": "Urgent",
+    "post": "Post"
   },
   "categories": {
     "tools": "Tools",
@@ -281,6 +319,9 @@
     "name_placeholder": "e.g., Bosch Cordless Drill",
     "description": "Description",
     "description_placeholder": "Describe your item, its condition, and any special instructions...",
+    "story": "Story (optional)",
+    "story_placeholder": "What's the story behind this item? How did you get it?",
+    "story_hint": "A personal story makes your listing stand out. People connect with stories.",
     "category": "Category",
     "item_type": "Item Type",
     "condition": "Condition",

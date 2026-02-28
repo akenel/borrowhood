@@ -69,6 +69,7 @@
                     <div class="hidden md:flex md:ml-8 md:space-x-6">
                         <a href="/" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.home') }}</a>
                         <a href="/browse" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.browse') }}</a>
+                        <a href="/helpboard" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.helpboard') }}</a>
                         {% if user %}
                         <a href="/dashboard" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.dashboard') }}</a>
                         <a href="/testing" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">QA</a>
@@ -166,6 +167,7 @@
             <div class="px-4 py-3 space-y-1">
                 <a href="/" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.home') }}</a>
                 <a href="/browse" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.browse') }}</a>
+                <a href="/helpboard" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.helpboard') }}</a>
                 <a href="/list" class="block px-3 py-3 text-base font-semibold text-indigo-600 hover:bg-indigo-50 rounded-lg min-h-[44px]">{{ t('nav.list_item') }}</a>
                 {% if user %}
                 <a href="/dashboard" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.dashboard') }}</a>
@@ -231,6 +233,62 @@
             </div>
         </div>
     </footer>
+
+    <!-- Shared components -->
+    <script>
+    function reportWidget(entityType, entityId) {
+        return {
+            showModal: false, reason: 'spam', detail: '', submitting: false, success: false, error: '',
+            async submit() {
+                this.submitting = true; this.error = ''; this.success = false;
+                try {
+                    const r = await fetch('/api/v1/reports', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ entity_type: entityType, entity_id: entityId, reason: this.reason, detail: this.detail || null }),
+                    });
+                    if (r.status === 409) { this.error = 'You already reported this.'; return; }
+                    if (!r.ok) throw new Error('Failed');
+                    this.success = true;
+                    setTimeout(() => { this.showModal = false; this.success = false; this.detail = ''; }, 1500);
+                } catch (e) { this.error = 'Failed to submit report.'; }
+                finally { this.submitting = false; }
+            }
+        };
+    }
+
+    function translateText(elId) {
+        return {
+            translated: false,
+            original: '',
+            loading: false,
+            async translate() {
+                var el = document.getElementById(elId);
+                if (!el) return;
+                if (this.translated) {
+                    el.textContent = this.original;
+                    this.translated = false;
+                    return;
+                }
+                this.original = el.textContent;
+                this.loading = true;
+                var targetLang = document.documentElement.lang === 'it' ? 'en' : 'it';
+                var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=' + targetLang + '&dt=t&q=' + encodeURIComponent(this.original);
+                try {
+                    var resp = await fetch(url);
+                    var data = await resp.json();
+                    var text = data[0].map(function(s) { return s[0]; }).join('');
+                    el.textContent = text;
+                    this.translated = true;
+                } catch(e) {
+                    // Fallback: open Google Translate page
+                    window.open('https://translate.google.com/?sl=auto&tl=' + targetLang + '&text=' + encodeURIComponent(this.original), '_blank');
+                }
+                this.loading = false;
+            }
+        };
+    }
+    </script>
 
     {% block scripts %}{% endblock %}
 </body>

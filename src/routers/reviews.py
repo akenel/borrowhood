@@ -10,9 +10,12 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.database import get_db
 from src.dependencies import require_auth
+from src.models.item import BHItem
+from src.models.listing import BHListing
 from src.models.rental import BHRental, RentalStatus
 from src.models.review import BHReview, REVIEW_WEIGHTS
 from src.models.user import BHUser, BadgeTier
@@ -88,7 +91,9 @@ async def create_review(
 
     # Verify rental exists and is completed
     result = await db.execute(
-        select(BHRental).where(BHRental.id == data.rental_id)
+        select(BHRental)
+        .options(selectinload(BHRental.listing).selectinload(BHListing.item))
+        .where(BHRental.id == data.rental_id)
     )
     rental = result.scalars().first()
     if not rental:
@@ -96,9 +101,10 @@ async def create_review(
     if rental.status != RentalStatus.COMPLETED:
         raise HTTPException(status_code=400, detail="Can only review completed rentals")
 
-    # Must be participant in the rental
-    if rental.renter_id != user.id:
-        raise HTTPException(status_code=403, detail="Only the renter can leave a review")
+    # Must be participant in the rental (renter OR item owner)
+    owner_id = rental.listing.item.owner_id if rental.listing and rental.listing.item else None
+    if rental.renter_id != user.id and owner_id != user.id:
+        raise HTTPException(status_code=403, detail="Only rental participants can leave a review")
 
     # Prevent duplicate reviews
     existing = await db.execute(

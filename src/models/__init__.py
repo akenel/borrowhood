@@ -20,6 +20,8 @@ from src.models.notification import BHNotification
 from src.models.badge import BHBadge
 from src.models.qa import BHTestResult, BHBugReport, BHBugActivity, BHBugCommit
 from src.models.backlog import BHBacklogItem, BHBacklogActivity
+from src.models.translation import BHContentTranslation
+from src.models.helpboard import BHHelpPost, BHHelpReply
 
 __all__ = [
     "BHUser",
@@ -47,4 +49,7 @@ __all__ = [
     "BHBugCommit",
     "BHBacklogItem",
     "BHBacklogActivity",
+    "BHContentTranslation",
+    "BHHelpPost",
+    "BHHelpReply",
 ]

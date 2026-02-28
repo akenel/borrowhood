@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('helpboard.title') }} - {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="helpBoard()">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">{{ t('helpboard.title') }}</h1>
+            <p class="text-sm text-gray-500 mt-1">{{ t('helpboard.subtitle') }}</p>
+        </div>
+        <button @click="showCreate = true"
+                class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px]">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            {{ t('helpboard.new_post') }}
+        </button>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
+            <p class="text-2xl font-bold text-gray-900" x-text="summary.total">0</p>
+            <p class="text-xs text-gray-500">{{ t('helpboard.total') }}</p>
+        </div>
+        <div class="bg-white rounded-lg border border-emerald-200 p-4 text-center">
+            <p class="text-2xl font-bold text-emerald-600" x-text="summary.open">0</p>
+            <p class="text-xs text-gray-500">{{ t('helpboard.open') }}</p>
+        </div>
+        <div class="bg-white rounded-lg border border-blue-200 p-4 text-center">
+            <p class="text-2xl font-bold text-blue-600" x-text="summary.needs">0</p>
+            <p class="text-xs text-gray-500">{{ t('helpboard.needs_count') }}</p>
+        </div>
+        <div class="bg-white rounded-lg border border-purple-200 p-4 text-center">
+            <p class="text-2xl font-bold text-purple-600" x-text="summary.offers">0</p>
+            <p class="text-xs text-gray-500">{{ t('helpboard.offers_count') }}</p>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="mt-6 flex flex-wrap gap-2">
+        <button @click="filter.type = ''; loadPosts()"
+                class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
+                :class="filter.type === '' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-indigo-50'">
+            {{ t('helpboard.all') }}
+        </button>
+        <button @click="filter.type = 'need'; loadPosts()"
+                class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
+                :class="filter.type === 'need' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-blue-50'">
+            {{ t('helpboard.needs') }}
+        </button>
+        <button @click="filter.type = 'offer'; loadPosts()"
+                class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
+                :class="filter.type === 'offer' ? 'bg-purple-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-purple-50'">
+            {{ t('helpboard.offers') }}
+        </button>
+    </div>
+
+    <!-- Posts list -->
+    <div class="mt-6 space-y-4">
+        <template x-if="posts.length === 0 && !loading">
+            <div class="text-center py-16 bg-white rounded-lg border border-gray-200">
+                <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <h3 class="mt-4 text-lg font-semibold text-gray-900">{{ t('helpboard.no_posts') }}</h3>
+                <p class="mt-2 text-sm text-gray-500">{{ t('helpboard.be_first') }}</p>
+            </div>
+        </template>
+
+        <template x-for="post in posts" :key="post.id">
+            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-sm transition-shadow">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xs px-2.5 py-1 rounded-full font-medium"
+                                  :class="post.help_type === 'need' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'"
+                                  x-text="post.help_type === 'need' ? '{{ t('helpboard.need_label') }}' : '{{ t('helpboard.offer_label') }}'">
+                            </span>
+                            <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                                  :class="{
+                                      'bg-red-100 text-red-700': post.urgency === 'urgent',
+                                      'bg-gray-100 text-gray-600': post.urgency === 'normal',
+                                      'bg-green-100 text-green-700': post.urgency === 'low'
+                                  }"
+                                  x-text="post.urgency" x-show="post.urgency !== 'normal'">
+                            </span>
+                            <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full" x-text="post.category"></span>
+                            <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                                  :class="{
+                                      'bg-emerald-100 text-emerald-700': post.status === 'open',
+                                      'bg-amber-100 text-amber-700': post.status === 'in_progress',
+                                      'bg-gray-100 text-gray-500': post.status === 'resolved' || post.status === 'closed'
+                                  }"
+                                  x-text="post.status.replace('_', ' ')">
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900" x-text="post.title"></h3>
+                        <p class="mt-1 text-sm text-gray-600 line-clamp-2" x-text="post.body" x-show="post.body"></p>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center justify-between text-xs text-gray-400">
+                    <div class="flex items-center gap-3">
+                        <span x-text="new Date(post.created_at).toLocaleDateString()"></span>
+                        <span x-show="post.neighborhood" x-text="post.neighborhood"></span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        <span x-text="post.reply_count"></span>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <!-- Create post modal -->
+    <template x-teleport="body">
+        <div x-show="showCreate" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="showCreate = false">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">{{ t('helpboard.new_post') }}</h3>
+
+                <!-- Type toggle -->
+                <div class="flex rounded-lg border border-gray-200 p-1 mb-4">
+                    <button @click="newPost.help_type = 'need'"
+                            class="flex-1 py-2 text-sm font-medium rounded-md transition-colors"
+                            :class="newPost.help_type === 'need' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:text-gray-900'">
+                        {{ t('helpboard.i_need') }}
+                    </button>
+                    <button @click="newPost.help_type = 'offer'"
+                            class="flex-1 py-2 text-sm font-medium rounded-md transition-colors"
+                            :class="newPost.help_type === 'offer' ? 'bg-purple-600 text-white' : 'text-gray-600 hover:text-gray-900'">
+                        {{ t('helpboard.i_offer') }}
+                    </button>
+                </div>
+
+                <input x-model="newPost.title" type="text" placeholder="{{ t('helpboard.title_placeholder') }}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-3 min-h-[44px]">
+
+                <textarea x-model="newPost.body" rows="3" placeholder="{{ t('helpboard.body_placeholder') }}"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-3"></textarea>
+
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <select x-model="newPost.category" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm min-h-[44px]">
+                        <option value="tools">{{ t('categories.tools') }}</option>
+                        <option value="kitchen">{{ t('categories.kitchen') }}</option>
+                        <option value="garden">{{ t('categories.garden') }}</option>
+                        <option value="electronics">{{ t('categories.electronics') }}</option>
+                        <option value="sports">{{ t('categories.sports') }}</option>
+                        <option value="crafts">{{ t('categories.crafts') }}</option>
+                        <option value="cleaning">{{ t('categories.cleaning') }}</option>
+                        <option value="other">{{ t('categories.other') }}</option>
+                    </select>
+                    <select x-model="newPost.urgency" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm min-h-[44px]">
+                        <option value="low">{{ t('helpboard.low') }}</option>
+                        <option value="normal">{{ t('helpboard.normal') }}</option>
+                        <option value="urgent">{{ t('helpboard.urgent') }}</option>
+                    </select>
+                </div>
+
+                <input x-model="newPost.neighborhood" type="text" placeholder="{{ t('helpboard.neighborhood_placeholder') }}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4 min-h-[44px]">
+
+                <div class="flex justify-end space-x-2">
+                    <button @click="showCreate = false"
+                            class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">
+                        {{ t('common.cancel') }}
+                    </button>
+                    <button @click="submitPost()" :disabled="submitting || !newPost.title.trim()"
+                            class="px-6 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 min-h-[44px]">
+                        {{ t('helpboard.post') }}
+                    </button>
+                </div>
+                <p x-show="error" class="text-xs text-red-600 mt-2" x-text="error"></p>
+            </div>
+        </div>
+    </template>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function helpBoard() {
+    return {
+        posts: [],
+        summary: { total: 0, open: 0, needs: 0, offers: 0 },
+        filter: { type: '' },
+        showCreate: false,
+        submitting: false,
+        error: '',
+        loading: true,
+        newPost: {
+            help_type: 'need',
+            title: '',
+            body: '',
+            category: 'tools',
+            urgency: 'normal',
+            neighborhood: '',
+            content_language: '{{ lang }}'
+        },
+        async init() {
+            await Promise.all([this.loadPosts(), this.loadSummary()]);
+            this.loading = false;
+        },
+        async loadPosts() {
+            var params = new URLSearchParams();
+            if (this.filter.type) params.set('help_type', this.filter.type);
+            var resp = await fetch('/api/v1/helpboard/posts?' + params.toString());
+            if (resp.ok) this.posts = await resp.json();
+        },
+        async loadSummary() {
+            var resp = await fetch('/api/v1/helpboard/summary');
+            if (resp.ok) this.summary = await resp.json();
+        },
+        async submitPost() {
+            this.submitting = true;
+            this.error = '';
+            try {
+                var resp = await fetch('/api/v1/helpboard/posts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        help_type: this.newPost.help_type,
+                        title: this.newPost.title,
+                        body: this.newPost.body || null,
+                        category: this.newPost.category,
+                        urgency: this.newPost.urgency,
+                        neighborhood: this.newPost.neighborhood || null,
+                        content_language: this.newPost.content_language
+                    })
+                });
+                if (resp.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+                if (!resp.ok) {
+                    var err = await resp.json();
+                    this.error = err.detail || 'Failed to create post';
+                    return;
+                }
+                this.showCreate = false;
+                this.newPost = { help_type: 'need', title: '', body: '', category: 'tools', urgency: 'normal', neighborhood: '', content_language: '{{ lang }}' };
+                await Promise.all([this.loadPosts(), this.loadSummary()]);
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Post created!' } }));
+            } catch(e) {
+                this.error = 'Network error';
+            }
+            this.submitting = false;
+        }
+    };
+}
+</script>
+{% endblock %}

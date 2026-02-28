@@ -29,6 +29,7 @@
         form: {
             name: '',
             description: '',
+            story: '',
             category: 'tools',
             item_type: 'physical',
             condition: 'good',
@@ -104,6 +105,7 @@
                     body: JSON.stringify({
                         name: this.form.name,
                         description: this.form.description,
+                        story: this.form.story || null,
                         category: this.form.category,
                         item_type: this.form.item_type,
                         condition: this.form.condition || null,
@@ -300,6 +302,15 @@
                           placeholder="{{ t('list_item.description_placeholder') }}"
                           class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                           :class="aiUsed && form.description ? 'border-purple-300 bg-purple-50/30' : 'border-gray-300'"></textarea>
+            </div>
+
+            <!-- Story -->
+            <div>
+                <label for="story" class="block text-sm font-medium text-gray-700 mb-1">{{ t('list_item.story') }}</label>
+                <textarea id="story" x-model="form.story" rows="3"
+                          placeholder="{{ t('list_item.story_placeholder') }}"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+                <p class="text-xs text-gray-400 mt-1">{{ t('list_item.story_hint') }}</p>
             </div>
 
             <!-- AI-suggested tags -->

@@ -220,6 +220,43 @@ async def workshop_profile(slug: str, request: Request,
     return _render("pages/workshop.html", ctx)
 
 
+@router.get("/workshop/{slug}/export", response_class=HTMLResponse)
+async def export_workshop(slug: str, request: Request,
+                          db: AsyncSession = Depends(get_db),
+                          token: Optional[dict] = Depends(get_current_user_token)):
+    """Export workshop as standalone HTML page (one-click download)."""
+    from datetime import date
+    result = await db.execute(
+        select(BHUser)
+        .options(
+            selectinload(BHUser.languages),
+            selectinload(BHUser.skills),
+            selectinload(BHUser.social_links),
+            selectinload(BHUser.items).selectinload(BHItem.media),
+            selectinload(BHUser.items).selectinload(BHItem.listings),
+        )
+        .where(BHUser.slug == slug)
+        .where(BHUser.deleted_at.is_(None))
+    )
+    workshop_owner = result.scalars().first()
+
+    if not workshop_owner:
+        return Response("Workshop not found", status_code=404)
+
+    lang = detect_language(request)
+    items = [i for i in workshop_owner.items if not i.deleted_at]
+    html = templates.TemplateResponse("export/workshop.html", {
+        "request": request,
+        "workshop": workshop_owner,
+        "items": items,
+        "lang": lang,
+        "export_date": date.today().isoformat(),
+    })
+    filename = f"{slug}-borrowhood-export.html"
+    html.headers["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return html
+
+
 @router.get("/list", response_class=HTMLResponse)
 async def list_item_page(request: Request,
                          token: Optional[dict] = Depends(get_current_user_token)):
@@ -356,6 +393,14 @@ async def profile(request: Request,
         stats=stats,
     )
     return _render("pages/profile.html", ctx)
+
+
+@router.get("/helpboard", response_class=HTMLResponse)
+async def helpboard_page(request: Request,
+                         token: Optional[dict] = Depends(get_current_user_token)):
+    """Community Help Board page."""
+    ctx = _ctx(request, token)
+    return _render("pages/helpboard.html", ctx)
 
 
 @router.get("/terms", response_class=HTMLResponse)

@@ -4,6 +4,20 @@
 
 *Free as in freedom. Open source. No platform fees. Forever.*
 
+**Live demo:** [https://46.62.138.218](https://46.62.138.218) (Hetzner UAT -- test user: `angel` / `helix_pass`)
+
+---
+
+## Screenshots
+
+| Home | Browse | Item Detail |
+|------|--------|-------------|
+| ![Home](docs/screenshots/home.png) | ![Browse](docs/screenshots/browse.png) | ![Item Detail](docs/screenshots/item-detail.png) |
+
+| Workshop Profile | Dashboard |
+|------------------|-----------|
+| ![Workshop](docs/screenshots/workshop.png) | ![Dashboard](docs/screenshots/dashboard.png) |
+
 ---
 
 ## What Is BorrowHood?
@@ -98,7 +112,7 @@ FastAPI (uvicorn)
   +-- SQLAlchemy async -------------> PostgreSQL
         |
         +-- 13 models (UUID PKs, soft deletes)
-        +-- Seed data (11 workshops, 20+ items)
+        +-- Seed data (11 workshops, 32 items)
 ```
 
 ## Data Model
@@ -281,11 +295,12 @@ Import `keycloak/borrowhood-realm-dev.json` into your Keycloak instance.
 | Python source | ~5,500 lines |
 | HTML templates | ~1,600 lines |
 | Test code | ~1,100 lines |
-| SQLAlchemy models | 13 |
-| API endpoints | 33 |
-| Automated tests | 111 |
+| SQLAlchemy models | 22 |
+| API endpoints | 35+ |
+| Automated tests | 183 |
 | i18n keys | 200+ (EN + IT) |
-| Routers | 11 |
+| Seed items | 32 (across 9 categories) |
+| Routers | 13 |
 
 ## License
 

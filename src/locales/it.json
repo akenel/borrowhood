@@ -14,7 +14,8 @@
     "profile": "Profilo",
     "settings": "Impostazioni",
     "dashboard": "La Mia Dashboard",
-    "list_item": "Pubblica Oggetto"
+    "list_item": "Pubblica Oggetto",
+    "helpboard": "Bacheca Aiuto"
   },
   "home": {
     "hero_title": "Ogni Garage Diventa un Negozio di Noleggio",
@@ -54,11 +55,14 @@
     "no_description": "Nessuna descrizione",
     "clear_filters": "Cancella Tutti i Filtri",
     "all_categories": "Tutte le Categorie",
-    "all_types": "Tutti i Tipi"
+    "all_types": "Tutti i Tipi",
+    "show_map": "Mostra Mappa",
+    "hide_map": "Nascondi Mappa"
   },
   "item": {
     "details": "Dettagli",
     "description": "Descrizione",
+    "story": "La Storia",
     "condition": "Condizione",
     "category": "Categoria",
     "type": "Tipo",
@@ -110,7 +114,14 @@
     "edit_profile": "Modifica Profilo",
     "message_telegram": "Messaggio su Telegram",
     "report": "Segnala questo profilo",
-    "verified": "verificato"
+    "verified": "verificato",
+    "services": "Servizi Offerti",
+    "offers_delivery": "Consegna",
+    "offers_pickup": "Ritiro Disponibile",
+    "offers_training": "Formazione",
+    "offers_custom": "Ordini Personalizzati",
+    "offers_repair": "Riparazioni",
+    "export": "Esporta Bottega"
   },
   "auction": {
     "current_bid": "Offerta Attuale",
@@ -183,7 +194,34 @@
     "per_hour": "all'ora",
     "flat": "tariffa fissa",
     "negotiable": "trattabile",
-    "free": "Gratis"
+    "free": "Gratis",
+    "translate": "Traduci",
+    "show_original": "Mostra Originale"
+  },
+  "helpboard": {
+    "title": "Bacheca Aiuto",
+    "subtitle": "Chiedi aiuto o offri le tue competenze. Vicini che aiutano vicini.",
+    "new_post": "Nuovo Post",
+    "total": "Totale Post",
+    "open": "Aperti",
+    "needs_count": "Richieste",
+    "offers_count": "Offerte",
+    "all": "Tutti",
+    "needs": "Richieste",
+    "offers": "Offerte",
+    "need_label": "Ho Bisogno",
+    "offer_label": "Posso Aiutare",
+    "no_posts": "Nessun post ancora",
+    "be_first": "Sii il primo a pubblicare sulla Bacheca Aiuto!",
+    "i_need": "Ho Bisogno di Aiuto",
+    "i_offer": "Posso Aiutare",
+    "title_placeholder": "Di cosa hai bisogno?",
+    "body_placeholder": "Aggiungi dettagli su cosa ti serve o cosa puoi offrire...",
+    "neighborhood_placeholder": "Quartiere (opzionale)",
+    "low": "Bassa",
+    "normal": "Normale",
+    "urgent": "Urgente",
+    "post": "Pubblica"
   },
   "categories": {
     "tools": "Attrezzi",
@@ -281,6 +319,9 @@
     "name_placeholder": "es., Trapano a Batteria Bosch",
     "description": "Descrizione",
     "description_placeholder": "Descrivi il tuo oggetto, le sue condizioni e istruzioni particolari...",
+    "story": "Storia (opzionale)",
+    "story_placeholder": "Qual e la storia dietro questo oggetto? Come lo hai ottenuto?",
+    "story_hint": "Una storia personale rende il tuo annuncio speciale. Le persone si connettono con le storie.",
     "category": "Categoria",
     "item_type": "Tipo di Oggetto",
     "condition": "Condizione",

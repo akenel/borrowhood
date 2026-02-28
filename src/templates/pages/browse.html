@@ -2,6 +2,11 @@
 
 {% block title %}{{ t('browse.title') }} - {{ t('app.name') }}{% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+{% endblock %}
+
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
@@ -114,6 +119,23 @@
         </div>
     </div>
 
+    <!-- Map toggle -->
+    <div class="mt-6" x-data="{ showMap: false }">
+        <button @click="showMap = !showMap; if(showMap) $nextTick(() => initBrowseMap())"
+                class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border transition-colors min-h-[44px]"
+                :class="showMap ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span x-text="showMap ? '{{ t('browse.hide_map') }}' : '{{ t('browse.show_map') }}'"></span>
+        </button>
+
+        <div x-show="showMap" x-transition class="mt-4 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+            <div id="browse-map" style="height: 350px; z-index: 0;"></div>
+        </div>
+    </div>
+
     <!-- Results -->
     <div class="mt-8">
         {% if items %}
@@ -206,4 +228,39 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+var _browseMap = null;
+function initBrowseMap() {
+    if (_browseMap) { _browseMap.invalidateSize(); return; }
+
+    var items = [
+        {% for item in items %}
+        {% if item.latitude and item.longitude %}
+        { lat: {{ item.latitude }}, lng: {{ item.longitude }}, name: {{ item.name | tojson }}, slug: "{{ item.slug }}", category: "{{ item.category }}" },
+        {% endif %}
+        {% endfor %}
+    ];
+
+    if (items.length === 0) {
+        _browseMap = L.map('browse-map', { scrollWheelZoom: false }).setView([38.018, 12.530], 13);
+    } else {
+        _browseMap = L.map('browse-map', { scrollWheelZoom: false });
+        var group = L.featureGroup();
+        items.forEach(function(it) {
+            var marker = L.marker([it.lat, it.lng])
+                .bindPopup('<a href="/items/' + it.slug + '" class="font-medium text-indigo-600 hover:underline">' + it.name + '</a><br><span class="text-xs text-gray-500">' + it.category + '</span>');
+            group.addLayer(marker);
+        });
+        group.addTo(_browseMap);
+        _browseMap.fitBounds(group.getBounds().pad(0.15));
+    }
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(_browseMap);
+}
+</script>
 {% endblock %}

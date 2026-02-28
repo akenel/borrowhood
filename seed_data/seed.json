@@ -63,7 +63,10 @@
         "reviews_received": 15,
         "items_listed": 18,
         "helpful_flags": 5
-      }
+      },
+      "offers_delivery": true,
+      "offers_training": true,
+      "offers_custom_orders": true
     },
     {
       "slug": "mikes-garage",
@@ -121,7 +124,9 @@
         "reviews_received": 22,
         "items_listed": 45,
         "helpful_flags": 12
-      }
+      },
+      "offers_repair": true,
+      "offers_pickup": true
     },
     {
       "slug": "angel-hq",
@@ -197,7 +202,7 @@
       "email": "nino@borrowhood.local",
       "workshop_name": "Camper & Tour",
       "workshop_type": "garage",
-      "tagline": "Casa \u00e8 dove parcheggi",
+      "tagline": "Casa è dove parcheggi",
       "bio": "Family camper business since the 90s. We rent, repair, and sell camper vans. Camping accessories for every adventure. Based at Palazzo Asia, Trapani.",
       "telegram_username": "nino_camper",
       "city": "Trapani",
@@ -243,7 +248,9 @@
         "reviews_received": 18,
         "items_listed": 22,
         "helpful_flags": 3
-      }
+      },
+      "offers_delivery": true,
+      "offers_repair": true
     },
     {
       "slug": "marias-garden",
@@ -252,7 +259,7 @@
       "workshop_name": "Il Giardino di Maria",
       "workshop_type": "garden",
       "tagline": "Ogni giardino racconta una storia",
-      "bio": "Ho 72 anni e il mio giardino \u00e8 la mia vita. Coltivo pomodori, basilico, e limoni. Posso insegnarti tutto quello che so -- ma devi portare i tuoi guanti!",
+      "bio": "Ho 72 anni e il mio giardino è la mia vita. Coltivo pomodori, basilico, e limoni. Posso insegnarti tutto quello che so -- ma devi portare i tuoi guanti!",
       "telegram_username": "maria_garden",
       "city": "Trapani",
       "country_code": "IT",
@@ -297,7 +304,9 @@
         "reviews_received": 25,
         "items_listed": 15,
         "helpful_flags": 20
-      }
+      },
+      "offers_delivery": true,
+      "offers_training": true
     },
     {
       "slug": "marcos-workshop",
@@ -366,7 +375,10 @@
         "reviews_received": 30,
         "items_listed": 28,
         "helpful_flags": 15
-      }
+      },
+      "offers_custom_orders": true,
+      "offers_repair": true,
+      "offers_training": true
     },
     {
       "slug": "jakes-electronics",
@@ -426,7 +438,9 @@
         "reviews_received": 8,
         "items_listed": 12,
         "helpful_flags": 2
-      }
+      },
+      "offers_repair": true,
+      "offers_pickup": true
     },
     {
       "slug": "lunas-studio",
@@ -490,7 +504,9 @@
         "reviews_received": 14,
         "items_listed": 8,
         "helpful_flags": 8
-      }
+      },
+      "offers_training": true,
+      "offers_custom_orders": true
     },
     {
       "slug": "rosas-home",
@@ -499,7 +515,7 @@
       "workshop_name": "Casa Rosa",
       "workshop_type": "kitchen",
       "tagline": "La nonna sa sempre cosa fare",
-      "bio": "Ho 84 anni. Non uso il computer. Mio nipote Marco ha fatto questo profilo per me. Ma so fare la pasta migliore di Trapani e ho una macchina per la pasta che chiunque pu\u00f2 usare.",
+      "bio": "Ho 84 anni. Non uso il computer. Mio nipote Marco ha fatto questo profilo per me. Ma so fare la pasta migliore di Trapani e ho una macchina per la pasta che chiunque può usare.",
       "telegram_username": null,
       "city": "Trapani",
       "country_code": "IT",
@@ -582,7 +598,8 @@
         "reviews_received": 6,
         "items_listed": 15,
         "helpful_flags": 1
-      }
+      },
+      "offers_delivery": true
     },
     {
       "slug": "johns-cleaning",
@@ -677,7 +694,8 @@
         }
       ],
       "latitude": 38.018,
-      "longitude": 12.537
+      "longitude": 12.537,
+      "story": "My mother started collecting these in 1982. Every Christmas, every Easter, every birthday -- she'd find a new shape. When she passed the collection to me, there were exactly 200 pieces. Each one has a memory attached to it."
     },
     {
       "owner_slug": "sallys-kitchen",
@@ -939,7 +957,7 @@
           "price": 10.0,
           "price_unit": "per_hour",
           "currency": "EUR",
-          "notes": "Minimo 2 ore. Pranzo incluso se restiamo pi\u00f9 di 3 ore!"
+          "notes": "Minimo 2 ore. Pranzo incluso se restiamo più di 3 ore!"
         }
       ],
       "latitude": 38.025,
@@ -1171,7 +1189,7 @@
           "price_unit": "per_day",
           "currency": "EUR",
           "pickup_only": true,
-          "notes": "Marco vi mostrer\u00e0 come funziona. Portate la vostra farina e le uova."
+          "notes": "Marco vi mostrerà come funziona. Portate la vostra farina e le uova."
         }
       ],
       "latitude": 38.023,
@@ -1316,6 +1334,442 @@
       ],
       "latitude": 38.022,
       "longitude": 12.542
+    },
+    {
+      "owner_slug": "rosas-home",
+      "name": "Cannoli Maker Kit (Sicilian Traditional)",
+      "slug": "cannoli-maker-kit-sicilian-traditional",
+      "description": "Everything you need: stainless steel tubes (6), ricotta strainer, piping bag, and nonna's recipe card. Makes 24 cannoli per batch. The tubes are the real deal from Palermo.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "kitchen",
+      "subcategory": "baking",
+      "condition": "good",
+      "brand": "Handmade",
+      "needs_equipment": "Oven, deep fryer or pot for frying",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/cannoli-kit.svg",
+          "alt_text": "Traditional Sicilian cannoli maker kit with metal tubes"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 8.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 15.0,
+          "delivery_available": false,
+          "pickup_only": true,
+          "notes": "Pickup in Trapani centro. I'll show you how to use the tubes."
+        },
+        {
+          "listing_type": "training",
+          "price": 25.0,
+          "price_unit": "per_session",
+          "currency": "EUR",
+          "notes": "Full cannoli masterclass -- 3 hours, you take home what you make."
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.514,
+      "story": "My nonna brought these tubes from Palermo in 1975. They're the real thing -- heavy gauge steel, hand-rolled. Every family gathering, the cannoli came out. Now it's my turn to keep the tradition alive."
+    },
+    {
+      "owner_slug": "ninos-campers",
+      "name": "Portable Solar Panel (200W Foldable)",
+      "slug": "portable-solar-panel-200w-foldable",
+      "description": "EcoFlow 200W bifacial portable solar panel. Folds flat for transport. Compatible with most power stations. Perfect for camping, van life, or emergency backup. Includes carrying case.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "electronics",
+      "subcategory": "power",
+      "condition": "like_new",
+      "brand": "EcoFlow",
+      "needs_equipment": "Power station or solar charge controller",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/solar-panel.svg",
+          "alt_text": "Foldable 200W solar panel set up outdoors"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 15.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 100.0,
+          "delivery_available": true,
+          "pickup_only": false,
+          "notes": "I'll deliver within Trapani province. Includes setup instructions."
+        }
+      ],
+      "latitude": 38.003,
+      "longitude": 12.54
+    },
+    {
+      "owner_slug": "lunas-studio",
+      "name": "Oil Painting Supplies (Complete Starter Kit)",
+      "slug": "oil-painting-supplies-complete-starter-kit",
+      "description": "Winsor & Newton oil paints (24 colours), brushes (15 assorted), palette, easel, canvas boards (5), turpentine, linseed oil, palette knife set. Everything a beginner or intermediate painter needs.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "art",
+      "subcategory": "painting",
+      "condition": "good",
+      "brand": "Winsor & Newton",
+      "needs_equipment": "Ventilated workspace (turpentine fumes)",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/oil-painting-kit.svg",
+          "alt_text": "Complete oil painting starter kit with paints, brushes, and easel"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 12.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 50.0,
+          "delivery_available": true,
+          "pickup_only": false,
+          "notes": "Paints are partially used but all colours present. I'll include a colour mixing guide."
+        }
+      ],
+      "latitude": 38.022,
+      "longitude": 12.52
+    },
+    {
+      "owner_slug": "lunas-studio",
+      "name": "Pottery Wheel (Electric, Shimpo VL-Whisper)",
+      "slug": "pottery-wheel-electric-shimpo-vl-whisper",
+      "description": "Professional-grade Shimpo VL-Whisper pottery wheel. Whisper-quiet motor, variable speed, reversible. Includes bat pins and splash pan. Heavy (30kg) but I can help load.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "art",
+      "subcategory": "ceramics",
+      "condition": "good",
+      "brand": "Shimpo",
+      "needs_equipment": "Clay, kiln access for firing",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/pottery-wheel.svg",
+          "alt_text": "Shimpo electric pottery wheel in studio setting"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 20.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 150.0,
+          "delivery_available": false,
+          "pickup_only": true,
+          "notes": "Pickup only -- it's 30kg. I'll help you load it. Call before pickup."
+        },
+        {
+          "listing_type": "training",
+          "price": 30.0,
+          "price_unit": "per_session",
+          "currency": "EUR",
+          "notes": "2-hour pottery basics. You'll throw your first bowl. Clay included."
+        }
+      ],
+      "latitude": 38.022,
+      "longitude": 12.52,
+      "story": "I saved for two years to buy this wheel. My first piece was so bad I almost gave up. Now I teach others. The wheel has made over 500 pieces -- each one better than the last."
+    },
+    {
+      "owner_slug": "marcos-workshop",
+      "name": "3D Printer (Prusa i3 MK3S+)",
+      "slug": "3d-printer-prusa-i3-mk3s-plus",
+      "description": "Prusa i3 MK3S+ FDM printer with MMU2S multi-material upgrade. Prints PLA, PETG, ABS, TPU. Build volume 250x210x210mm. Includes 3 spools of PLA and USB drive with test models.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "3d_printing",
+      "subcategory": "fdm",
+      "condition": "good",
+      "brand": "Prusa Research",
+      "needs_equipment": "Slicing software (PrusaSlicer is free)",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/3d-printer.svg",
+          "alt_text": "Prusa i3 MK3S+ 3D printer printing an object"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 25.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 200.0,
+          "delivery_available": false,
+          "pickup_only": true,
+          "notes": "Calibrated and ready to print. I'll do a test print with you at pickup."
+        }
+      ],
+      "latitude": 38.015,
+      "longitude": 12.53
+    },
+    {
+      "owner_slug": "marcos-workshop",
+      "name": "3D Printing Service (Custom Parts)",
+      "slug": "3d-printing-service-custom-parts",
+      "description": "Send me your STL file, I'll print it. PLA, PETG, or ABS. Max size 250x210x210mm. Typical turnaround 1-3 days depending on complexity. Price per hour of print time.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "3d_printing",
+      "subcategory": "printing_service",
+      "condition": "not_applicable",
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/3d-print-service.svg",
+          "alt_text": "Various 3D printed parts and prototypes"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 5.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "Material cost included for standard PLA. Special materials (PETG, ABS, TPU) add EUR 2/hour."
+        }
+      ],
+      "latitude": 38.015,
+      "longitude": 12.53
+    },
+    {
+      "owner_slug": "daves-sports",
+      "name": "Stand-Up Paddleboard (Inflatable 10'6\")",
+      "slug": "stand-up-paddleboard-inflatable-10-6",
+      "description": "Red Paddle Co Ride 10'6\" inflatable SUP. Includes pump, adjustable paddle, ankle leash, backpack. Inflates in 5 minutes, fits in car boot. Perfect for the Trapani coast.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "sports",
+      "subcategory": "water_sports",
+      "condition": "good",
+      "brand": "Red Paddle Co",
+      "needs_equipment": null,
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/paddleboard.svg",
+          "alt_text": "Inflatable stand-up paddleboard on Sicilian beach"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 20.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 75.0,
+          "delivery_available": true,
+          "pickup_only": false,
+          "notes": "I'll deliver to beaches within 15km of Trapani. Life jacket available on request."
+        }
+      ],
+      "latitude": 38.029,
+      "longitude": 12.528
+    },
+    {
+      "owner_slug": "jakes-electronics",
+      "name": "Drone (DJI Mini 3 Pro)",
+      "slug": "drone-dji-mini-3-pro",
+      "description": "DJI Mini 3 Pro with RC controller (built-in screen). 4K/60fps video, 48MP photos, obstacle avoidance. Under 249g so no licence needed in Italy. 3 batteries, carrying case, ND filter set.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "electronics",
+      "subcategory": "photography",
+      "condition": "like_new",
+      "brand": "DJI",
+      "needs_equipment": "Smartphone for DJI Fly app (optional with RC controller)",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/drone.svg",
+          "alt_text": "DJI Mini 3 Pro drone with controller and accessories"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 35.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 250.0,
+          "delivery_available": false,
+          "pickup_only": true,
+          "notes": "I'll do a 15-minute orientation at pickup. Must have ID for deposit. No flying near airports."
+        }
+      ],
+      "latitude": 38.025,
+      "longitude": 12.535
+    },
+    {
+      "owner_slug": "marias-garden",
+      "name": "Greenhouse (Pop-up Walk-in, 3x2m)",
+      "slug": "greenhouse-pop-up-walk-in-3x2m",
+      "description": "Walk-in pop-up greenhouse, 3m x 2m x 2m. Steel frame, UV-resistant cover, roll-up door, 4 ventilation windows. Sets up in 30 minutes, no tools needed. Great for extending the growing season.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "garden",
+      "subcategory": "structures",
+      "condition": "good",
+      "brand": "Outsunny",
+      "needs_equipment": "Flat ground, stakes (included)",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/greenhouse.svg",
+          "alt_text": "Pop-up walk-in greenhouse in garden setting"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 10.0,
+          "price_unit": "per_week",
+          "currency": "EUR",
+          "deposit": 40.0,
+          "delivery_available": true,
+          "pickup_only": false,
+          "notes": "Seasonal rental preferred. I'll help with setup on delivery."
+        }
+      ],
+      "latitude": 38.01,
+      "longitude": 12.525
+    },
+    {
+      "owner_slug": "johns-cleaning",
+      "name": "Carpet Cleaner (Bissell ProHeat 2X)",
+      "slug": "carpet-cleaner-bissell-proheat-2x",
+      "description": "Bissell ProHeat 2X Revolution deep carpet cleaner. Hot water extraction, rotating brushes. Cleans carpets, upholstery, stairs. Includes cleaning solution (1 bottle per rental).",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "cleaning",
+      "subcategory": "deep_cleaning",
+      "condition": "good",
+      "brand": "Bissell",
+      "needs_equipment": "Hot water, electrical outlet",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/carpet-cleaner.svg",
+          "alt_text": "Bissell ProHeat carpet cleaner machine"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 15.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 30.0,
+          "delivery_available": true,
+          "pickup_only": false,
+          "notes": "Cleaning solution included. I'll show you how to fill and operate it."
+        }
+      ],
+      "latitude": 38.02,
+      "longitude": 12.518
+    },
+    {
+      "owner_slug": "mikes-garage",
+      "name": "Welder (MIG, Gasless 180A)",
+      "slug": "welder-mig-gasless-180a",
+      "description": "Gasless MIG welder, 180A. Welds steel up to 6mm. Includes welding mask, gloves, wire brush, 2 rolls of flux-core wire. Runs on standard 230V outlet.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "tools",
+      "subcategory": "welding",
+      "condition": "good",
+      "brand": "Parkside",
+      "needs_equipment": "230V outlet, ventilated workspace, safety gear (mask included)",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/welder.svg",
+          "alt_text": "MIG welder with welding mask and accessories"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 18.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 80.0,
+          "delivery_available": false,
+          "pickup_only": true,
+          "notes": "Experience required. I'll ask about your welding background at pickup."
+        },
+        {
+          "listing_type": "training",
+          "price": 40.0,
+          "price_unit": "per_session",
+          "currency": "EUR",
+          "notes": "Beginner welding workshop. 3 hours. You'll learn basic joints and safety."
+        }
+      ],
+      "latitude": 38.012,
+      "longitude": 12.532,
+      "story": "Bought this when I decided to build my own motorcycle frame. The frame never happened, but I learned to weld and now I fix everything -- gates, railings, furniture. Best impulse buy of my life."
+    },
+    {
+      "owner_slug": "sallys-kitchen",
+      "name": "Pasta Machine (Marcato Atlas 150 + Ravioli Set)",
+      "slug": "pasta-machine-marcato-atlas-150-ravioli-set",
+      "description": "Marcato Atlas 150 pasta machine with motor attachment and ravioli tray. Makes spaghetti, fettuccine, lasagne sheets, and ravioli. Chrome-plated steel, Italian made. Clamp-mount for any table.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "kitchen",
+      "subcategory": "cooking",
+      "condition": "like_new",
+      "brand": "Marcato",
+      "needs_equipment": "Table with edge for clamp, flour, eggs",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/pasta-machine.svg",
+          "alt_text": "Marcato Atlas 150 pasta machine with fresh pasta sheets"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 6.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 20.0,
+          "delivery_available": true,
+          "pickup_only": false,
+          "notes": "Motor attachment included -- no hand-cranking needed. Recipe booklet included."
+        },
+        {
+          "listing_type": "training",
+          "price": 20.0,
+          "price_unit": "per_session",
+          "currency": "EUR",
+          "notes": "Fresh pasta masterclass. 2 hours. Spaghetti, fettuccine, and ravioli. You eat what you make."
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.537
     }
   ],
   "teams": [

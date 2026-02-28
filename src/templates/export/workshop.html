@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ workshop.workshop_name or workshop.display_name }} - BorrowHood</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="max-w-4xl mx-auto px-6 py-8">
+
+        <!-- Header -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div class="h-24 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+            <div class="px-6 pb-6 -mt-10">
+                <div class="flex items-end space-x-4">
+                    <div class="w-20 h-20 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                        <span class="text-2xl font-bold text-indigo-600">{{ workshop.display_name[0] }}</span>
+                    </div>
+                    <div class="mb-1">
+                        <h1 class="text-2xl font-bold">{{ workshop.workshop_name or workshop.display_name }}</h1>
+                        {% if workshop.tagline %}
+                        <p class="text-gray-500">{{ workshop.tagline }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <!-- Main content -->
+            <div class="md:col-span-2 space-y-6">
+
+                {% if workshop.bio %}
+                <div class="bg-white rounded-lg border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold">About</h2>
+                    <p class="mt-2 text-gray-700 leading-relaxed">{{ workshop.bio }}</p>
+                </div>
+                {% endif %}
+
+                {% if workshop.skills %}
+                <div class="bg-white rounded-lg border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold">Skills</h2>
+                    <div class="mt-3 grid grid-cols-2 gap-2">
+                        {% for skill in workshop.skills %}
+                        <div class="p-3 bg-gray-50 rounded-lg">
+                            <p class="text-sm font-medium">{{ skill.skill_name }}</p>
+                            <p class="text-xs text-gray-500">{{ skill.category | replace('categories.', '') | capitalize }}{% if skill.years_experience %} &middot; {{ skill.years_experience }}y{% endif %}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="bg-white rounded-lg border border-gray-200 p-6">
+                    <h2 class="text-lg font-semibold">Items ({{ items | length }})</h2>
+                    {% if items %}
+                    <div class="mt-4 space-y-3">
+                        {% for item in items %}
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium">{{ item.name }}</h3>
+                            {% if item.description %}
+                            <p class="text-sm text-gray-600 mt-1">{{ item.description[:200] }}{% if item.description|length > 200 %}...{% endif %}</p>
+                            {% endif %}
+                            {% if item.story %}
+                            <p class="text-sm text-gray-500 italic mt-1">{{ item.story[:150] }}{% if item.story|length > 150 %}...{% endif %}</p>
+                            {% endif %}
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                <span class="text-xs px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full">{{ item.category }}</span>
+                                <span class="text-xs px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full">{{ item.item_type.value }}</span>
+                                {% if item.condition %}
+                                <span class="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-full">{{ item.condition.value }}</span>
+                                {% endif %}
+                            </div>
+                            {% for listing in item.listings %}
+                            {% if listing.price %}
+                            <p class="text-sm font-medium mt-2">&euro;{{ "%.0f" | format(listing.price) }} {{ listing.price_unit }}</p>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="mt-4 text-sm text-gray-500">No items listed yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+
+                {% if workshop.city %}
+                <div class="bg-white rounded-lg border border-gray-200 p-6">
+                    <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-900 mb-2">Location</h3>
+                    <p class="text-sm text-gray-700">{{ workshop.city }}{% if workshop.country_code %}, {{ workshop.country_code }}{% endif %}</p>
+                </div>
+                {% endif %}
+
+                {% if workshop.languages %}
+                <div class="bg-white rounded-lg border border-gray-200 p-6">
+                    <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-900 mb-2">Languages</h3>
+                    <div class="space-y-1">
+                        {% for ulang in workshop.languages %}
+                        <div class="flex justify-between text-sm">
+                            <span>{{ ulang.language_code | upper }}</span>
+                            <span class="text-indigo-600 font-medium">{{ ulang.proficiency.value }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if workshop.social_links %}
+                <div class="bg-white rounded-lg border border-gray-200 p-6">
+                    <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-900 mb-2">Links</h3>
+                    <div class="space-y-1">
+                        {% for link in workshop.social_links %}
+                        <a href="{{ link.url }}" class="block text-sm text-indigo-600 hover:underline" target="_blank">{{ link.platform | capitalize }}{% if link.label %} - {{ link.label }}{% endif %}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if workshop.telegram_username %}
+                <div class="bg-white rounded-lg border border-gray-200 p-6">
+                    <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-900 mb-2">Contact</h3>
+                    <a href="https://t.me/{{ workshop.telegram_username }}" class="text-sm text-indigo-600 hover:underline" target="_blank">Telegram: @{{ workshop.telegram_username }}</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-xs text-gray-400 no-print">
+            <p>Exported from <a href="https://borrowhood.io" class="text-indigo-500 hover:underline">BorrowHood</a> &middot; {{ export_date }}</p>
+        </div>
+    </div>
+</body>
+</html>

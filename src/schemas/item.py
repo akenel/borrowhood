@@ -25,6 +25,7 @@ class ItemOut(BaseModel):
     name: str
     slug: str
     description: Optional[str] = None
+    story: Optional[str] = None
     content_language: str
     item_type: ItemType
     category: str
@@ -44,6 +45,7 @@ class ItemCreate(BaseModel):
     """Create a new item."""
     name: str = Field(..., min_length=2, max_length=200)
     description: Optional[str] = None
+    story: Optional[str] = None
     content_language: str = Field(default="en", max_length=5)
     item_type: ItemType
     category: str = Field(..., max_length=50)
@@ -61,6 +63,7 @@ class ItemUpdate(BaseModel):
     """Update an existing item."""
     name: Optional[str] = Field(None, min_length=2, max_length=200)
     description: Optional[str] = None
+    story: Optional[str] = None
     content_language: Optional[str] = Field(None, max_length=5)
     category: Optional[str] = Field(None, max_length=50)
     subcategory: Optional[str] = Field(None, max_length=50)

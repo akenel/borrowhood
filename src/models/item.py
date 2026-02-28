@@ -67,6 +67,9 @@ class BHItem(BHBase, Base):
     latitude: Mapped[Optional[float]] = mapped_column(Float)
     longitude: Mapped[Optional[float]] = mapped_column(Float)
 
+    # Story -- the human narrative behind this item
+    story: Mapped[Optional[str]] = mapped_column(Text)  # "My father's drill from 1978..."
+
     # Relationships & compatibility
     needs_equipment: Mapped[Optional[str]] = mapped_column(Text)  # "Requires safety goggles, hearing protection"
     compatible_with: Mapped[Optional[str]] = mapped_column(Text)  # "Works with Bosch 18V batteries"
