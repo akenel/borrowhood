@@ -227,7 +227,7 @@
             {% endif %}
 
             <!-- Report -->
-            <div class="text-center" x-data="reportWidget('user', '{{ owner.id }}')">
+            <div class="text-center" x-data="reportWidget('user', '{{ workshop.id }}')">
                 <button @click="showModal = true" class="text-xs text-gray-400 hover:text-red-500 transition-colors min-h-[44px]">
                     {{ t('workshop.report') }}
                 </button>
