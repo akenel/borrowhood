@@ -8,7 +8,7 @@ import uuid
 from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy import DateTime, Enum, Float, ForeignKey, Integer, String, Text, func
+from sqlalchemy import DateTime, Enum, Float, ForeignKey, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -107,6 +107,9 @@ class BHUser(BHBase, Base):
     points: Mapped[Optional["BHUserPoints"]] = relationship(back_populates="user", uselist=False, cascade="all, delete-orphan")
     social_links: Mapped[List["BHUserSocialLink"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     items: Mapped[List["BHItem"]] = relationship(back_populates="owner")
+    favorites: Mapped[List["BHUserFavorite"]] = relationship(
+        back_populates="user", foreign_keys="BHUserFavorite.user_id", cascade="all, delete-orphan"
+    )
 
 
 class BHUserLanguage(BHBase, Base):
@@ -171,3 +174,23 @@ class BHUserSocialLink(BHBase, Base):
     label: Mapped[Optional[str]] = mapped_column(String(100))  # "My Woodworking Channel"
 
     user: Mapped["BHUser"] = relationship(back_populates="social_links")
+
+
+class BHUserFavorite(BHBase, Base):
+    """User-to-user favorites (bookmarks)."""
+
+    __tablename__ = "bh_user_favorite"
+    __table_args__ = (
+        UniqueConstraint("user_id", "favorite_user_id", name="uq_user_favorite"),
+    )
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_user.id"), nullable=False, index=True
+    )
+    favorite_user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_user.id"), nullable=False, index=True
+    )
+    note: Mapped[Optional[str]] = mapped_column(String(200))
+
+    user: Mapped["BHUser"] = relationship(back_populates="favorites", foreign_keys=[user_id])
+    favorite_user: Mapped["BHUser"] = relationship(foreign_keys=[favorite_user_id])

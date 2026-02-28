@@ -77,7 +77,7 @@
                             </button>
                         </div>
                     </div>
-                    <p id="desc-text" class="mt-2 text-gray-700 leading-relaxed">{{ item.description }}</p>
+                    <p id="desc-text" class="mt-2 text-gray-700 leading-relaxed" data-translatable data-content-lang="{{ item.content_language or 'en' }}">{{ item.description }}</p>
                     <span class="text-xs text-gray-400 mt-1 inline-block">{{ t('item.written_in') }} {{ item.content_language | upper }}</span>
                 </div>
                 {% endif %}
@@ -95,7 +95,7 @@
                             </button>
                         </div>
                     </div>
-                    <p id="story-text" class="mt-2 text-gray-700 leading-relaxed italic">{{ item.story }}</p>
+                    <p id="story-text" class="mt-2 text-gray-700 leading-relaxed italic" data-translatable data-content-lang="{{ item.content_language or 'en' }}">{{ item.story }}</p>
                 </div>
                 {% endif %}
 

@@ -15,7 +15,9 @@
     "settings": "Settings",
     "dashboard": "Dashboard",
     "list_item": "List Your Stuff",
-    "helpboard": "Help Board"
+    "helpboard": "Help Board",
+    "members": "Members",
+    "demo_login": "Demo"
   },
   "home": {
     "hero_title": "Every Garage Becomes a Rental Shop",
@@ -57,7 +59,9 @@
     "all_categories": "All Categories",
     "all_types": "All Types",
     "show_map": "Show Map",
-    "hide_map": "Hide Map"
+    "hide_map": "Hide Map",
+    "load_more": "Load More",
+    "showing_items": "Showing {shown} of {total} items"
   },
   "item": {
     "details": "Details",
@@ -111,6 +115,8 @@
     "location": "Location",
     "member_since": "Member since",
     "no_items": "No items listed yet.",
+    "show_all_items": "Show All",
+    "show_fewer": "Show Less",
     "edit_profile": "Edit Profile",
     "message_telegram": "Message on Telegram",
     "report": "Report this profile",
@@ -221,7 +227,22 @@
     "low": "Low",
     "normal": "Normal",
     "urgent": "Urgent",
-    "post": "Post"
+    "post": "Post",
+    "search_placeholder": "Search posts...",
+    "showing_count": "Showing {shown} of {total} posts",
+    "load_more": "Load More",
+    "filter_category": "Category",
+    "filter_status": "Status",
+    "filter_sort": "Sort",
+    "sort_newest": "Newest",
+    "sort_oldest": "Oldest",
+    "sort_most_replies": "Most Replies",
+    "sort_urgent": "Urgent First",
+    "status_open": "Open",
+    "status_in_progress": "In Progress",
+    "status_resolved": "Resolved",
+    "all_categories": "All Categories",
+    "all_statuses": "All Statuses"
   },
   "cat_groups": {
     "tools_workshop": "Tools & Workshop",
@@ -376,7 +397,11 @@
     "no_rentals": "No rental activity yet.",
     "list_first_item": "List Your First Item",
     "as_renter": "As Renter",
-    "as_owner": "As Owner"
+    "as_owner": "As Owner",
+    "load_more": "Load More",
+    "showing_items": "Showing {shown} of {total} items",
+    "favorites": "Favorites",
+    "no_favorites": "No favorites yet. Browse Members to find people to follow."
   },
   "onboarding": {
     "title": "Welcome to BorrowHood",
@@ -438,6 +463,54 @@
     "generating": "Generating image...",
     "stock_fallback": "Stock photo (AI generation not available)",
     "ai_generated": "AI Generated"
+  },
+  "members": {
+    "title": "Members",
+    "subtitle": "Discover workshops and people in your community.",
+    "search_placeholder": "Search members, workshops...",
+    "search": "Search",
+    "filter_city": "City",
+    "filter_badge": "Badge Tier",
+    "filter_workshop_type": "Workshop Type",
+    "all_cities": "All Cities",
+    "all_badges": "All Badges",
+    "all_workshop_types": "All Types",
+    "sort": "Sort by",
+    "sort_newest": "Newest",
+    "sort_name": "Name (A-Z)",
+    "sort_badge": "Reputation",
+    "no_results_title": "No members found",
+    "no_results": "Try broadening your search or changing your filters.",
+    "clear_filters": "Clear Filters",
+    "load_more": "Load More",
+    "showing_members": "Showing {shown} of {total} members",
+    "items_count": "items",
+    "view_workshop": "View Workshop"
+  },
+  "favorites": {
+    "title": "Favorites",
+    "add": "Add to favorites",
+    "remove": "Remove from favorites",
+    "added": "Added to favorites",
+    "removed": "Removed from favorites",
+    "no_favorites": "No favorites yet. Browse the Members page to find people to follow.",
+    "login_to_favorite": "Log in to save favorites"
+  },
+  "demo": {
+    "title": "Demo Login",
+    "warning": "Development Mode Only",
+    "warning_text": "One-click login as any test user. Not available in production.",
+    "current_user": "Currently logged in as",
+    "click_to_login": "Click a card to log in as that user",
+    "logging_in": "Logging in...",
+    "roles": "Roles",
+    "password_hint": "All passwords: helix_pass"
+  },
+  "pagination": {
+    "per_page": "Per page",
+    "per_page_12": "12 per page",
+    "per_page_24": "24 per page",
+    "per_page_48": "48 per page"
   },
   "footer": {
     "tagline": "Free as in freedom. Open source. No platform fees. Forever.",

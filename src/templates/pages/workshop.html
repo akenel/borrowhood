@@ -45,15 +45,29 @@
                             {% endif %}
                         </div>
 
-                        <!-- Badge -->
-                        <span class="mt-2 sm:mt-0 text-sm px-3 py-1.5 rounded-full font-medium w-fit
-                            {% if workshop.badge_tier.value == 'legend' %}bg-amber-100 text-amber-700
-                            {% elif workshop.badge_tier.value == 'pillar' %}bg-purple-100 text-purple-700
-                            {% elif workshop.badge_tier.value == 'trusted' %}bg-emerald-100 text-emerald-700
-                            {% elif workshop.badge_tier.value == 'active' %}bg-blue-100 text-blue-700
-                            {% else %}bg-gray-100 text-gray-700{% endif %}">
-                            {{ t('badges.' + workshop.badge_tier.value) }}
-                        </span>
+                        <div class="mt-2 sm:mt-0 flex items-center space-x-2">
+                            <!-- Badge -->
+                            <span class="text-sm px-3 py-1.5 rounded-full font-medium w-fit
+                                {% if workshop.badge_tier.value == 'legend' %}bg-amber-100 text-amber-700
+                                {% elif workshop.badge_tier.value == 'pillar' %}bg-purple-100 text-purple-700
+                                {% elif workshop.badge_tier.value == 'trusted' %}bg-emerald-100 text-emerald-700
+                                {% elif workshop.badge_tier.value == 'active' %}bg-blue-100 text-blue-700
+                                {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                {{ t('badges.' + workshop.badge_tier.value) }}
+                            </span>
+                            <!-- Favorite heart -->
+                            {% if user %}
+                            <div x-data="workshopFavorite('{{ workshop.id }}')">
+                                <button @click="toggle()"
+                                        class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                                        :title="favorited ? '{{ t('favorites.remove') }}' : '{{ t('favorites.add') }}'">
+                                    <svg class="w-5 h-5 transition-colors" :class="favorited ? 'text-red-500 fill-red-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -69,7 +83,7 @@
             {% if workshop.bio %}
             <div class="bg-white rounded-lg border border-gray-200 p-6">
                 <h2 class="text-lg font-semibold text-gray-900">{{ t('workshop.about') }}</h2>
-                <p class="mt-3 text-gray-700 leading-relaxed">{{ workshop.bio }}</p>
+                <p class="mt-3 text-gray-700 leading-relaxed" data-translatable data-content-lang="{{ workshop.languages[0].language_code if workshop.languages else 'en' }}">{{ workshop.bio }}</p>
             </div>
             {% endif %}
 
@@ -101,14 +115,15 @@
             {% endif %}
 
             <!-- Items -->
-            <div class="bg-white rounded-lg border border-gray-200 p-6">
-                <h2 class="text-lg font-semibold text-gray-900">{{ t('workshop.items') }} ({{ workshop.items | length }})</h2>
-                {% if workshop.items %}
+            <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="{ showAll: false }">
+                {% set active_items = workshop.items | rejectattr('deleted_at') | list %}
+                <h2 class="text-lg font-semibold text-gray-900">{{ t('workshop.items') }} ({{ active_items | length }})</h2>
+                {% if active_items %}
                 <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {% for item in workshop.items %}
-                    {% if not item.deleted_at %}
+                    {% for item in active_items %}
                     <a href="/items/{{ item.slug }}"
-                       class="flex space-x-4 p-3 rounded-lg hover:bg-gray-50 transition-colors group">
+                       class="flex space-x-4 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+                       {% if loop.index > 12 %}x-show="showAll" x-cloak{% endif %}>
                         {% if item.media %}
                         <img src="{{ item.media[0].url }}" alt="{{ item.media[0].alt_text }}"
                              class="w-20 h-20 rounded-lg object-cover flex-shrink-0" loading="lazy">
@@ -127,9 +142,17 @@
                             </span>
                         </div>
                     </a>
-                    {% endif %}
                     {% endfor %}
                 </div>
+                {% if active_items | length > 12 %}
+                <div class="mt-4 text-center">
+                    <button @click="showAll = !showAll"
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[36px]">
+                        <span x-show="!showAll">{{ t('workshop.show_all_items') }} ({{ active_items | length }})</span>
+                        <span x-show="showAll" x-cloak>{{ t('workshop.show_fewer') }}</span>
+                    </button>
+                </div>
+                {% endif %}
                 {% else %}
                 <!-- Empty state -->
                 <div class="text-center py-8">
@@ -256,4 +279,43 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function workshopFavorite(userId) {
+    return {
+        favorited: false,
+        userId: userId,
+        async init() {
+            try {
+                var resp = await fetch('/api/v1/users/me/favorite-ids');
+                if (resp.ok) {
+                    var data = await resp.json();
+                    this.favorited = data.ids.includes(this.userId);
+                }
+            } catch(e) {}
+        },
+        async toggle() {
+            if (this.favorited) {
+                var resp = await fetch('/api/v1/users/' + this.userId + '/favorite', { method: 'DELETE' });
+                if (resp.ok) {
+                    this.favorited = false;
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: '{{ t("favorites.removed") }}' } }));
+                }
+            } else {
+                var resp = await fetch('/api/v1/users/' + this.userId + '/favorite', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                if (resp.ok || resp.status === 409) {
+                    this.favorited = true;
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{{ t("favorites.added") }}' } }));
+                }
+            }
+        }
+    };
+}
+</script>
 {% endblock %}

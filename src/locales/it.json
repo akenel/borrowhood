@@ -15,7 +15,9 @@
     "settings": "Impostazioni",
     "dashboard": "La Mia Dashboard",
     "list_item": "Pubblica Oggetto",
-    "helpboard": "Bacheca Aiuto"
+    "helpboard": "Bacheca Aiuto",
+    "members": "Membri",
+    "demo_login": "Demo"
   },
   "home": {
     "hero_title": "Ogni Garage Diventa un Negozio di Noleggio",
@@ -57,7 +59,9 @@
     "all_categories": "Tutte le Categorie",
     "all_types": "Tutti i Tipi",
     "show_map": "Mostra Mappa",
-    "hide_map": "Nascondi Mappa"
+    "hide_map": "Nascondi Mappa",
+    "load_more": "Carica Altri",
+    "showing_items": "Mostrando {shown} di {total} oggetti"
   },
   "item": {
     "details": "Dettagli",
@@ -111,6 +115,8 @@
     "location": "Posizione",
     "member_since": "Membro da",
     "no_items": "Nessun oggetto pubblicato.",
+    "show_all_items": "Mostra Tutti",
+    "show_fewer": "Mostra Meno",
     "edit_profile": "Modifica Profilo",
     "message_telegram": "Messaggio su Telegram",
     "report": "Segnala questo profilo",
@@ -221,7 +227,22 @@
     "low": "Bassa",
     "normal": "Normale",
     "urgent": "Urgente",
-    "post": "Pubblica"
+    "post": "Pubblica",
+    "search_placeholder": "Cerca nei post...",
+    "showing_count": "Mostrando {shown} di {total} post",
+    "load_more": "Carica Altri",
+    "filter_category": "Categoria",
+    "filter_status": "Stato",
+    "filter_sort": "Ordina",
+    "sort_newest": "Più Recenti",
+    "sort_oldest": "Più Vecchi",
+    "sort_most_replies": "Più Risposte",
+    "sort_urgent": "Urgenti Prima",
+    "status_open": "Aperto",
+    "status_in_progress": "In Corso",
+    "status_resolved": "Risolto",
+    "all_categories": "Tutte le Categorie",
+    "all_statuses": "Tutti gli Stati"
   },
   "cat_groups": {
     "tools_workshop": "Attrezzi e Officina",
@@ -376,7 +397,11 @@
     "no_rentals": "Nessuna attività di noleggio.",
     "list_first_item": "Pubblica il Tuo Primo Oggetto",
     "as_renter": "Come Noleggiatore",
-    "as_owner": "Come Proprietario"
+    "as_owner": "Come Proprietario",
+    "load_more": "Carica Altri",
+    "showing_items": "Mostrando {shown} di {total} oggetti",
+    "favorites": "Preferiti",
+    "no_favorites": "Nessun preferito ancora. Esplora i Membri per trovare persone da seguire."
   },
   "onboarding": {
     "title": "Benvenuto su BorrowHood",
@@ -438,6 +463,54 @@
     "generating": "Generazione immagine...",
     "stock_fallback": "Foto stock (generazione AI non disponibile)",
     "ai_generated": "Generata con AI"
+  },
+  "members": {
+    "title": "Membri",
+    "subtitle": "Scopri le botteghe e le persone nella tua comunità.",
+    "search_placeholder": "Cerca membri, botteghe...",
+    "search": "Cerca",
+    "filter_city": "Città",
+    "filter_badge": "Livello Badge",
+    "filter_workshop_type": "Tipo Bottega",
+    "all_cities": "Tutte le Città",
+    "all_badges": "Tutti i Badge",
+    "all_workshop_types": "Tutti i Tipi",
+    "sort": "Ordina per",
+    "sort_newest": "Più Recenti",
+    "sort_name": "Nome (A-Z)",
+    "sort_badge": "Reputazione",
+    "no_results_title": "Nessun membro trovato",
+    "no_results": "Prova ad ampliare la ricerca o a cambiare i filtri.",
+    "clear_filters": "Cancella Filtri",
+    "load_more": "Carica Altri",
+    "showing_members": "Mostrando {shown} di {total} membri",
+    "items_count": "oggetti",
+    "view_workshop": "Vedi Bottega"
+  },
+  "favorites": {
+    "title": "Preferiti",
+    "add": "Aggiungi ai preferiti",
+    "remove": "Rimuovi dai preferiti",
+    "added": "Aggiunto ai preferiti",
+    "removed": "Rimosso dai preferiti",
+    "no_favorites": "Nessun preferito ancora. Esplora la pagina Membri per trovare persone da seguire.",
+    "login_to_favorite": "Accedi per salvare i preferiti"
+  },
+  "demo": {
+    "title": "Login Demo",
+    "warning": "Solo Modalità Sviluppo",
+    "warning_text": "Login con un clic come qualsiasi utente di test. Non disponibile in produzione.",
+    "current_user": "Attualmente connesso come",
+    "click_to_login": "Clicca una scheda per accedere come quell'utente",
+    "logging_in": "Accesso in corso...",
+    "roles": "Ruoli",
+    "password_hint": "Tutte le password: helix_pass"
+  },
+  "pagination": {
+    "per_page": "Per pagina",
+    "per_page_12": "12 per pagina",
+    "per_page_24": "24 per pagina",
+    "per_page_48": "48 per pagina"
   },
   "footer": {
     "tagline": "Libero come la libertà. Open source. Nessuna commissione. Per sempre.",

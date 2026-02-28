@@ -70,10 +70,14 @@
                         <a href="/" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.home') }}</a>
                         <a href="/browse" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.browse') }}</a>
                         <a href="/helpboard" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.helpboard') }}</a>
+                        <a href="/members" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.members') }}</a>
                         {% if user %}
                         <a href="/dashboard" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.dashboard') }}</a>
                         <a href="/testing" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">QA</a>
                         <a href="/backlog" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">Backlog</a>
+                        {% endif %}
+                        {% if debug %}
+                        <a href="/demo-login" class="text-amber-600 hover:text-amber-800 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.demo_login') }}</a>
                         {% endif %}
                         <a href="/list" class="text-indigo-600 hover:text-indigo-800 px-3 py-2 text-sm font-semibold transition-colors">{{ t('nav.list_item') }}</a>
                     </div>
@@ -188,11 +192,15 @@
                 <a href="/" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.home') }}</a>
                 <a href="/browse" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.browse') }}</a>
                 <a href="/helpboard" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.helpboard') }}</a>
+                <a href="/members" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.members') }}</a>
                 <a href="/list" class="block px-3 py-3 text-base font-semibold text-indigo-600 hover:bg-indigo-50 rounded-lg min-h-[44px]">{{ t('nav.list_item') }}</a>
                 {% if user %}
                 <a href="/dashboard" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.dashboard') }}</a>
                 <a href="/testing" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">QA Testing</a>
                 <a href="/backlog" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">Backlog</a>
+                {% if debug %}
+                <a href="/demo-login" class="block px-3 py-3 text-base font-medium text-amber-600 hover:bg-amber-50 rounded-lg min-h-[44px]">{{ t('nav.demo_login') }}</a>
+                {% endif %}
                 <a href="/profile" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.profile') }}</a>
                 <a href="/logout" class="block px-3 py-3 text-base font-medium text-red-600 hover:bg-red-50 rounded-lg min-h-[44px]">{{ t('nav.logout') }}</a>
                 {% else %}
@@ -255,6 +263,18 @@
         </div>
     </footer>
 
+    <!-- Auto-translate toggle (hidden until needed) -->
+    <div id="bh-translate-toggle" style="display: none;"
+         class="fixed bottom-4 right-4 z-40 flex items-center gap-2 px-4 py-2.5 bg-white rounded-full shadow-lg border border-gray-200 cursor-pointer hover:shadow-xl transition-shadow"
+         onclick="BHTranslate.toggleOriginals(); var lbl = this.querySelector('span'); lbl.textContent = BHTranslate.showingOriginals ? lbl.getAttribute('data-show-translated') : lbl.getAttribute('data-show-original');">
+        <svg class="w-4 h-4 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
+        </svg>
+        <span class="text-sm font-medium text-gray-700"
+              data-show-original="{{ t('common.show_original') }}"
+              data-show-translated="{{ t('common.translate') }}">{{ t('common.show_original') }}</span>
+    </div>
+
     <!-- Shared components -->
     <script>
     function reportWidget(entityType, entityId) {
@@ -278,6 +298,7 @@
         };
     }
 
+    // ── Per-element translate toggle (used in item_detail.html) ──
     function translateText(elId) {
         return {
             translated: false,
@@ -293,22 +314,109 @@
                 }
                 this.original = el.textContent;
                 this.loading = true;
-                var targetLang = document.documentElement.lang === 'it' ? 'en' : 'it';
-                var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=' + targetLang + '&dt=t&q=' + encodeURIComponent(this.original);
                 try {
-                    var resp = await fetch(url);
-                    var data = await resp.json();
-                    var text = data[0].map(function(s) { return s[0]; }).join('');
+                    var text = await BHTranslate.translateString(this.original);
                     el.textContent = text;
                     this.translated = true;
                 } catch(e) {
-                    // Fallback: open Google Translate page
+                    var targetLang = BHTranslate.userLang;
                     window.open('https://translate.google.com/?sl=auto&tl=' + targetLang + '&text=' + encodeURIComponent(this.original), '_blank');
                 }
                 this.loading = false;
             }
         };
     }
+
+    // ── Global auto-translate system ──
+    // Mark any element with: data-translatable data-content-lang="it"
+    // On page load, mismatched elements auto-translate to user's language.
+    // Global toggle to show originals. Cached in sessionStorage.
+    var BHTranslate = {
+        userLang: document.documentElement.lang || 'en',
+        cache: {},
+        showingOriginals: false,
+        _elements: [],
+
+        async translateString(text, sourceLang) {
+            if (!text || !text.trim()) return text;
+            var key = this.userLang + ':' + text.substring(0, 80);
+            // Check sessionStorage cache
+            try {
+                var cached = sessionStorage.getItem('bht:' + key);
+                if (cached) return cached;
+            } catch(e) {}
+            var url = 'https://translate.googleapis.com/translate_a/single?client=gtx'
+                + '&sl=' + (sourceLang || 'auto')
+                + '&tl=' + this.userLang
+                + '&dt=t&q=' + encodeURIComponent(text);
+            var resp = await fetch(url);
+            var data = await resp.json();
+            var result = data[0].map(function(s) { return s[0]; }).join('');
+            // Cache it
+            try { sessionStorage.setItem('bht:' + key, result); } catch(e) {}
+            return result;
+        },
+
+        async autoTranslatePage() {
+            var els = document.querySelectorAll('[data-translatable][data-content-lang]');
+            if (!els.length) return;
+
+            var toTranslate = [];
+            els.forEach(function(el) {
+                var contentLang = el.getAttribute('data-content-lang');
+                // Skip already-translated elements and same-language content
+                if (contentLang && contentLang !== BHTranslate.userLang && !el.hasAttribute('data-translated-text')) {
+                    toTranslate.push(el);
+                }
+            });
+            if (!toTranslate.length) return;
+
+            BHTranslate._elements = BHTranslate._elements.concat(toTranslate);
+
+            // Show the toggle pill
+            var toggle = document.getElementById('bh-translate-toggle');
+            if (toggle) toggle.style.display = 'flex';
+
+            // Translate in batches of 5 to avoid hammering the API
+            for (var i = 0; i < toTranslate.length; i += 5) {
+                var batch = toTranslate.slice(i, i + 5);
+                await Promise.all(batch.map(async function(el) {
+                    var original = el.textContent.trim();
+                    if (!original) return;
+                    el.setAttribute('data-original-text', original);
+                    try {
+                        var translated = await BHTranslate.translateString(
+                            original, el.getAttribute('data-content-lang')
+                        );
+                        if (!BHTranslate.showingOriginals) {
+                            el.textContent = translated;
+                        }
+                        el.setAttribute('data-translated-text', translated);
+                    } catch(e) {
+                        // Silent fail -- leave original text
+                    }
+                }));
+            }
+        },
+
+        toggleOriginals() {
+            this.showingOriginals = !this.showingOriginals;
+            this._elements.forEach(function(el) {
+                if (BHTranslate.showingOriginals) {
+                    var orig = el.getAttribute('data-original-text');
+                    if (orig) el.textContent = orig;
+                } else {
+                    var trans = el.getAttribute('data-translated-text');
+                    if (trans) el.textContent = trans;
+                }
+            });
+        }
+    };
+
+    // Auto-run on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        BHTranslate.autoTranslatePage();
+    });
     </script>
 
     {% block scripts %}{% endblock %}

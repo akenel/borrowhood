@@ -13,6 +13,7 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from src.config import settings
 from src.database import get_db
 from src.dependencies import get_current_user_token
 from src.i18n import detect_language, get_translator, SUPPORTED_LANGUAGES
@@ -20,7 +21,7 @@ from src.models.item import BHItem, CATEGORY_GROUPS
 from src.models.listing import BHListing, ListingStatus
 from src.models.rental import BHRental
 from src.models.review import BHReview
-from src.models.user import BHUser
+from src.models.user import BadgeTier, BHUser, WorkshopType
 
 router = APIRouter(tags=["pages"])
 templates = Jinja2Templates(directory="src/templates")
@@ -48,6 +49,7 @@ def _ctx(request: Request, token: Optional[dict] = None, **kwargs) -> dict:
         "t": t,
         "lang": lang,
         "supported_languages": SUPPORTED_LANGUAGES,
+        "debug": settings.debug,
         "_set_lang_cookie": set_lang_cookie,
     }
     ctx.update(kwargs)
@@ -140,12 +142,17 @@ async def browse(request: Request,
     elif sort == "name_asc":
         query = query.order_by(BHItem.name.asc())
 
-    query = query.limit(50)
+    # Total count with same filters (before limit)
+    count_query = select(func.count()).select_from(query.subquery())
+    total_count = await db.scalar(count_query) or 0
+
+    query = query.limit(12)
     result = await db.execute(query)
     items = result.scalars().unique().all()
 
     ctx = _ctx(request, token,
         items=items,
+        total_count=total_count,
         category_groups=CATEGORY_GROUPS,
         q=q or "",
         selected_category=category,
@@ -266,6 +273,7 @@ async def dashboard(request: Request,
                     token: Optional[dict] = Depends(get_current_user_token)):
     """User dashboard with items, rentals, and incoming requests."""
     items = []
+    item_count = 0
     renter_rentals = []
     owner_rentals = []
 
@@ -277,13 +285,20 @@ async def dashboard(request: Request,
         db_user = user_result.scalars().first()
 
         if db_user:
-            # User's items
+            # User's items (capped at 12 for initial load)
+            item_count = await db.scalar(
+                select(func.count(BHItem.id))
+                .where(BHItem.owner_id == db_user.id)
+                .where(BHItem.deleted_at.is_(None))
+            ) or 0
+
             items_result = await db.execute(
                 select(BHItem)
                 .options(selectinload(BHItem.media), selectinload(BHItem.listings))
                 .where(BHItem.owner_id == db_user.id)
                 .where(BHItem.deleted_at.is_(None))
                 .order_by(BHItem.created_at.desc())
+                .limit(12)
             )
             items = items_result.scalars().unique().all()
 
@@ -315,6 +330,7 @@ async def dashboard(request: Request,
 
     ctx = _ctx(request, token,
         items=items,
+        item_total=item_count,
         renter_rentals=renter_rentals,
         owner_rentals=owner_rentals,
     )
@@ -394,8 +410,116 @@ async def profile(request: Request,
 async def helpboard_page(request: Request,
                          token: Optional[dict] = Depends(get_current_user_token)):
     """Community Help Board page."""
-    ctx = _ctx(request, token)
+    ctx = _ctx(request, token, category_groups=CATEGORY_GROUPS)
     return _render("pages/helpboard.html", ctx)
+
+
+@router.get("/members", response_class=HTMLResponse)
+async def members_directory(
+    request: Request,
+    q: Optional[str] = None,
+    city: Optional[str] = None,
+    badge_tier: Optional[str] = None,
+    workshop_type: Optional[str] = None,
+    sort: str = "newest",
+    db: AsyncSession = Depends(get_db),
+    token: Optional[dict] = Depends(get_current_user_token),
+):
+    """Members directory with search and filters."""
+    from sqlalchemy import case
+
+    _badge_sort = case(
+        (BHUser.badge_tier == BadgeTier.LEGEND, 0),
+        (BHUser.badge_tier == BadgeTier.PILLAR, 1),
+        (BHUser.badge_tier == BadgeTier.TRUSTED, 2),
+        (BHUser.badge_tier == BadgeTier.ACTIVE, 3),
+        else_=4,
+    )
+
+    query = (
+        select(BHUser)
+        .options(selectinload(BHUser.languages))
+        .where(BHUser.deleted_at.is_(None))
+    )
+
+    if q:
+        search_term = f"%{q}%"
+        query = query.where(
+            BHUser.display_name.ilike(search_term)
+            | BHUser.workshop_name.ilike(search_term)
+            | BHUser.tagline.ilike(search_term)
+        )
+    if city:
+        query = query.where(BHUser.city.ilike(f"%{city}%"))
+    if badge_tier:
+        query = query.where(BHUser.badge_tier == badge_tier)
+    if workshop_type:
+        query = query.where(BHUser.workshop_type == workshop_type)
+
+    count_query = select(func.count()).select_from(query.subquery())
+    total_count = await db.scalar(count_query) or 0
+
+    if sort == "newest":
+        query = query.order_by(BHUser.created_at.desc())
+    elif sort == "name_asc":
+        query = query.order_by(BHUser.display_name.asc())
+    elif sort == "badge_tier":
+        query = query.order_by(_badge_sort, BHUser.display_name.asc())
+
+    query = query.limit(12)
+    result = await db.execute(query)
+    members = result.scalars().unique().all()
+
+    # Distinct cities for filter dropdown
+    cities_result = await db.execute(
+        select(func.distinct(BHUser.city))
+        .where(BHUser.deleted_at.is_(None))
+        .where(BHUser.city.isnot(None))
+        .order_by(BHUser.city)
+    )
+    cities = [r[0] for r in cities_result.all()]
+
+    ctx = _ctx(request, token,
+        members=members,
+        total_count=total_count,
+        cities=cities,
+        badge_tiers=[t.value for t in BadgeTier],
+        workshop_types=[t.value for t in WorkshopType],
+        q=q or "",
+        selected_city=city,
+        selected_badge=badge_tier,
+        selected_workshop_type=workshop_type,
+        selected_sort=sort,
+    )
+    return _render("pages/members.html", ctx)
+
+
+@router.get("/demo-login", response_class=HTMLResponse)
+async def demo_login_page(
+    request: Request,
+    token: Optional[dict] = Depends(get_current_user_token),
+):
+    """One-click demo login page. Debug mode only."""
+    if not settings.debug:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Not found")
+
+    demo_users = [
+        {"username": "angel", "display_name": "Angelo Kenel", "workshop": "The Black Wolf Workshop", "roles": "admin, operator, moderator, lender", "badge": "legend", "color": "amber"},
+        {"username": "nino", "display_name": "Nino Cassisa", "workshop": "Camper & Tour Trapani", "roles": "operator, moderator, lender", "badge": "pillar", "color": "purple"},
+        {"username": "luna", "display_name": "Luna Greco", "workshop": "Luna's Art Studio", "roles": "moderator, lender", "badge": "trusted", "color": "emerald"},
+        {"username": "sally", "display_name": "Sally Baker", "workshop": "Sally's Kitchen", "roles": "lender", "badge": "trusted", "color": "emerald"},
+        {"username": "mike", "display_name": "Mike Kenel", "workshop": "Mike's Tool Shed", "roles": "lender", "badge": "pillar", "color": "purple"},
+        {"username": "marco", "display_name": "Marco Moretti", "workshop": "Bottega del Legno", "roles": "lender", "badge": "active", "color": "blue"},
+        {"username": "jake", "display_name": "Jake Chen", "workshop": "Jake's Maker Space", "roles": "lender", "badge": "active", "color": "blue"},
+        {"username": "dave", "display_name": "Dave Thompson", "workshop": "Dave's Sports Locker", "roles": "lender", "badge": "active", "color": "blue"},
+        {"username": "maria", "display_name": "Maria Ferretti", "workshop": None, "roles": "lender", "badge": "newcomer", "color": "gray"},
+        {"username": "rosa", "display_name": "Rosa Ferretti", "workshop": None, "roles": "member only", "badge": "newcomer", "color": "gray"},
+        {"username": "anne", "display_name": "Anne Muthoni", "workshop": None, "roles": "qa-tester", "badge": "active", "color": "blue"},
+    ]
+
+    ctx = _ctx(request, token, demo_users=demo_users)
+    return _render("pages/demo_login.html", ctx)
 
 
 @router.get("/terms", response_class=HTMLResponse)

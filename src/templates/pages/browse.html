@@ -144,10 +144,10 @@
     </div>
 
     <!-- Results -->
-    <div class="mt-8">
+    <div class="mt-8" x-data="browseLoadMore()">
         {% if items %}
         <!-- Item grid (Rule 2: single col mobile, multi-col desktop) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="browse-grid">
             {% for item in items %}
             <a href="/items/{{ item.slug }}"
                class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group flex flex-col">
@@ -180,7 +180,7 @@
                 </div>
                 <div class="p-4 flex-1 flex flex-col">
                     <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ item.name }}</h3>
-                    <p class="text-sm text-gray-500 mt-1 line-clamp-2 flex-1">{{ item.description or t('browse.no_description') }}</p>
+                    <p class="text-sm text-gray-500 mt-1 line-clamp-2 flex-1" data-translatable data-content-lang="{{ item.content_language or 'en' }}">{{ item.description or t('browse.no_description') }}</p>
 
                     <!-- Price -->
                     {% if item.listings %}
@@ -218,6 +218,50 @@
                 </div>
             </a>
             {% endfor %}
+
+            <!-- Dynamic items appended by Load More (inside grid for correct layout) -->
+            <template x-for="item in extraItems" :key="item.id">
+                <a :href="'/items/' + item.slug"
+                   class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group flex flex-col">
+                    <div class="relative">
+                        <template x-if="item.media && item.media.length">
+                            <img :src="item.media[0].url" :alt="item.media[0].alt_text || ''"
+                                 class="w-full h-48 object-cover" loading="lazy">
+                        </template>
+                        <template x-if="!item.media || !item.media.length">
+                            <div class="w-full h-48 bg-gray-100 flex items-center justify-center">
+                                <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col">
+                        <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors" x-text="item.name"></h3>
+                        <p class="text-sm text-gray-500 mt-1 line-clamp-2 flex-1" x-text="item.description || '{{ t('browse.no_description') }}'"></p>
+                    </div>
+                </a>
+            </template>
+        </div>
+
+        <!-- Pagination footer -->
+        <div class="mt-8 text-center space-y-3">
+            <div class="flex items-center justify-center gap-3">
+                <p class="text-sm text-gray-500"
+                   x-text="'{{ t('browse.showing_items') }}'.replace('{shown}', shownCount).replace('{total}', totalCount)">
+                </p>
+                <select x-model="limit" @change="resetAndLoad()"
+                        class="text-xs border border-gray-300 rounded-lg py-1.5 px-2 focus:ring-2 focus:ring-indigo-500">
+                    <option value="12">{{ t('pagination.per_page_12') }}</option>
+                    <option value="24">{{ t('pagination.per_page_24') }}</option>
+                    <option value="48">{{ t('pagination.per_page_48') }}</option>
+                </select>
+            </div>
+            <button x-show="hasMore" @click="loadMore()" :disabled="loadingMore"
+                    class="inline-flex items-center px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px] disabled:opacity-50">
+                <span x-show="!loadingMore">{{ t('browse.load_more') }}</span>
+                <span x-show="loadingMore" x-cloak>{{ t('common.loading') }}</span>
+            </button>
         </div>
         {% else %}
         <!-- Empty state (Rule 24) -->
@@ -239,6 +283,54 @@
 
 {% block scripts %}
 <script>
+function browseLoadMore() {
+    var initialCount = {{ items | length }};
+    var total = {{ total_count }};
+    return {
+        extraItems: [],
+        offset: initialCount,
+        limit: 12,
+        totalCount: total,
+        loadingMore: false,
+        get shownCount() { return initialCount + this.extraItems.length; },
+        get hasMore() { return this.shownCount < this.totalCount; },
+        async loadMore() {
+            this.loadingMore = true;
+            var params = new URLSearchParams(window.location.search);
+            params.set('limit', this.limit);
+            params.set('offset', this.offset);
+            try {
+                var resp = await fetch('/api/v1/items?' + params.toString());
+                if (resp.ok) {
+                    var items = await resp.json();
+                    this.extraItems = this.extraItems.concat(items);
+                    this.offset += items.length;
+                }
+            } catch(e) { /* network error */ }
+            this.loadingMore = false;
+        },
+        async resetAndLoad() {
+            this.extraItems = [];
+            this.offset = 0;
+            this.loadingMore = true;
+            var params = new URLSearchParams(window.location.search);
+            params.set('limit', this.limit);
+            params.set('offset', 0);
+            try {
+                var resp = await fetch('/api/v1/items?' + params.toString());
+                if (resp.ok) {
+                    var items = await resp.json();
+                    this.extraItems = items;
+                    this.offset = items.length;
+                    // Hide SSR items by replacing entire grid content via Alpine
+                    document.querySelectorAll('#browse-grid > a:not([x-bind\\:href])').forEach(el => el.style.display = 'none');
+                }
+            } catch(e) {}
+            this.loadingMore = false;
+        }
+    };
+}
+
 var _browseMap = null;
 function initBrowseMap() {
     if (_browseMap) { _browseMap.invalidateSize(); return; }

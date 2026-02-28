@@ -40,23 +40,63 @@
         </div>
     </div>
 
-    <!-- Filters -->
-    <div class="mt-6 flex flex-wrap gap-2">
-        <button @click="filter.type = ''; loadPosts()"
-                class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
-                :class="filter.type === '' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-indigo-50'">
-            {{ t('helpboard.all') }}
-        </button>
-        <button @click="filter.type = 'need'; loadPosts()"
-                class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
-                :class="filter.type === 'need' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-blue-50'">
-            {{ t('helpboard.needs') }}
-        </button>
-        <button @click="filter.type = 'offer'; loadPosts()"
-                class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
-                :class="filter.type === 'offer' ? 'bg-purple-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-purple-50'">
-            {{ t('helpboard.offers') }}
-        </button>
+    <!-- Row 1: Type pills + Search -->
+    <div class="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div class="flex flex-wrap gap-2 flex-shrink-0">
+            <button @click="filter.type = ''; resetAndLoad()"
+                    class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
+                    :class="filter.type === '' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-indigo-50'">
+                {{ t('helpboard.all') }}
+            </button>
+            <button @click="filter.type = 'need'; resetAndLoad()"
+                    class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
+                    :class="filter.type === 'need' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-blue-50'">
+                {{ t('helpboard.needs') }}
+            </button>
+            <button @click="filter.type = 'offer'; resetAndLoad()"
+                    class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
+                    :class="filter.type === 'offer' ? 'bg-purple-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-purple-50'">
+                {{ t('helpboard.offers') }}
+            </button>
+        </div>
+        <div class="flex-1 relative">
+            <input type="text" x-model="filter.q" @input.debounce.300ms="resetAndLoad()"
+                   placeholder="{{ t('helpboard.search_placeholder') }}"
+                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm min-h-[36px]"
+                   autocomplete="off">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Row 2: Category + Status + Sort dropdowns -->
+    <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <select x-model="filter.category" @change="resetAndLoad()"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 min-h-[36px]">
+            <option value="">{{ t('helpboard.all_categories') }}</option>
+            {% for group_key, cats in category_groups.items() %}
+            <optgroup label="{{ t('cat_groups.' + group_key) }}">
+                {% for cat in cats %}
+                <option value="{{ cat }}">{{ t('categories.' + cat) }}</option>
+                {% endfor %}
+            </optgroup>
+            {% endfor %}
+        </select>
+        <select x-model="filter.status" @change="resetAndLoad()"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 min-h-[36px]">
+            <option value="">{{ t('helpboard.all_statuses') }}</option>
+            <option value="open">{{ t('helpboard.status_open') }}</option>
+            <option value="in_progress">{{ t('helpboard.status_in_progress') }}</option>
+            <option value="resolved">{{ t('helpboard.status_resolved') }}</option>
+        </select>
+        <select x-model="filter.sort" @change="resetAndLoad()"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 min-h-[36px]">
+            <option value="newest">{{ t('helpboard.sort_newest') }}</option>
+            <option value="oldest">{{ t('helpboard.sort_oldest') }}</option>
+            <option value="most_replies">{{ t('helpboard.sort_most_replies') }}</option>
+            <option value="urgent_first">{{ t('helpboard.sort_urgent') }}</option>
+        </select>
     </div>
 
     <!-- Posts list -->
@@ -75,7 +115,7 @@
             <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-sm transition-shadow">
                 <div class="flex items-start justify-between">
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-2">
+                        <div class="flex items-center gap-2 mb-2 flex-wrap">
                             <span class="text-xs px-2.5 py-1 rounded-full font-medium"
                                   :class="post.help_type === 'need' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'"
                                   x-text="post.help_type === 'need' ? '{{ t('helpboard.need_label') }}' : '{{ t('helpboard.offer_label') }}'">
@@ -98,8 +138,10 @@
                                   x-text="post.status.replace('_', ' ')">
                             </span>
                         </div>
-                        <h3 class="text-lg font-semibold text-gray-900" x-text="post.title"></h3>
-                        <p class="mt-1 text-sm text-gray-600 line-clamp-2" x-text="post.body" x-show="post.body"></p>
+                        <h3 class="text-lg font-semibold text-gray-900" x-text="post.title"
+                            data-translatable :data-content-lang="post.content_language || 'en'"></h3>
+                        <p class="mt-1 text-sm text-gray-600 line-clamp-2" x-text="post.body" x-show="post.body"
+                           data-translatable :data-content-lang="post.content_language || 'en'"></p>
                     </div>
                 </div>
                 <div class="mt-4 flex items-center justify-between text-xs text-gray-400">
@@ -116,6 +158,26 @@
                 </div>
             </div>
         </template>
+    </div>
+
+    <!-- Pagination footer: showing count + Load More -->
+    <div x-show="posts.length > 0" class="mt-6 text-center space-y-3">
+        <div class="flex items-center justify-center gap-3">
+            <p class="text-sm text-gray-500"
+               x-text="'{{ t('helpboard.showing_count') }}'.replace('{shown}', posts.length).replace('{total}', page.total)">
+            </p>
+            <select x-model="page.limit" @change="resetAndLoad()"
+                    class="text-xs border border-gray-300 rounded-lg py-1.5 px-2 focus:ring-2 focus:ring-indigo-500">
+                <option value="12">{{ t('pagination.per_page_12') }}</option>
+                <option value="24">{{ t('pagination.per_page_24') }}</option>
+                <option value="48">{{ t('pagination.per_page_48') }}</option>
+            </select>
+        </div>
+        <button x-show="page.hasMore" @click="loadMore()" :disabled="loadingMore"
+                class="inline-flex items-center px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px] disabled:opacity-50">
+            <span x-show="!loadingMore">{{ t('helpboard.load_more') }}</span>
+            <span x-show="loadingMore" x-cloak>{{ t('common.loading') }}</span>
+        </button>
     </div>
 
     <!-- Create post modal -->
@@ -146,14 +208,13 @@
 
                 <div class="grid grid-cols-2 gap-3 mb-4">
                     <select x-model="newPost.category" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm min-h-[44px]">
-                        <option value="tools">{{ t('categories.tools') }}</option>
-                        <option value="kitchen">{{ t('categories.kitchen') }}</option>
-                        <option value="garden">{{ t('categories.garden') }}</option>
-                        <option value="electronics">{{ t('categories.electronics') }}</option>
-                        <option value="sports">{{ t('categories.sports') }}</option>
-                        <option value="crafts">{{ t('categories.crafts') }}</option>
-                        <option value="cleaning">{{ t('categories.cleaning') }}</option>
-                        <option value="other">{{ t('categories.other') }}</option>
+                        {% for group_key, cats in category_groups.items() %}
+                        <optgroup label="{{ t('cat_groups.' + group_key) }}">
+                            {% for cat in cats %}
+                            <option value="{{ cat }}">{{ t('categories.' + cat) }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endfor %}
                     </select>
                     <select x-model="newPost.urgency" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm min-h-[44px]">
                         <option value="low">{{ t('helpboard.low') }}</option>
@@ -188,16 +249,18 @@ function helpBoard() {
     return {
         posts: [],
         summary: { total: 0, open: 0, needs: 0, offers: 0 },
-        filter: { type: '' },
+        filter: { type: '', category: '', status: '', q: '', sort: 'newest' },
+        page: { total: 0, limit: 12, offset: 0, hasMore: false },
         showCreate: false,
         submitting: false,
         error: '',
         loading: true,
+        loadingMore: false,
         newPost: {
             help_type: 'need',
             title: '',
             body: '',
-            category: 'tools',
+            category: 'power_tools',
             urgency: 'normal',
             neighborhood: '',
             content_language: '{{ lang }}'
@@ -205,12 +268,45 @@ function helpBoard() {
         async init() {
             await Promise.all([this.loadPosts(), this.loadSummary()]);
             this.loading = false;
+            this.$nextTick(() => BHTranslate.autoTranslatePage());
         },
-        async loadPosts() {
+        _buildParams() {
             var params = new URLSearchParams();
             if (this.filter.type) params.set('help_type', this.filter.type);
+            if (this.filter.category) params.set('category', this.filter.category);
+            if (this.filter.status) params.set('status_filter', this.filter.status);
+            if (this.filter.q.trim()) params.set('q', this.filter.q.trim());
+            if (this.filter.sort) params.set('sort', this.filter.sort);
+            params.set('limit', this.page.limit);
+            params.set('offset', this.page.offset);
+            return params;
+        },
+        async loadPosts() {
+            var params = this._buildParams();
             var resp = await fetch('/api/v1/helpboard/posts?' + params.toString());
-            if (resp.ok) this.posts = await resp.json();
+            if (resp.ok) {
+                var data = await resp.json();
+                this.posts = data.items;
+                this.page.total = data.total;
+                this.page.hasMore = data.has_more;
+            }
+        },
+        async loadMore() {
+            this.loadingMore = true;
+            this.page.offset += this.page.limit;
+            var params = this._buildParams();
+            var resp = await fetch('/api/v1/helpboard/posts?' + params.toString());
+            if (resp.ok) {
+                var data = await resp.json();
+                this.posts = this.posts.concat(data.items);
+                this.page.total = data.total;
+                this.page.hasMore = data.has_more;
+            }
+            this.loadingMore = false;
+        },
+        resetAndLoad() {
+            this.page.offset = 0;
+            this.loadPosts().then(() => this.$nextTick(() => BHTranslate.autoTranslatePage()));
         },
         async loadSummary() {
             var resp = await fetch('/api/v1/helpboard/summary');
@@ -243,7 +339,8 @@ function helpBoard() {
                     return;
                 }
                 this.showCreate = false;
-                this.newPost = { help_type: 'need', title: '', body: '', category: 'tools', urgency: 'normal', neighborhood: '', content_language: '{{ lang }}' };
+                this.newPost = { help_type: 'need', title: '', body: '', category: 'power_tools', urgency: 'normal', neighborhood: '', content_language: '{{ lang }}' };
+                this.page.offset = 0;
                 await Promise.all([this.loadPosts(), this.loadSummary()]);
                 window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Post created!' } }));
             } catch(e) {

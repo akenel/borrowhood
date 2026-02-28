@@ -32,11 +32,16 @@
                         class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
                     {{ t('dashboard.incoming_requests') }}
                 </button>
+                <button @click="tab = 'favorites'"
+                        :class="tab === 'favorites' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
+                    {{ t('dashboard.favorites') }}
+                </button>
             </nav>
         </div>
 
         <!-- My Items tab -->
-        <div x-show="tab === 'items'">
+        <div x-show="tab === 'items'" x-data="dashboardItems()">
             {% if items %}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {% for item in items %}
@@ -71,6 +76,37 @@
                     </div>
                 </a>
                 {% endfor %}
+
+                <!-- Dynamic items from Load More -->
+                <template x-for="item in extraItems" :key="item.id">
+                    <a :href="'/items/' + item.slug" class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group">
+                        <template x-if="item.media && item.media.length">
+                            <img :src="item.media[0].url" :alt="item.media[0].alt_text || ''" class="w-full h-40 object-cover">
+                        </template>
+                        <template x-if="!item.media || !item.media.length">
+                            <div class="w-full h-40 bg-gray-100 flex items-center justify-center">
+                                <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                        </template>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors" x-text="item.name"></h3>
+                        </div>
+                    </a>
+                </template>
+            </div>
+
+            <!-- Pagination footer -->
+            <div class="mt-6 text-center space-y-3">
+                <p class="text-sm text-gray-500"
+                   x-text="'{{ t('dashboard.showing_items') }}'.replace('{shown}', shownCount).replace('{total}', totalCount)">
+                </p>
+                <button x-show="hasMore" @click="loadMore()" :disabled="loadingMore"
+                        class="inline-flex items-center px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px] disabled:opacity-50">
+                    <span x-show="!loadingMore">{{ t('dashboard.load_more') }}</span>
+                    <span x-show="loadingMore" x-cloak>{{ t('common.loading') }}</span>
+                </button>
             </div>
             {% else %}
             <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
@@ -170,6 +206,64 @@
             {% endif %}
         </div>
 
+        <!-- Favorites tab -->
+        <div x-show="tab === 'favorites'" x-cloak x-data="dashboardFavorites()" x-effect="if (tab === 'favorites') loadFavorites()">
+            <template x-if="favLoading">
+                <div class="text-center py-12">
+                    <p class="text-gray-500">{{ t('common.loading') }}</p>
+                </div>
+            </template>
+            <template x-if="!favLoading && favItems.length === 0">
+                <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
+                    <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                    <p class="text-gray-500 mt-4">{{ t('dashboard.no_favorites') }}</p>
+                    <a href="/members" class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 min-h-[44px]">
+                        {{ t('nav.members') }}
+                    </a>
+                </div>
+            </template>
+            <template x-if="!favLoading && favItems.length > 0">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <template x-for="fav in favItems" :key="fav.id">
+                        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group relative">
+                            <button @click="removeFavorite(fav.favorite_user.id, fav.id)"
+                                    class="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/80 hover:bg-white shadow-sm transition-colors"
+                                    title="{{ t('favorites.remove') }}">
+                                <svg class="w-5 h-5 text-red-500 fill-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg>
+                            </button>
+                            <a :href="'/workshop/' + fav.favorite_user.slug" class="block p-6">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-14 h-14 rounded-full flex-shrink-0 flex items-center justify-center bg-gray-100">
+                                        <template x-if="fav.favorite_user.avatar_url">
+                                            <img :src="fav.favorite_user.avatar_url" :alt="fav.favorite_user.display_name" class="w-14 h-14 rounded-full object-cover">
+                                        </template>
+                                        <template x-if="!fav.favorite_user.avatar_url">
+                                            <span class="text-xl font-bold text-gray-500" x-text="fav.favorite_user.display_name[0]"></span>
+                                        </template>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors truncate" x-text="fav.favorite_user.display_name"></h3>
+                                        <p class="text-sm text-gray-500 truncate" x-show="fav.favorite_user.workshop_name" x-text="fav.favorite_user.workshop_name"></p>
+                                        <p class="text-xs text-gray-400 mt-1" x-show="fav.favorite_user.city" x-text="fav.favorite_user.city"></p>
+                                    </div>
+                                </div>
+                                <div class="mt-3 flex items-center space-x-2">
+                                    <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-600" x-text="fav.favorite_user.badge_tier"></span>
+                                    <template x-for="lang in (fav.favorite_user.languages || []).slice(0, 3)" :key="lang.language_code">
+                                        <span class="text-xs px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded font-medium" x-text="lang.language_code.toUpperCase()"></span>
+                                    </template>
+                                </div>
+                            </a>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+
         <!-- Incoming Requests tab (as owner) -->
         <div x-show="tab === 'requests'" x-cloak>
             {% if owner_rentals %}
@@ -263,6 +357,59 @@
 
 {% block scripts %}
 <script>
+    // Dashboard items Load More
+    function dashboardItems() {
+        var initialCount = {{ items | length }};
+        var total = {{ item_total }};
+        return {
+            extraItems: [],
+            offset: initialCount,
+            limit: 12,
+            totalCount: total,
+            loadingMore: false,
+            get shownCount() { return initialCount + this.extraItems.length; },
+            get hasMore() { return this.shownCount < this.totalCount; },
+            async loadMore() {
+                this.loadingMore = true;
+                try {
+                    var resp = await fetch('/api/v1/items?limit=' + this.limit + '&offset=' + this.offset + '&sort=newest');
+                    if (resp.ok) {
+                        var items = await resp.json();
+                        this.extraItems = this.extraItems.concat(items);
+                        this.offset += items.length;
+                    }
+                } catch(e) { /* network error */ }
+                this.loadingMore = false;
+            }
+        };
+    }
+
+    // Dashboard favorites (lazy-loaded)
+    function dashboardFavorites() {
+        return {
+            favItems: [],
+            favLoading: false,
+            favLoaded: false,
+            async loadFavorites() {
+                if (this.favLoaded) return;
+                this.favLoading = true;
+                try {
+                    var resp = await fetch('/api/v1/users/me/favorites');
+                    if (resp.ok) this.favItems = await resp.json();
+                } catch(e) {}
+                this.favLoading = false;
+                this.favLoaded = true;
+            },
+            async removeFavorite(userId, favId) {
+                var resp = await fetch('/api/v1/users/' + userId + '/favorite', { method: 'DELETE' });
+                if (resp.ok) {
+                    this.favItems = this.favItems.filter(f => f.id !== favId);
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: 'Removed from favorites' } }));
+                }
+            }
+        };
+    }
+
     // Lock box component for owners (generate codes)
     function lockboxOwner(rentalId, status) {
         return {

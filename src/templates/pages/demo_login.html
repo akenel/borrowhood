@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('demo.title') }} - {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="demoLogin()">
+
+    <!-- Warning banner -->
+    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8">
+        <div class="flex items-start space-x-3">
+            <svg class="w-6 h-6 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+            </svg>
+            <div>
+                <h3 class="text-sm font-bold text-amber-800">{{ t('demo.warning') }}</h3>
+                <p class="text-sm text-amber-700 mt-1">{{ t('demo.warning_text') }}</p>
+                <p class="text-xs text-amber-600 mt-2">{{ t('demo.password_hint') }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">{{ t('demo.title') }}</h1>
+        <p class="text-sm text-gray-500 mt-1">{{ t('demo.click_to_login') }}</p>
+    </div>
+
+    <!-- Current user indicator -->
+    {% if user %}
+    <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-6">
+        <p class="text-sm text-emerald-800">
+            <span class="font-semibold">{{ t('demo.current_user') }}:</span>
+            {{ user.get('preferred_username', '?') }}
+            ({{ user.get('name', '') }})
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- Role legend -->
+    <div class="mb-6 flex flex-wrap gap-2">
+        <span class="text-xs px-2 py-1 rounded-full font-medium" style="background-color: #FEF3C7; color: #92400E;">admin</span>
+        <span class="text-xs px-2 py-1 rounded-full font-medium" style="background-color: #F3E8FF; color: #6B21A8;">operator</span>
+        <span class="text-xs px-2 py-1 rounded-full font-medium" style="background-color: #ECFDF5; color: #065F46;">moderator</span>
+        <span class="text-xs px-2 py-1 rounded-full font-medium" style="background-color: #EFF6FF; color: #1E40AF;">lender</span>
+        <span class="text-xs px-2 py-1 rounded-full font-medium" style="background-color: #F3F4F6; color: #374151;">member</span>
+        <span class="text-xs px-2 py-1 rounded-full font-medium" style="background-color: #FEF2F2; color: #991B1B;">qa-tester</span>
+    </div>
+
+    <!-- Status message -->
+    <div x-show="error" x-cloak class="mb-4 bg-red-50 border border-red-200 rounded-lg p-3">
+        <p class="text-sm text-red-700" x-text="error"></p>
+    </div>
+
+    <!-- User cards grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for du in demo_users %}
+        {% set badge_styles = {
+            'legend': 'background-color: #FEF3C7; color: #92400E; border-color: #FDE68A;',
+            'pillar': 'background-color: #F3E8FF; color: #6B21A8; border-color: #E9D5FF;',
+            'trusted': 'background-color: #ECFDF5; color: #065F46; border-color: #A7F3D0;',
+            'active': 'background-color: #EFF6FF; color: #1E40AF; border-color: #BFDBFE;',
+            'newcomer': 'background-color: #F9FAFB; color: #374151; border-color: #E5E7EB;'
+        } %}
+        <button @click="login('{{ du.username }}')"
+                :disabled="loggingIn"
+                class="text-left bg-white rounded-lg border-2 p-5 hover:shadow-md transition-all min-h-[44px] disabled:opacity-50"
+                style="border-color: {% if du.color == 'amber' %}#FDE68A{% elif du.color == 'purple' %}#E9D5FF{% elif du.color == 'emerald' %}#A7F3D0{% elif du.color == 'blue' %}#BFDBFE{% else %}#E5E7EB{% endif %};">
+            <div class="flex items-start space-x-4">
+                <!-- Avatar initial -->
+                <div class="w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center text-lg font-bold"
+                     style="{{ badge_styles[du.badge] }}">
+                    {{ du.display_name[0] }}
+                </div>
+
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-semibold text-gray-900">{{ du.display_name }}</h3>
+                    <p class="text-xs text-gray-500">@{{ du.username }}</p>
+                    {% if du.workshop %}
+                    <p class="text-sm text-gray-600 mt-1 truncate">{{ du.workshop }}</p>
+                    {% endif %}
+
+                    <!-- Roles -->
+                    <div class="mt-2 flex flex-wrap gap-1">
+                        {% for role in du.roles.split(', ') %}
+                        <span class="text-xs px-1.5 py-0.5 rounded font-medium"
+                              style="{% if 'admin' in role %}background-color: #FEF3C7; color: #92400E;{% elif 'operator' in role %}background-color: #F3E8FF; color: #6B21A8;{% elif 'moderator' in role %}background-color: #ECFDF5; color: #065F46;{% elif 'qa' in role %}background-color: #FEF2F2; color: #991B1B;{% elif 'lender' in role %}background-color: #EFF6FF; color: #1E40AF;{% else %}background-color: #F3F4F6; color: #374151;{% endif %}">
+                            {{ role }}
+                        </span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Badge -->
+                    <div class="mt-2">
+                        <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                              style="{{ badge_styles[du.badge] }}">
+                            {{ du.badge }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading indicator -->
+            <div x-show="loggingIn && currentUser === '{{ du.username }}'" x-cloak class="mt-3 text-center">
+                <span class="text-xs text-indigo-600 font-medium">{{ t('demo.logging_in') }}</span>
+            </div>
+        </button>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function demoLogin() {
+    return {
+        loggingIn: false,
+        currentUser: '',
+        error: '',
+        async login(username) {
+            this.loggingIn = true;
+            this.currentUser = username;
+            this.error = '';
+            try {
+                var resp = await fetch('/api/v1/demo/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: username, password: 'helix_pass' })
+                });
+                if (!resp.ok) {
+                    var err = await resp.json();
+                    this.error = err.detail || 'Login failed';
+                    this.loggingIn = false;
+                    return;
+                }
+                // Redirect to dashboard
+                window.location.href = '/dashboard';
+            } catch(e) {
+                this.error = 'Network error. Is Keycloak running?';
+                this.loggingIn = false;
+            }
+        }
+    };
+}
+</script>
+{% endblock %}
