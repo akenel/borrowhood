@@ -21,6 +21,8 @@ logger = logging.getLogger(__name__)
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.2")
 POLLINATIONS_TEXT_URL = "https://text.pollinations.ai/"
+POLLINATIONS_IMAGE_URL = "https://gen.pollinations.ai/image"
+POLLINATIONS_API_KEY = os.environ.get("POLLINATIONS_API_KEY", "")
 
 
 async def generate_listing_description(
@@ -273,21 +275,89 @@ def _template_fallback(name: str, category: str, item_type: str, language: str) 
     }
 
 
-def generate_image_url(name: str, category: str) -> str:
-    """Generate a product image URL for a listing.
+def build_image_prompt(
+    name: str, description: str = "", category: str = "", brand: str = ""
+) -> str:
+    """Build a sensible image generation prompt from item details.
 
-    Uses picsum.photos with a deterministic seed based on item name,
-    so the same item always gets the same photo. Free, reliable, no API key.
+    Uses the full description for context -- not just the name.
+    "Bobcat E10" + "mini excavator" → excavator photo, not a cat.
     """
-    # Use item name as seed for consistent, reproducible images
+    parts = ["Professional product photo"]
+
+    if brand and brand.lower() not in name.lower():
+        parts.append(f"of a {brand} {name}")
+    else:
+        parts.append(f"of a {name}")
+
+    if description:
+        # First sentence or 100 chars -- the most descriptive part
+        desc_snippet = description.split(".")[0][:100].strip()
+        if desc_snippet:
+            parts.append(f"({desc_snippet})")
+
+    if category:
+        parts.append(category.replace("_", " "))
+
+    parts.append("clean background, studio lighting, high quality")
+    return ", ".join(parts)
+
+
+async def generate_image(prompt: str) -> dict:
+    """Generate an image from a prompt.
+
+    Returns: { image_url, ai_generated }
+    Tries Pollinations (if API key configured), falls back to picsum.
+    """
+    if POLLINATIONS_API_KEY:
+        url = await _try_pollinations_image(prompt)
+        if url:
+            return {"image_url": url, "ai_generated": True}
+
+    # Fallback: picsum with prompt-based seed
+    seed = quote(prompt[:80])
+    return {
+        "image_url": f"https://picsum.photos/seed/{seed}/800/600",
+        "ai_generated": False,
+    }
+
+
+async def _try_pollinations_image(prompt: str) -> Optional[str]:
+    """Call Pollinations image API with API key. Returns URL or None."""
+    encoded = quote(prompt)
+    url = f"{POLLINATIONS_IMAGE_URL}/{encoded}?width=800&height=600&model=flux"
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.head(
+                url,
+                headers={"Authorization": f"Bearer {POLLINATIONS_API_KEY}"},
+                follow_redirects=True,
+            )
+            if resp.status_code == 200:
+                return url
+    except Exception as e:
+        logger.warning(f"Pollinations image API failed: {e}")
+    return None
+
+
+def generate_image_url(name: str, category: str) -> str:
+    """Generate a product image URL for a listing (legacy).
+
+    Uses picsum.photos with a deterministic seed based on item name.
+    Kept for backward compat (seed data). New code should use generate_image().
+    """
     seed = quote(f"{name}-{category}")
     return f"https://picsum.photos/seed/{seed}/800/600"
 
 
-async def ensure_item_has_image(db, item_id, name: str, category: str):
-    """Auto-generate a Pollinations image if item has no media.
+async def ensure_item_has_image(
+    db, item_id, name: str, category: str,
+    description: str = "", brand: str = "",
+):
+    """Auto-generate an image if item has no media.
 
     Called after item creation so items NEVER appear without a picture.
+    Uses smart prompt with description context for better results.
     """
     from sqlalchemy import select, func
     from src.models.item import BHItemMedia, MediaType
@@ -298,14 +368,15 @@ async def ensure_item_has_image(db, item_id, name: str, category: str):
     if count and count > 0:
         return  # Item already has at least one image
 
-    image_url = generate_image_url(name, category)
+    prompt = build_image_prompt(name, description, category, brand)
+    result = await generate_image(prompt)
     media = BHItemMedia(
         item_id=item_id,
-        url=image_url,
+        url=result["image_url"],
         alt_text=f"{name} - AI generated preview",
         media_type=MediaType.PHOTO,
         sort_order=0,
     )
     db.add(media)
     await db.flush()
-    logger.info(f"Auto-generated AI image for item {item_id}")
+    logger.info(f"Auto-generated image for item {item_id} (ai={result['ai_generated']})")

@@ -429,6 +429,16 @@
     "no_badges": "Nessun badge guadagnato ancora. Inizia a noleggiare e recensire!",
     "about": "Chi Sono"
   },
+  "ai_image": {
+    "prompt_label": "Prompt Immagine",
+    "prompt_hint": "Descrivi cosa deve mostrare l'immagine. L'abbiamo compilato dai dettagli del tuo articolo -- modificalo per risultati migliori.",
+    "generate": "Genera Immagine",
+    "regenerate": "Rigenera",
+    "cancel": "Annulla",
+    "generating": "Generazione immagine...",
+    "stock_fallback": "Foto stock (generazione AI non disponibile)",
+    "ai_generated": "Generata con AI"
+  },
   "footer": {
     "tagline": "Libero come la libertà. Open source. Nessuna commissione. Per sempre.",
     "github": "GitHub",

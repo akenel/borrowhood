@@ -23,6 +23,9 @@
         aiTags: [],
         aiImageUrl: '',
         aiImageGenerating: false,
+        aiImageIsReal: false,
+        imagePrompt: '',
+        imagePromptVisible: false,
         uploadFile: null,
         uploadPreview: '',
         dragging: false,
@@ -169,7 +172,12 @@
                         const aiResp = await fetch('/api/v1/ai/generate-image', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ name: this.form.name, category: this.form.category })
+                            body: JSON.stringify({
+                                name: this.form.name,
+                                category: this.form.category,
+                                description: this.form.description,
+                                brand: this.form.brand
+                            })
                         });
                         if (aiResp.ok) {
                             const aiData = await aiResp.json();
@@ -385,51 +393,103 @@
                 <div x-show="aiImageUrl && !uploadPreview" x-cloak class="relative">
                     <img :src="aiImageUrl" alt="AI-generated preview" class="w-full h-48 object-cover rounded-lg border border-purple-200">
                     <div class="absolute top-2 right-2 flex space-x-1">
-                        <span class="text-xs px-2 py-1 bg-purple-600 text-white rounded-full">AI Preview</span>
+                        <span x-show="aiImageIsReal" class="text-xs px-2 py-1 bg-purple-600 text-white rounded-full">{{ t('ai_image.ai_generated') }}</span>
+                        <span x-show="!aiImageIsReal" class="text-xs px-2 py-1 bg-gray-500 text-white rounded-full">{{ t('ai_image.stock_fallback') }}</span>
                         <button @click="removeImage()" class="text-xs px-2 py-1 bg-red-500 text-white rounded-full hover:bg-red-600">&times;</button>
                     </div>
                 </div>
 
-                <!-- AI image generate button (secondary option) -->
-                <div x-show="!uploadPreview && !aiImageUrl" class="mt-3 text-center">
-                    <button @click="async () => {
-                                if (!form.name.trim()) return;
-                                aiImageGenerating = true;
-                                try {
-                                    const resp = await fetch('/api/v1/ai/generate-image', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ name: form.name, category: form.category })
-                                    });
-                                    if (resp.ok) {
-                                        const data = await resp.json();
-                                        aiImageUrl = data.image_url;
-                                        uploadFile = null;
-                                        uploadPreview = '';
+                <!-- AI image prompt editor + generate button -->
+                <div x-show="!uploadPreview" class="mt-3">
+
+                    <!-- "or Generate with AI" link (shows prompt editor) -->
+                    <div x-show="!imagePromptVisible && !aiImageUrl" class="text-center">
+                        <button @click="
+                                    if (!form.name.trim()) return;
+                                    let parts = ['Professional product photo'];
+                                    if (form.brand) { parts.push('of a ' + form.brand + ' ' + form.name); }
+                                    else { parts.push('of a ' + form.name); }
+                                    if (form.description) {
+                                        let snippet = form.description.split('.')[0].substring(0, 100).trim();
+                                        if (snippet) parts.push('(' + snippet + ')');
                                     }
-                                } catch(e) {
-                                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'AI image generation failed' } }));
-                                } finally { aiImageGenerating = false; }
-                            }"
-                            :disabled="!form.name.trim() || aiImageGenerating"
-                            class="text-sm text-purple-600 hover:text-purple-800 font-medium disabled:opacity-50">
-                        <span x-show="!aiImageGenerating" class="flex items-center justify-center space-x-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                            </svg>
-                            <span>{% if lang == 'it' %}oppure Genera Immagine con AI{% else %}or Generate Image with AI{% endif %}</span>
-                        </span>
-                        <span x-show="aiImageGenerating" x-cloak class="flex items-center justify-center space-x-2">
-                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            <span>{% if lang == 'it' %}Generazione...{% else %}Generating...{% endif %}</span>
-                        </span>
-                    </button>
-                    <p class="text-xs text-gray-400 mt-1">
-                        {% if lang == 'it' %}Nessuna foto? Ne creiamo una automaticamente{% else %}No photo? We'll auto-generate one for you{% endif %}
-                    </p>
+                                    if (form.category) parts.push(form.category.replace(/_/g, ' '));
+                                    parts.push('clean background, studio lighting, high quality');
+                                    imagePrompt = parts.join(', ');
+                                    imagePromptVisible = true;
+                                "
+                                :disabled="!form.name.trim()"
+                                class="text-sm text-purple-600 hover:text-purple-800 font-medium disabled:opacity-50">
+                            <span class="flex items-center justify-center space-x-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                                <span>{% if lang == 'it' %}oppure Genera Immagine con AI{% else %}or Generate Image with AI{% endif %}</span>
+                            </span>
+                        </button>
+                        <p class="text-xs text-gray-400 mt-1">
+                            {% if lang == 'it' %}Nessuna foto? Ne creiamo una automaticamente{% else %}No photo? We'll auto-generate one for you{% endif %}
+                        </p>
+                    </div>
+
+                    <!-- Prompt editor (visible after clicking "AI Generate" or when image exists) -->
+                    <div x-show="imagePromptVisible || aiImageUrl" x-cloak
+                         class="bg-purple-50 border border-purple-200 rounded-lg p-4 space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-purple-900 mb-1">{{ t('ai_image.prompt_label') }}</label>
+                            <textarea x-model="imagePrompt" rows="3"
+                                      class="w-full px-3 py-2 border border-purple-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                                      placeholder="Professional product photo of a..."></textarea>
+                            <p class="text-xs text-purple-600 mt-1">{{ t('ai_image.prompt_hint') }}</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button @click="async () => {
+                                        if (!imagePrompt.trim()) return;
+                                        aiImageGenerating = true;
+                                        try {
+                                            const resp = await fetch('/api/v1/ai/generate-image', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({
+                                                    name: form.name,
+                                                    category: form.category,
+                                                    description: form.description,
+                                                    brand: form.brand,
+                                                    prompt: imagePrompt
+                                                })
+                                            });
+                                            if (resp.ok) {
+                                                const data = await resp.json();
+                                                aiImageUrl = data.image_url;
+                                                imagePrompt = data.prompt;
+                                                aiImageIsReal = data.ai_generated;
+                                                uploadFile = null;
+                                                uploadPreview = '';
+                                            } else {
+                                                throw new Error('Generation failed');
+                                            }
+                                        } catch(e) {
+                                            window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } }));
+                                        } finally { aiImageGenerating = false; }
+                                    }"
+                                    :disabled="!imagePrompt.trim() || aiImageGenerating"
+                                    class="px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors">
+                                <span x-show="!aiImageGenerating" x-text="aiImageUrl ? '{{ t('ai_image.regenerate') }}' : '{{ t('ai_image.generate') }}'"></span>
+                                <span x-show="aiImageGenerating" x-cloak class="flex items-center space-x-1">
+                                    <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span>{{ t('ai_image.generating') }}</span>
+                                </span>
+                            </button>
+                            <button @click="imagePromptVisible = false; if (!aiImageUrl) imagePrompt = '';"
+                                    x-show="!aiImageUrl"
+                                    class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium">
+                                {{ t('ai_image.cancel') }}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 

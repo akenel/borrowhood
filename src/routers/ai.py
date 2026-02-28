@@ -10,7 +10,10 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 from src.dependencies import require_auth
-from src.services.ai import generate_listing_description, generate_skill_bio, generate_image_url
+from src.services.ai import (
+    generate_listing_description, generate_skill_bio,
+    generate_image_url, build_image_prompt, generate_image,
+)
 
 router = APIRouter(prefix="/api/v1/ai", tags=["ai"])
 
@@ -74,11 +77,16 @@ async def ai_generate_skill_bio(
 
 class ImageGenerateRequest(BaseModel):
     name: str = Field(..., min_length=2, max_length=200)
-    category: str = Field(..., max_length=50)
+    category: str = Field(default="", max_length=50)
+    description: str = Field(default="", max_length=500)
+    brand: str = Field(default="", max_length=100)
+    prompt: Optional[str] = Field(None, max_length=500)
 
 
 class ImageGenerateResponse(BaseModel):
     image_url: str
+    prompt: str
+    ai_generated: bool
 
 
 @router.post("/generate-image", response_model=ImageGenerateResponse)
@@ -86,10 +94,21 @@ async def ai_generate_image(
     data: ImageGenerateRequest,
     token: dict = Depends(require_auth),
 ):
-    """Generate a product preview image using Pollinations.ai.
+    """Generate a product preview image.
 
-    Returns a URL that generates the image on-demand (no storage needed).
-    The grandma moment: type a name, get a professional product photo.
+    If prompt is provided, uses it directly (user edited it).
+    Otherwise builds a smart prompt from name + description + brand + category.
+    Returns the prompt used so the user can see and edit it.
     """
-    url = generate_image_url(name=data.name, category=data.category)
-    return {"image_url": url}
+    prompt = data.prompt or build_image_prompt(
+        name=data.name,
+        description=data.description,
+        category=data.category,
+        brand=data.brand,
+    )
+    result = await generate_image(prompt)
+    return {
+        "image_url": result["image_url"],
+        "prompt": prompt,
+        "ai_generated": result["ai_generated"],
+    }

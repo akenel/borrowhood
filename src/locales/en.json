@@ -429,6 +429,16 @@
     "no_badges": "No badges earned yet. Start renting and reviewing to earn your first!",
     "about": "About"
   },
+  "ai_image": {
+    "prompt_label": "Image Prompt",
+    "prompt_hint": "Describe what the image should show. We auto-filled this from your item details -- edit it to get better results.",
+    "generate": "Generate Image",
+    "regenerate": "Regenerate",
+    "cancel": "Cancel",
+    "generating": "Generating image...",
+    "stock_fallback": "Stock photo (AI generation not available)",
+    "ai_generated": "AI Generated"
+  },
   "footer": {
     "tagline": "Free as in freedom. Open source. No platform fees. Forever.",
     "github": "GitHub",
