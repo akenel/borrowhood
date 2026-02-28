@@ -1770,6 +1770,856 @@
       ],
       "latitude": 38.018,
       "longitude": 12.537
+    },
+    {
+      "owner_slug": "marcos-workshop",
+      "name": "Banco da falegname -- uso orario",
+      "slug": "banco-da-falegname-uso-orario",
+      "description": "Postazione completa con banco da lavoro, morsa, aspiratore trucioli e illuminazione professionale. Accesso a sega circolare e levigatrice incluso. Portate il vostro legno e i vostri progetti. Devo vedervi lavorare prima di lasciarvi soli -- sicurezza prima di tutto.",
+      "content_language": "it",
+      "item_type": "space",
+      "category": "spaces",
+      "subcategory": "workshop",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Woodworking bench with tools in professional workshop"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 12.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "deposit": 50.0,
+          "notes": "Minimo 3 ore. Esperienza richiesta o lezione introduttiva obbligatoria (25 EUR). Portate DPI."
+        },
+        {
+          "listing_type": "rent",
+          "price": 60.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 50.0,
+          "notes": "Giornata intera 8:00-18:00. Pranzo libero, c'è il bar a 50 metri."
+        }
+      ]
+    },
+    {
+      "owner_slug": "sallys-kitchen",
+      "name": "Commercial Kitchen for Event Catering",
+      "slug": "commercial-kitchen-event-catering",
+      "description": "Full commercial kitchen with 6-burner gas range, double oven, walk-in fridge, prep tables, and professional cookware. Perfect for catering prep, food truck staging, or cooking classes. Fully licensed for commercial food preparation. I'll show you where everything is and the hygiene rules.",
+      "content_language": "en",
+      "item_type": "space",
+      "category": "spaces",
+      "subcategory": "kitchen",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Professional commercial kitchen with stainless steel equipment"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 20.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "deposit": 100.0,
+          "notes": "Minimum 4 hours. Leave it cleaner than you found it. Cleaning fee EUR 50 if kitchen not properly cleaned."
+        },
+        {
+          "listing_type": "rent",
+          "price": 120.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 100.0,
+          "notes": "Full day 6:00-22:00. Includes gas, water, electricity. You bring ingredients, I provide the kitchen."
+        }
+      ]
+    },
+    {
+      "owner_slug": "mikes-garage",
+      "name": "Garage Bay -- DIY Car Work",
+      "slug": "garage-bay-diy-car-work",
+      "description": "One full garage bay with hydraulic lift, air compressor, basic hand tools, and drop light. Oil drain pan and jack stands included. Perfect for oil changes, brake jobs, or suspension work. I'm next door if you get stuck -- 30 years under the hood, I've seen it all.",
+      "content_language": "en",
+      "item_type": "space",
+      "category": "spaces",
+      "subcategory": "garage",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1580983559367-0dc2f8934365?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Clean garage bay with hydraulic car lift"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 15.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "deposit": 50.0,
+          "notes": "Minimum 2 hours. If you need my help, it's EUR 30/hr on top. Bring your own parts and fluids."
+        },
+        {
+          "listing_type": "rent",
+          "price": 80.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 50.0,
+          "notes": "Full day access. I'll help with the lift. Clean up your mess -- oil spills = EUR 50 fee."
+        }
+      ]
+    },
+    {
+      "owner_slug": "marias-garden",
+      "name": "Orto in affitto -- 4x6 metri con acqua",
+      "slug": "orto-in-affitto-4x6-metri",
+      "description": "Parcella di orto 4x6 metri con terreno già lavorato, irrigazione a goccia, e recinzione. Sole pieno dalla mattina fino alle 15:00. Perfetto per pomodori, zucchine, melanzane. Vi insegno io quando piantare e come curare -- 50 anni di esperienza non si buttano via.",
+      "content_language": "it",
+      "item_type": "space",
+      "category": "spaces",
+      "subcategory": "garden",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Sunny vegetable garden plot with irrigation"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 40.0,
+          "price_unit": "per_month",
+          "currency": "EUR",
+          "notes": "Minimo 3 mesi (una stagione). Acqua inclusa. Semi e piantine a carico vostro. Lezione gratuita il primo giorno."
+        }
+      ]
+    },
+    {
+      "owner_slug": "angel-hq",
+      "name": "Rooftop Terrace for Events -- Baglio Xiare",
+      "slug": "rooftop-terrace-events-baglio-xiare",
+      "description": "Private rooftop terrace overlooking the salt flats and Egadi Islands. 50 sqm, power outlets, string lights installed. Perfect for small events (up to 20 people), sunset aperitivo, photography shoots, or private dinners. The view alone is worth the trip. Tables and chairs for 12 included.",
+      "content_language": "en",
+      "item_type": "space",
+      "category": "spaces",
+      "subcategory": "events",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Rooftop terrace with sea view at sunset"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 50.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "4-hour block. Sunset slot (17:00-21:00) is EUR 75. You bring food/drinks. No amplified music after 22:00. Cleanup included."
+        }
+      ]
+    },
+    {
+      "owner_slug": "ninos-campers",
+      "name": "Furgone con autista -- traslochi e trasporti",
+      "slug": "furgone-con-autista-traslochi",
+      "description": "Fiat Ducato L3H2, 14 metri cubi di carico. Autista incluso (io, Nino). Perfetto per traslochi, consegne mobili, trasporto materiali da cantiere. Cinghie, coperte, carrello a mano inclusi. Conosco ogni via di Trapani e provincia -- niente GPS, solo esperienza.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "vehicles",
+      "subcategory": "transport",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1586191582056-2e4c9f103420?w=800&h=600&fit=crop&q=80",
+          "alt_text": "White cargo van Fiat Ducato ready for moving"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 35.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "Minimo 2 ore (EUR 70). Carburante incluso entro 30km. Oltre = EUR 0.50/km. Secondo uomo disponibile +EUR 20/ora. Sabato +20%."
+        }
+      ]
+    },
+    {
+      "owner_slug": "mikes-garage",
+      "name": "Cargo Trailer Rental -- 750kg",
+      "slug": "cargo-trailer-rental-750kg",
+      "description": "Single-axle cargo trailer, 750kg capacity, no special license needed. 2.5m x 1.3m bed with fold-down sides. Includes ratchet straps, wheel chocks, and trailer lock. Tow ball is standard 50mm. I'll check your car's tow rating before I hand over the keys -- safety first.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "vehicles",
+      "subcategory": "trailer",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1601628828688-632f38a5a7d0?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Cargo utility trailer with fold-down sides"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 30.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 100.0,
+          "notes": "Return clean. Mud = EUR 30 cleaning fee. Weekend rate EUR 50 (Fri evening to Mon morning). Insurance your responsibility."
+        }
+      ]
+    },
+    {
+      "owner_slug": "daves-sports",
+      "name": "Electric Cargo Bike -- Babboe City Mountain",
+      "slug": "electric-cargo-bike-babboe",
+      "description": "Front-loading electric cargo bike with rain cover. Carries up to 100kg or 2 kids + groceries. Shimano mid-drive motor, 80km range. Perfect for market runs, beach gear, or kid transport in the centro storico where cars can't go. Includes lock, helmet, and rain cover.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "vehicles",
+      "subcategory": "cycling",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Electric cargo bike with front loading box"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 25.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 150.0,
+          "notes": "Full charge on pickup. Charger included for multi-day. Helmet mandatory. ID required. Weekly rate EUR 120."
+        }
+      ]
+    },
+    {
+      "owner_slug": "jakes-electronics",
+      "name": "Appliance Repair Service -- Washers, Dryers, Dishwashers",
+      "slug": "appliance-repair-service-home",
+      "description": "I fix washing machines, dryers, dishwashers, and ovens. 15 years experience with all major brands (Bosch, Samsung, LG, Whirlpool, Indesit). Diagnostic visit EUR 40 -- fully refunded if you hire me for the repair. Most repairs same-day. I bring my tools, you just need to be home.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "repairs",
+      "subcategory": "appliances",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Technician repairing washing machine"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 40.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "EUR 40 diagnostic visit -- refunded if you hire me. Labor EUR 35/hour after diagnosis. Parts at cost + 10%. Most repairs EUR 80-150 total. No fix, no charge beyond diagnostic."
+        }
+      ]
+    },
+    {
+      "owner_slug": "marcos-workshop",
+      "name": "Restauro mobili antichi -- falegname esperto",
+      "slug": "restauro-mobili-antichi-falegname",
+      "description": "Restauro professionale di mobili antichi e d'epoca. Riparazione strutturale, sostituzione impiallacciatura, lucidatura a gommalacca, trattamento tarli. 40 anni di esperienza. Mandate foto per un preventivo gratuito via WhatsApp. Per pezzi complessi, visita a domicilio EUR 50 (scalati dal lavoro).",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "repairs",
+      "subcategory": "furniture",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Craftsman restoring antique wooden furniture"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 50.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "Visita a domicilio EUR 50 (scalati se accettate il lavoro). Preventivo gratuito via foto WhatsApp. Ritiro e consegna disponibili entro Trapani (EUR 30). Tempi: 1-4 settimane a seconda del lavoro."
+        },
+        {
+          "listing_type": "commission",
+          "price": null,
+          "price_unit": "negotiable",
+          "currency": "EUR",
+          "notes": "Restauri complessi: prezzo da concordare dopo la visita. Mandate foto del mobile + dettagli del danno."
+        }
+      ]
+    },
+    {
+      "owner_slug": "daves-sports",
+      "name": "Bike Tune-Up & Repair Service",
+      "slug": "bike-tune-up-repair-service",
+      "description": "Full bike tune-up: brakes, gears, chain, tires, cables, bearings. I work on road bikes, mountain bikes, city bikes, and e-bikes (non-motor parts). 10 years as a weekend mechanic. Drop off at my shed or I come to you (within Trapani). Most tune-ups done in 1-2 hours while you wait.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "repairs",
+      "subcategory": "cycling",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Bike mechanic adjusting gears on a bicycle"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 30.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "Basic tune-up EUR 30 (brakes, gears, chain lube, tire pressure). Full overhaul EUR 60 (+ bearings, cables, deep clean). Parts extra at cost. Mobile service +EUR 10."
+        }
+      ]
+    },
+    {
+      "owner_slug": "mikes-garage",
+      "name": "Plumbing Repair -- Leaks, Taps, Drains",
+      "slug": "plumbing-repair-leaks-taps-drains",
+      "description": "Basic plumbing repairs: leaky taps, toilet flush mechanisms, blocked drains, pipe joints, washing machine connections. NOT a licensed plumber -- I'm a garage guy who's fixed his own house for 30 years. Simple stuff I can handle. Complex jobs I'll tell you straight: call a pro.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "repairs",
+      "subcategory": "plumbing",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Plumber fixing sink pipe under cabinet"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 25.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "Minimum 1 hour (EUR 25). Most tap/drain fixes done in under an hour. Parts at cost -- I'll show you the receipt. If it's beyond my skill, I tell you and you pay nothing. Honest work."
+        }
+      ]
+    },
+    {
+      "owner_slug": "marias-garden",
+      "name": "Riparazione impianto irrigazione giardino",
+      "slug": "riparazione-impianto-irrigazione",
+      "description": "Riparo e installo impianti di irrigazione a goccia e a sprinkler. Tubi rotti, gocciolatori intasati, programmatori, elettrovalvole. 30 anni di esperienza con giardini e orti. Mandate foto del problema e vi dico subito se posso aiutarvi. Lavoro solo su impianti esterni, non idraulica di casa.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "repairs",
+      "subcategory": "garden",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1599629954294-14df9ec24988?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Garden irrigation system with drip lines"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 30.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "Minimo 2 ore (EUR 60). Materiali a parte. Sopralluogo gratuito se il lavoro viene fatto. Altrimenti EUR 20 per il viaggio."
+        }
+      ]
+    },
+    {
+      "owner_slug": "marcos-workshop",
+      "name": "Corso di saldatura base -- MIG e arco",
+      "slug": "corso-saldatura-base-mig-arco",
+      "description": "Impara a saldare da zero. 35 anni di esperienza professionale. Il corso copre: sicurezza, preparazione materiale, saldatura MIG, saldatura ad arco, giunti di base. Tutto il materiale e le attrezzature incluse. Alla fine costruisci il tuo primo progetto da portare a casa.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "training_service",
+      "subcategory": "welding",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Welding training with sparks flying in workshop"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "training",
+          "price": 80.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "Sessione di 4 ore. Massimo 2 studenti per sessione. DPI inclusi (maschera, guanti, grembiule). Portate solo scarpe chiuse. Sabato mattina o su appuntamento."
+        }
+      ]
+    },
+    {
+      "owner_slug": "lunas-studio",
+      "name": "Photography Walk & Lesson -- Trapani Old Town",
+      "slug": "photography-walk-lesson-trapani",
+      "description": "Learn photography while exploring Trapani's stunning old town. Composition, lighting, street photography, golden hour techniques. Bring your camera (phone is fine too). I'll teach you to see light the way artists do. We end at a cafe overlooking the sea. Small groups only -- 3 people max.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "training_service",
+      "subcategory": "photography",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1502982720700-bfff97f2ecac?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Photographer teaching during golden hour in old town"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "training",
+          "price": 35.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "2.5 hours. Sunset walk preferred (16:30 start, winter) or morning (7:30, summer). Coffee at the end included. Rain date guaranteed -- Sicily rain doesn't last long."
+        }
+      ]
+    },
+    {
+      "owner_slug": "rosas-home",
+      "name": "Lezione di cucina siciliana -- pasta fresca e dolci",
+      "slug": "lezione-cucina-siciliana-pasta-dolci",
+      "description": "Vi insegno a fare la pasta fresca (busiate, cavatelli, ravioli) e i dolci siciliani (cannoli, cassata, frutta di Martorana). Ricette della nonna, niente scorciatoie. Cuciniamo insieme e poi mangiamo tutto. La mia cucina, i miei ingredienti, la vostra fame.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "training_service",
+      "subcategory": "cooking",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Making fresh pasta by hand in Sicilian kitchen"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "training",
+          "price": 45.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "3 ore, pranzo incluso (mangiamo quello che cuciniamo). Massimo 4 persone. Ingredienti inclusi. Portate il grembiule o ve ne presto uno. Mercoledì e venerdì pomeriggio."
+        }
+      ]
+    },
+    {
+      "owner_slug": "jakes-electronics",
+      "name": "Electronics & Soldering Workshop for Beginners",
+      "slug": "electronics-soldering-workshop-beginners",
+      "description": "Learn to solder, read schematics, and build your first circuit. We'll start with basic theory (15 min), then hands-on: through-hole soldering, desoldering, component identification. You leave with a working LED blinker circuit you built yourself. All materials included.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "training_service",
+      "subcategory": "electronics",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Soldering iron on circuit board in electronics workshop"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "training",
+          "price": 25.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "2 hours. All tools and components included. Ages 12+ welcome (minors with parent). Max 3 students. Saturday afternoons at my bench."
+        }
+      ]
+    },
+    {
+      "owner_slug": "marias-garden",
+      "name": "Corso cura olivi e potatura -- 50 anni di esperienza",
+      "slug": "corso-cura-olivi-potatura",
+      "description": "Vi insegno tutto sugli ulivi: potatura di formazione, potatura di produzione, trattamento della mosca olearia, raccolta, e spremitura. Lavoriamo nel mio oliveto (12 alberi). Teoria la mattina, pratica il pomeriggio. Portate guanti da lavoro e scarpe robuste.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "training_service",
+      "subcategory": "agriculture",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1445282768818-728615cc910a?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Olive trees in Mediterranean garden"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "training",
+          "price": 60.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "Giornata intera (9:00-16:00). Pranzo incluso (cucino io). Massimo 4 persone. Stagione potatura: novembre-febbraio. Stagione raccolta: ottobre-novembre."
+        }
+      ]
+    },
+    {
+      "owner_slug": "marcos-workshop",
+      "name": "Mobili su misura in legno massello",
+      "slug": "mobili-su-misura-legno-massello",
+      "description": "Costruisco mobili su misura: librerie, tavoli, armadi, porte, scale. Solo legno massello (castagno, noce, frassino, ulivo). Niente truciolato, niente IKEA. Ogni pezzo è unico. Mandate misure e foto dello spazio, vi mando un preventivo dettagliato entro 48 ore.",
+      "content_language": "it",
+      "item_type": "made_to_order",
+      "category": "custom_orders",
+      "subcategory": "furniture",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Custom handmade wooden bookshelf in workshop"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "commission",
+          "price": null,
+          "price_unit": "negotiable",
+          "currency": "EUR",
+          "notes": "Preventivo gratuito via foto/misure. Visita a domicilio EUR 50 (scalati dal lavoro se accettate). Tempi: 2-6 settimane. Acconto 40% alla conferma, saldo alla consegna. Garanzia 5 anni sulla struttura."
+        }
+      ]
+    },
+    {
+      "owner_slug": "lunas-studio",
+      "name": "Commissioned Portrait Painting -- Oil on Canvas",
+      "slug": "commissioned-portrait-oil-canvas",
+      "description": "Custom oil portrait from your photo. Realistic or impressionist style. Canvas sizes from 30x40cm to 100x80cm. I work from high-resolution photos -- send 3-5 from different angles. Each portrait takes 2-4 weeks. Perfect gift for anniversaries, memorials, or just because your dog deserves it.",
+      "content_language": "en",
+      "item_type": "made_to_order",
+      "category": "custom_orders",
+      "subcategory": "art",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Artist painting portrait on canvas in studio"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "commission",
+          "price": 150.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "Starting at EUR 150 for 30x40cm. 50x70cm = EUR 280. 100x80cm = EUR 450. 50% deposit upfront. Revision round included. Shipping available (EU only). Dogs and cats cost the same as humans."
+        }
+      ]
+    },
+    {
+      "owner_slug": "jakes-electronics",
+      "name": "Custom 3D Printed Parts & Prototypes",
+      "slug": "custom-3d-printed-parts-prototypes",
+      "description": "Send me your STL file or describe what you need, and I'll print it. PLA, PETG, or TPU materials. Max build volume 220x220x250mm. Perfect for replacement parts, enclosures, brackets, prototypes, or that weird adapter nobody sells. I can also design the part if you send dimensions and sketches.",
+      "content_language": "en",
+      "item_type": "made_to_order",
+      "category": "custom_orders",
+      "subcategory": "3d_printing",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1631558135610-f6af11d60e7c?w=800&h=600&fit=crop&q=80",
+          "alt_text": "3D printer creating custom part"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "commission",
+          "price": 5.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "Starting EUR 5 for simple parts. Price based on material + print time. Design service EUR 15/hour if you need me to model it. Rush jobs (24h) +50%. Send STL for instant quote."
+        }
+      ]
+    },
+    {
+      "owner_slug": "marias-garden",
+      "name": "Progettazione giardino su misura",
+      "slug": "progettazione-giardino-su-misura",
+      "description": "Disegno il vostro giardino dei sogni: piante mediterranee, irrigazione efficiente, spazi per mangiare all'aperto, orto produttivo. Lavoro con quello che avete -- non serve ricominciare da zero. Prima visita per capire il terreno, l'esposizione, e i vostri desideri. Poi un progetto su carta con lista piante e costi.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "custom_orders",
+      "subcategory": "garden_design",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Mediterranean garden design with stone paths and herbs"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "commission",
+          "price": 80.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "Visita + progetto completo EUR 80 (giardini fino a 100mq). Giardini grandi: da concordare. Realizzazione del giardino: preventivo separato dopo il progetto. Posso anche solo consigliarvi le piante giuste per EUR 30 (1 ora al telefono con foto)."
+        },
+        {
+          "listing_type": "service",
+          "price": 30.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "Consulenza telefonica con foto: EUR 30/ora. Vi dico cosa piantare, quando, e come curarlo. Niente visite, solo consigli pratici."
+        }
+      ]
+    },
+    {
+      "owner_slug": "sallys-kitchen",
+      "name": "Custom Sicilian Pastries for Events",
+      "slug": "custom-sicilian-pastries-events",
+      "description": "Handmade Sicilian pastries for your event: cannoli (ricotta or pistachio), cassatelle, iris, frutta di Martorana, buccellato. Minimum order 20 pieces. Made fresh the morning of your event. Everything from scratch, no shortcuts -- real sheep's milk ricotta, hand-rolled shells, Bronte pistachios.",
+      "content_language": "en",
+      "item_type": "made_to_order",
+      "category": "custom_orders",
+      "subcategory": "catering",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Assortment of Sicilian cannoli and pastries on display"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "commission",
+          "price": 3.5,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "EUR 3.50 per piece (cannoli, cassatelle). Minimum 20 pieces = EUR 70. Frutta di Martorana EUR 5/piece. Order 3 days in advance. Pickup from my kitchen or delivery within Trapani EUR 10. Large orders (100+) = 10% discount."
+        }
+      ]
+    },
+    {
+      "owner_slug": "angel-hq",
+      "name": "Garden Maintenance & Cleanup -- The Full Day Crew",
+      "slug": "garden-maintenance-cleanup-full-crew",
+      "description": "Two guys, shovels, wheelbarrow, hedge trimmer, leaf blower. We show up, we work, we clean up. Garden cleanup, hedge trimming, weed removal, basic landscaping, green waste hauling. No fancy quotes -- minimum EUR 200 covers 1 hour travel + 3 hours work for 2 workers. Need us longer? EUR 30/hour per worker after that. We bring the tools, you point at what needs doing.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "garden",
+      "subcategory": "maintenance",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Garden workers with wheelbarrow doing yard cleanup"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 200.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "MINIMUM EUR 200 = 2 workers, 1hr travel + 3hrs work. Extra hours EUR 30/worker/hr. Green waste removal EUR 40/trailer load. We quote via photos first -- send pics of your garden via WhatsApp, we tell you how long it'll take. Consultation visit EUR 50 (refunded if you hire us). Don't waste our time and we won't waste yours."
+        }
+      ]
+    },
+    {
+      "owner_slug": "mikes-garage",
+      "name": "Interior Painting Service -- Rooms & Apartments",
+      "slug": "interior-painting-service-rooms",
+      "description": "Interior painting: walls, ceilings, doors, window frames. Prep work included (filling holes, sanding, masking). I bring drop cloths, rollers, brushes. You buy the paint (I'll tell you exactly what and how much). Clean lines, no drips, furniture moved and protected. 30 years of doing my own house -- time to do yours.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "home_improvement",
+      "subcategory": "painting",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Person painting interior wall with roller"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 150.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "EUR 150 per standard room (up to 15 sqm walls). Ceiling +EUR 50. Multiple rooms: 10% off after 3rd room. Full apartment quote via photos. Minimum job EUR 150. Paint NOT included -- I'll send you the shopping list. Weekend jobs +20%."
+        }
+      ]
+    },
+    {
+      "owner_slug": "ninos-campers",
+      "name": "Servizio traslochi -- squadra da 2-3 persone",
+      "slug": "servizio-traslochi-squadra",
+      "description": "Traslochi locali a Trapani e provincia. Squadra di 2-3 persone con furgone, cinghie, coperte, carrello. Smontiamo mobili, li carichiamo, li trasportiamo, li rimontiamo. 10 anni di esperienza -- sappiamo come portare un armadio per le scale strette del centro storico senza graffiare niente.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "home_improvement",
+      "subcategory": "moving",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Moving team carrying furniture into van"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 250.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "MINIMO EUR 250 = 2 uomini + furgone, 4 ore (carico + trasporto + scarico). Terzo uomo +EUR 25/ora. Oltre le 4 ore: EUR 35/ora per uomo. Smontaggio/rimontaggio mobili incluso. Scala senza ascensore: +EUR 10/piano. Preventivo gratuito via foto degli ambienti."
+        }
+      ]
+    },
+    {
+      "owner_slug": "johns-cleaning",
+      "name": "Deep Cleaning Service -- Move-In/Move-Out",
+      "slug": "deep-cleaning-service-move-in-out",
+      "description": "Professional deep cleaning for apartments and houses. Move-in, move-out, post-renovation, or just because it's been too long. Every surface: kitchen (oven, fridge inside), bathroom (grout, limescale), floors (mop + wax), windows, baseboards. I bring all products and equipment. You come back to a place that smells like new.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "cleaning",
+      "subcategory": "deep_clean",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Professional deep cleaning service in modern apartment"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 120.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "EUR 120 for apartment up to 60 sqm. EUR 180 up to 100 sqm. EUR 250 for full house. Products included. Windows +EUR 5 each. Post-renovation cleanup +30% (dust is evil). Keys or be home -- I need 4-6 hours uninterrupted."
+        }
+      ]
+    },
+    {
+      "owner_slug": "johns-cleaning",
+      "name": "Pressure Washing Service -- Patios, Driveways, Walls",
+      "slug": "pressure-washing-service-patios",
+      "description": "High-pressure washing for patios, driveways, garden walls, pool surrounds, and exterior surfaces. Karcher K5 professional with surface cleaner attachment. Removes years of dirt, moss, algae, and black marks. The before-and-after will blow your mind. I bring the machine, you provide the water tap.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "cleaning",
+      "subcategory": "exterior",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Pressure washing stone patio clean"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 3.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "EUR 3 per square meter. Minimum job EUR 60 (20 sqm). Driveway average EUR 90-150. Send photos for exact quote. I need access to a water tap and power outlet. Best results on stone, concrete, tile. Not suitable for wood decking."
+        }
+      ]
+    },
+    {
+      "owner_slug": "mikes-garage",
+      "name": "Handyman by the Hour -- General Home Repairs",
+      "slug": "handyman-by-the-hour-general",
+      "description": "Jack of all trades, master of getting things done. Shelf mounting, door repair, lock changes, curtain rails, TV wall mounts, furniture assembly, small electrical (light switches, outlets), minor plumbing. If it takes less than a day and doesn't need a licensed specialist, I can probably fix it.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "home_improvement",
+      "subcategory": "handyman",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Handyman with toolbelt fixing shelves on wall"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 25.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "Minimum 2 hours (EUR 50). I bring basic tools. Specialized parts/materials at cost. List your jobs in advance so I bring the right tools -- one trip, multiple fixes, best value. Weekends: EUR 30/hour."
+        }
+      ]
+    },
+    {
+      "owner_slug": "daves-sports",
+      "name": "Kayak Tandem -- Explore the Coast",
+      "slug": "kayak-tandem-explore-coast",
+      "description": "Sit-on-top tandem kayak (2 person). Stable, easy to paddle, great for exploring the coast between Trapani and San Vito. Includes 2 paddles, 2 life vests, dry bag, and a basic map of good spots. I'll meet you at the beach and show you how to launch.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "water_sports",
+      "subcategory": "kayak",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Tandem kayak on clear Mediterranean water"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 30.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 50.0,
+          "notes": "Full day rental. Pickup/return at Lido beach. Weekly rate EUR 150. I'll deliver to other beaches within 20km for EUR 15. Life vests mandatory -- non-negotiable."
+        }
+      ]
+    },
+    {
+      "owner_slug": "lunas-studio",
+      "name": "Pottery Wheel Session -- Make Your Own",
+      "slug": "pottery-wheel-session-make-your-own",
+      "description": "Hands-on pottery session on a professional electric wheel. I'll teach you centering, pulling, and shaping. You make 2-3 pieces (bowl, cup, vase) and I fire them in my kiln. Pick them up glazed and finished 2 weeks later. Great date activity, great rainy day activity, great any day activity.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "art",
+      "subcategory": "pottery",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Hands shaping clay on pottery wheel"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "training",
+          "price": 40.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "2-hour session. Clay, glazing, and firing included. Max 2 people per session. Finished pieces ready in 2 weeks. Couples session EUR 70 (2 people). Wear clothes you don't mind getting dirty."
+        }
+      ]
     }
   ],
   "teams": [

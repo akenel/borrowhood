@@ -439,3 +439,90 @@ async def seed_database(db: AsyncSession) -> dict:
     await db.commit()
     logger.info("Seed data loaded: %s", counts)
     return counts
+
+
+async def seed_new_items(db: AsyncSession) -> dict:
+    """Add any items from seed.json that don't already exist (by slug).
+
+    Safe to call on every startup -- only inserts missing items.
+    Preserves all existing data (bugs, rentals, reviews, favorites).
+    """
+    with open(SEED_FILE) as f:
+        data = json.load(f)
+
+    # Build user lookup by slug
+    result = await db.execute(select(BHUser))
+    all_users = result.scalars().all()
+    user_map = {u.slug: u for u in all_users}
+
+    if not user_map:
+        logger.info("No users in DB -- run full seed first")
+        return {"status": "no_users"}
+
+    # Get existing item slugs
+    result = await db.execute(select(BHItem.slug))
+    existing_slugs = {row[0] for row in result.all()}
+
+    added = 0
+    for item_data in data["items"]:
+        if item_data["slug"] in existing_slugs:
+            continue
+
+        owner = user_map.get(item_data["owner_slug"])
+        if not owner:
+            logger.warning("Owner %s not found, skipping item %s", item_data["owner_slug"], item_data["name"])
+            continue
+
+        item = BHItem(
+            owner_id=owner.id,
+            name=item_data["name"],
+            slug=item_data["slug"],
+            description=item_data.get("description"),
+            story=item_data.get("story"),
+            content_language=item_data.get("content_language", "en"),
+            item_type=_enum_val(ItemType, item_data["item_type"]),
+            category=item_data["category"],
+            subcategory=item_data.get("subcategory"),
+            condition=_enum_val(ItemCondition, item_data.get("condition")),
+            brand=item_data.get("brand"),
+            model=item_data.get("model"),
+            needs_equipment=item_data.get("needs_equipment"),
+            compatible_with=item_data.get("compatible_with"),
+            latitude=owner.latitude,
+            longitude=owner.longitude,
+        )
+        db.add(item)
+        await db.flush()
+
+        for media in item_data.get("media", []):
+            db.add(BHItemMedia(
+                item_id=item.id,
+                media_type=_enum_val(MediaType, media["media_type"]),
+                url=media["url"],
+                alt_text=media["alt_text"],
+            ))
+
+        for listing in item_data.get("listings", []):
+            db.add(BHListing(
+                item_id=item.id,
+                listing_type=_enum_val(ListingType, listing["listing_type"]),
+                status=ListingStatus.ACTIVE,
+                price=listing.get("price"),
+                price_unit=listing.get("price_unit"),
+                currency=listing.get("currency", "EUR"),
+                deposit=listing.get("deposit"),
+                min_rental_days=listing.get("min_rental_days"),
+                max_rental_days=listing.get("max_rental_days"),
+                delivery_available=listing.get("delivery_available", False),
+                pickup_only=listing.get("pickup_only", True),
+                notes=listing.get("notes"),
+            ))
+
+        added += 1
+        logger.info("Seeded new item: %s", item_data["slug"])
+
+    if added:
+        await db.commit()
+
+    logger.info("Incremental seed: %d new items added (%d already existed)", added, len(existing_slugs))
+    return {"new_items": added, "existing_items": len(existing_slugs)}

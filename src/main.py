@@ -13,11 +13,11 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
-from src.database import create_tables, get_db
+from src.database import async_session, create_tables, get_db
 from src.routers import ai, auth, badges, bids, deposits, disputes, health, helpboard, items, listings, lockbox, notifications, onboarding, pages, payments, rentals, reports, reviews, users
 from src.routers import qa as qa_router_mod
 from src.routers import backlog as backlog_router_mod
-from src.services.seeding import seed_database
+from src.services.seeding import seed_database, seed_new_items
 from src.services.qa_seeding import seed_qa_checklist
 from src.services.backlog_seeding import seed_backlog_data
 
@@ -99,6 +99,11 @@ def create_app() -> FastAPI:
         if settings.debug:
             await create_tables()
             logger.info("Database tables created/verified")
+            # Add any new items from seed.json that don't exist yet
+            from sqlalchemy.ext.asyncio import AsyncSession
+            async with async_session() as db:
+                result = await seed_new_items(db)
+                logger.info("Incremental seed check: %s", result)
 
     @app.on_event("shutdown")
     async def shutdown():
