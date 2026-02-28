@@ -533,7 +533,8 @@
     "free_hint": "This item is free. First to claim gets it.",
     "approved": "Approved! Go pick it up.",
     "completed": "Giveaway complete",
-    "badge_generous": "Generous Neighbor"
+    "badge_generous": "Generous Neighbor",
+    "login_to_claim": "Log In to Claim"
   },
   "footer": {
     "tagline": "Free as in freedom. Open source. No platform fees. Forever.",

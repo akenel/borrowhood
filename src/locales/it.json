@@ -533,7 +533,8 @@
     "free_hint": "Questo oggetto è gratis. Il primo che lo richiede lo ottiene.",
     "approved": "Approvato! Vai a ritirarlo.",
     "completed": "Regalo completato",
-    "badge_generous": "Vicino Generoso"
+    "badge_generous": "Vicino Generoso",
+    "login_to_claim": "Accedi per Richiedere"
   },
   "footer": {
     "tagline": "Libero come la libertà. Open source. Nessuna commissione. Per sempre.",

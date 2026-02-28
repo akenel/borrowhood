@@ -375,7 +375,7 @@
                 {% else %}
                 <a href="/login"
                    class="w-full flex items-center justify-center px-6 py-3 {{ 'bg-green-600 hover:bg-green-700 focus:ring-green-500' if is_giveaway.val else 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500' }} text-white font-semibold rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors min-h-[44px]">
-                    {{ t('item.login_to_rent') }}
+                    {{ t('giveaway.login_to_claim') if is_giveaway.val else t('item.login_to_rent') }}
                 </a>
                 {% endif %}
                 {% if item.owner and item.owner.telegram_username %}
