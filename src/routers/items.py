@@ -4,10 +4,13 @@ Public reads, auth-gated writes. Items belong to the authenticated user.
 Slug auto-generated from name via python-slugify.
 """
 
+import os
+import uuid as uuid_mod
+from pathlib import Path
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from pydantic import BaseModel, Field
 from slugify import slugify
 from sqlalchemy import select, func
@@ -16,10 +19,14 @@ from sqlalchemy.orm import selectinload
 
 from src.database import get_db
 from src.dependencies import require_auth
-from src.models.item import BHItem, BHItemMedia
+from src.models.item import BHItem, BHItemMedia, MediaType
 from src.models.listing import BHListing, ListingStatus
 from src.models.user import BHUser
 from src.schemas.item import ItemCreate, ItemOut, ItemUpdate
+
+UPLOAD_DIR = Path(__file__).resolve().parent.parent / "static" / "uploads"
+ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 
 router = APIRouter(prefix="/api/v1/items", tags=["items"])
 
@@ -247,6 +254,58 @@ async def add_item_media(
         url=data.url,
         alt_text=data.alt_text,
         media_type=MediaType(data.media_type) if data.media_type in [e.value for e in MediaType] else MediaType.PHOTO,
+        sort_order=0,
+    )
+    db.add(media)
+    await db.commit()
+    await db.refresh(media)
+    return media
+
+
+@router.post("/{item_id}/upload", response_model=MediaOut, status_code=201)
+async def upload_item_image(
+    item_id: UUID,
+    file: UploadFile = File(...),
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Upload an image file for an item. Only the owner can upload."""
+    if file.content_type not in ALLOWED_TYPES:
+        raise HTTPException(status_code=400, detail="File must be JPEG, PNG, WebP, or GIF")
+
+    user = await _get_user(db, token["sub"])
+
+    result = await db.execute(
+        select(BHItem)
+        .where(BHItem.id == item_id)
+        .where(BHItem.deleted_at.is_(None))
+    )
+    item = result.scalars().first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    if item.owner_id != user.id:
+        raise HTTPException(status_code=403, detail="Not your item")
+
+    # Read and validate file size
+    contents = await file.read()
+    if len(contents) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="File too large (max 10 MB)")
+
+    # Save to disk
+    ext = file.filename.rsplit(".", 1)[-1].lower() if file.filename and "." in file.filename else "jpg"
+    if ext not in ("jpg", "jpeg", "png", "webp", "gif"):
+        ext = "jpg"
+    filename = f"{uuid_mod.uuid4().hex}.{ext}"
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    filepath = UPLOAD_DIR / filename
+    filepath.write_bytes(contents)
+
+    # Create media record
+    media = BHItemMedia(
+        item_id=item.id,
+        url=f"/static/uploads/{filename}",
+        alt_text=f"{item.name} photo",
+        media_type=MediaType.PHOTO,
         sort_order=0,
     )
     db.add(media)

@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+
+{% block title %}Backlog - {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+     x-data="backlogBoard()"
+     x-init="loadAll()">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Backlog Board</h1>
+            <p class="text-sm text-gray-500 mt-1">Track all BorrowHood work items</p>
+        </div>
+        <button @click="showCreateModal = true"
+                class="mt-4 sm:mt-0 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px]">
+            New Item
+        </button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
+            <p class="text-2xl font-bold text-gray-900" x-text="summary.total">0</p>
+            <p class="text-xs text-gray-500 mt-1">Total</p>
+        </div>
+        <div class="bg-white rounded-lg border border-amber-200 p-4 text-center">
+            <p class="text-2xl font-bold text-amber-600" x-text="summary.pending">0</p>
+            <p class="text-xs text-gray-500 mt-1">Pending</p>
+        </div>
+        <div class="bg-white rounded-lg border border-blue-200 p-4 text-center">
+            <p class="text-2xl font-bold text-blue-600" x-text="summary.in_progress">0</p>
+            <p class="text-xs text-gray-500 mt-1">In Progress</p>
+        </div>
+        <div class="bg-white rounded-lg border border-red-200 p-4 text-center">
+            <p class="text-2xl font-bold text-red-600" x-text="summary.blocked">0</p>
+            <p class="text-xs text-gray-500 mt-1">Blocked</p>
+        </div>
+        <div class="bg-white rounded-lg border border-emerald-200 p-4 text-center">
+            <p class="text-2xl font-bold text-emerald-600" x-text="summary.done">0</p>
+            <p class="text-xs text-gray-500 mt-1">Done</p>
+        </div>
+    </div>
+
+    <!-- View Toggle -->
+    <div class="flex border-b border-gray-200 mb-6">
+        <button @click="view = 'board'"
+                :class="view === 'board' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                class="px-4 py-3 text-sm font-medium border-b-2 transition-colors min-h-[44px]">Board</button>
+        <button @click="view = 'list'"
+                :class="view === 'list' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                class="px-4 py-3 text-sm font-medium border-b-2 transition-colors min-h-[44px]">List</button>
+    </div>
+
+    <!-- Kanban Board View -->
+    <div x-show="view === 'board'" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <template x-for="col in ['pending', 'in_progress', 'blocked', 'done']" :key="col">
+            <div class="bg-gray-50 rounded-lg p-3 min-h-[200px]">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide"
+                    :class="{
+                        'text-amber-700': col === 'pending',
+                        'text-blue-700': col === 'in_progress',
+                        'text-red-700': col === 'blocked',
+                        'text-emerald-700': col === 'done'
+                    }"
+                    x-text="col.replace('_', ' ')"></h3>
+                <div class="space-y-2">
+                    <template x-for="item in items.filter(i => i.status === col)" :key="item.id">
+                        <div @click="openDetail(item)"
+                             class="bg-white rounded-lg border border-gray-200 p-3 cursor-pointer hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-mono text-gray-400" x-text="'BL-' + String(item.item_number).padStart(3, '0')"></span>
+                                <span class="px-1.5 py-0.5 text-[10px] font-medium rounded-full"
+                                      :class="{
+                                          'bg-red-100 text-red-700': item.priority === 'critical',
+                                          'bg-orange-100 text-orange-700': item.priority === 'high',
+                                          'bg-yellow-100 text-yellow-700': item.priority === 'medium',
+                                          'bg-gray-100 text-gray-600': item.priority === 'low'
+                                      }"
+                                      x-text="item.priority"></span>
+                            </div>
+                            <p class="text-sm font-medium text-gray-900 line-clamp-2" x-text="item.title"></p>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="text-[10px] px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded"
+                                      x-text="item.item_type.replace('_', ' ')"></span>
+                                <span x-show="item.assigned_to" class="text-[10px] text-gray-400" x-text="item.assigned_to"></span>
+                            </div>
+                        </div>
+                    </template>
+                    <p x-show="items.filter(i => i.status === col).length === 0"
+                       class="text-xs text-gray-400 text-center py-4">Empty</p>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <!-- List View -->
+    <div x-show="view === 'list'" x-cloak>
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Type</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Priority</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Assigned</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <template x-for="item in items" :key="item.id">
+                        <tr @click="openDetail(item)" class="hover:bg-gray-50 cursor-pointer">
+                            <td class="px-4 py-3 text-xs font-mono text-gray-400" x-text="'BL-' + String(item.item_number).padStart(3, '0')"></td>
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900" x-text="item.title"></td>
+                            <td class="px-4 py-3 text-xs text-gray-500 hidden sm:table-cell" x-text="item.item_type.replace('_', ' ')"></td>
+                            <td class="px-4 py-3">
+                                <span class="px-2 py-0.5 text-xs font-medium rounded-full"
+                                      :class="{
+                                          'bg-amber-100 text-amber-700': item.status === 'pending',
+                                          'bg-blue-100 text-blue-700': item.status === 'in_progress',
+                                          'bg-red-100 text-red-700': item.status === 'blocked',
+                                          'bg-emerald-100 text-emerald-700': item.status === 'done',
+                                          'bg-gray-100 text-gray-500': item.status === 'archived'
+                                      }"
+                                      x-text="item.status.replace('_', ' ')"></span>
+                            </td>
+                            <td class="px-4 py-3 hidden md:table-cell">
+                                <span class="px-2 py-0.5 text-xs font-medium rounded-full"
+                                      :class="{
+                                          'bg-red-100 text-red-700': item.priority === 'critical',
+                                          'bg-orange-100 text-orange-700': item.priority === 'high',
+                                          'bg-yellow-100 text-yellow-700': item.priority === 'medium',
+                                          'bg-gray-100 text-gray-600': item.priority === 'low'
+                                      }"
+                                      x-text="item.priority"></span>
+                            </td>
+                            <td class="px-4 py-3 text-xs text-gray-500 hidden md:table-cell" x-text="item.assigned_to || '-'"></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Item Detail Modal -->
+    <div x-show="selectedItem" x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+         @click.self="selectedItem = null">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6" x-show="selectedItem">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold text-gray-900">
+                        <span class="text-indigo-600 font-mono" x-text="'BL-' + String(selectedItem?.item_number || 0).padStart(3, '0')"></span>
+                        <span x-text="selectedItem?.title"></span>
+                    </h2>
+                    <button @click="selectedItem = null" class="text-gray-400 hover:text-gray-600 min-h-[44px] min-w-[44px] flex items-center justify-center">&times;</button>
+                </div>
+
+                <p class="text-sm text-gray-600 mb-4" x-text="selectedItem?.description || 'No description'"></p>
+
+                <!-- Quick Status Buttons -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button @click="quickStatus('pending')"
+                            :class="selectedItem?.status === 'pending' ? 'bg-amber-600 text-white' : 'bg-amber-50 text-amber-700 hover:bg-amber-100'"
+                            class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors">Pending</button>
+                    <button @click="quickStatus('in_progress')"
+                            :class="selectedItem?.status === 'in_progress' ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100'"
+                            class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors">In Progress</button>
+                    <button @click="quickStatus('blocked')"
+                            :class="selectedItem?.status === 'blocked' ? 'bg-red-600 text-white' : 'bg-red-50 text-red-700 hover:bg-red-100'"
+                            class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors">Blocked</button>
+                    <button @click="quickStatus('done')"
+                            :class="selectedItem?.status === 'done' ? 'bg-emerald-600 text-white' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'"
+                            class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors">Done</button>
+                </div>
+
+                <!-- Item Meta -->
+                <div class="grid grid-cols-2 gap-3 text-xs text-gray-500 mb-4 bg-gray-50 rounded-lg p-3">
+                    <div>Type: <span class="font-medium text-gray-700" x-text="selectedItem?.item_type?.replace('_', ' ')"></span></div>
+                    <div>Priority: <span class="font-medium text-gray-700" x-text="selectedItem?.priority"></span></div>
+                    <div>Assigned: <span class="font-medium text-gray-700" x-text="selectedItem?.assigned_to || 'Unassigned'"></span></div>
+                    <div>Created: <span class="font-medium text-gray-700" x-text="selectedItem?.created_at ? new Date(selectedItem.created_at).toLocaleDateString() : ''"></span></div>
+                </div>
+
+                <!-- Tags -->
+                <div x-show="selectedItem?.tags" class="mb-4">
+                    <template x-for="tag in (selectedItem?.tags || '').split(',')" :key="tag">
+                        <span class="inline-block px-2 py-0.5 text-[10px] bg-gray-100 text-gray-600 rounded mr-1 mb-1" x-text="tag.trim()"></span>
+                    </template>
+                </div>
+
+                <!-- Activity Trail -->
+                <div class="border-t border-gray-200 pt-4">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Activity</h3>
+                    <div class="space-y-2 max-h-48 overflow-y-auto">
+                        <template x-for="a in activities" :key="a.id">
+                            <div class="text-xs text-gray-500 flex items-start space-x-2 py-1">
+                                <span class="font-medium text-gray-700 flex-shrink-0" x-text="a.actor"></span>
+                                <span x-show="a.activity_type === 'status_change'">
+                                    changed status <span class="font-medium" x-text="a.old_value"></span> &rarr; <span class="font-medium" x-text="a.new_value"></span>
+                                </span>
+                                <span x-show="a.activity_type === 'priority_change'">
+                                    changed priority <span class="font-medium" x-text="a.old_value"></span> &rarr; <span class="font-medium" x-text="a.new_value"></span>
+                                </span>
+                                <span x-show="a.activity_type === 'assigned'">
+                                    assigned to <span class="font-medium" x-text="a.new_value || 'nobody'"></span>
+                                </span>
+                                <span x-show="a.activity_type === 'comment'" x-text="a.comment"></span>
+                                <span class="text-gray-400 flex-shrink-0" x-text="new Date(a.created_at).toLocaleString()"></span>
+                            </div>
+                        </template>
+                        <p x-show="activities.length === 0" class="text-xs text-gray-400">No activity yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Item Modal -->
+    <div x-show="showCreateModal" x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+         @click.self="showCreateModal = false">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold text-gray-900">New Backlog Item</h2>
+                    <button @click="showCreateModal = false" class="text-gray-400 hover:text-gray-600 min-h-[44px] min-w-[44px] flex items-center justify-center">&times;</button>
+                </div>
+                <form @submit.prevent="createItem()">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                            <input x-model="newItem.title" type="text" required minlength="3" maxlength="200"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <textarea x-model="newItem.description" rows="3"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                                <select x-model="newItem.item_type"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="dev_task">Dev Task</option>
+                                    <option value="bug_fix">Bug Fix</option>
+                                    <option value="feature">Feature</option>
+                                    <option value="improvement">Improvement</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                                <select x-model="newItem.priority"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
+                                <input x-model="newItem.assigned_to" type="text"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                                <input x-model="newItem.tags" type="text" placeholder="comma, separated"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button type="button" @click="showCreateModal = false"
+                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">Cancel</button>
+                        <button type="submit"
+                                class="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 min-h-[44px]">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function backlogBoard() {
+    return {
+        view: 'board',
+        summary: { total: 0, pending: 0, in_progress: 0, blocked: 0, done: 0, archived: 0 },
+        items: [],
+        selectedItem: null,
+        activities: [],
+        showCreateModal: false,
+        newItem: { title: '', description: '', item_type: 'dev_task', priority: 'medium', assigned_to: '', tags: '', created_by: '{{ user.get("preferred_username", "Angel") if user else "Angel" }}' },
+
+        async api(url, options = {}) {
+            const r = await fetch(url, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers } });
+            if (!r.ok) throw new Error(`API error: ${r.status}`);
+            return r.json();
+        },
+
+        async loadAll() {
+            try {
+                const [s, i] = await Promise.all([
+                    this.api('/api/v1/backlog/summary'),
+                    this.api('/api/v1/backlog/items'),
+                ]);
+                this.summary = s;
+                this.items = i;
+            } catch (e) {
+                console.error('Failed to load backlog data:', e);
+            }
+        },
+
+        async openDetail(item) {
+            this.selectedItem = item;
+            try {
+                this.activities = await this.api(`/api/v1/backlog/items/${item.id}/activities`);
+            } catch (e) {
+                this.activities = [];
+            }
+        },
+
+        async quickStatus(newStatus) {
+            if (!this.selectedItem) return;
+            try {
+                const actor = '{{ user.get("preferred_username", "Angel") if user else "Angel" }}';
+                const updated = await this.api(`/api/v1/backlog/items/${this.selectedItem.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ status: newStatus, actor }),
+                });
+                this.selectedItem = updated;
+                await this.loadAll();
+                this.activities = await this.api(`/api/v1/backlog/items/${this.selectedItem.id}/activities`);
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: `Status changed to ${newStatus.replace('_', ' ')}` } }));
+            } catch (e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Failed to update status' } }));
+            }
+        },
+
+        async createItem() {
+            try {
+                await this.api('/api/v1/backlog/items', {
+                    method: 'POST',
+                    body: JSON.stringify(this.newItem),
+                });
+                this.showCreateModal = false;
+                this.newItem = { title: '', description: '', item_type: 'dev_task', priority: 'medium', assigned_to: '', tags: '', created_by: this.newItem.created_by };
+                await this.loadAll();
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Item created!' } }));
+            } catch (e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Failed to create item' } }));
+            }
+        },
+    };
+}
+</script>
+{% endblock %}

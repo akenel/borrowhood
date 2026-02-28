@@ -282,3 +282,30 @@ def generate_image_url(name: str, category: str) -> str:
     prompt = f"Professional product photo of {name}, {category} category, clean white background, studio lighting, marketplace listing photo, high quality"
     encoded = quote(prompt)
     return f"https://image.pollinations.ai/prompt/{encoded}?width=800&height=600&nologo=true"
+
+
+async def ensure_item_has_image(db, item_id, name: str, category: str):
+    """Auto-generate a Pollinations image if item has no media.
+
+    Called after item creation so items NEVER appear without a picture.
+    """
+    from sqlalchemy import select, func
+    from src.models.item import BHItemMedia, MediaType
+
+    count = await db.scalar(
+        select(func.count(BHItemMedia.id)).where(BHItemMedia.item_id == item_id)
+    )
+    if count and count > 0:
+        return  # Item already has at least one image
+
+    image_url = generate_image_url(name, category)
+    media = BHItemMedia(
+        item_id=item_id,
+        url=image_url,
+        alt_text=f"{name} - AI generated preview",
+        media_type=MediaType.PHOTO,
+        sort_order=0,
+    )
+    db.add(media)
+    await db.flush()
+    logger.info(f"Auto-generated AI image for item {item_id}")

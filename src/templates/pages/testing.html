@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block title %}QA Dashboard - {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+     x-data="qaDashboard()"
+     x-init="loadAll()">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">QA Testing Dashboard</h1>
+            <p class="text-sm text-gray-500 mt-1">BorrowHood Test Checklist</p>
+        </div>
+        <div class="flex space-x-3 mt-4 sm:mt-0">
+            <button @click="showBugModal = true"
+                    class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition-colors min-h-[44px]">
+                Report Bug
+            </button>
+            <button @click="resetTests()"
+                    class="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300 transition-colors min-h-[44px]">
+                Reset All
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
+            <p class="text-2xl font-bold text-gray-900" x-text="summary.total_tests">0</p>
+            <p class="text-xs text-gray-500 mt-1">Total Tests</p>
+        </div>
+        <div class="bg-white rounded-lg border border-emerald-200 p-4 text-center">
+            <p class="text-2xl font-bold text-emerald-600" x-text="summary.passed">0</p>
+            <p class="text-xs text-gray-500 mt-1">Passed</p>
+        </div>
+        <div class="bg-white rounded-lg border border-red-200 p-4 text-center">
+            <p class="text-2xl font-bold text-red-600" x-text="summary.failed">0</p>
+            <p class="text-xs text-gray-500 mt-1">Failed</p>
+        </div>
+        <div class="bg-white rounded-lg border border-amber-200 p-4 text-center">
+            <p class="text-2xl font-bold text-amber-600" x-text="summary.pending">0</p>
+            <p class="text-xs text-gray-500 mt-1">Pending</p>
+        </div>
+        <div class="bg-white rounded-lg border border-purple-200 p-4 text-center">
+            <p class="text-2xl font-bold text-purple-600" x-text="summary.open_bugs">0</p>
+            <p class="text-xs text-gray-500 mt-1">Open Bugs</p>
+        </div>
+    </div>
+
+    <!-- Overall Progress Bar -->
+    <div class="bg-white rounded-lg border border-gray-200 p-4 mb-8">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-medium text-gray-700">Overall Progress</span>
+            <span class="text-sm font-semibold text-indigo-600" x-text="summary.percent_complete + '%'">0%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-3">
+            <div class="h-3 rounded-full bg-indigo-600 transition-all duration-500"
+                 :style="'width: ' + summary.percent_complete + '%'"></div>
+        </div>
+    </div>
+
+    <!-- Tabs: Tests | Bugs -->
+    <div class="flex border-b border-gray-200 mb-6">
+        <button @click="activeTab = 'tests'"
+                :class="activeTab === 'tests' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                class="px-4 py-3 text-sm font-medium border-b-2 transition-colors min-h-[44px]">
+            Test Checklist
+        </button>
+        <button @click="activeTab = 'bugs'"
+                :class="activeTab === 'bugs' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                class="px-4 py-3 text-sm font-medium border-b-2 transition-colors min-h-[44px]">
+            Bug Reports
+            <span x-show="summary.open_bugs > 0" class="ml-1 px-1.5 py-0.5 text-xs bg-red-100 text-red-700 rounded-full" x-text="summary.open_bugs"></span>
+        </button>
+    </div>
+
+    <!-- Tests Tab -->
+    <div x-show="activeTab === 'tests'" x-cloak>
+        <!-- Phase Progress Bars -->
+        <div class="space-y-4 mb-8">
+            <template x-for="phase in phases" :key="phase.phase">
+                <div class="bg-white rounded-lg border border-gray-200 p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-semibold text-gray-900">
+                            <span class="text-indigo-600" x-text="'Phase ' + phase.phase"></span>
+                            <span x-text="' - ' + phase.phase_name"></span>
+                        </span>
+                        <span class="text-xs text-gray-500">
+                            <span x-text="phase.passed" class="text-emerald-600 font-medium"></span>/<span x-text="phase.total"></span>
+                            (<span x-text="phase.percent_complete + '%'"></span>)
+                        </span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-2">
+                        <div class="h-2 rounded-full transition-all duration-500"
+                             :class="phase.failed > 0 ? 'bg-red-500' : 'bg-emerald-500'"
+                             :style="'width: ' + phase.percent_complete + '%'"></div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Test Items List -->
+        <div class="space-y-2">
+            <template x-for="test in tests" :key="test.id">
+                <div class="bg-white rounded-lg border border-gray-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded" x-text="'P' + test.phase"></span>
+                            <span class="text-sm font-medium text-gray-900 truncate" x-text="test.title"></span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1 line-clamp-1" x-text="test.description"></p>
+                    </div>
+                    <div class="flex items-center space-x-2 flex-shrink-0">
+                        <button @click="updateTest(test.id, 'pass')"
+                                :class="test.status === 'pass' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-emerald-100'"
+                                class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors min-h-[32px]">Pass</button>
+                        <button @click="updateTest(test.id, 'fail')"
+                                :class="test.status === 'fail' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-red-100'"
+                                class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors min-h-[32px]">Fail</button>
+                        <button @click="updateTest(test.id, 'skip')"
+                                :class="test.status === 'skip' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-amber-100'"
+                                class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors min-h-[32px]">Skip</button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Bugs Tab -->
+    <div x-show="activeTab === 'bugs'" x-cloak>
+        <div x-show="bugs.length === 0" class="text-center py-12">
+            <p class="text-gray-400 text-sm">No bugs reported yet. That's either great news or nobody's testing.</p>
+        </div>
+        <div class="space-y-3">
+            <template x-for="bug in bugs" :key="bug.id">
+                <div class="bg-white rounded-lg border border-gray-200 p-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+                                <span class="text-xs font-mono font-bold text-gray-500" x-text="'BUG-' + String(bug.bug_number).padStart(3, '0')"></span>
+                                <span class="text-sm font-semibold text-gray-900" x-text="bug.title"></span>
+                                <span class="px-2 py-0.5 text-xs font-medium rounded-full"
+                                      :class="{
+                                          'bg-red-100 text-red-700': bug.severity === 'critical',
+                                          'bg-orange-100 text-orange-700': bug.severity === 'high',
+                                          'bg-yellow-100 text-yellow-700': bug.severity === 'medium',
+                                          'bg-gray-100 text-gray-600': bug.severity === 'low'
+                                      }"
+                                      x-text="bug.severity"></span>
+                                <span class="px-2 py-0.5 text-xs font-medium rounded-full"
+                                      :class="{
+                                          'bg-red-50 text-red-600': bug.status === 'open',
+                                          'bg-blue-50 text-blue-600': bug.status === 'in_progress',
+                                          'bg-emerald-50 text-emerald-600': bug.status === 'fixed',
+                                          'bg-green-50 text-green-700': bug.status === 'verified',
+                                          'bg-gray-50 text-gray-500': bug.status === 'wont_fix'
+                                      }"
+                                      x-text="bug.status.replace('_', ' ')"></span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1 line-clamp-2" x-text="bug.description"></p>
+                            <p class="text-xs text-gray-400 mt-1">
+                                Reported by <span x-text="bug.reported_by" class="font-medium"></span>
+                                <span x-text="' on ' + new Date(bug.created_at).toLocaleDateString()"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Report Bug Modal -->
+    <div x-show="showBugModal" x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+         @click.self="showBugModal = false">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold text-gray-900">Report a Bug</h2>
+                    <button @click="showBugModal = false" class="text-gray-400 hover:text-gray-600 min-h-[44px] min-w-[44px] flex items-center justify-center">&times;</button>
+                </div>
+                <form @submit.prevent="submitBug()">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                            <input x-model="newBug.title" type="text" required minlength="3" maxlength="200"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <textarea x-model="newBug.description" required minlength="10" rows="3"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                      placeholder="What happened? What did you expect?"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Severity</label>
+                                <select x-model="newBug.severity"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                                <select x-model="newBug.category"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="functional">Functional</option>
+                                    <option value="cosmetic">Cosmetic</option>
+                                    <option value="performance">Performance</option>
+                                    <option value="data">Data</option>
+                                    <option value="security">Security</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                            <input x-model="newBug.reported_by" type="text" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button type="button" @click="showBugModal = false"
+                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">Cancel</button>
+                        <button type="submit"
+                                class="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 min-h-[44px]">Submit Bug</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function qaDashboard() {
+    return {
+        activeTab: 'tests',
+        summary: { total_tests: 0, passed: 0, failed: 0, skipped: 0, blocked: 0, pending: 0, percent_complete: 0, total_bugs: 0, open_bugs: 0, critical_bugs: 0 },
+        phases: [],
+        tests: [],
+        bugs: [],
+        showBugModal: false,
+        newBug: { title: '', description: '', severity: 'medium', category: 'functional', reported_by: '{{ user.get("preferred_username", "Tester") if user else "Tester" }}' },
+
+        async api(url, options = {}) {
+            const r = await fetch(url, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers } });
+            if (!r.ok) throw new Error(`API error: ${r.status}`);
+            return r.json();
+        },
+
+        async loadAll() {
+            try {
+                const [s, p, t, b] = await Promise.all([
+                    this.api('/api/v1/testing/summary'),
+                    this.api('/api/v1/testing/phases'),
+                    this.api('/api/v1/testing/tests'),
+                    this.api('/api/v1/testing/bugs'),
+                ]);
+                this.summary = s;
+                this.phases = p;
+                this.tests = t;
+                this.bugs = b;
+            } catch (e) {
+                console.error('Failed to load QA data:', e);
+            }
+        },
+
+        async updateTest(testId, newStatus) {
+            try {
+                const tester = '{{ user.get("preferred_username", "Tester") if user else "Tester" }}';
+                await this.api(`/api/v1/testing/tests/${testId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ status: newStatus, tester_name: tester }),
+                });
+                await this.loadAll();
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: `Test marked as ${newStatus}` } }));
+            } catch (e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Failed to update test' } }));
+            }
+        },
+
+        async resetTests() {
+            if (!confirm('Reset all tests to pending? This cannot be undone.')) return;
+            try {
+                await this.api('/api/v1/testing/tests/reset', { method: 'POST' });
+                await this.loadAll();
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'All tests reset to pending' } }));
+            } catch (e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Failed to reset tests' } }));
+            }
+        },
+
+        async submitBug() {
+            try {
+                await this.api('/api/v1/testing/bugs', {
+                    method: 'POST',
+                    body: JSON.stringify(this.newBug),
+                });
+                this.showBugModal = false;
+                this.newBug = { title: '', description: '', severity: 'medium', category: 'functional', reported_by: this.newBug.reported_by };
+                await this.loadAll();
+                this.activeTab = 'bugs';
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Bug reported!' } }));
+            } catch (e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Failed to submit bug' } }));
+            }
+        },
+    };
+}
+</script>
+{% endblock %}

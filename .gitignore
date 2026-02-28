@@ -43,8 +43,9 @@ Thumbs.db
 # Docker
 docker-compose.override.yml
 
-# Minio uploads (local dev)
-uploads/
+# User uploads (don't commit uploaded images)
+src/static/uploads/*
+!src/static/uploads/.gitkeep
 
 # Test / Coverage
 .coverage

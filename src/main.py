@@ -15,7 +15,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.config import settings
 from src.database import create_tables, get_db
 from src.routers import ai, auth, badges, bids, deposits, disputes, health, items, listings, lockbox, notifications, onboarding, pages, payments, rentals, reviews
+from src.routers import qa as qa_router_mod
+from src.routers import backlog as backlog_router_mod
 from src.services.seeding import seed_database
+from src.services.qa_seeding import seed_qa_checklist
+from src.services.backlog_seeding import seed_backlog_data
 
 # Configure logging
 logging.basicConfig(
@@ -57,6 +61,14 @@ def create_app() -> FastAPI:
     # Auth routers (login/logout/callback)
     app.include_router(auth.router)
 
+    # QA + Backlog API routers
+    app.include_router(qa_router_mod.router)
+    app.include_router(backlog_router_mod.router)
+
+    # QA + Backlog HTML routers
+    app.include_router(qa_router_mod.html_router)
+    app.include_router(backlog_router_mod.html_router)
+
     # Page routers (HTML)
     app.include_router(pages.router)
 
@@ -68,6 +80,9 @@ def create_app() -> FastAPI:
             from fastapi import HTTPException
             raise HTTPException(status_code=403, detail="Seeding disabled in production")
         result = await seed_database(db)
+        await seed_qa_checklist(db)
+        await seed_backlog_data(db)
+        await db.commit()
         return {"status": "ok", "counts": result}
 
     @app.on_event("startup")

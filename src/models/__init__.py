@@ -18,6 +18,8 @@ from src.models.dispute import BHDispute
 from src.models.payment import BHPayment
 from src.models.notification import BHNotification
 from src.models.badge import BHBadge
+from src.models.qa import BHTestResult, BHBugReport, BHBugActivity, BHBugCommit
+from src.models.backlog import BHBacklogItem, BHBacklogActivity
 
 __all__ = [
     "BHUser",
@@ -39,4 +41,10 @@ __all__ = [
     "BHPayment",
     "BHNotification",
     "BHBadge",
+    "BHTestResult",
+    "BHBugReport",
+    "BHBugActivity",
+    "BHBugCommit",
+    "BHBacklogItem",
+    "BHBacklogActivity",
 ]
