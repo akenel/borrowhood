@@ -1530,7 +1530,7 @@
       "item_type": "service",
       "category": "3d_printing",
       "subcategory": "printing_service",
-      "condition": "not_applicable",
+      "condition": null,
       "brand": null,
       "needs_equipment": null,
       "media": [
