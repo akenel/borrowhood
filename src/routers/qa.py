@@ -12,7 +12,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -21,7 +21,7 @@ from src.dependencies import get_current_user_token, require_auth
 from src.i18n import detect_language, get_translator, SUPPORTED_LANGUAGES
 from src.models.qa import (
     BHTestResult, TestStatus,
-    BHBugReport, BugSeverity, BugStatus,
+    BHBugReport, BugSeverity, BugStatus, BugCategory,
     BHBugActivity, BugActivityType,
     BHBugCommit,
 )
@@ -326,14 +326,22 @@ async def create_bug(
 
 @router.get("/bugs", response_model=list[BugReportRead])
 async def list_bugs(
+    q: Optional[str] = None,
     severity: Optional[str] = None,
     status_filter: Optional[str] = None,
     category: Optional[str] = None,
     token: dict = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
-    """List all bug reports, newest first. Filter by severity, status, category."""
+    """List all bug reports, newest first. Filter by severity, status, category. Search by q."""
     query = select(BHBugReport).options(selectinload(BHBugReport.commits))
+
+    if q and q.strip():
+        term = f"%{q.strip()}%"
+        query = query.where(or_(
+            BHBugReport.title.ilike(term),
+            BHBugReport.description.ilike(term),
+        ))
 
     if severity:
         try:

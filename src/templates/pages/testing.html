@@ -131,8 +131,15 @@
     <!-- Bugs Tab -->
     <div x-show="activeTab === 'bugs'" x-cloak>
 
-        <!-- Filter Bar -->
-        <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+        <!-- Search + Filter Bar -->
+        <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4 space-y-3">
+            <!-- Search -->
+            <div class="relative">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" x-model="bugSearch" @input.debounce.300ms="loadBugs()" placeholder="Search bugs by title or description..."
+                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <!-- Filters -->
             <div class="flex flex-col sm:flex-row sm:items-center gap-3">
                 <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Filter</span>
                 <select x-model="bugFilters.severity" @change="loadBugs()"
@@ -161,10 +168,10 @@
                     <option value="data">Data</option>
                     <option value="security">Security</option>
                 </select>
-                <button x-show="bugFilters.severity || bugFilters.status || bugFilters.category"
-                        @click="bugFilters = {severity:'', status:'', category:''}; loadBugs()"
+                <button x-show="bugFilters.severity || bugFilters.status || bugFilters.category || bugSearch"
+                        @click="bugFilters = {severity:'', status:'', category:''}; bugSearch = ''; loadBugs()"
                         class="text-xs text-indigo-600 hover:text-indigo-800 font-medium whitespace-nowrap">
-                    Clear filters
+                    Clear all
                 </button>
                 <span class="ml-auto text-xs text-gray-400" x-text="bugs.length + ' bug' + (bugs.length !== 1 ? 's' : '')"></span>
             </div>
@@ -385,6 +392,54 @@
                                         </button>
                                     </div>
 
+                                    <!-- Assign To -->
+                                    <div class="bg-white rounded-lg border border-gray-200 p-3">
+                                        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Assign To</h4>
+                                        <div class="flex gap-2">
+                                            <input x-model="bugAssignee" type="text" placeholder="Name..."
+                                                   class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                            <button @click="assignBug(bug)"
+                                                    class="px-3 py-1.5 bg-purple-600 text-white text-xs font-medium rounded-md hover:bg-purple-700 transition-colors min-h-[36px]">
+                                                Assign
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Link Commit -->
+                                    <div class="bg-white rounded-lg border border-gray-200 p-3">
+                                        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Link Commit</h4>
+                                        <input x-model="commitSha" type="text" placeholder="SHA (e.g. abc1234)" maxlength="40"
+                                               class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 mb-2">
+                                        <input x-model="commitMessage" type="text" placeholder="Commit message" maxlength="200"
+                                               class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 mb-2">
+                                        <button @click="linkCommit(bug)"
+                                                :disabled="!commitSha.trim()"
+                                                :class="!commitSha.trim() ? 'bg-gray-300 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'"
+                                                class="w-full px-3 py-1.5 text-white text-sm font-medium rounded-md transition-colors min-h-[36px]">
+                                            Link Commit
+                                        </button>
+                                    </div>
+
+                                    <!-- Edit Bug -->
+                                    <div class="bg-white rounded-lg border border-gray-200 p-3">
+                                        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Edit Bug</h4>
+                                        <input x-model="editTitle" type="text" placeholder="Title"
+                                               class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 mb-2">
+                                        <textarea x-model="editDescription" rows="2" placeholder="Description"
+                                                  class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 mb-2"></textarea>
+                                        <select x-model="editSeverity"
+                                                class="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 mb-2">
+                                            <option value="low">Low</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="high">High</option>
+                                            <option value="critical">Critical</option>
+                                        </select>
+                                        <button @click="editBug(bug)"
+                                                class="w-full px-3 py-1.5 bg-amber-600 text-white text-sm font-medium rounded-md hover:bg-amber-700 transition-colors min-h-[36px]">
+                                            Save Changes
+                                        </button>
+                                    </div>
+
                                     <!-- Add Screenshot -->
                                     <div class="bg-white rounded-lg border border-gray-200 p-3">
                                         <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
@@ -498,8 +553,15 @@ function qaDashboard() {
         selectedBug: null,
         bugActivities: [],
         bugFilters: { severity: '', status: '', category: '' },
+        bugSearch: '',
         bugUpdateStatus: 'open',
         bugComment: '',
+        bugAssignee: '',
+        commitSha: '',
+        commitMessage: '',
+        editTitle: '',
+        editDescription: '',
+        editSeverity: 'medium',
 
         async api(url, options = {}) {
             const r = await fetch(url, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers } });
@@ -526,6 +588,7 @@ function qaDashboard() {
         async loadBugs() {
             try {
                 const params = new URLSearchParams();
+                if (this.bugSearch.trim()) params.set('q', this.bugSearch.trim());
                 if (this.bugFilters.severity) params.set('severity', this.bugFilters.severity);
                 if (this.bugFilters.status) params.set('status_filter', this.bugFilters.status);
                 if (this.bugFilters.category) params.set('category', this.bugFilters.category);
@@ -545,6 +608,12 @@ function qaDashboard() {
             this.selectedBug = bug;
             this.bugUpdateStatus = bug.status;
             this.bugComment = '';
+            this.bugAssignee = bug.assigned_to || '';
+            this.commitSha = '';
+            this.commitMessage = '';
+            this.editTitle = bug.title;
+            this.editDescription = bug.description || '';
+            this.editSeverity = bug.severity;
             try {
                 this.bugActivities = await this.api(`/api/v1/testing/bugs/${bug.id}/activities`);
             } catch (e) {
@@ -589,6 +658,73 @@ function qaDashboard() {
                 window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Comment added' } }));
             } catch (e) {
                 window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Failed to add comment' } }));
+            }
+        },
+
+        async assignBug(bug) {
+            try {
+                const actor = '{{ user.get("preferred_username", "Tester") if user else "Tester" }}';
+                await this.api(`/api/v1/testing/bugs/${bug.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ assigned_to: this.bugAssignee || '', actor }),
+                });
+                await this.loadBugs();
+                const updated = this.bugs.find(b => b.id === bug.id);
+                if (updated) {
+                    this.selectedBug = updated;
+                    this.bugActivities = await this.api(`/api/v1/testing/bugs/${bug.id}/activities`);
+                }
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: this.bugAssignee ? `Assigned to ${this.bugAssignee}` : 'Unassigned' } }));
+            } catch (e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Failed to assign bug' } }));
+            }
+        },
+
+        async linkCommit(bug) {
+            if (!this.commitSha.trim()) return;
+            try {
+                const actor = '{{ user.get("preferred_username", "Tester") if user else "Tester" }}';
+                await this.api(`/api/v1/testing/bugs/${bug.id}/commits`, {
+                    method: 'POST',
+                    body: JSON.stringify({ sha: this.commitSha.trim(), message: this.commitMessage || '', actor }),
+                });
+                this.commitSha = '';
+                this.commitMessage = '';
+                await this.loadBugs();
+                const updated = this.bugs.find(b => b.id === bug.id);
+                if (updated) {
+                    this.selectedBug = updated;
+                    this.bugActivities = await this.api(`/api/v1/testing/bugs/${bug.id}/activities`);
+                }
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Commit linked' } }));
+            } catch (e) {
+                const msg = e.message.includes('409') ? 'Commit already linked' : 'Failed to link commit';
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: msg } }));
+            }
+        },
+
+        async editBug(bug) {
+            try {
+                const actor = '{{ user.get("preferred_username", "Tester") if user else "Tester" }}';
+                const payload = { actor };
+                if (this.editTitle !== bug.title) payload.title = this.editTitle;
+                if (this.editDescription !== bug.description) payload.description = this.editDescription;
+                if (this.editSeverity !== bug.severity) payload.severity = this.editSeverity;
+                await this.api(`/api/v1/testing/bugs/${bug.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(payload),
+                });
+                await this.loadBugs();
+                const updated = this.bugs.find(b => b.id === bug.id);
+                if (updated) {
+                    this.selectedBug = updated;
+                    this.editTitle = updated.title;
+                    this.editDescription = updated.description || '';
+                    this.editSeverity = updated.severity;
+                }
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Bug updated' } }));
+            } catch (e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Failed to update bug' } }));
             }
         },
 

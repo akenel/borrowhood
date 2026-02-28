@@ -15,7 +15,7 @@ from src.database import get_db
 from src.dependencies import require_auth
 from src.models.helpboard import BHHelpPost, BHHelpReply, HelpStatus, HelpType
 from src.models.user import BHUser
-from src.schemas.helpboard import HelpPostCreate, HelpPostOut, HelpReplyCreate, HelpReplyOut
+from src.schemas.helpboard import HelpPostCreate, HelpPostOut, HelpReplyCreate, HelpReplyOut, PaginatedPosts
 
 router = APIRouter(prefix="/api/v1/helpboard", tags=["helpboard"])
 
@@ -30,34 +30,71 @@ async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
     return user
 
 
-@router.get("/posts", response_model=list[HelpPostOut])
+@router.get("/posts", response_model=PaginatedPosts)
 async def list_posts(
     help_type: Optional[str] = None,
     category: Optional[str] = None,
     status_filter: Optional[str] = None,
-    limit: int = Query(50, ge=1, le=100),
+    q: Optional[str] = None,
+    sort: str = Query("newest", pattern="^(newest|oldest|most_replies|urgent_first)$"),
+    limit: int = Query(12, ge=1, le=100),
     offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
 ):
-    """List help posts with optional filters. Public endpoint."""
-    query = select(BHHelpPost).where(BHHelpPost.deleted_at.is_(None))
+    """List help posts with optional filters, search, and sort. Public endpoint."""
+    base = select(BHHelpPost).where(BHHelpPost.deleted_at.is_(None))
 
     if help_type:
         try:
-            query = query.where(BHHelpPost.help_type == HelpType(help_type))
+            base = base.where(BHHelpPost.help_type == HelpType(help_type))
         except ValueError:
             pass
     if category:
-        query = query.where(BHHelpPost.category == category)
+        base = base.where(BHHelpPost.category == category)
     if status_filter:
         try:
-            query = query.where(BHHelpPost.status == HelpStatus(status_filter))
+            base = base.where(BHHelpPost.status == HelpStatus(status_filter))
         except ValueError:
             pass
+    if q:
+        search_term = f"%{q}%"
+        base = base.where(
+            BHHelpPost.title.ilike(search_term) | BHHelpPost.body.ilike(search_term)
+        )
 
-    query = query.order_by(BHHelpPost.created_at.desc()).offset(offset).limit(limit)
-    result = await db.execute(query)
-    return result.scalars().all()
+    # Total count with same filters (before limit/offset)
+    count_query = select(func.count()).select_from(base.subquery())
+    total = await db.scalar(count_query) or 0
+
+    # Sorting
+    if sort == "oldest":
+        base = base.order_by(BHHelpPost.created_at.asc())
+    elif sort == "most_replies":
+        base = base.order_by(BHHelpPost.reply_count.desc(), BHHelpPost.created_at.desc())
+    elif sort == "urgent_first":
+        # urgent > normal > low, then newest
+        from sqlalchemy import case
+        urgency_order = case(
+            (BHHelpPost.urgency == "urgent", 0),
+            (BHHelpPost.urgency == "normal", 1),
+            (BHHelpPost.urgency == "low", 2),
+            else_=3,
+        )
+        base = base.order_by(urgency_order, BHHelpPost.created_at.desc())
+    else:  # newest (default)
+        base = base.order_by(BHHelpPost.created_at.desc())
+
+    base = base.offset(offset).limit(limit)
+    result = await db.execute(base)
+    items = result.scalars().all()
+
+    return PaginatedPosts(
+        items=items,
+        total=total,
+        limit=limit,
+        offset=offset,
+        has_more=offset + limit < total,
+    )
 
 
 @router.get("/posts/{post_id}", response_model=HelpPostOut)

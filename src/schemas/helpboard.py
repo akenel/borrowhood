@@ -36,6 +36,14 @@ class HelpPostOut(BaseModel):
     created_at: datetime
 
 
+class PaginatedPosts(BaseModel):
+    items: list[HelpPostOut]
+    total: int
+    limit: int
+    offset: int
+    has_more: bool
+
+
 class HelpReplyCreate(BaseModel):
     body: str = Field(..., min_length=1, max_length=2000)
 
