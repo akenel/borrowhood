@@ -29,6 +29,7 @@ from src.models.user import (
     CEFRLevel,
     WorkshopType,
 )
+from src.models.helpboard import BHHelpPost, BHHelpReply, HelpType, HelpStatus, HelpUrgency
 from src.models.workshop import BHWorkshopMember, TeamRole
 
 logger = logging.getLogger(__name__)
@@ -285,6 +286,155 @@ async def seed_database(db: AsyncSession) -> dict:
         )
         db.add(review)
         counts["reviews"] += 1
+
+    # Create help board posts and replies
+    help_posts = [
+        {
+            "author_slug": "mikes-garage",
+            "help_type": "need",
+            "urgency": "urgent",
+            "title": "Need someone to help move a lathe -- too heavy for one person",
+            "body": "I bought a used wood lathe (about 120kg) and need help moving it from a van into my garage. It's on a pallet. Two strong people + a furniture dolly should do it. Can offer beer and pizza after. This Saturday morning if possible.",
+            "category": "power_tools",
+            "neighborhood": "Bonagia",
+            "content_language": "en",
+            "status": "open",
+            "replies": [
+                {"author_slug": "sallys-kitchen", "body": "My husband can help! He moved our fridge last week. Saturday works. What time?"},
+                {"author_slug": "marias-garden", "body": "I have a furniture dolly you can borrow. DM me on Telegram."},
+            ],
+        },
+        {
+            "author_slug": "sallys-kitchen",
+            "help_type": "offer",
+            "urgency": "normal",
+            "title": "Free baking lessons for beginners -- sourdough, focaccia, cookies",
+            "body": "I've been baking for 20 years and I'd love to teach. I have all the equipment in my kitchen. Groups of 2-3 people max. You bring the ingredients (I'll tell you what to buy), I teach you the technique. Weekday afternoons work best for me.",
+            "category": "kitchen",
+            "neighborhood": "Centro Storico",
+            "content_language": "en",
+            "status": "open",
+            "replies": [
+                {"author_slug": "mikes-garage", "body": "My daughter would LOVE this. She's 14 and obsessed with the British Bake Off. Can she come?"},
+            ],
+        },
+        {
+            "author_slug": "marias-garden",
+            "help_type": "need",
+            "urgency": "normal",
+            "title": "Looking for someone to help prune olive trees (4 trees)",
+            "body": "I have 4 olive trees in my yard that haven't been pruned in 2 years. They're getting wild. I have the tools (loppers, hand saw) but I don't know the proper technique. Would love someone experienced to show me how or do it together.",
+            "category": "garden",
+            "neighborhood": "Xiare",
+            "content_language": "en",
+            "status": "open",
+            "replies": [
+                {"author_slug": "angel-hq", "body": "Ho potato ulivi per 40 anni. Posso aiutarti sabato. Porta guanti buoni. / I've been pruning olives for 40 years. I can help Saturday. Bring good gloves."},
+            ],
+        },
+        {
+            "author_slug": "marcos-workshop",
+            "help_type": "offer",
+            "urgency": "low",
+            "title": "Posso insegnare la saldatura base -- MIG e ad arco",
+            "body": "Saldatore in pensione, 35 anni di esperienza. Se qualcuno vuole imparare la saldatura base (MIG o ad arco), ho l'attrezzatura e lo spazio nel mio laboratorio. Sessioni di 2 ore, gratis per i vicini. Portate solo i guanti da lavoro.",
+            "category": "power_tools",
+            "neighborhood": "Trapani Sud",
+            "content_language": "it",
+            "status": "open",
+            "replies": [],
+        },
+        {
+            "author_slug": "jakes-electronics",
+            "help_type": "need",
+            "urgency": "normal",
+            "title": "Need help setting up a Raspberry Pi weather station",
+            "body": "I bought all the sensors (BME280, rain gauge, anemometer) but I'm stuck on the wiring and the Python code. Anyone in the neighborhood good with electronics and basic coding? Happy to share the data with the community once it's running.",
+            "category": "electronics",
+            "neighborhood": "Bonagia",
+            "content_language": "en",
+            "status": "in_progress",
+            "replies": [
+                {"author_slug": "mikes-garage", "body": "I've done a couple of Pi projects. The BME280 is straightforward -- I2C bus, 4 wires. Want to come by my garage Wednesday evening?"},
+                {"author_slug": "jakes-electronics", "body": "That would be amazing! I'll bring the Pi and all the sensors. What time works?"},
+            ],
+        },
+        {
+            "author_slug": "rosas-home",
+            "help_type": "need",
+            "urgency": "normal",
+            "title": "Cerco qualcuno che possa aiutarmi a montare una libreria IKEA",
+            "body": "Ho comprato una libreria BILLY/OXBERG e non ho gli attrezzi giusti. Mi serve un trapano e qualcuno con un po' di pazienza. Offro caffe e dolci siciliani!",
+            "category": "furniture",
+            "neighborhood": "Centro",
+            "content_language": "it",
+            "status": "open",
+            "replies": [
+                {"author_slug": "mikes-garage", "body": "I have the drill and all the bits. IKEA furniture is my specialty -- I've assembled about 50 of them. Free Saturday afternoon?"},
+            ],
+        },
+        {
+            "author_slug": "sallys-kitchen",
+            "help_type": "offer",
+            "urgency": "low",
+            "title": "Offering free cooking equipment for community events",
+            "body": "I have 3 large stock pots (20L each), serving trays, and a portable gas burner that I'm happy to lend for neighborhood events, block parties, or fundraisers. Just give me a few days notice so I can clean everything.",
+            "category": "kitchen",
+            "neighborhood": "Centro Storico",
+            "content_language": "en",
+            "status": "open",
+            "replies": [],
+        },
+        {
+            "author_slug": "lunas-studio",
+            "help_type": "need",
+            "urgency": "urgent",
+            "title": "Urgent: need a sewing machine for a costume repair -- event tomorrow!",
+            "body": "My daughter's dance recital costume ripped along the seam. I need a sewing machine for about 30 minutes tonight or early tomorrow morning. It's a simple straight stitch repair. Can anyone help?",
+            "category": "art",
+            "neighborhood": "Bonagia",
+            "content_language": "en",
+            "status": "resolved",
+            "replies": [
+                {"author_slug": "marias-garden", "body": "I have a Singer! Come over anytime tonight. Via Roma 15, ring the top bell."},
+                {"author_slug": "lunas-studio", "body": "THANK YOU Maria!! Fixed it in 10 minutes. You saved the show!"},
+            ],
+        },
+    ]
+
+    counts["help_posts"] = 0
+    counts["help_replies"] = 0
+    for post_data in help_posts:
+        author = user_map.get(post_data["author_slug"])
+        if not author:
+            continue
+        post = BHHelpPost(
+            author_id=author.id,
+            help_type=HelpType(post_data["help_type"]),
+            status=HelpStatus(post_data["status"]),
+            urgency=HelpUrgency(post_data["urgency"]),
+            title=post_data["title"],
+            body=post_data.get("body"),
+            category=post_data["category"],
+            content_language=post_data.get("content_language", "en"),
+            neighborhood=post_data.get("neighborhood"),
+            reply_count=len(post_data.get("replies", [])),
+        )
+        db.add(post)
+        await db.flush()
+        counts["help_posts"] += 1
+
+        for reply_data in post_data.get("replies", []):
+            reply_author = user_map.get(reply_data["author_slug"])
+            if not reply_author:
+                continue
+            reply = BHHelpReply(
+                post_id=post.id,
+                author_id=reply_author.id,
+                body=reply_data["body"],
+            )
+            db.add(reply)
+            counts["help_replies"] += 1
 
     await db.commit()
     logger.info("Seed data loaded: %s", counts)
