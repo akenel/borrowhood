@@ -4,6 +4,7 @@ Community rental, sales, and services platform.
 "Rent it. Lend it. Share it. Teach it."
 """
 
+import asyncio
 import logging
 
 from fastapi import FastAPI
@@ -14,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
 from src.database import async_session, create_tables, get_db
-from src.routers import ai, auth, badges, bids, deposits, disputes, health, helpboard, items, listings, lockbox, notifications, onboarding, pages, payments, rentals, reports, reviews, users
+from src.routers import ai, auth, badges, bids, deposits, disputes, health, helpboard, items, listings, lockbox, notifications, onboarding, pages, payments, rentals, reports, reviews, telegram, users
 from src.routers import qa as qa_router_mod
 from src.routers import backlog as backlog_router_mod
 from src.services.seeding import seed_database, seed_new_items
@@ -60,6 +61,7 @@ def create_app() -> FastAPI:
     app.include_router(reports.router)
     app.include_router(helpboard.router)
     app.include_router(users.router)
+    app.include_router(telegram.router)
 
     # Demo login (debug only)
     if settings.debug:
@@ -105,9 +107,21 @@ def create_app() -> FastAPI:
                 result = await seed_new_items(db)
                 logger.info("Incremental seed check: %s", result)
 
+        # Start Telegram bot if configured
+        if settings.telegram_enabled and settings.telegram_bot_token:
+            from src.services.telegram_bot import bot
+            app.state.telegram_bot_task = asyncio.create_task(bot.start())
+            logger.info("Telegram bot started")
+
     @app.on_event("shutdown")
     async def shutdown():
         logger.info("BorrowHood shutting down...")
+        # Stop Telegram bot if running
+        if hasattr(app.state, "telegram_bot_task"):
+            from src.services.telegram_bot import bot
+            await bot.stop()
+            app.state.telegram_bot_task.cancel()
+            logger.info("Telegram bot stopped")
 
     return app
 

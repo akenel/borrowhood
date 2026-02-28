@@ -512,6 +512,19 @@
     "per_page_24": "24 per page",
     "per_page_48": "48 per page"
   },
+  "telegram": {
+    "title": "Telegram Notifications",
+    "link": "Link Telegram",
+    "unlink": "Unlink Telegram",
+    "linked": "Telegram linked",
+    "not_linked": "Not linked",
+    "linking_instructions": "Link your Telegram account to receive instant notifications about rentals, bids, and lockbox codes.",
+    "open_instructions": "Click the button below to open Telegram and complete the link.",
+    "open_telegram": "Open in Telegram",
+    "notifications_enabled": "Telegram notifications enabled",
+    "notifications_disabled": "Telegram notifications disabled",
+    "unlink_confirm": "Are you sure you want to unlink Telegram?"
+  },
   "footer": {
     "tagline": "Free as in freedom. Open source. No platform fees. Forever.",
     "github": "GitHub",

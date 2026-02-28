@@ -5,7 +5,6 @@ See RULES.md Section 11 for notification rules.
 """
 
 import logging
-from typing import Optional
 
 import httpx
 
@@ -47,59 +46,3 @@ async def send_telegram_message(chat_id: str, text: str) -> bool:
         return False
 
 
-async def notify_new_rental_request(
-    owner_telegram: Optional[str],
-    renter_name: str,
-    item_name: str,
-    app_url: str,
-    rental_id: str,
-) -> bool:
-    """Notify item owner of a new rental request."""
-    if not owner_telegram:
-        return False
-
-    text = (
-        f"<b>New Rental Request</b>\n\n"
-        f"{renter_name} wants to rent your <b>{item_name}</b>.\n\n"
-        f'<a href="{app_url}/rentals/{rental_id}">View Request</a>'
-    )
-    return await send_telegram_message(owner_telegram, text)
-
-
-async def notify_rental_approved(
-    renter_telegram: Optional[str],
-    owner_name: str,
-    item_name: str,
-    app_url: str,
-    rental_id: str,
-) -> bool:
-    """Notify renter that their request was approved."""
-    if not renter_telegram:
-        return False
-
-    text = (
-        f"<b>Rental Approved!</b>\n\n"
-        f"{owner_name} approved your request for <b>{item_name}</b>.\n\n"
-        f'<a href="{app_url}/rentals/{rental_id}">View Details</a>'
-    )
-    return await send_telegram_message(renter_telegram, text)
-
-
-async def notify_new_review(
-    reviewee_telegram: Optional[str],
-    reviewer_name: str,
-    rating: int,
-    item_name: str,
-    app_url: str,
-) -> bool:
-    """Notify user they received a new review."""
-    if not reviewee_telegram:
-        return False
-
-    stars = "★" * rating + "☆" * (5 - rating)
-    text = (
-        f"<b>New Review</b>\n\n"
-        f"{reviewer_name} left you a {stars} review for <b>{item_name}</b>.\n\n"
-        f'<a href="{app_url}/workshop/me">View Your Profile</a>'
-    )
-    return await send_telegram_message(reviewee_telegram, text)

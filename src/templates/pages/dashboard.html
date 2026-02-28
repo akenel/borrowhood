@@ -37,6 +37,11 @@
                         class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
                     {{ t('dashboard.favorites') }}
                 </button>
+                <button @click="tab = 'settings'"
+                        :class="tab === 'settings' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
+                    {{ t('nav.settings') }}
+                </button>
             </nav>
         </div>
 
@@ -351,6 +356,80 @@
             </div>
             {% endif %}
         </div>
+
+        <!-- Settings tab -->
+        <div x-show="tab === 'settings'" x-cloak x-data="telegramLink()">
+            <div class="max-w-lg space-y-6">
+                <!-- Telegram Notifications Card -->
+                <div class="bg-white rounded-lg border border-gray-200 p-6">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <svg class="w-6 h-6 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ t('telegram.title') }}</h3>
+                    </div>
+
+                    <!-- Not linked state -->
+                    <template x-if="!linked && !linkUrl">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-4">{{ t('telegram.linking_instructions') }}</p>
+                            <button @click="generateLink()" :disabled="generating"
+                                    class="inline-flex items-center px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg hover:bg-blue-600 transition-colors min-h-[44px] disabled:opacity-50">
+                                <span x-show="!generating">{{ t('telegram.link') }}</span>
+                                <span x-show="generating" x-cloak>{{ t('common.loading') }}</span>
+                            </button>
+                        </div>
+                    </template>
+
+                    <!-- Link URL generated, waiting for user to click -->
+                    <template x-if="!linked && linkUrl">
+                        <div>
+                            <p class="text-sm text-gray-600 mb-3">{{ t('telegram.open_instructions') }}</p>
+                            <a :href="linkUrl" target="_blank" rel="noopener"
+                               class="inline-flex items-center px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg hover:bg-blue-600 transition-colors min-h-[44px]">
+                                <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                                </svg>
+                                {{ t('telegram.open_telegram') }}
+                            </a>
+                            <p class="text-xs text-gray-400 mt-2" x-text="'Waiting for link confirmation...'"></p>
+                        </div>
+                    </template>
+
+                    <!-- Linked state -->
+                    <template x-if="linked">
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span class="text-sm font-medium text-emerald-700">{{ t('telegram.linked') }}</span>
+                            </div>
+
+                            <!-- Toggle notifications -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-700" x-text="notifyEnabled ? '{{ t('telegram.notifications_enabled') }}' : '{{ t('telegram.notifications_disabled') }}'"></span>
+                                <button @click="toggleNotifications()" :disabled="toggling"
+                                        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+                                        :class="notifyEnabled ? 'bg-indigo-600' : 'bg-gray-200'">
+                                    <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+                                          :class="notifyEnabled ? 'translate-x-6' : 'translate-x-1'"></span>
+                                </button>
+                            </div>
+
+                            <!-- Unlink button -->
+                            <div class="pt-2 border-t border-gray-100">
+                                <button @click="unlinkConfirm()" :disabled="unlinking"
+                                        class="text-sm text-red-600 hover:text-red-700 font-medium disabled:opacity-50">
+                                    <span x-show="!unlinking">{{ t('telegram.unlink') }}</span>
+                                    <span x-show="unlinking" x-cloak>{{ t('common.loading') }}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -471,6 +550,97 @@
                 } catch (err) {
                     window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: err.message } }));
                 } finally { this.generating = false; }
+            }
+        };
+    }
+
+    // Telegram account linking
+    function telegramLink() {
+        return {
+            linked: false,
+            notifyEnabled: true,
+            linkUrl: null,
+            generating: false,
+            toggling: false,
+            unlinking: false,
+            _pollInterval: null,
+
+            async init() {
+                await this.checkStatus();
+            },
+
+            async checkStatus() {
+                try {
+                    const resp = await fetch('/api/v1/telegram/status');
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        this.linked = data.linked;
+                        this.notifyEnabled = data.notify_telegram;
+                        if (this.linked && this._pollInterval) {
+                            clearInterval(this._pollInterval);
+                            this._pollInterval = null;
+                            this.linkUrl = null;
+                            window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{{ t("telegram.linked") }}' } }));
+                        }
+                    }
+                } catch(e) { /* not logged in or network error */ }
+            },
+
+            async generateLink() {
+                this.generating = true;
+                try {
+                    const resp = await fetch('/api/v1/telegram/link', { method: 'POST' });
+                    if (!resp.ok) { const err = await resp.json(); throw new Error(err.detail); }
+                    const data = await resp.json();
+                    this.linkUrl = data.url;
+                    // Poll for link completion every 3 seconds
+                    this._pollInterval = setInterval(() => this.checkStatus(), 3000);
+                    // Stop polling after 10 minutes (link expires)
+                    setTimeout(() => {
+                        if (this._pollInterval) {
+                            clearInterval(this._pollInterval);
+                            this._pollInterval = null;
+                            if (!this.linked) this.linkUrl = null;
+                        }
+                    }, 600000);
+                } catch (err) {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: err.message } }));
+                } finally { this.generating = false; }
+            },
+
+            async toggleNotifications() {
+                this.toggling = true;
+                try {
+                    const resp = await fetch('/api/v1/telegram/toggle', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ enabled: !this.notifyEnabled })
+                    });
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        this.notifyEnabled = data.notify_telegram;
+                    }
+                } catch(e) {}
+                finally { this.toggling = false; }
+            },
+
+            unlinkConfirm() {
+                if (confirm('{{ t("telegram.unlink_confirm") }}')) {
+                    this.doUnlink();
+                }
+            },
+
+            async doUnlink() {
+                this.unlinking = true;
+                try {
+                    const resp = await fetch('/api/v1/telegram/link', { method: 'DELETE' });
+                    if (resp.ok) {
+                        this.linked = false;
+                        this.linkUrl = null;
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: '{{ t("telegram.not_linked") }}' } }));
+                    }
+                } catch(e) {}
+                finally { this.unlinking = false; }
             }
         };
     }

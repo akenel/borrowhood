@@ -74,6 +74,7 @@ class BHUser(BHBase, Base):
 
     # Contact
     telegram_username: Mapped[Optional[str]] = mapped_column(String(100))
+    telegram_chat_id: Mapped[Optional[str]] = mapped_column(String(50))  # Numeric Telegram chat ID for Bot API
     phone: Mapped[Optional[str]] = mapped_column(String(30))
 
     # Location (fuzzy -- 3 decimal places max)

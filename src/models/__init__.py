@@ -22,6 +22,7 @@ from src.models.qa import BHTestResult, BHBugReport, BHBugActivity, BHBugCommit
 from src.models.backlog import BHBacklogItem, BHBacklogActivity
 from src.models.translation import BHContentTranslation
 from src.models.helpboard import BHHelpPost, BHHelpReply
+from src.models.telegram import BHTelegramLink
 
 __all__ = [
     "BHUser",
@@ -52,4 +53,5 @@ __all__ = [
     "BHContentTranslation",
     "BHHelpPost",
     "BHHelpReply",
+    "BHTelegramLink",
 ]

@@ -42,6 +42,13 @@ async def create_notification(
     )
     db.add(notification)
 
+    # Auto-fetch telegram_chat_id from user record if not explicitly provided
+    if not telegram_chat_id:
+        from src.models.user import BHUser
+        user = await db.get(BHUser, user_id)
+        if user and user.notify_telegram and user.telegram_chat_id:
+            telegram_chat_id = user.telegram_chat_id
+
     # Best-effort Telegram forwarding
     if telegram_chat_id:
         telegram_text = f"<b>{title}</b>"

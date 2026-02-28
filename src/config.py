@@ -34,6 +34,7 @@ class BHSettings(BaseSettings):
 
     # Telegram
     telegram_bot_token: str = ""
+    telegram_bot_name: str = ""  # e.g. "BorrowHoodBot" (without @)
     telegram_enabled: bool = False
 
     # PayPal

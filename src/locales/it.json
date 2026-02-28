@@ -512,6 +512,19 @@
     "per_page_24": "24 per pagina",
     "per_page_48": "48 per pagina"
   },
+  "telegram": {
+    "title": "Notifiche Telegram",
+    "link": "Collega Telegram",
+    "unlink": "Scollega Telegram",
+    "linked": "Telegram collegato",
+    "not_linked": "Non collegato",
+    "linking_instructions": "Collega il tuo account Telegram per ricevere notifiche istantanee su noleggi, offerte e codici cassetta.",
+    "open_instructions": "Clicca il pulsante qui sotto per aprire Telegram e completare il collegamento.",
+    "open_telegram": "Apri in Telegram",
+    "notifications_enabled": "Notifiche Telegram attivate",
+    "notifications_disabled": "Notifiche Telegram disattivate",
+    "unlink_confirm": "Sei sicuro di voler scollegare Telegram?"
+  },
   "footer": {
     "tagline": "Libero come la libertà. Open source. Nessuna commissione. Per sempre.",
     "github": "GitHub",
