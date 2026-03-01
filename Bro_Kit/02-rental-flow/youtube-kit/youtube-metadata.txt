@@ -1,0 +1,51 @@
+YOUTUBE VIDEO METADATA
+=====================
+
+TITLE:
+BorrowHood Rental Flow -- Request to Complete in 5 Steps
+
+DESCRIPTION:
+The full rental state machine. Request, approve, pick up, return, complete. Every click is real.
+
+Sally needs a drill for her deck project. Mike has a Bosch Professional in his garage. Here is the entire rental flow, end to end:
+
+0:00 Intro
+0:06 Browse page -- rental items with prices
+0:14 Item detail -- Bosch Drill (EUR 8/day + EUR 30 deposit)
+0:28 Sally logs in
+0:38 Sally clicks "Rent This" -- picks dates, types a message
+0:58 Mike logs in, sees the request on Incoming Requests
+1:08 Mike approves the rental
+1:18 Mike generates lock box codes (location + instructions)
+1:38 Sally sees the pickup code on her dashboard
+1:48 Sally clicks "I've Picked It Up"
+2:08 Sally clicks "I've Returned It"
+2:28 Mike clicks "Complete"
+2:48 Mike's dashboard shows "Completed" status
+3:00 Feature complete summary
+
+What makes this different:
+- Lock box codes for contactless exchange -- no meetup needed
+- Owner types location hint and instructions (e.g., "key under flower pot")
+- Pickup code and return code are one-time use
+- Each step updates the status badge in real time
+- Both parties earn reputation points on completion
+- Full state machine: PENDING to APPROVED to PICKED_UP to RETURNED to COMPLETED
+
+Built with Claude Code (AI co-pilot). Recorded with Puppeteer + OBS.
+
+Tech stack: FastAPI, SQLAlchemy, Jinja2, Tailwind CSS, Alpine.js, Keycloak OIDC, Docker, Hetzner Cloud.
+
+Music: Brotherhood Run
+
+TAGS:
+borrowhood, rental flow, peer to peer rental, fastapi, python, web development, keycloak, fullstack, live demo, alpine.js, tailwind css, docker, hetzner, claude code, ai coding, sharing economy, lockbox, contactless exchange, state machine
+
+CATEGORY:
+Science & Technology
+
+VISIBILITY:
+Public
+
+THUMBNAIL:
+thumbnail-rental-flow.jpg (1280x720)

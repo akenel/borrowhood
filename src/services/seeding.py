@@ -441,6 +441,99 @@ async def seed_database(db: AsyncSession) -> dict:
     return counts
 
 
+async def seed_new_users(db: AsyncSession) -> dict:
+    """Add any users from seed.json that don't already exist (by slug).
+
+    Safe to call on every startup -- only inserts missing users.
+    Must run BEFORE seed_new_items() so new item owners exist.
+    """
+    with open(SEED_FILE) as f:
+        data = json.load(f)
+
+    # Get existing user slugs
+    result = await db.execute(select(BHUser.slug))
+    existing_slugs = {row[0] for row in result.all()}
+
+    if not existing_slugs:
+        logger.info("No users in DB -- run full seed first")
+        return {"status": "no_users"}
+
+    added = 0
+    for u in data["users"]:
+        if u["slug"] in existing_slugs:
+            continue
+
+        user = BHUser(
+            keycloak_id=str(uuid.uuid4()),
+            email=u["email"],
+            display_name=u["display_name"],
+            slug=u["slug"],
+            workshop_name=u.get("workshop_name"),
+            workshop_type=_enum_val(WorkshopType, u.get("workshop_type")),
+            tagline=u.get("tagline"),
+            bio=u.get("bio"),
+            telegram_username=u.get("telegram_username"),
+            city=u.get("city"),
+            country_code=u.get("country_code"),
+            latitude=u.get("latitude"),
+            longitude=u.get("longitude"),
+            offers_delivery=u.get("offers_delivery", False),
+            offers_pickup=u.get("offers_pickup", False),
+            offers_training=u.get("offers_training", False),
+            offers_custom_orders=u.get("offers_custom_orders", False),
+            offers_repair=u.get("offers_repair", False),
+            account_status=AccountStatus.ACTIVE,
+            badge_tier=_enum_val(BadgeTier, u.get("badge_tier", "newcomer")),
+        )
+        db.add(user)
+        await db.flush()
+
+        for lang in u.get("languages", []):
+            db.add(BHUserLanguage(
+                user_id=user.id,
+                language_code=lang["language_code"],
+                proficiency=_enum_val(CEFRLevel, lang["proficiency"]),
+            ))
+
+        for skill in u.get("skills", []):
+            db.add(BHUserSkill(
+                user_id=user.id,
+                skill_name=skill["skill_name"],
+                category=skill["category"],
+                self_rating=skill.get("self_rating", 3),
+                years_experience=skill.get("years_experience"),
+            ))
+
+        for link in u.get("social_links", []):
+            db.add(BHUserSocialLink(
+                user_id=user.id,
+                platform=link["platform"],
+                url=link["url"],
+                label=link.get("label"),
+            ))
+
+        pts = u.get("points")
+        if pts:
+            db.add(BHUserPoints(
+                user_id=user.id,
+                total_points=pts.get("total_points", 0),
+                rentals_completed=pts.get("rentals_completed", 0),
+                reviews_given=pts.get("reviews_given", 0),
+                reviews_received=pts.get("reviews_received", 0),
+                items_listed=pts.get("items_listed", 0),
+                helpful_flags=pts.get("helpful_flags", 0),
+            ))
+
+        added += 1
+        logger.info("Seeded new user: %s (%s)", u["display_name"], u["slug"])
+
+    if added:
+        await db.commit()
+
+    logger.info("Incremental user seed: %d new users added (%d already existed)", added, len(existing_slugs))
+    return {"new_users": added, "existing_users": len(existing_slugs)}
+
+
 async def seed_new_items(db: AsyncSession) -> dict:
     """Add any items from seed.json that don't already exist (by slug).
 

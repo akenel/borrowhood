@@ -1,5 +1,6 @@
 """Pydantic schemas for listing endpoints."""
 
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
@@ -22,7 +23,7 @@ class ListingOut(BaseModel):
     delivery_available: bool
     pickup_only: bool
     notes: Optional[str] = None
-    auction_end: Optional[str] = None
+    auction_end: Optional[datetime] = None
     starting_bid: Optional[float] = None
     bid_increment: Optional[float] = None
 
@@ -56,3 +57,7 @@ class ListingUpdate(BaseModel):
     delivery_available: Optional[bool] = None
     pickup_only: Optional[bool] = None
     notes: Optional[str] = None
+    auction_end: Optional[str] = None
+    starting_bid: Optional[float] = Field(None, ge=0)
+    reserve_price: Optional[float] = Field(None, ge=0)
+    bid_increment: Optional[float] = Field(None, ge=0)

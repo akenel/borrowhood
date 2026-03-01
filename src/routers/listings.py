@@ -91,6 +91,12 @@ async def create_listing(
     if item.owner_id != user.id:
         raise HTTPException(status_code=403, detail="Not your item")
 
+    # Parse auction_end from ISO string if provided
+    auction_end_dt = None
+    if data.auction_end:
+        from datetime import datetime, timezone
+        auction_end_dt = datetime.fromisoformat(data.auction_end.replace("Z", "+00:00"))
+
     listing = BHListing(
         item_id=data.item_id,
         listing_type=data.listing_type,
@@ -104,6 +110,10 @@ async def create_listing(
         delivery_available=data.delivery_available,
         pickup_only=data.pickup_only,
         notes=data.notes,
+        auction_end=auction_end_dt,
+        starting_bid=data.starting_bid,
+        reserve_price=data.reserve_price,
+        bid_increment=data.bid_increment,
     )
     db.add(listing)
     await db.commit()

@@ -18,7 +18,7 @@ from src.database import async_session, create_tables, get_db
 from src.routers import ai, auth, badges, bids, deposits, disputes, health, helpboard, items, listings, lockbox, notifications, onboarding, pages, payments, rentals, reports, reviews, telegram, users
 from src.routers import qa as qa_router_mod
 from src.routers import backlog as backlog_router_mod
-from src.services.seeding import seed_database, seed_new_items
+from src.services.seeding import seed_database, seed_new_users, seed_new_items
 from src.services.qa_seeding import seed_qa_checklist
 from src.services.backlog_seeding import seed_backlog_data
 
@@ -101,11 +101,13 @@ def create_app() -> FastAPI:
         if settings.debug:
             await create_tables()
             logger.info("Database tables created/verified")
-            # Add any new items from seed.json that don't exist yet
+            # Add any new users and items from seed.json that don't exist yet
             from sqlalchemy.ext.asyncio import AsyncSession
             async with async_session() as db:
+                user_result = await seed_new_users(db)
+                logger.info("Incremental user seed: %s", user_result)
                 result = await seed_new_items(db)
-                logger.info("Incremental seed check: %s", result)
+                logger.info("Incremental item seed: %s", result)
 
         # Start Telegram bot if configured
         if settings.telegram_enabled and settings.telegram_bot_token:

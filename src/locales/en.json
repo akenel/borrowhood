@@ -91,7 +91,7 @@
     "start_date": "Pickup Date",
     "end_date": "Return Date",
     "message": "Message to Owner",
-    "message_placeholder": "Hi! I'd like to rent this for...",
+    "message_placeholder": "Hi! I would like to rent this for...",
     "submit": "Send Request",
     "status": {
       "pending": "Pending",
@@ -528,7 +528,7 @@
   },
   "giveaway": {
     "claim": "Claim This Item",
-    "claim_message_placeholder": "Hi! I'd love to have this. I can pick it up...",
+    "claim_message_placeholder": "Hi! I would love to have this. I can pick it up...",
     "free_item": "FREE -- Pick Up Only",
     "free_hint": "This item is free. First to claim gets it.",
     "approved": "Approved! Go pick it up.",

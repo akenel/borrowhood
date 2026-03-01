@@ -1,0 +1,64 @@
+Auction -- Competitive Bidding with Live Countdown | BorrowHood EP3
+
+Dave lists his Mountain Bike with a 2-minute countdown. Sally bids EUR 50. Rosa outbids at EUR 75. Sally comes back at EUR 130 -- reserve price met. The timer hits zero. Sally wins the bike.
+
+Real auction. Real countdown. Real bidding war. No fake demos.
+
+---
+
+TIMESTAMPS
+0:00 Intro -- Competitive Bidding
+0:05 Browse page -- Mountain Bike with Auction badge
+0:09 Item detail -- live countdown ticking
+0:13 Sally bids EUR 50 -- first bid
+0:26 Rosa outbids EUR 75
+0:39 Sally bids EUR 130 -- reserve price met
+0:55 Dave watches the countdown
+1:45 Timer hits zero -- Auction ended
+1:52 Dave ends auction -- Sally wins
+2:02 Feature complete
+
+---
+
+WHAT YOU'RE SEEING
+- Owner creates auction listing with starting bid, reserve price, and bid increment
+- 2-minute live countdown timer (real, not simulated)
+- Bidders place bids through the item detail page
+- Each bid updates the current price and bid count in real time
+- Reserve price indicator shows when the minimum has been met
+- Anti-snipe protection extends the timer if bids come in the final seconds
+- Owner ends auction after timer expires -- winner and amount confirmed
+- Three users, three sessions, one auction -- all through the browser
+
+AUCTION RULES
+- Starting bid: EUR 50
+- Bid increment: EUR 5
+- Reserve price: EUR 120 (hidden from bidders)
+- Duration: 2 minutes
+- Winner: highest bidder when timer hits zero (if reserve met)
+
+TECH STACK
+- FastAPI + SQLAlchemy (async)
+- Alpine.js (reactive auction panel, live countdown)
+- Tailwind CSS
+- Keycloak OIDC (session-based auth)
+- PostgreSQL
+- Docker Compose on Hetzner VPS
+
+This is Episode 3 of the BorrowHood feature series.
+
+---
+
+SERIES
+EP1 -- Giveaway (free items, simplified claim flow)
+EP2 -- Rental Flow (request, approve, pick up, return, review)
+EP3 -- Auction (this video)
+EP4 -- Badge System & Reputation (coming soon)
+EP5 -- Multilingual Live Switch (coming soon)
+
+---
+
+BorrowHood -- neighbors sharing what they have. Tools, bikes, kitchen gear, skills.
+Built with open source. Runs on a EUR 8/month VPS.
+
+#borrowhood #auction #bidding #opensource #fastapi #alpinejs #tailwindcss #keycloak #docker #selfhosted #helixnet #sharingeconomy
