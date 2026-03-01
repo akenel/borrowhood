@@ -26,11 +26,42 @@
         <!-- Left: Images + Details (2/3 width on desktop) -->
         <div class="lg:col-span-2 space-y-6">
 
-            <!-- Image -->
+            <!-- Image Gallery -->
             {% if item.media %}
-            <div class="rounded-lg overflow-hidden bg-gray-100">
-                <img src="{{ item.media[0].url }}" alt="{{ item.media[0].alt_text }}"
-                     class="w-full h-64 md:h-96 object-cover">
+            <div x-data="{ active: 0, images: {{ item.media | map(attribute='url') | list | tojson }}, alts: {{ item.media | map(attribute='alt_text') | list | tojson }} }">
+                <!-- Main image -->
+                <div class="rounded-lg overflow-hidden bg-gray-100 relative group cursor-pointer"
+                     @click="if (images.length > 1) active = (active + 1) % images.length">
+                    <img :src="images[active]" :alt="alts[active] || ''"
+                         class="w-full h-64 md:h-96 object-cover transition-opacity duration-200">
+                    <!-- Nav arrows (shown on hover, multi-image only) -->
+                    {% if item.media | length > 1 %}
+                    <button @click.stop="active = (active - 1 + images.length) % images.length"
+                            class="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button @click.stop="active = (active + 1) % images.length"
+                            class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                    <!-- Counter badge -->
+                    <span class="absolute bottom-2 right-2 px-2 py-0.5 bg-black/50 text-white text-xs rounded-full"
+                          x-text="(active + 1) + ' / ' + images.length"></span>
+                    {% endif %}
+                </div>
+                <!-- Thumbnails (multi-image only) -->
+                {% if item.media | length > 1 %}
+                <div class="flex gap-2 mt-2 overflow-x-auto pb-1">
+                    {% for media in item.media %}
+                    <button @click="active = {{ loop.index0 }}"
+                            class="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-md overflow-hidden border-2 transition-all"
+                            :class="active === {{ loop.index0 }} ? 'border-indigo-500 ring-1 ring-indigo-500' : 'border-transparent hover:border-gray-300'">
+                        <img src="{{ media.url }}" alt="{{ media.alt_text }}"
+                             class="w-full h-full object-cover">
+                    </button>
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
             {% else %}
             <div class="w-full h-64 md:h-96 bg-gray-100 rounded-lg flex items-center justify-center">
