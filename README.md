@@ -42,7 +42,7 @@ BorrowHood fixes that. Built from a camper van in Trapani, Sicily.
 
 ## DEV Weekend Challenge
 
-This project was built for the [DEV Weekend Challenge](https://dev.to/challenges/claude) -- Anthropic Claude Code edition.
+This project was built for the [DEV Weekend Challenge](https://dev.to/challenges/weekend-2026-02-28) -- Anthropic Claude Code edition.
 
 **Built with:** Claude Code (Claude Opus 4.6) as co-pilot.
 
