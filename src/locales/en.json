@@ -453,7 +453,9 @@
     "skills": "Skills",
     "badges": "Badges",
     "no_badges": "No badges earned yet. Start renting and reviewing to earn your first!",
-    "about": "About"
+    "about": "About",
+    "favorite_items": "Favorite Items",
+    "no_favorite_items": "No favorite items yet. Browse and heart the items you love!"
   },
   "ai_image": {
     "prompt_label": "Image Prompt",

@@ -317,6 +317,24 @@ async def upload_item_image(
 # ── Item Favorites ──
 
 
+@router.get("/me/favorites", response_model=List[ItemOut])
+async def list_my_item_favorites(
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Return full item objects the current user has favorited."""
+    user = await _get_user(db, token["sub"])
+    result = await db.execute(
+        select(BHItem)
+        .join(BHItemFavorite, BHItemFavorite.item_id == BHItem.id)
+        .options(selectinload(BHItem.media))
+        .where(BHItemFavorite.user_id == user.id)
+        .where(BHItem.deleted_at.is_(None))
+        .order_by(BHItemFavorite.created_at.desc())
+    )
+    return result.scalars().unique().all()
+
+
 @router.get("/me/favorite-ids")
 async def list_my_item_favorite_ids(
     token: dict = Depends(require_auth),
