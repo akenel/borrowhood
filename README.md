@@ -4,7 +4,13 @@
 
 *Free as in freedom. Open source. No platform fees. Forever.*
 
-**Live demo:** [https://46.62.138.218:8443](https://46.62.138.218:8443) (Hetzner UAT -- test user: `angel` / `helix_pass`)
+![BorrowHood Demo](docs/demo.gif)
+
+**Live demo:** [https://46.62.138.218](https://46.62.138.218) (test user: `angel` / `helix_pass`)
+
+> **First visit?** Your browser will show a certificate warning ("Your connection is not private") because the server uses a self-signed certificate. This is expected. Click **Advanced** then **Proceed to site**. It only happens once.
+
+**Video walkthroughs:** [YouTube Playlist -- BorrowHood Feature Demos](https://youtube.com/playlist?list=PLrRlgzUrqK1_HzIH6cRHKtfYOuawEeSS3)
 
 ---
 
@@ -302,29 +308,68 @@ QA Module:
 
 ## Quick Start
 
+### Option A: Just look at it (live demo)
+
+1. Open [https://46.62.138.218](https://46.62.138.218)
+2. Your browser will warn you about the certificate. Click **Advanced** > **Proceed**. (Self-signed cert, expected.)
+3. Browse around. No login needed for the public pages.
+4. To log in: click **Demo** in the nav bar, or go to `/demo-login` and pick a user. All passwords are `helix_pass`.
+
+### Option B: Run it yourself
+
+**Prerequisites:**
+- Python 3.11+
+- PostgreSQL 15+
+- Docker (for Keycloak)
+- [mkcert](https://github.com/FiloSottile/mkcert) (for local HTTPS -- Keycloak OIDC requires it)
+
 ```bash
-# Clone
+# 1. Clone
 git clone https://github.com/akenel/borrowhood.git
 cd borrowhood
 
-# Python environment
+# 2. Python environment
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-# Configure
-cp .env.example .env
-# Edit .env with your PostgreSQL and Keycloak URLs
+# 3. Local HTTPS certificates (required for Keycloak OIDC)
+#    Without this, login will fail with redirect_uri errors.
+mkcert -install                      # Trust the local CA (one-time)
+mkcert localhost 127.0.0.1 ::1       # Creates localhost+2.pem and localhost+2-key.pem
 
-# Run
+# 4. Start Keycloak (Docker)
+#    Import the realm file on first run.
+docker run -d --name keycloak \
+  -p 8080:8080 \
+  -e KEYCLOAK_ADMIN=admin \
+  -e KEYCLOAK_ADMIN_PASSWORD=admin \
+  quay.io/keycloak/keycloak:24.0.4 start-dev
+#    Then go to http://localhost:8080, log in as admin/admin,
+#    and import keycloak/borrowhood-realm-dev.json
+
+# 5. Configure
+cp .env.example .env
+# Edit .env -- set your PostgreSQL URL and Keycloak URL (http://localhost:8080)
+
+# 6. Run
 uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 
-# Seed test data (debug mode)
+# 7. Seed test data (auto on startup in debug mode, or manually):
 curl -X POST http://localhost:8000/api/v1/seed
 
-# Open in browser
+# 8. Open in browser
 open http://localhost:8000
 ```
+
+### Common issues
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| Login redirects to blank page or errors | Keycloak needs HTTPS for redirect URIs | Install mkcert and generate local certs (step 3) |
+| "redirect_uri mismatch" on login | App URL doesn't match Keycloak client config | Check `BH_APP_URL` in `.env` matches what's in Keycloak client settings |
+| Browser says "connection not private" | Self-signed certificate | Click Advanced > Proceed (expected for local dev and the live demo) |
+| Seed data missing after restart | `DEBUG=false` in `.env` | Set `DEBUG=true` for auto-seed on startup |
 
 ## Running Tests
 
