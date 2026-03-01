@@ -15,7 +15,7 @@ from sqlalchemy.orm import selectinload
 from src.database import get_db
 from src.dependencies import require_auth
 from src.models.item import BHItem
-from src.models.listing import BHListing, ListingStatus
+from src.models.listing import BHListing, ListingStatus, ListingType
 from src.models.user import BHUser
 from src.schemas.listing import ListingCreate, ListingOut, ListingUpdate
 
@@ -47,8 +47,14 @@ async def list_listings(
     if item_id:
         query = query.where(BHListing.item_id == item_id)
     if status:
+        valid_statuses = {s.value for s in ListingStatus}
+        if status not in valid_statuses:
+            raise HTTPException(status_code=400, detail=f"Invalid status '{status}'. Must be one of: {', '.join(sorted(valid_statuses))}")
         query = query.where(BHListing.status == status)
     if listing_type:
+        valid_types = {t.value for t in ListingType}
+        if listing_type not in valid_types:
+            raise HTTPException(status_code=400, detail=f"Invalid listing_type '{listing_type}'. Must be one of: {', '.join(sorted(valid_types))}")
         query = query.where(BHListing.listing_type == listing_type)
 
     query = query.order_by(BHListing.created_at.desc()).offset(offset).limit(limit)
