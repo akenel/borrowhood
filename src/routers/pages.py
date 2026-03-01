@@ -142,8 +142,8 @@ async def browse(request: Request,
     elif sort == "name_asc":
         query = query.order_by(BHItem.name.asc())
 
-    # Total count with same filters (before limit)
-    count_query = select(func.count()).select_from(query.subquery())
+    # Total count with same filters (before limit) -- DISTINCT to avoid JOIN duplicates
+    count_query = select(func.count(func.distinct(BHItem.id))).select_from(query.subquery())
     total_count = await db.scalar(count_query) or 0
 
     query = query.limit(12)
