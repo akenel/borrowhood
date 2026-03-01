@@ -375,8 +375,17 @@ open http://localhost:8000
 
 ```bash
 source .venv/bin/activate
+
+# Unit tests only (no database required -- runs anywhere):
+python -m pytest tests/ -v -k "not test_pages and not test_business_logic and not test_auth"
+# Result: 181 passed
+
+# Full suite (requires PostgreSQL running on localhost:5432):
 python -m pytest tests/ -v
+# Result: 250 passed
 ```
+
+> **No database?** 181 tests pass without any external services -- models, enums, schemas, i18n, API edge cases, state machine logic. The remaining 69 are integration tests that hit the database.
 
 ```
 250 tests across 23 files
