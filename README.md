@@ -20,9 +20,9 @@
 |------|--------|-------------|
 | ![Home](docs/screenshots/home.png) | ![Browse](docs/screenshots/browse.png) | ![Item Detail](docs/screenshots/item-detail.png) |
 
-| Workshop Profile | Dashboard |
-|------------------|-----------|
-| ![Workshop](docs/screenshots/workshop.png) | ![Dashboard](docs/screenshots/dashboard.png) |
+| Workshop Profile | Dashboard | Members |
+|------------------|-----------|---------|
+| ![Workshop](docs/screenshots/workshop.png) | ![Dashboard](docs/screenshots/dashboard.png) | ![Members](docs/screenshots/members.png) |
 
 ---
 
@@ -52,12 +52,13 @@ This project was built for the [DEV Weekend Challenge](https://dev.to/challenges
 
 ### For Users
 - **List anything** -- tools, kitchen gear, digital goods, services, spaces, made-to-order items
-- **Seven listing types** -- Rent, Sell, Commission, Offer, Service, Training, Auction
-- **Bilingual** -- English + Italian (474 translatable strings, 3-tier language detection)
+- **Eight listing types** -- Rent, Sell, Give Away, Commission, Offer, Service, Training, Auction
+- **Bilingual** -- English + Italian (476 translatable strings, 3-tier language detection)
 - **Workshop profiles** -- Every user is a shop with skills, languages (CEFR levels), and social links
 - **Reputation system** -- Reviews weighted by reviewer badge tier (Newcomer 1x to Legend 10x)
 - **Rental state machine** -- Request > Approve > Pickup > Return > Complete (with dispute handling)
 - **Auction system** -- Timed bidding with auto-outbid notifications, reserve prices, bid increments
+- **Giveaway flow** -- Free items with simplified claim, no return dates, earns Generous Neighbor badge
 - **Dispute resolution** -- 3-step flow: file, respond, resolve (8 reasons, 7 resolution types)
 - **Security deposits** -- Hold at pickup, release on return, forfeit on damage
 - **Lockbox codes** -- One-time 8-character codes for contactless pickup and return
@@ -68,10 +69,10 @@ This project was built for the [DEV Weekend Challenge](https://dev.to/challenges
 - **Onboarding wizard** -- 3-step profile setup for new users
 
 ### For Developers
-- **104 REST API endpoints** with OpenAPI docs (`/docs`)
-- **250 automated tests** across 23 test files
-- **31 SQLAlchemy models** with UUID PKs, soft deletes, audit timestamps
-- **36 typed enums** -- no magic strings anywhere
+- **109 REST API endpoints** with OpenAPI docs (`/docs`)
+- **250 automated tests** across 23 test files (201 pass without DB)
+- **32 SQLAlchemy models** with UUID PKs, soft deletes, audit timestamps
+- **37 typed enums** -- no magic strings anywhere
 - **Keycloak OIDC** -- enterprise SSO with 6 realm roles and RBAC
 - **Idempotency keys** on rental requests (no double-submit)
 - **Optimistic locking** on listings (version field)
@@ -95,7 +96,7 @@ This project was built for the [DEV Weekend Challenge](https://dev.to/challenges
 | Payments | PayPal REST API v2 (sandbox + live) |
 | AI | Pollinations API (image + text generation) |
 | Bot | Telegram Bot API |
-| Tests | pytest + pytest-asyncio (250 tests) |
+| Tests | pytest + pytest-asyncio (250 tests, 201 without DB) |
 | Container | Docker |
 | Reverse Proxy | Caddy 2 (automatic TLS) |
 | Hosting | Hetzner CX32 (4 vCPU, 8 GB RAM, EUR 7.59/mo) |
@@ -117,9 +118,9 @@ FastAPI (uvicorn)
   |
   +-- Page Routes (Jinja2 SSR) -----> 18 templates (base + pages)
   |     |
-  |     +-- i18n engine (EN/IT) ----> 474 translatable strings
+  |     +-- i18n engine (EN/IT) ----> 476 translatable strings
   |
-  +-- API Routes (/api/v1/) --------> 104 endpoints, JSON
+  +-- API Routes (/api/v1/) --------> 109 endpoints, JSON
   |     |
   |     +-- Items CRUD + search
   |     +-- Listings CRUD + filters
@@ -142,8 +143,8 @@ FastAPI (uvicorn)
   |
   +-- SQLAlchemy async -------------> PostgreSQL
   |     |
-  |     +-- 31 models (UUID PKs, soft deletes)
-  |     +-- 36 typed enums
+  |     +-- 32 models (UUID PKs, soft deletes)
+  |     +-- 37 typed enums
   |     +-- Seed data (12 workshops, 119 items)
   |
   +-- Redis (caching) + RabbitMQ (task queue) + MinIO (file storage)
@@ -165,7 +166,7 @@ BHUser (every user IS a workshop)
   |     |-- BHItemMedia (photos, video embeds)
   |     +-- BHContentTranslation (multi-language content)
   |
-  +-- BHListing (rent, sell, commission, offer, service, training, auction)
+  +-- BHListing (rent, sell, giveaway, commission, offer, service, training, auction)
   |     |-- BHBid (auction bids with auto-outbid)
   |     +-- BHRental (state machine: pending -> completed)
   |           |-- BHReview (weighted by reviewer badge tier)
@@ -377,15 +378,15 @@ open http://localhost:8000
 source .venv/bin/activate
 
 # Unit tests only (no database required -- runs anywhere):
-python -m pytest tests/ -v -k "not test_pages and not test_business_logic and not test_auth"
-# Result: 181 passed
+python -m pytest tests/ -v
+# Result: 201 passed (49 skipped -- need DB)
 
-# Full suite (requires PostgreSQL running on localhost:5432):
+# Full suite (requires PostgreSQL with current schema):
 python -m pytest tests/ -v
 # Result: 250 passed
 ```
 
-> **No database?** 181 tests pass without any external services -- models, enums, schemas, i18n, API edge cases, state machine logic. The remaining 69 are integration tests that hit the database.
+> **No database?** 201 tests pass without any external services -- models, enums, schemas, i18n, API edge cases, state machine logic. The remaining 49 are integration tests that hit the database.
 
 ```
 250 tests across 23 files
@@ -415,7 +416,7 @@ test_api_onboarding.py       -  3 tests (page, steps, auth gate)
 
 ## Internationalization
 
-Full bilingual support: English + Italian. 474 translatable strings across 32 sections.
+Full bilingual support: English + Italian. 476 translatable strings across 32 sections.
 
 Language detection chain:
 1. `?lang=it` query parameter (highest priority)
@@ -450,20 +451,21 @@ Import `keycloak/borrowhood-realm-dev.json` into your Keycloak instance.
 
 | Metric | Count |
 |--------|------:|
-| Python source lines | 10,430 |
-| HTML template lines | 6,144 |
-| Test lines | 2,221 |
-| Total lines | ~18,800 |
+| Python source lines | 10,625 |
+| HTML template lines | 6,244 |
+| Test lines | 2,220 |
+| Total lines | ~19,100 |
 | Python source files | 75 |
 | Test files | 23 |
-| Total files | 241 |
-| SQLAlchemy models | 31 |
-| Typed enums | 36 |
-| API endpoints | 104 |
+| Total files | 250+ |
+| SQLAlchemy models | 32 |
+| Typed enums | 37 |
+| API endpoints | 109 |
 | Router modules | 23 |
 | Service modules | 12 |
-| Automated tests | 250 |
-| i18n strings | 474 (EN + IT) |
+| Automated tests | 250 (201 without DB) |
+| Puppeteer screen tests | 52 edge-case checks |
+| i18n strings | 476 (EN + IT) |
 | Seed items | 119 (across 21 categories) |
 | Custom SVG illustrations | 20 |
 
