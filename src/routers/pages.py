@@ -142,9 +142,23 @@ async def browse(request: Request,
     elif sort == "name_asc":
         query = query.order_by(BHItem.name.asc())
 
-    # Total count with same filters (before limit) -- DISTINCT to avoid JOIN duplicates
-    count_query = select(func.count(func.distinct(BHItem.id))).select_from(query.subquery())
-    total_count = await db.scalar(count_query) or 0
+    # Total count with same filters (before limit)
+    # Build count query separately -- subquery wrapping loses column refs
+    count_q = (
+        select(func.count(func.distinct(BHItem.id)))
+        .join(BHListing, BHItem.id == BHListing.item_id)
+        .where(BHListing.status == ListingStatus.ACTIVE)
+        .where(BHItem.deleted_at.is_(None))
+    )
+    if q:
+        count_q = count_q.where(
+            BHItem.name.ilike(f"%{q}%") | BHItem.description.ilike(f"%{q}%")
+        )
+    if category:
+        count_q = count_q.where(BHItem.category == category)
+    if item_type:
+        count_q = count_q.where(BHItem.item_type == item_type)
+    total_count = await db.scalar(count_q) or 0
 
     query = query.limit(12)
     result = await db.execute(query)
