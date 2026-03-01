@@ -133,14 +133,13 @@ function check(name, condition, detail = '') {
     await snap('browse-offset-beyond');
     checkNoConsoleErrors('Browse offset beyond');
 
-    // 1e. Pagination: limit=1 (minimum)
+    // 1e. Pagination: limit=1 (clamped to min=12 by server)
     resetConsole();
     await page.goto(`${BASE}/browse?limit=1`, { waitUntil: 'networkidle2', timeout: 15000 });
     const limit1Count = await page.evaluate(() => {
-        // Count actual item links (anchor tags in the grid that point to /items/)
         return document.querySelectorAll('a[href*="/items/"]').length;
     });
-    check('Browse limit=1 shows 1 item link', limit1Count === 1, `found ${limit1Count}`);
+    check('Browse limit=1 clamped to minimum 12', limit1Count === 12, `found ${limit1Count}`);
     await snap('browse-limit-1');
 
     // 1f. Pagination: limit=999 (very large)
