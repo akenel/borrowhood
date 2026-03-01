@@ -320,7 +320,8 @@ function browseLoadMore() {
         limit: 12,
         totalCount: total,
         loadingMore: false,
-        get shownCount() { return initialCount + this.extraItems.length; },
+        didReset: false,
+        get shownCount() { return this.didReset ? this.extraItems.length : initialCount + this.extraItems.length; },
         get hasMore() { return this.shownCount < this.totalCount; },
         async loadMore() {
             this.loadingMore = true;
@@ -338,6 +339,7 @@ function browseLoadMore() {
             this.loadingMore = false;
         },
         async resetAndLoad() {
+            this.didReset = true;
             this.extraItems = [];
             this.offset = 0;
             this.loadingMore = true;
