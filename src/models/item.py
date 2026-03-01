@@ -8,7 +8,7 @@ import enum
 import uuid
 from typing import List, Optional
 
-from sqlalchemy import Enum, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import Enum, Float, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -147,3 +147,22 @@ class BHItemMedia(BHBase, Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
 
     item: Mapped["BHItem"] = relationship(back_populates="media")
+
+
+class BHItemFavorite(BHBase, Base):
+    """User-to-item favorites (wishlist / bookmarks)."""
+
+    __tablename__ = "bh_item_favorite"
+    __table_args__ = (
+        UniqueConstraint("user_id", "item_id", name="uq_item_favorite"),
+    )
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_user.id"), nullable=False, index=True
+    )
+    item_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_item.id"), nullable=False, index=True
+    )
+
+    user: Mapped["BHUser"] = relationship()
+    item: Mapped["BHItem"] = relationship()

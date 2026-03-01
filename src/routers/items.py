@@ -19,7 +19,7 @@ from sqlalchemy.orm import selectinload
 
 from src.database import get_db
 from src.dependencies import require_auth
-from src.models.item import BHItem, BHItemMedia, MediaType
+from src.models.item import BHItem, BHItemFavorite, BHItemMedia, MediaType
 from src.models.listing import BHListing, ListingStatus
 from src.models.user import BHUser
 from src.schemas.item import ItemCreate, ItemOut, ItemUpdate
@@ -312,3 +312,70 @@ async def upload_item_image(
     await db.commit()
     await db.refresh(media)
     return media
+
+
+# ── Item Favorites ──
+
+
+@router.get("/me/favorite-ids")
+async def list_my_item_favorite_ids(
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Return IDs of items the current user has favorited."""
+    user = await _get_user(db, token["sub"])
+    result = await db.execute(
+        select(BHItemFavorite.item_id).where(BHItemFavorite.user_id == user.id)
+    )
+    ids = [str(row[0]) for row in result.all()]
+    return {"ids": ids}
+
+
+@router.post("/{item_id}/favorite", status_code=201)
+async def add_item_favorite(
+    item_id: UUID,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Add an item to favorites."""
+    user = await _get_user(db, token["sub"])
+
+    item = await db.scalar(
+        select(BHItem.id).where(BHItem.id == item_id).where(BHItem.deleted_at.is_(None))
+    )
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    existing = await db.scalar(
+        select(BHItemFavorite.id)
+        .where(BHItemFavorite.user_id == user.id)
+        .where(BHItemFavorite.item_id == item_id)
+    )
+    if existing:
+        raise HTTPException(status_code=409, detail="Already favorited")
+
+    fav = BHItemFavorite(user_id=user.id, item_id=item_id)
+    db.add(fav)
+    await db.commit()
+    return {"status": "added", "item_id": str(item_id)}
+
+
+@router.delete("/{item_id}/favorite", status_code=200)
+async def remove_item_favorite(
+    item_id: UUID,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Remove an item from favorites."""
+    user = await _get_user(db, token["sub"])
+    result = await db.execute(
+        select(BHItemFavorite)
+        .where(BHItemFavorite.user_id == user.id)
+        .where(BHItemFavorite.item_id == item_id)
+    )
+    fav = result.scalars().first()
+    if not fav:
+        raise HTTPException(status_code=404, detail="Not in favorites")
+    await db.delete(fav)
+    await db.commit()
+    return {"status": "removed", "item_id": str(item_id)}

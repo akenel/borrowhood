@@ -147,7 +147,22 @@
     <div class="mt-8" x-data="browseLoadMore()">
         {% if items %}
         <!-- Item grid (Rule 2: single col mobile, multi-col desktop) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="browse-grid">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="browse-grid"
+             x-data="{
+                favIds: new Set(),
+                async init() {
+                    try { var r = await fetch('/api/v1/items/me/favorite-ids'); if (r.ok) { var d = await r.json(); this.favIds = new Set(d.ids || []); } } catch(e) {}
+                },
+                isFav(id) { return this.favIds.has(String(id)); },
+                async toggleFav(id, ev) {
+                    ev.preventDefault(); ev.stopPropagation();
+                    var method = this.isFav(id) ? 'DELETE' : 'POST';
+                    var r = await fetch('/api/v1/items/' + id + '/favorite', { method: method });
+                    if (r.ok || r.status === 409) { this.isFav(id) ? this.favIds.delete(String(id)) : this.favIds.add(String(id)); this.favIds = new Set(this.favIds); }
+                    else if (r.status === 401) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: 'Log in to save favorites' } })); }
+                },
+                doShare(name, slug, ev) { ev.preventDefault(); ev.stopPropagation(); bhShare(name, window.location.origin + '/items/' + slug); }
+             }">
             {% for item in items %}
             <a href="/items/{{ item.slug }}"
                class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group flex flex-col">
@@ -177,6 +192,19 @@
                         {% endfor %}
                     </div>
                     {% endif %}
+                    <!-- Favorite + Share -->
+                    <div class="absolute top-2 right-2 flex gap-1">
+                        <button @click="toggleFav('{{ item.id }}', $event)" class="p-1.5 bg-white/80 backdrop-blur rounded-full shadow hover:bg-white transition-colors">
+                            <svg class="w-4 h-4 transition-colors" :class="isFav('{{ item.id }}') ? 'text-red-500 fill-red-500' : 'text-gray-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 10-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                        </button>
+                        <button @click="doShare('{{ item.name | e }}', '{{ item.slug }}', $event)" class="p-1.5 bg-white/80 backdrop-blur rounded-full shadow hover:bg-white transition-colors">
+                            <svg class="w-4 h-4 text-gray-500 hover:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="p-4 flex-1 flex flex-col">
                     <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ item.name }}</h3>

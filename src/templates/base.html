@@ -298,6 +298,16 @@
         };
     }
 
+    // ── Share button (Web Share API + clipboard fallback) ──
+    async function bhShare(title, url) {
+        if (navigator.share) {
+            try { await navigator.share({ title: title, url: url }); } catch(e) {}
+        } else {
+            await navigator.clipboard.writeText(url);
+            window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Link copied to clipboard!' } }));
+        }
+    }
+
     // ── Per-element translate toggle (used in item_detail.html) ──
     function translateText(elId) {
         return {
