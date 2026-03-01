@@ -110,6 +110,8 @@ async def browse(request: Request,
                  category: Optional[str] = None,
                  item_type: Optional[str] = None,
                  sort: str = "newest",
+                 limit: int = 12,
+                 offset: int = 0,
                  db: AsyncSession = Depends(get_db),
                  token: Optional[dict] = Depends(get_current_user_token)):
     """Browse and search items with filters."""
@@ -164,7 +166,9 @@ async def browse(request: Request,
         count_q = count_q.where(BHItem.item_type == item_type)
     total_count = await db.scalar(count_q) or 0
 
-    query = query.limit(12)
+    # Clamp limit to valid range
+    limit = max(12, min(limit, 48))
+    query = query.offset(offset).limit(limit)
     result = await db.execute(query)
     items = result.scalars().unique().all()
 
@@ -176,6 +180,8 @@ async def browse(request: Request,
         selected_category=category,
         selected_type=item_type,
         selected_sort=sort,
+        selected_limit=limit,
+        selected_offset=offset,
     )
     return _render("pages/browse.html", ctx)
 
