@@ -55,6 +55,17 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 <span>{{ profile_user.city }}{% if profile_user.country_code %}, {{ profile_user.country_code | upper }}{% endif %}</span>
             </div>
+            {% if profile_user.latitude and profile_user.longitude %}
+            <div class="mt-3 rounded-lg overflow-hidden border border-gray-200">
+                <iframe
+                    src="https://www.openstreetmap.org/export/embed.html?bbox={{ profile_user.longitude - 0.015 }},{{ profile_user.latitude - 0.01 }},{{ profile_user.longitude + 0.015 }},{{ profile_user.latitude + 0.01 }}&layer=mapnik&marker={{ profile_user.latitude }},{{ profile_user.longitude }}"
+                    class="w-full h-40"
+                    style="border:0"
+                    loading="lazy"
+                    referrerpolicy="no-referrer">
+                </iframe>
+            </div>
+            {% endif %}
             {% endif %}
 
             <!-- Badge Tier -->
@@ -92,11 +103,13 @@
 
     <!-- Languages -->
     {% if languages %}
+    {% set lang_flags = {'de': '&#127465;&#127466;', 'en': '&#127468;&#127463;', 'es': '&#127466;&#127480;', 'fr': '&#127467;&#127479;', 'it': '&#127470;&#127481;', 'mt': '&#127474;&#127481;', 'zh': '&#127464;&#127475;', 'pt': '&#127477;&#127481;', 'ja': '&#127471;&#127477;', 'ar': '&#127462;&#127466;', 'ru': '&#127479;&#127482;', 'nl': '&#127475;&#127473;', 'tr': '&#127481;&#127479;'} %}
     <div class="mt-6 bg-white rounded-lg border border-gray-200 p-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-3">{{ t('profile.languages') }}</h2>
         <div class="flex flex-wrap gap-2">
             {% for lang_item in languages %}
             <span class="inline-flex items-center px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-full text-sm">
+                <span class="mr-1.5">{{ lang_flags.get(lang_item.language_code, '&#127760;') }}</span>
                 <span class="font-medium text-gray-700">{{ lang_item.language_code | upper }}</span>
                 <span class="ml-1.5 text-xs text-gray-400">{{ lang_item.proficiency.value }}</span>
             </span>
