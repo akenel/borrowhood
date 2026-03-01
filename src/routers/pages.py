@@ -113,6 +113,13 @@ async def browse(request: Request,
                  db: AsyncSession = Depends(get_db),
                  token: Optional[dict] = Depends(get_current_user_token)):
     """Browse and search items with filters."""
+    # EXISTS avoids JOIN duplicates (items with multiple active listings)
+    has_active_listing = (
+        select(BHListing.id)
+        .where(BHListing.item_id == BHItem.id)
+        .where(BHListing.status == ListingStatus.ACTIVE)
+        .exists()
+    )
     query = (
         select(BHItem)
         .options(
@@ -120,8 +127,7 @@ async def browse(request: Request,
             selectinload(BHItem.owner).selectinload(BHUser.languages),
             selectinload(BHItem.listings),
         )
-        .join(BHListing, BHItem.id == BHListing.item_id)
-        .where(BHListing.status == ListingStatus.ACTIVE)
+        .where(has_active_listing)
         .where(BHItem.deleted_at.is_(None))
     )
 
@@ -143,11 +149,9 @@ async def browse(request: Request,
         query = query.order_by(BHItem.name.asc())
 
     # Total count with same filters (before limit)
-    # Build count query separately -- subquery wrapping loses column refs
     count_q = (
-        select(func.count(func.distinct(BHItem.id)))
-        .join(BHListing, BHItem.id == BHListing.item_id)
-        .where(BHListing.status == ListingStatus.ACTIVE)
+        select(func.count(BHItem.id))
+        .where(has_active_listing)
         .where(BHItem.deleted_at.is_(None))
     )
     if q:
