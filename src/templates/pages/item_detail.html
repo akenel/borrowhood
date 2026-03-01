@@ -28,25 +28,19 @@
 
             <!-- Image Gallery -->
             {% if item.media %}
-            <script>
-                var _gallery = {
-                    images: {{ item.media | map(attribute='url') | list | tojson }},
-                    alts: {{ item.media | map(attribute='alt_text') | list | tojson }}
-                };
-            </script>
-            <div x-data="{ active: 0, images: _gallery.images, alts: _gallery.alts }">
+            <div x-data="imageGallery()" x-init="init()">
                 <!-- Main image -->
-                <div class="rounded-lg overflow-hidden bg-gray-100 relative group cursor-pointer"
-                     @click="if (images.length > 1) active = (active + 1) % images.length">
+                <div class="rounded-lg overflow-hidden bg-gray-100 relative group">
                     <img :src="images[active]" :alt="alts[active] || ''"
-                         class="w-full h-64 md:h-96 object-cover transition-opacity duration-200">
-                    <!-- Nav arrows (shown on hover, multi-image only) -->
+                         class="w-full h-64 md:h-96 object-cover">
                     {% if item.media | length > 1 %}
-                    <button @click.stop="active = (active - 1 + images.length) % images.length"
+                    <!-- Left arrow -->
+                    <button @click="prev()"
                             class="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     </button>
-                    <button @click.stop="active = (active + 1) % images.length"
+                    <!-- Right arrow -->
+                    <button @click="next()"
                             class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </button>
@@ -55,7 +49,7 @@
                           x-text="(active + 1) + ' / ' + images.length"></span>
                     {% endif %}
                 </div>
-                <!-- Thumbnails (multi-image only) -->
+                <!-- Thumbnails -->
                 {% if item.media | length > 1 %}
                 <div class="flex gap-2 mt-2 overflow-x-auto pb-1">
                     {% for media in item.media %}
@@ -610,6 +604,24 @@
 {% endif %}
 
 <script>
+    // Image gallery component
+    function imageGallery() {
+        return {
+            active: 0,
+            images: {{ item.media | map(attribute='url') | list | tojson }},
+            alts: {{ item.media | map(attribute='alt_text') | list | tojson }},
+            init() {
+                // Keyboard navigation
+                this.$el.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') this.prev();
+                    if (e.key === 'ArrowRight') this.next();
+                });
+            },
+            next() { this.active = (this.active + 1) % this.images.length; },
+            prev() { this.active = (this.active - 1 + this.images.length) % this.images.length; }
+        };
+    }
+
     // Auction panel component
     function auctionPanel(listingId, startingBid, bidIncrement, currency) {
         return {
