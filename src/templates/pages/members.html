@@ -174,7 +174,7 @@
                             <div class="flex items-center space-x-1">
                                 {% for ulang in member.languages[:3] %}
                                 <span class="text-xs px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded font-medium">
-                                    {{ ulang.language_code | upper }}
+                                    {{ lang_flags.get(ulang.language_code, '\U0001f310') }} {{ ulang.language_code | upper }}
                                 </span>
                                 {% endfor %}
                             </div>

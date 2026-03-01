@@ -26,6 +26,23 @@ from src.models.user import BadgeTier, BHUser, WorkshopType
 router = APIRouter(tags=["pages"])
 templates = Jinja2Templates(directory="src/templates")
 
+# Language code -> flag emoji mapping (available in all templates as lang_flags)
+templates.env.globals["lang_flags"] = {
+    "de": "\U0001f1e9\U0001f1ea", "en": "\U0001f1ec\U0001f1e7",
+    "es": "\U0001f1ea\U0001f1f8", "fr": "\U0001f1eb\U0001f1f7",
+    "it": "\U0001f1ee\U0001f1f9", "mt": "\U0001f1f2\U0001f1f9",
+    "zh": "\U0001f1e8\U0001f1f3", "pt": "\U0001f1f5\U0001f1f9",
+    "ja": "\U0001f1ef\U0001f1f5", "ar": "\U0001f1e6\U0001f1ea",
+    "ru": "\U0001f1f7\U0001f1fa", "nl": "\U0001f1f3\U0001f1f1",
+    "tr": "\U0001f1f9\U0001f1f7", "ko": "\U0001f1f0\U0001f1f7",
+    "pl": "\U0001f1f5\U0001f1f1", "sv": "\U0001f1f8\U0001f1ea",
+    "da": "\U0001f1e9\U0001f1f0", "fi": "\U0001f1eb\U0001f1ee",
+    "no": "\U0001f1f3\U0001f1f4", "el": "\U0001f1ec\U0001f1f7",
+    "ro": "\U0001f1f7\U0001f1f4", "hr": "\U0001f1ed\U0001f1f7",
+    "hu": "\U0001f1ed\U0001f1fa", "cs": "\U0001f1e8\U0001f1ff",
+    "uk": "\U0001f1fa\U0001f1e6", "hi": "\U0001f1ee\U0001f1f3",
+}
+
 
 def _ctx(request: Request, token: Optional[dict] = None, **kwargs) -> dict:
     """Build template context with i18n, lang, and common vars.

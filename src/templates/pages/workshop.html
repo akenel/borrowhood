@@ -220,7 +220,7 @@
                 <div class="space-y-2">
                     {% for ulang in workshop.languages %}
                     <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-700">{{ ulang.language_code | upper }}</span>
+                        <span class="text-sm text-gray-700">{{ lang_flags.get(ulang.language_code, '\U0001f310') }} {{ ulang.language_code | upper }}</span>
                         <span class="text-xs px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-full font-medium">
                             {{ ulang.proficiency.value }}
                         </span>

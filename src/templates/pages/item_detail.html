@@ -530,7 +530,7 @@
                     <div class="flex flex-wrap gap-1.5">
                         {% for ulang in item.owner.languages %}
                         <span class="text-xs px-2 py-1 bg-indigo-50 text-indigo-600 rounded font-medium">
-                            {{ ulang.language_code | upper }} {{ ulang.proficiency.value }}
+                            {{ lang_flags.get(ulang.language_code, '\U0001f310') }} {{ ulang.language_code | upper }} {{ ulang.proficiency.value }}
                         </span>
                         {% endfor %}
                     </div>

@@ -109,7 +109,7 @@
                     <div class="space-y-1">
                         {% for ulang in workshop.languages %}
                         <div class="flex justify-between text-sm">
-                            <span>{{ ulang.language_code | upper }}</span>
+                            <span>{{ lang_flags.get(ulang.language_code, '\U0001f310') }} {{ ulang.language_code | upper }}</span>
                             <span class="text-indigo-600 font-medium">{{ ulang.proficiency.value }}</span>
                         </div>
                         {% endfor %}
