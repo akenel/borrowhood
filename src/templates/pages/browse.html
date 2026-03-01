@@ -251,7 +251,10 @@
         </div>
 
         <!-- Pagination footer -->
-        <div class="mt-8 text-center space-y-3">
+        {% set current_page = (selected_offset // selected_limit) + 1 %}
+        {% set total_pages = ((total_count - 1) // selected_limit) + 1 if total_count > 0 else 1 %}
+        {% macro page_url(page_num) %}?{{ 'q=' ~ q ~ '&' if q }}{{ 'category=' ~ selected_category ~ '&' if selected_category }}{{ 'item_type=' ~ selected_type ~ '&' if selected_type }}sort={{ selected_sort }}&limit={{ selected_limit }}&offset={{ (page_num - 1) * selected_limit }}{% endmacro %}
+        <div class="mt-8 space-y-3">
             <div class="flex items-center justify-center gap-3">
                 <p class="text-sm text-gray-500">
                     {{ t('browse.showing_items').replace('{shown}', items | length | string).replace('{total}', total_count | string) }}
@@ -263,11 +266,26 @@
                     <option value="48" {{ 'selected' if selected_limit == 48 }}>{{ t('pagination.per_page_48') }}</option>
                 </select>
             </div>
-            {% if items | length < total_count %}
-            <a href="?{{ 'q=' ~ q ~ '&' if q }}{{ 'category=' ~ selected_category ~ '&' if selected_category }}{{ 'item_type=' ~ selected_type ~ '&' if selected_type }}sort={{ selected_sort }}&limit={{ selected_limit }}&offset={{ selected_offset + selected_limit }}"
-               class="inline-flex items-center px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px]">
-                {{ t('browse.load_more') }}
-            </a>
+            {% if total_pages > 1 %}
+            <nav class="flex items-center justify-center gap-1">
+                {% if current_page > 1 %}
+                <a href="{{ page_url(current_page - 1) }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">&laquo;</a>
+                {% endif %}
+                {% for p in range(1, total_pages + 1) %}
+                    {% if p == current_page %}
+                    <span class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg">{{ p }}</span>
+                    {% elif p <= 2 or p >= total_pages - 1 or (p >= current_page - 1 and p <= current_page + 1) %}
+                    <a href="{{ page_url(p) }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">{{ p }}</a>
+                    {% elif p == 3 and current_page > 4 %}
+                    <span class="px-2 py-2 text-sm text-gray-400">...</span>
+                    {% elif p == total_pages - 2 and current_page < total_pages - 3 %}
+                    <span class="px-2 py-2 text-sm text-gray-400">...</span>
+                    {% endif %}
+                {% endfor %}
+                {% if current_page < total_pages %}
+                <a href="{{ page_url(current_page + 1) }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">&raquo;</a>
+                {% endif %}
+            </nav>
             {% endif %}
         </div>
         {% else %}
