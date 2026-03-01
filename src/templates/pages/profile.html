@@ -20,7 +20,7 @@
         <!-- Banner -->
         <div class="h-32 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 relative">
             {% if profile_user %}
-            <div class="absolute bottom-0 left-0 right-0 px-6 pb-3">
+            <div class="absolute bottom-3 right-6 text-right">
                 <h1 class="text-2xl font-bold text-white drop-shadow-md">
                     {{ profile_user.display_name if profile_user else user.get('name', user.get('preferred_username', 'User')) }}
                 </h1>
