@@ -79,10 +79,9 @@ class TestAIService:
     def test_generate_image_url(self):
         from src.services.ai import generate_image_url
         url = generate_image_url("Bosch Drill", "tools")
-        assert url.startswith("https://image.pollinations.ai/prompt/")
+        assert url.startswith("https://picsum.photos/seed/")
         assert "800" in url
         assert "600" in url
-        assert "nologo=true" in url
 
 
 # --- Lock Box Code Generation ---
@@ -139,7 +138,7 @@ class TestEnums:
 
     def test_listing_type_values(self):
         from src.models.listing import ListingType
-        expected = {"rent", "sell", "commission", "offer", "service", "training", "auction"}
+        expected = {"rent", "sell", "commission", "offer", "service", "training", "auction", "giveaway"}
         assert {t.value for t in ListingType} == expected
 
     def test_listing_status_values(self):

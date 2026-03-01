@@ -463,11 +463,15 @@ async def members_directory(
     badge_tier: Optional[str] = None,
     workshop_type: Optional[str] = None,
     sort: str = "newest",
+    limit: int = Query(12, ge=12, le=48),
+    offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
     token: Optional[dict] = Depends(get_current_user_token),
 ):
     """Members directory with search and filters."""
     from sqlalchemy import case
+
+    limit = max(12, min(limit, 48))
 
     _badge_sort = case(
         (BHUser.badge_tier == BadgeTier.LEGEND, 0),
@@ -477,28 +481,29 @@ async def members_directory(
         else_=4,
     )
 
-    query = (
-        select(BHUser)
-        .options(selectinload(BHUser.languages))
-        .where(BHUser.deleted_at.is_(None))
-    )
-
+    base_where = [BHUser.deleted_at.is_(None)]
     if q:
         search_term = f"%{q}%"
-        query = query.where(
+        base_where.append(
             BHUser.display_name.ilike(search_term)
             | BHUser.workshop_name.ilike(search_term)
             | BHUser.tagline.ilike(search_term)
         )
     if city:
-        query = query.where(BHUser.city.ilike(f"%{city}%"))
+        base_where.append(BHUser.city.ilike(f"%{city}%"))
     if badge_tier:
-        query = query.where(BHUser.badge_tier == badge_tier)
+        base_where.append(BHUser.badge_tier == badge_tier)
     if workshop_type:
-        query = query.where(BHUser.workshop_type == workshop_type)
+        base_where.append(BHUser.workshop_type == workshop_type)
 
-    count_query = select(func.count()).select_from(query.subquery())
+    count_query = select(func.count(BHUser.id)).where(*base_where)
     total_count = await db.scalar(count_query) or 0
+
+    query = (
+        select(BHUser)
+        .options(selectinload(BHUser.languages))
+        .where(*base_where)
+    )
 
     if sort == "newest":
         query = query.order_by(BHUser.created_at.desc())
@@ -507,7 +512,7 @@ async def members_directory(
     elif sort == "badge_tier":
         query = query.order_by(_badge_sort, BHUser.display_name.asc())
 
-    query = query.limit(12)
+    query = query.offset(offset).limit(limit)
     result = await db.execute(query)
     members = result.scalars().unique().all()
 
@@ -531,6 +536,8 @@ async def members_directory(
         selected_badge=badge_tier,
         selected_workshop_type=workshop_type,
         selected_sort=sort,
+        selected_limit=limit,
+        selected_offset=offset,
     )
     return _render("pages/members.html", ctx)
 
