@@ -18,21 +18,52 @@
     <!-- Profile Header -->
     <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <!-- Banner -->
-        <div class="h-32 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+        <div class="h-32 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 relative">
+            {% if profile_user %}
+            <div class="absolute bottom-0 left-0 right-0 px-6 pb-3">
+                <h1 class="text-2xl font-bold text-white drop-shadow-md">
+                    {{ profile_user.display_name if profile_user else user.get('name', user.get('preferred_username', 'User')) }}
+                </h1>
+                <p class="text-sm text-white/80">@{{ user.get('preferred_username', '') }}</p>
+            </div>
+            {% endif %}
+        </div>
 
-        <div class="px-6 pb-6 -mt-12">
-            <!-- Avatar -->
-            <div class="flex items-end space-x-4">
-                <div class="w-24 h-24 rounded-full bg-white border-4 border-white shadow-lg flex items-center justify-center text-3xl font-bold text-indigo-600 bg-indigo-50">
-                    {{ profile_user.display_name[0] | upper if profile_user else user.get('given_name', '?')[0] | upper }}
+        <div class="px-6 pb-6">
+            <!-- Avatar row -->
+            <div class="flex items-start -mt-10 mb-3">
+                <div class="relative group flex-shrink-0"
+                     x-data="{ uploading: false }"
+                     >
+                    {% if profile_user and profile_user.avatar_url %}
+                    <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.display_name }}"
+                         class="w-20 h-20 rounded-full bg-white border-4 border-white shadow-lg object-cover">
+                    {% else %}
+                    <div class="w-20 h-20 rounded-full bg-indigo-50 border-4 border-white shadow-lg flex items-center justify-center text-2xl font-bold text-indigo-600">
+                        {{ profile_user.display_name[0] | upper if profile_user else user.get('given_name', '?')[0] | upper }}
+                    </div>
+                    {% endif %}
+                    <!-- Upload avatar overlay -->
+                    <label class="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/40 flex items-center justify-center cursor-pointer transition-colors"
+                           :class="uploading ? 'bg-black/40' : ''">
+                        <svg class="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" :class="uploading ? 'animate-spin opacity-100' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden"
+                               @change="
+                                    if (!$event.target.files[0]) return;
+                                    uploading = true;
+                                    var fd = new FormData();
+                                    fd.append('file', $event.target.files[0]);
+                                    fetch('/api/v1/users/me/avatar', { method: 'POST', body: fd })
+                                        .then(r => { if (r.ok) location.reload(); else { uploading = false; window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Upload failed' } })); } })
+                                        .catch(() => { uploading = false; });
+                               ">
+                    </label>
                 </div>
-                <div class="pb-2 flex-1">
-                    <h1 class="text-2xl font-bold text-gray-900">
-                        {{ profile_user.display_name if profile_user else user.get('name', user.get('preferred_username', 'User')) }}
-                    </h1>
-                    <p class="text-sm text-gray-500">@{{ user.get('preferred_username', '') }}</p>
-                </div>
-                <button @click="bhShare('{{ (profile_user.display_name if profile_user else user.get('preferred_username', 'User')) | e }}', window.location.href)" class="p-2 rounded-full hover:bg-gray-100 transition-colors self-end" title="Share profile">
+                <div class="flex-1"></div>
+                <button @click="bhShare('{{ (profile_user.display_name if profile_user else user.get('preferred_username', 'User')) | e }}', window.location.href)" class="mt-12 p-2 rounded-full hover:bg-gray-100 transition-colors" title="Share profile">
                     <svg class="w-5 h-5 text-gray-400 hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
                     </svg>
@@ -42,7 +73,7 @@
             {% if profile_user %}
             <!-- Workshop Info -->
             {% if profile_user.workshop_name %}
-            <div class="mt-4 flex items-center space-x-2 text-gray-600">
+            <div class="mt-2 flex items-center space-x-2 text-gray-600">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                 <span class="text-sm font-medium">{{ profile_user.workshop_name }}</span>
                 {% if profile_user.workshop_type %}
@@ -89,32 +120,32 @@
     <!-- Stats Grid -->
     <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
-            <p class="text-2xl font-bold text-indigo-600">{{ stats.items }}</p>
+            <p class="text-2xl font-bold text-indigo-600">{{ stats['items'] }}</p>
             <p class="text-xs text-gray-500 mt-1">{{ t('profile.items_listed') }}</p>
         </div>
         <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
-            <p class="text-2xl font-bold text-emerald-600">{{ stats.rentals }}</p>
+            <p class="text-2xl font-bold text-emerald-600">{{ stats['rentals'] }}</p>
             <p class="text-xs text-gray-500 mt-1">{{ t('profile.rentals') }}</p>
         </div>
         <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
-            <p class="text-2xl font-bold text-amber-600">{{ stats.reviews }}</p>
+            <p class="text-2xl font-bold text-amber-600">{{ stats['reviews'] }}</p>
             <p class="text-xs text-gray-500 mt-1">{{ t('profile.reviews') }}</p>
         </div>
         <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
-            <p class="text-2xl font-bold text-purple-600">{{ stats.points }}</p>
+            <p class="text-2xl font-bold text-purple-600">{{ stats['points'] }}</p>
             <p class="text-xs text-gray-500 mt-1">{{ t('profile.points') }}</p>
         </div>
     </div>
 
     <!-- Languages -->
     {% if languages %}
-    {% set lang_flags = {'de': '&#127465;&#127466;', 'en': '&#127468;&#127463;', 'es': '&#127466;&#127480;', 'fr': '&#127467;&#127479;', 'it': '&#127470;&#127481;', 'mt': '&#127474;&#127481;', 'zh': '&#127464;&#127475;', 'pt': '&#127477;&#127481;', 'ja': '&#127471;&#127477;', 'ar': '&#127462;&#127466;', 'ru': '&#127479;&#127482;', 'nl': '&#127475;&#127473;', 'tr': '&#127481;&#127479;'} %}
+    {% set lang_flags = {'de': '\U0001f1e9\U0001f1ea', 'en': '\U0001f1ec\U0001f1e7', 'es': '\U0001f1ea\U0001f1f8', 'fr': '\U0001f1eb\U0001f1f7', 'it': '\U0001f1ee\U0001f1f9', 'mt': '\U0001f1f2\U0001f1f9', 'zh': '\U0001f1e8\U0001f1f3', 'pt': '\U0001f1f5\U0001f1f9', 'ja': '\U0001f1ef\U0001f1f5', 'ar': '\U0001f1e6\U0001f1ea', 'ru': '\U0001f1f7\U0001f1fa', 'nl': '\U0001f1f3\U0001f1f1', 'tr': '\U0001f1f9\U0001f1f7'} %}
     <div class="mt-6 bg-white rounded-lg border border-gray-200 p-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-3">{{ t('profile.languages') }}</h2>
         <div class="flex flex-wrap gap-2">
             {% for lang_item in languages %}
             <span class="inline-flex items-center px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-full text-sm">
-                <span class="mr-1.5">{{ lang_flags.get(lang_item.language_code, '&#127760;') }}</span>
+                <span class="mr-1.5">{{ lang_flags.get(lang_item.language_code, '\U0001f310') }}</span>
                 <span class="font-medium text-gray-700">{{ lang_item.language_code | upper }}</span>
                 <span class="ml-1.5 text-xs text-gray-400">{{ lang_item.proficiency.value }}</span>
             </span>

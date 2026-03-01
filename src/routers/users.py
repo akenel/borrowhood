@@ -3,10 +3,12 @@
 Public reads for member discovery, auth-gated favorites.
 """
 
+import uuid as uuid_mod
+from pathlib import Path
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -14,6 +16,10 @@ from sqlalchemy.orm import selectinload
 from src.database import get_db
 from src.dependencies import get_current_user_token, require_auth
 from src.models.user import BadgeTier, BHUser, BHUserFavorite, WorkshopType
+
+UPLOAD_DIR = Path(__file__).resolve().parent.parent / "static" / "uploads" / "avatars"
+ALLOWED_AVATAR_TYPES = {"image/jpeg", "image/png", "image/webp"}
+MAX_AVATAR_SIZE = 5 * 1024 * 1024  # 5 MB
 from src.schemas.user import (
     FavoriteCreate,
     FavoriteOut,
@@ -42,6 +48,37 @@ async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
     if not user:
         raise HTTPException(status_code=403, detail="User not provisioned in BorrowHood")
     return user
+
+
+# ── Avatar upload ──
+
+
+@router.post("/me/avatar", status_code=200)
+async def upload_avatar(
+    file: UploadFile = File(...),
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Upload a profile avatar image."""
+    if file.content_type not in ALLOWED_AVATAR_TYPES:
+        raise HTTPException(status_code=400, detail="File must be JPEG, PNG, or WebP")
+
+    user = await _get_user(db, token["sub"])
+
+    contents = await file.read()
+    if len(contents) > MAX_AVATAR_SIZE:
+        raise HTTPException(status_code=400, detail="File too large (max 5 MB)")
+
+    ext = file.filename.rsplit(".", 1)[-1].lower() if file.filename and "." in file.filename else "jpg"
+    if ext not in ("jpg", "jpeg", "png", "webp"):
+        ext = "jpg"
+    filename = f"{uuid_mod.uuid4().hex}.{ext}"
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    (UPLOAD_DIR / filename).write_bytes(contents)
+
+    user.avatar_url = f"/static/uploads/avatars/{filename}"
+    await db.commit()
+    return {"status": "ok", "avatar_url": user.avatar_url}
 
 
 # ── Favorites (auth-gated) ── must be BEFORE /{user_id} routes ──
