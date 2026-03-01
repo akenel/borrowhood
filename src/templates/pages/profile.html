@@ -159,7 +159,7 @@
                              'bg-red-100': badge.color === 'red',
                              'bg-gray-100': !badge.color
                          }">
-                        <span x-text="badge.icon === 'trophy' ? '&#127942;' : badge.icon === 'star' ? '&#11088;' : badge.icon === 'heart' ? '&#10084;' : badge.icon === 'rocket' ? '&#128640;' : badge.icon === 'crown' ? '&#128081;' : badge.icon === 'globe' ? '&#127760;' : badge.icon === 'shield-check' ? '&#128737;' : '&#127941;'"></span>
+                        <span x-text="({'package':'&#128230;','handshake':'&#129309;','star':'&#11088;','sparkles':'&#10024;','gift':'&#127873;','shield-check':'&#128737;','megaphone':'&#128226;','globe':'&#127760;','wrench':'&#128295;','trophy':'&#127942;','rocket':'&#128640;','crown':'&#128081;','heart':'&#10084;','building-storefront':'&#127978;'})[badge.icon] || '&#127941;'"></span>
                     </div>
                     <p class="mt-1.5 text-xs font-semibold text-gray-800" x-text="badge.name"></p>
                     <p class="text-[10px] text-gray-400 mt-0.5" x-text="badge.description"></p>
