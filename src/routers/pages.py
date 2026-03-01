@@ -463,8 +463,8 @@ async def members_directory(
     badge_tier: Optional[str] = None,
     workshop_type: Optional[str] = None,
     sort: str = "newest",
-    limit: int = Query(12, ge=12, le=48),
-    offset: int = Query(0, ge=0),
+    limit: int = 12,
+    offset: int = 0,
     db: AsyncSession = Depends(get_db),
     token: Optional[dict] = Depends(get_current_user_token),
 ):
