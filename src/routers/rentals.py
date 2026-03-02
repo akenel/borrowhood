@@ -237,6 +237,19 @@ async def update_rental_status(
         await check_and_award_badges(db, rental.renter_id)
         await check_and_award_badges(db, rental.listing.item.owner_id)
 
+        # Auto-release any HELD deposit back to renter
+        from src.models.deposit import BHDeposit, DepositStatus
+        dep_result = await db.execute(
+            select(BHDeposit)
+            .where(BHDeposit.rental_id == rental.id)
+            .where(BHDeposit.status == DepositStatus.HELD)
+        )
+        deposit = dep_result.scalars().first()
+        if deposit:
+            deposit.status = DepositStatus.RELEASED
+            deposit.released_amount = deposit.amount
+            deposit.reason = "Auto-released on rental completion"
+
     await db.commit()
     await db.refresh(rental)
     return rental

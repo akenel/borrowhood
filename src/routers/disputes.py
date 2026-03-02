@@ -341,6 +341,32 @@ async def resolve_dispute(
     else:
         rental.status = RentalStatus.COMPLETED
 
+    # Apply deposit action based on resolution
+    from src.models.deposit import BHDeposit, DepositStatus
+    dep_result = await db.execute(
+        select(BHDeposit)
+        .where(BHDeposit.rental_id == rental.id)
+        .where(BHDeposit.status == DepositStatus.HELD)
+    )
+    deposit = dep_result.scalars().first()
+    if deposit:
+        if body.resolution in (DisputeResolution.DEPOSIT_FORFEITED,):
+            deposit.status = DepositStatus.FORFEITED
+            deposit.forfeited_amount = deposit.amount
+            deposit.reason = body.resolution_notes or "Forfeited via dispute resolution"
+        elif body.resolution in (
+            DisputeResolution.DEPOSIT_RETURNED,
+            DisputeResolution.FULL_REFUND,
+        ):
+            deposit.status = DepositStatus.RELEASED
+            deposit.released_amount = deposit.amount
+            deposit.reason = body.resolution_notes or "Released via dispute resolution"
+        elif body.resolution == DisputeResolution.PARTIAL_REFUND:
+            # Partial refund: release deposit back to renter (benefit of doubt)
+            deposit.status = DepositStatus.RELEASED
+            deposit.released_amount = deposit.amount
+            deposit.reason = body.resolution_notes or "Released via partial refund resolution"
+
     # Notify both parties
     renter_id = rental.renter_id
     filer_id = dispute.filed_by_id
