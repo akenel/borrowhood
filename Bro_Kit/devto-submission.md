@@ -40,6 +40,9 @@ Test user: `angel` / `helix_pass` (or sign in with GitHub)
 **Full rental lifecycle:**
 Request > Approve > Pickup (lockbox code) > Return (lockbox code) > Review > Complete. With security deposits, dispute resolution, and PayPal payments at every step.
 
+**Security deposits -- peer-to-peer insurance:**
+You lend your neighbor a EUR 2,000 drone. How do you know you get it back in one piece? The deposit. The owner sets the amount. The renter pays it at pickup. Bring it back in one piece -- deposit returned. Break it -- owner keeps the deposit. No insurance company. No paperwork. Just neighbors handling it themselves. If they disagree, the 3-step dispute resolution kicks in and the deposit follows the outcome automatically.
+
 **Reputation that means something:**
 15 badges across 5 tiers (Newcomer to Legend). Reviews are weighted by the reviewer's badge tier -- a Legend's 5-star review counts 10x more than a Newcomer's. Your reputation is earned, not gamed.
 
@@ -56,8 +59,8 @@ One click switches the entire app between English and Italian. Navigation, forms
 | Auction system | Timed bidding, auto-outbid notifications, reserve prices, bid increments |
 | Giveaway flow | Free items, simplified claim, no return dates, Generous Neighbor badge |
 | Lockbox codes | One-time 8-character codes for contactless pickup and return |
-| Dispute resolution | 3-step flow: file, respond, resolve (8 reasons, 7 resolution types) |
-| Security deposits | Hold at pickup, release on return, forfeit on damage |
+| Security deposits | Owner sets amount, hold at pickup, auto-release on return, forfeit on damage |
+| Dispute resolution | 3-step flow: file, respond, resolve (8 reasons, 7 resolutions, deposit auto-wired) |
 | Community helpboard | Post requests ("Need a ladder this Saturday"), get replies, track status |
 | AI-assisted listings | Generate descriptions and images via Pollinations API |
 | Notification bell | 15 event types with optional Telegram bot forwarding |
@@ -68,13 +71,14 @@ One click switches the entire app between English and Italian. Navigation, forms
 
 ## Demo
 
-**5-part video series showing every feature live on a production server:**
+**6-part video series showing every feature live on a production server:**
 
 1. [EP1 -- Giveaway Flow](https://youtu.be/ML1aPJqHDuc) -- free items, simplified claim
 2. [EP2 -- Rental Flow](https://youtu.be/DRju5RuojeA) -- full lifecycle from request to review
 3. [EP3 -- Auction System](https://youtu.be/T2WqnM457LI) -- competitive bidding with anti-snipe
 4. [EP4 -- Badge System](https://youtu.be/MxlZX1yHoYc) -- 15 badges, 5 reputation tiers
 5. [EP5 -- Multilingual Live Switch](https://youtu.be/SLB3-0vIlaI) -- one click, every label, instant
+6. [EP6 -- Deposit System](https://youtu.be/MJWlWsiJHCY) -- hold, release, forfeit, dispute resolution
 
 **Live demo:** [https://46.62.138.218](https://46.62.138.218)
 Log in as `angel` / `helix_pass` or use **Sign in with GitHub**.
@@ -83,7 +87,7 @@ Log in as `angel` / `helix_pass` or use **Sign in with GitHub**.
 
 ## Code
 
-{% github akenel/borrowhood %}
+**GitHub:** [github.com/akenel/borrowhood](https://github.com/akenel/borrowhood)
 
 ### By the numbers
 
@@ -126,9 +130,9 @@ Log in as `angel` / `helix_pass` or use **Sign in with GitHub**.
 Browser --> Caddy (TLS) --> FastAPI (uvicorn)
                               |
                               +-- 18 Jinja2 templates (i18n: EN/IT)
-                              +-- 104 API endpoints (JSON)
+                              +-- 109 API endpoints (JSON)
                               +-- Keycloak OIDC (6 roles, GitHub OAuth)
-                              +-- PostgreSQL (31 models, UUID PKs)
+                              +-- PostgreSQL (32 models, UUID PKs)
                               +-- Redis + RabbitMQ + MinIO
 ```
 
@@ -140,14 +144,17 @@ Claude Code (Opus 4.6) was my co-pilot throughout. Not a code generator I copied
 - **Scaffolding models and routers** -- describing a feature like "auction system with reserve prices and anti-snipe" and getting a working first draft with the right SQLAlchemy relationships
 - **Test generation** -- 250 pytest tests + 52 Puppeteer edge-case screen tests, most written by describing the behavior I wanted tested
 - **Edge-case testing** -- Puppeteer tests that probe XSS, pagination boundaries, invalid enums, mobile viewport, broken images -- found a real 500 error on invalid listing type filter
+- **Deposit system wiring** -- the deposit auto-release on rental completion and dispute-to-deposit wiring were Claude Code fixes applied hours before deadline. Described the gap, got working code in minutes
 - **i18n coverage** -- translating 476 strings to Italian with context-appropriate translations (not Google Translate quality)
 - **Debugging production issues** -- tracing an OAuth redirect loop to a missing port number in an env var, across 4 different config files
 
 **What I still did myself:**
 - Architecture decisions (Keycloak over simple JWT, server-rendered over SPA)
 - UI/UX design (every page layout, color choices, the workshop-as-identity concept)
+- The deposit-as-insurance concept (no third-party insurer -- neighbors handle it themselves)
 - Production deployment and ops (Docker Compose, Caddy config, Hetzner setup)
 - Manual testing on a real server with real users
+- All 6 demo videos (Puppeteer + OBS, recorded and edited same day)
 
 The commit history tells the story. Every feature was built iteratively -- scaffold, test, deploy, fix, repeat.
 
