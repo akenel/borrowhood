@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import require_auth
+from src.dependencies import get_user, require_auth
 from src.models.dispute import BHDispute, DisputeReason, DisputeResolution, DisputeStatus
 from src.models.notification import NotificationType
 from src.models.rental import BHRental, RentalStatus
@@ -69,18 +69,6 @@ class DisputeSummary(BaseModel):
     resolved: int
 
 
-# --- Helpers ---
-
-async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
-    result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == keycloak_id)
-    )
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned")
-    return user
-
-
 # --- Endpoints ---
 
 @router.post("", response_model=DisputeOut, status_code=201)
@@ -90,7 +78,7 @@ async def file_dispute(
     db: AsyncSession = Depends(get_db),
 ):
     """File a dispute on a rental. Either the renter or item owner can file."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     # Get rental with listing + item
     result = await db.execute(
@@ -179,7 +167,7 @@ async def list_disputes(
     db: AsyncSession = Depends(get_db),
 ):
     """List disputes involving the authenticated user."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     # Get rental IDs where user is renter
     renter_rentals = select(BHRental.id).where(BHRental.renter_id == user.id)
@@ -234,7 +222,7 @@ async def dispute_summary(
     db: AsyncSession = Depends(get_db),
 ):
     """Get dispute counts for the current user."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     # All disputes filed by user
     filed_by_user = select(BHDispute.id).where(BHDispute.filed_by_id == user.id)
@@ -269,7 +257,7 @@ async def respond_to_dispute(
     db: AsyncSession = Depends(get_db),
 ):
     """The other party responds to a dispute (step 2)."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHDispute)
@@ -314,7 +302,7 @@ async def resolve_dispute(
     db: AsyncSession = Depends(get_db),
 ):
     """Resolve a dispute (step 3). Owner or admin applies resolution."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHDispute)

@@ -20,8 +20,41 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
 from src.database import get_db
+from src.models.user import BHUser
 
 logger = logging.getLogger(__name__)
+
+
+async def get_user(db: AsyncSession, token: dict) -> BHUser:
+    """Resolve a Keycloak JWT token to a BHUser record.
+
+    Auto-links seed data users on first login: if no user matches
+    keycloak_id (sub), falls back to matching by preferred_username
+    (slug) and updates the keycloak_id for future lookups.
+    """
+    kc_id = token.get("sub", "")
+    result = await db.execute(
+        select(BHUser).where(BHUser.keycloak_id == kc_id)
+    )
+    user = result.scalars().first()
+    if user:
+        return user
+
+    # Fallback: match by username/slug (links seed users on first KC login)
+    username = token.get("preferred_username", "")
+    if username:
+        result = await db.execute(
+            select(BHUser).where(BHUser.slug == username)
+        )
+        user = result.scalars().first()
+        if user:
+            logger.info("Auto-linking user '%s' (slug) to keycloak_id %s", username, kc_id)
+            user.keycloak_id = kc_id
+            await db.commit()
+            await db.refresh(user)
+            return user
+
+    raise HTTPException(status_code=403, detail="User not provisioned in BorrowHood")
 
 # Keycloak OIDC discovery cache
 _jwks_client = None

@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import require_auth
+from src.dependencies import get_user, require_auth
 from src.models.item import BHItem
 from src.models.listing import BHListing
 from src.models.rental import BHRental, RentalStatus
@@ -22,16 +22,6 @@ from src.models.user import BHUser, BadgeTier
 from src.schemas.review import ReviewCreate, ReviewOut
 
 router = APIRouter(prefix="/api/v1/reviews", tags=["reviews"])
-
-
-async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
-    result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == keycloak_id)
-    )
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned in BorrowHood")
-    return user
 
 
 @router.get("", response_model=List[ReviewOut])
@@ -87,7 +77,7 @@ async def create_review(
     db: AsyncSession = Depends(get_db),
 ):
     """Submit a review after a completed rental. Requires authentication."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     # Verify rental exists and is completed
     result = await db.execute(

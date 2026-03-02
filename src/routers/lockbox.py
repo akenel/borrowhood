@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import require_auth
+from src.dependencies import get_user, require_auth
 from src.models.listing import BHListing
 from src.models.lockbox import BHLockBoxAccess
 from src.models.notification import NotificationType
@@ -24,16 +24,6 @@ from src.services.lockbox import generate_unique_codes
 from src.services.notify import create_notification
 
 router = APIRouter(prefix="/api/v1/lockbox", tags=["lockbox"])
-
-
-async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
-    result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == keycloak_id)
-    )
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned")
-    return user
 
 
 async def _get_rental_with_auth(
@@ -101,7 +91,7 @@ async def generate_codes(
     db: AsyncSession = Depends(get_db),
 ):
     """Generate lock box access codes. Owner only. Rental must be APPROVED."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     rental = await _get_rental_with_auth(db, rental_id, user)
 
     # Only owner can generate codes
@@ -152,7 +142,7 @@ async def get_codes(
     db: AsyncSession = Depends(get_db),
 ):
     """Get lock box codes for a rental. Owner or renter."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     rental = await _get_rental_with_auth(db, rental_id, user)
 
     if not rental.lockbox:
@@ -173,7 +163,7 @@ async def verify_code(
     - Pickup code: transitions rental to PICKED_UP
     - Return code: transitions rental to RETURNED
     """
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     rental = await _get_rental_with_auth(db, rental_id, user)
 
     if not rental.lockbox:

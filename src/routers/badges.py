@@ -13,7 +13,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_db
-from src.dependencies import require_auth
+from src.dependencies import require_auth, get_user
 from src.models.badge import BHBadge, BadgeCode, BADGE_INFO
 from src.models.user import BHUser
 from src.services.badges import check_and_award_badges
@@ -38,12 +38,7 @@ async def list_my_badges(
     db: AsyncSession = Depends(get_db),
 ):
     """List all badges earned by the authenticated user."""
-    user_result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == token.get("sub", ""))
-    )
-    user = user_result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned")
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHBadge)
@@ -101,12 +96,7 @@ async def check_badges(
     db: AsyncSession = Depends(get_db),
 ):
     """Trigger badge check for current user. Returns newly awarded badges."""
-    user_result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == token.get("sub", ""))
-    )
-    user = user_result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned")
+    user = await get_user(db, token)
 
     awarded = await check_and_award_badges(db, user.id)
     await db.commit()

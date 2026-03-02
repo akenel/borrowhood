@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import require_auth
+from src.dependencies import get_user, require_auth
 from src.models.bid import BHBid, BidStatus
 from src.models.listing import BHListing, ListingStatus, ListingType
 from src.models.user import BHUser
@@ -23,16 +23,6 @@ from src.schemas.bid import AuctionSummary, BidCreate, BidOut
 from src.services.notify import create_notification
 
 router = APIRouter(prefix="/api/v1/bids", tags=["bids"])
-
-
-async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
-    result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == keycloak_id)
-    )
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned")
-    return user
 
 
 @router.post("", response_model=BidOut, status_code=201)
@@ -49,7 +39,7 @@ async def place_bid(
     - Bid meets minimum (starting_bid or current highest + increment)
     - Bidder is not the item owner
     """
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     # Get listing with item for owner check
     result = await db.execute(
@@ -253,7 +243,7 @@ async def end_auction(
     - If reserve met: winning bid status = WON, notifications sent
     - If reserve not met: all bids marked RESERVE_NOT_MET
     """
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHListing)

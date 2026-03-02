@@ -13,23 +13,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import require_auth
+from src.dependencies import get_user, require_auth
 from src.models.item import BHItem
 from src.models.listing import BHListing, ListingStatus, ListingType
 from src.models.user import BHUser
 from src.schemas.listing import ListingCreate, ListingOut, ListingUpdate
 
 router = APIRouter(prefix="/api/v1/listings", tags=["listings"])
-
-
-async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
-    result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == keycloak_id)
-    )
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned in BorrowHood")
-    return user
 
 
 @router.get("", response_model=List[ListingOut])
@@ -83,7 +73,7 @@ async def create_listing(
     db: AsyncSession = Depends(get_db),
 ):
     """Create a listing on an item you own. Requires authentication."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     # Verify ownership
     result = await db.execute(
@@ -135,7 +125,7 @@ async def update_listing(
     db: AsyncSession = Depends(get_db),
 ):
     """Update a listing. Only the item owner can update."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHListing)
@@ -166,7 +156,7 @@ async def delete_listing(
     db: AsyncSession = Depends(get_db),
 ):
     """Soft-delete a listing. Only the item owner can delete."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHListing)

@@ -12,22 +12,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import require_auth
+from src.dependencies import get_user, require_auth
 from src.models.helpboard import BHHelpPost, BHHelpReply, HelpStatus, HelpType
 from src.models.user import BHUser
 from src.schemas.helpboard import HelpPostCreate, HelpPostOut, HelpReplyCreate, HelpReplyOut, PaginatedPosts
 
 router = APIRouter(prefix="/api/v1/helpboard", tags=["helpboard"])
-
-
-async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
-    result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == keycloak_id)
-    )
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned")
-    return user
 
 
 @router.get("/posts", response_model=PaginatedPosts)
@@ -116,7 +106,7 @@ async def create_post(
     db: AsyncSession = Depends(get_db),
 ):
     """Create a help request or offer."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     post = BHHelpPost(
         author_id=user.id,
         help_type=data.help_type,
@@ -141,7 +131,7 @@ async def update_post_status(
     db: AsyncSession = Depends(get_db),
 ):
     """Update post status. Author only."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     result = await db.execute(
         select(BHHelpPost).where(BHHelpPost.id == post_id, BHHelpPost.deleted_at.is_(None))
     )
@@ -177,7 +167,7 @@ async def create_reply(
     db: AsyncSession = Depends(get_db),
 ):
     """Reply to a help post."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     # Verify post exists
     post_result = await db.execute(

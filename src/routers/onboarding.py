@@ -67,12 +67,22 @@ async def setup_profile(
     """Create or update user profile during onboarding."""
     keycloak_id = token["sub"]
     email = token.get("email", "")
+    username = token.get("preferred_username", "")
 
-    # Check if user already exists
+    # Check if user already exists by keycloak_id
     result = await db.execute(
         select(BHUser).where(BHUser.keycloak_id == keycloak_id)
     )
     user = result.scalars().first()
+
+    # Fallback: link seed user by slug on first KC login
+    if not user and username:
+        result = await db.execute(
+            select(BHUser).where(BHUser.slug == username)
+        )
+        user = result.scalars().first()
+        if user:
+            user.keycloak_id = keycloak_id
 
     if user:
         # Update existing

@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import get_current_user_token, require_auth
+from src.dependencies import get_current_user_token, get_user, require_auth
 from src.models.user import BadgeTier, BHUser, BHUserFavorite, WorkshopType
 
 UPLOAD_DIR = Path(__file__).resolve().parent.parent / "static" / "uploads" / "avatars"
@@ -39,17 +39,6 @@ _BADGE_SORT = case(
 )
 
 
-async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
-    """Look up BHUser by Keycloak subject ID."""
-    result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == keycloak_id)
-    )
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned in BorrowHood")
-    return user
-
-
 # ── Avatar upload ──
 
 
@@ -63,7 +52,7 @@ async def upload_avatar(
     if file.content_type not in ALLOWED_AVATAR_TYPES:
         raise HTTPException(status_code=400, detail="File must be JPEG, PNG, or WebP")
 
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     contents = await file.read()
     if len(contents) > MAX_AVATAR_SIZE:
@@ -90,7 +79,7 @@ async def list_my_favorites(
     db: AsyncSession = Depends(get_db),
 ):
     """List current user's favorites with nested member cards."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     result = await db.execute(
         select(BHUserFavorite)
         .options(
@@ -109,7 +98,7 @@ async def list_my_favorite_ids(
     db: AsyncSession = Depends(get_db),
 ):
     """Return just the IDs of favorited users (for batch heart-state checks)."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     result = await db.execute(
         select(BHUserFavorite.favorite_user_id)
         .where(BHUserFavorite.user_id == user.id)
@@ -204,7 +193,7 @@ async def add_favorite(
     db: AsyncSession = Depends(get_db),
 ):
     """Add a user to favorites. Returns 409 if already favorited."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     if user.id == user_id:
         raise HTTPException(status_code=400, detail="Cannot favorite yourself")
 
@@ -241,7 +230,7 @@ async def remove_favorite(
     db: AsyncSession = Depends(get_db),
 ):
     """Remove a user from favorites."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     result = await db.execute(
         select(BHUserFavorite)
         .where(BHUserFavorite.user_id == user.id)

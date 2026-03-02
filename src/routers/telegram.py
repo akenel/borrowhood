@@ -14,21 +14,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
 from src.database import get_db
-from src.dependencies import require_auth
+from src.dependencies import get_user, require_auth
 from src.models.telegram import BHTelegramLink
 from src.models.user import BHUser
 
 router = APIRouter(prefix="/api/v1/telegram", tags=["telegram"])
-
-
-async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
-    result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == keycloak_id)
-    )
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned")
-    return user
 
 
 # --- Schemas ---
@@ -67,7 +57,7 @@ async def generate_link(
     if not settings.telegram_enabled or not settings.telegram_bot_name:
         raise HTTPException(status_code=503, detail="Telegram linking not available")
 
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     # Delete any existing pending link for this user
     result = await db.execute(
@@ -100,7 +90,7 @@ async def get_status(
     db: AsyncSession = Depends(get_db),
 ):
     """Check if the user's Telegram account is linked."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     return TelegramStatusResponse(
         linked=bool(user.telegram_chat_id),
         notify_telegram=user.notify_telegram,
@@ -114,7 +104,7 @@ async def unlink(
     db: AsyncSession = Depends(get_db),
 ):
     """Unlink Telegram account."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     if not user.telegram_chat_id:
         raise HTTPException(status_code=400, detail="Telegram not linked")
@@ -140,7 +130,7 @@ async def toggle_notifications(
     db: AsyncSession = Depends(get_db),
 ):
     """Toggle Telegram notifications on or off."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     user.notify_telegram = data.enabled
     await db.commit()
     return TelegramToggleResponse(notify_telegram=user.notify_telegram)

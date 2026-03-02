@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import require_auth
+from src.dependencies import get_user, require_auth
 from src.models.item import BHItem, BHItemFavorite, BHItemMedia, MediaType
 from src.models.listing import BHListing, ListingStatus
 from src.models.user import BHUser
@@ -29,17 +29,6 @@ ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 
 router = APIRouter(prefix="/api/v1/items", tags=["items"])
-
-
-async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
-    """Look up BHUser by Keycloak subject ID."""
-    result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == keycloak_id)
-    )
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned in BorrowHood")
-    return user
 
 
 async def _unique_slug(db: AsyncSession, base: str) -> str:
@@ -118,7 +107,7 @@ async def create_item(
     db: AsyncSession = Depends(get_db),
 ):
     """Create a new item. Requires authentication."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     slug = await _unique_slug(db, data.name)
 
     item = BHItem(
@@ -163,7 +152,7 @@ async def update_item(
     db: AsyncSession = Depends(get_db),
 ):
     """Update an item. Only the owner can update."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHItem)
@@ -193,7 +182,7 @@ async def delete_item(
     db: AsyncSession = Depends(get_db),
 ):
     """Soft-delete an item. Only the owner can delete."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHItem)
@@ -235,7 +224,7 @@ async def add_item_media(
     db: AsyncSession = Depends(get_db),
 ):
     """Add a media URL to an item. Only the owner can add media."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHItem)
@@ -273,7 +262,7 @@ async def upload_item_image(
     if file.content_type not in ALLOWED_TYPES:
         raise HTTPException(status_code=400, detail="File must be JPEG, PNG, WebP, or GIF")
 
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHItem)
@@ -323,7 +312,7 @@ async def list_my_item_favorites(
     db: AsyncSession = Depends(get_db),
 ):
     """Return full item objects the current user has favorited."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     result = await db.execute(
         select(BHItem)
         .join(BHItemFavorite, BHItemFavorite.item_id == BHItem.id)
@@ -341,7 +330,7 @@ async def list_my_item_favorite_ids(
     db: AsyncSession = Depends(get_db),
 ):
     """Return IDs of items the current user has favorited."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     result = await db.execute(
         select(BHItemFavorite.item_id).where(BHItemFavorite.user_id == user.id)
     )
@@ -356,7 +345,7 @@ async def add_item_favorite(
     db: AsyncSession = Depends(get_db),
 ):
     """Add an item to favorites."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     item = await db.scalar(
         select(BHItem.id).where(BHItem.id == item_id).where(BHItem.deleted_at.is_(None))
@@ -385,7 +374,7 @@ async def remove_item_favorite(
     db: AsyncSession = Depends(get_db),
 ):
     """Remove an item from favorites."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
     result = await db.execute(
         select(BHItemFavorite)
         .where(BHItemFavorite.user_id == user.id)

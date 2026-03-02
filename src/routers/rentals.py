@@ -14,23 +14,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import require_auth
+from src.dependencies import get_user, require_auth
 from src.models.listing import BHListing, ListingType, ListingStatus
 from src.models.rental import BHRental, RentalStatus, validate_rental_transition
 from src.models.user import BHUser
 from src.schemas.rental import RentalCreate, RentalOut, RentalStatusUpdate
 
 router = APIRouter(prefix="/api/v1/rentals", tags=["rentals"])
-
-
-async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
-    result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == keycloak_id)
-    )
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned in BorrowHood")
-    return user
 
 
 @router.get("", response_model=List[RentalOut])
@@ -43,7 +33,7 @@ async def list_rentals(
     db: AsyncSession = Depends(get_db),
 ):
     """List rentals for the authenticated user (as renter or owner)."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     query = select(BHRental).options(
         selectinload(BHRental.listing).selectinload(BHListing.item)
@@ -77,7 +67,7 @@ async def get_rental(
     db: AsyncSession = Depends(get_db),
 ):
     """Get a single rental. Must be renter or item owner."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHRental)
@@ -104,7 +94,7 @@ async def create_rental(
     db: AsyncSession = Depends(get_db),
 ):
     """Request a rental on a listing. Requires authentication."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     # Idempotency check
     if data.idempotency_key:
@@ -165,7 +155,7 @@ async def update_rental_status(
     Renter actions: cancel, confirm pickup
     Either: dispute
     """
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHRental)

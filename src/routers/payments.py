@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import require_auth
+from src.dependencies import get_user, require_auth
 from src.models.item import BHItem
 from src.models.listing import BHListing
 from src.models.notification import NotificationType
@@ -72,18 +72,6 @@ class RefundRequest(BaseModel):
     reason: Optional[str] = None
 
 
-# --- Helpers ---
-
-async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
-    result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == keycloak_id)
-    )
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned")
-    return user
-
-
 # --- Endpoints ---
 
 @router.post("/create-order", response_model=CreateOrderResponse)
@@ -93,7 +81,7 @@ async def create_payment_order(
     db: AsyncSession = Depends(get_db),
 ):
     """Create a PayPal order. Returns approval URL to redirect buyer."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     # Get rental and item owner
     result = await db.execute(
@@ -155,7 +143,7 @@ async def capture_payment(
     db: AsyncSession = Depends(get_db),
 ):
     """Capture a PayPal payment after buyer approval."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     # Get payment record
     result = await db.execute(
@@ -202,7 +190,7 @@ async def refund_payment(
     db: AsyncSession = Depends(get_db),
 ):
     """Refund a payment (full or partial). Payee (item owner) initiates."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHPayment).where(BHPayment.id == payment_id)
@@ -259,7 +247,7 @@ async def list_payments(
     db: AsyncSession = Depends(get_db),
 ):
     """List payments for the current user (as payer or payee)."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHPayment)

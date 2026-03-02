@@ -15,7 +15,7 @@ from sqlalchemy.orm import selectinload
 
 from src.config import settings
 from src.database import get_db
-from src.dependencies import get_current_user_token
+from src.dependencies import get_current_user_token, get_user
 from src.i18n import detect_language, get_translator, SUPPORTED_LANGUAGES
 from src.models.item import BHItem, CATEGORY_GROUPS
 from src.models.listing import BHListing, ListingStatus
@@ -319,11 +319,10 @@ async def dashboard(request: Request,
     owner_rentals = []
 
     if token:
-        # Find user in DB by keycloak_id
-        user_result = await db.execute(
-            select(BHUser).where(BHUser.keycloak_id == token.get("sub", ""))
-        )
-        db_user = user_result.scalars().first()
+        try:
+            db_user = await get_user(db, token)
+        except Exception:
+            db_user = None
 
         if db_user:
             # User's items (capped at 12 for initial load)
@@ -397,16 +396,21 @@ async def profile(request: Request,
     stats = {"items": 0, "rentals": 0, "reviews": 0, "points": 0}
 
     if token:
-        result = await db.execute(
-            select(BHUser)
-            .options(
-                selectinload(BHUser.languages),
-                selectinload(BHUser.skills),
-                selectinload(BHUser.points),
+        try:
+            linked_user = await get_user(db, token)
+            # Re-fetch with eager-loaded relations
+            result = await db.execute(
+                select(BHUser)
+                .options(
+                    selectinload(BHUser.languages),
+                    selectinload(BHUser.skills),
+                    selectinload(BHUser.points),
+                )
+                .where(BHUser.id == linked_user.id)
             )
-            .where(BHUser.keycloak_id == token.get("sub", ""))
-        )
-        profile_user = result.scalars().first()
+            profile_user = result.scalars().first()
+        except Exception:
+            profile_user = None
 
         if profile_user:
             languages = profile_user.languages

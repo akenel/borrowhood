@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import require_auth
+from src.dependencies import get_user, require_auth
 from src.models.deposit import BHDeposit, DepositStatus
 from src.models.listing import BHListing
 from src.models.item import BHItem
@@ -62,18 +62,6 @@ class DepositForfeit(BaseModel):
     reason: str = Field(..., min_length=5, max_length=500)
 
 
-# --- Helpers ---
-
-async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
-    result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == keycloak_id)
-    )
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned")
-    return user
-
-
 # --- Endpoints ---
 
 @router.post("", response_model=DepositOut, status_code=201)
@@ -83,7 +71,7 @@ async def hold_deposit(
     db: AsyncSession = Depends(get_db),
 ):
     """Hold a deposit for a rental (renter pays at pickup)."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     # Get rental
     result = await db.execute(
@@ -157,7 +145,7 @@ async def list_deposits(
     db: AsyncSession = Depends(get_db),
 ):
     """List deposits for the current user (as payer or recipient)."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     query = select(BHDeposit).where(
         (BHDeposit.payer_id == user.id) | (BHDeposit.recipient_id == user.id)
@@ -196,7 +184,7 @@ async def release_deposit(
     db: AsyncSession = Depends(get_db),
 ):
     """Release deposit back to renter (owner action after successful return)."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHDeposit).where(BHDeposit.id == deposit_id)
@@ -246,7 +234,7 @@ async def forfeit_deposit(
     db: AsyncSession = Depends(get_db),
 ):
     """Forfeit deposit (owner keeps it due to damage/loss)."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHDeposit).where(BHDeposit.id == deposit_id)

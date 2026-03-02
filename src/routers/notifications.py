@@ -13,7 +13,7 @@ from sqlalchemy import select, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_db
-from src.dependencies import require_auth
+from src.dependencies import get_user, require_auth
 from src.models.notification import BHNotification, NotificationType
 from src.models.user import BHUser
 
@@ -38,23 +38,13 @@ class NotificationSummary(BaseModel):
     unread: int
 
 
-async def _get_user(db: AsyncSession, keycloak_id: str) -> BHUser:
-    result = await db.execute(
-        select(BHUser).where(BHUser.keycloak_id == keycloak_id)
-    )
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=403, detail="User not provisioned")
-    return user
-
-
 @router.get("/summary", response_model=NotificationSummary)
 async def notification_summary(
     token: dict = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
     """Get notification counts (total + unread) for the bell icon."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     total = await db.scalar(
         select(func.count(BHNotification.id))
@@ -79,7 +69,7 @@ async def list_notifications(
     db: AsyncSession = Depends(get_db),
 ):
     """List notifications for the authenticated user."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     query = (
         select(BHNotification)
@@ -115,7 +105,7 @@ async def mark_read(
     db: AsyncSession = Depends(get_db),
 ):
     """Mark a single notification as read."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     result = await db.execute(
         select(BHNotification)
@@ -137,7 +127,7 @@ async def mark_all_read(
     db: AsyncSession = Depends(get_db),
 ):
     """Mark all notifications as read."""
-    user = await _get_user(db, token["sub"])
+    user = await get_user(db, token)
 
     await db.execute(
         update(BHNotification)
