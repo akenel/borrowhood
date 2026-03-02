@@ -43,12 +43,21 @@ async def get_user(db: AsyncSession, token: dict) -> BHUser:
     # Fallback: match by username/slug (links seed users on first KC login)
     username = token.get("preferred_username", "")
     if username:
+        # Try exact slug match first
         result = await db.execute(
             select(BHUser).where(BHUser.slug == username)
         )
         user = result.scalars().first()
+
+        # Try slug prefix match (e.g. KC "mike" -> DB "mikes-garage")
+        if not user:
+            result = await db.execute(
+                select(BHUser).where(BHUser.slug.startswith(username + "s-"))
+            )
+            user = result.scalars().first()
+
         if user:
-            logger.info("Auto-linking user '%s' (slug) to keycloak_id %s", username, kc_id)
+            logger.info("Auto-linking user '%s' (slug=%s) to keycloak_id %s", username, user.slug, kc_id)
             user.keycloak_id = kc_id
             await db.commit()
             await db.refresh(user)
