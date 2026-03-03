@@ -20,7 +20,9 @@
         submitting: false,
         aiGenerating: false,
         aiUsed: false,
+        aiProvider: '',
         aiTags: [],
+        aiSuggestion: null,
         aiImageUrl: '',
         aiImageGenerating: false,
         aiImageIsReal: false,
@@ -87,7 +89,8 @@
             if (!this.form.name.trim()) return;
             this.aiGenerating = true;
             try {
-                const resp = await fetch('/api/v1/ai/generate-listing', {
+                // Try Gemini smart-listing first (richer output)
+                const resp = await fetch('/api/v1/ai/smart-listing', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -102,11 +105,31 @@
                     throw new Error(err.detail || 'AI generation failed');
                 }
                 const data = await resp.json();
+                // Apply rich suggestions
                 if (data.title) this.form.name = data.title;
                 if (data.description) this.form.description = data.description;
+                if (data.category) this.form.category = data.category;
+                if (data.condition) this.form.condition = data.condition;
+                if (data.item_type) this.form.item_type = data.item_type;
+                if (data.story_suggestion) this.form.story = data.story_suggestion;
                 this.aiTags = data.tags || [];
+                this.aiSuggestion = data;
+                this.aiProvider = data.ai_provider || 'gemini';
                 this.aiUsed = true;
-                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'AI suggestion ready! Review and edit as needed.' } }));
+                // Pre-fill pricing if Gemini provided suggestions
+                if (data.suggested_price && data.suggested_listing_type) {
+                    const lt = data.suggested_listing_type;
+                    if (!this.selectedTypes.includes(lt)) {
+                        this.selectedTypes = [...this.selectedTypes, lt];
+                    }
+                    if (this.listingPrices[lt]) {
+                        this.listingPrices[lt].price = String(data.suggested_price);
+                        if (data.price_unit) this.listingPrices[lt].price_unit = data.price_unit;
+                        if (data.deposit_suggestion) this.listingPrices[lt].deposit = String(data.deposit_suggestion);
+                    }
+                }
+                const provider = this.aiProvider === 'gemini' ? 'Gemini' : 'AI';
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: provider + ' suggestion ready! Review and edit as needed.' } }));
             } catch (err) {
                 window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: err.message } }));
             } finally {
@@ -257,14 +280,36 @@
                     </div>
                     <div class="flex-1">
                         <p class="text-sm font-semibold text-purple-900">
-                            {% if lang == 'it' %}Assistente AI{% else %}AI Assistant{% endif %}
+                            {% if lang == 'it' %}Assistente AI Gemini{% else %}Gemini AI Assistant{% endif %}
                         </p>
                         <p class="text-xs text-purple-700 mt-0.5">
-                            {% if lang == 'it' %}Scrivi il nome, scegli la categoria, clicca il bottone. L'AI scrive la descrizione per te.{% else %}Type the name, pick a category, click the button. AI writes the description for you.{% endif %}
+                            {% if lang == 'it' %}Scrivi il nome e clicca il bottone. Gemini genera descrizione, prezzo, deposito e storia -- tutto in un colpo.{% else %}Type the name and click the button. Gemini generates description, price, deposit, and story -- all in one shot.{% endif %}
                         </p>
                     </div>
                 </div>
             </div>
+
+            <!-- AI Suggestion Summary (shows after Gemini generates) -->
+            <template x-if="aiSuggestion && aiProvider === 'gemini'">
+                <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                    <p class="text-sm font-semibold text-emerald-800 mb-2">Gemini filled in:</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-emerald-700">
+                        <span x-show="aiSuggestion.suggested_price > 0" class="bg-emerald-100 rounded px-2 py-1">
+                            Price: EUR <span x-text="aiSuggestion.suggested_price"></span>/<span x-text="aiSuggestion.price_unit?.replace('per_','') || 'day'"></span>
+                        </span>
+                        <span x-show="aiSuggestion.deposit_suggestion > 0" class="bg-emerald-100 rounded px-2 py-1">
+                            Deposit: EUR <span x-text="aiSuggestion.deposit_suggestion"></span>
+                        </span>
+                        <span x-show="aiSuggestion.condition" class="bg-emerald-100 rounded px-2 py-1">
+                            Condition: <span x-text="aiSuggestion.condition"></span>
+                        </span>
+                        <span x-show="aiSuggestion.suggested_listing_type" class="bg-emerald-100 rounded px-2 py-1">
+                            Type: <span x-text="aiSuggestion.suggested_listing_type"></span>
+                        </span>
+                    </div>
+                    <p class="text-xs text-emerald-600 mt-2">Review and adjust before submitting. You're the boss.</p>
+                </div>
+            </template>
 
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700 mb-1">{{ t('list_item.name') }} *</label>
@@ -307,7 +352,7 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                             </svg>
-                            <span>{% if lang == 'it' %}Genera Descrizione con AI{% else %}Generate Description with AI{% endif %}</span>
+                            <span>{% if lang == 'it' %}Genera con Gemini AI{% else %}Generate with Gemini AI{% endif %}</span>
                         </span>
                     </template>
                     <template x-if="aiGenerating">

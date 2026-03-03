@@ -45,6 +45,8 @@ class BHSettings(BaseSettings):
 
     # Google
     google_maps_api_key: str = ""
+    google_api_key: str = ""  # Gemini API key for AI agents
+    gemini_model: str = "gemini-2.5-flash"
 
     class Config:
         env_prefix = "BH_"
