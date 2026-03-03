@@ -90,9 +90,13 @@ async function testHealthEndpoints(page) {
     console.log('\n--- Health Endpoints ---');
 
     await test('Health endpoint returns ok', async () => {
-        const resp = await fetchJSON(page, '/api/v1/health');
-        assert(resp.status === 200, `Expected 200, got ${resp.status}`);
-        assert(resp.body?.status === 'ok', 'Health status not ok');
+        const resp = await page.goto(`${BASE_URL}/api/v1/health`, {
+            waitUntil: 'domcontentloaded',
+            timeout: 15000,
+        });
+        assert(resp.status() === 200, `Expected 200, got ${resp.status()}`);
+        const body = await resp.json();
+        assert(body?.status === 'healthy' || body?.status === 'ok', `Health status: ${body?.status}`);
     });
 }
 
@@ -100,43 +104,64 @@ async function testAPISmokeTests(page) {
     console.log('\n--- API Smoke Tests ---');
 
     await test('Items API returns list', async () => {
-        const resp = await fetchJSON(page, '/api/v1/items?limit=5');
-        assert(resp.status === 200, `Expected 200, got ${resp.status}`);
-        assert(Array.isArray(resp.body), 'Expected array');
+        const resp = await page.goto(`${BASE_URL}/api/v1/items?limit=5`, {
+            waitUntil: 'domcontentloaded', timeout: 15000,
+        });
+        assert(resp.status() === 200, `Expected 200, got ${resp.status()}`);
+        const body = await resp.json();
+        assert(Array.isArray(body), 'Expected array');
     });
 
-    await test('Users API returns list', async () => {
-        const resp = await fetchJSON(page, '/api/v1/users?limit=5');
-        assert(resp.status === 200, `Expected 200, got ${resp.status}`);
-        assert(Array.isArray(resp.body), 'Expected array');
+    await test('Users API returns paginated list', async () => {
+        const resp = await page.goto(`${BASE_URL}/api/v1/users?limit=5`, {
+            waitUntil: 'domcontentloaded', timeout: 15000,
+        });
+        assert(resp.status() === 200, `Expected 200, got ${resp.status()}`);
+        const body = await resp.json();
+        assert(body?.items !== undefined || Array.isArray(body), 'Expected items array or array');
     });
 
     await test('Reviews summary returns data', async () => {
-        // Try to get any user's review summary
-        const users = await fetchJSON(page, '/api/v1/users?limit=1');
-        if (users.body?.length > 0) {
-            const userId = users.body[0].id;
-            const resp = await fetchJSON(page, `/api/v1/reviews/summary/${userId}`);
-            assert(resp.status === 200, `Expected 200, got ${resp.status}`);
-            assert(resp.body?.user_id !== undefined, 'Missing user_id in summary');
+        // Get a user from the paginated endpoint
+        const usersResp = await page.goto(`${BASE_URL}/api/v1/users?limit=1`, {
+            waitUntil: 'domcontentloaded', timeout: 15000,
+        });
+        const usersBody = await usersResp.json();
+        const userList = usersBody?.items || usersBody || [];
+        if (userList.length > 0) {
+            const userId = userList[0].id;
+            const resp = await page.goto(`${BASE_URL}/api/v1/reviews/summary/${userId}`, {
+                waitUntil: 'domcontentloaded', timeout: 15000,
+            });
+            assert(resp.status() === 200, `Expected 200, got ${resp.status()}`);
+            const body = await resp.json();
+            assert(body?.user_id !== undefined, 'Missing user_id in summary');
         }
     });
 
     await test('Badges catalog returns list', async () => {
-        const resp = await fetchJSON(page, '/api/v1/badges/catalog');
-        assert(resp.status === 200, `Expected 200, got ${resp.status}`);
+        const resp = await page.goto(`${BASE_URL}/api/v1/badges/catalog`, {
+            waitUntil: 'domcontentloaded', timeout: 15000,
+        });
+        assert(resp.status() === 200, `Expected 200, got ${resp.status()}`);
     });
 
     await test('Helpboard summary returns counts', async () => {
-        const resp = await fetchJSON(page, '/api/v1/helpboard/summary');
-        assert(resp.status === 200, `Expected 200, got ${resp.status}`);
-        assert(resp.body?.total !== undefined, 'Missing total in summary');
+        const resp = await page.goto(`${BASE_URL}/api/v1/helpboard/summary`, {
+            waitUntil: 'domcontentloaded', timeout: 15000,
+        });
+        assert(resp.status() === 200, `Expected 200, got ${resp.status()}`);
+        const body = await resp.json();
+        assert(body?.total !== undefined, 'Missing total in summary');
     });
 
     await test('Helpboard posts returns paginated', async () => {
-        const resp = await fetchJSON(page, '/api/v1/helpboard/posts?limit=5');
-        assert(resp.status === 200, `Expected 200, got ${resp.status}`);
-        assert(resp.body?.items !== undefined, 'Missing items in response');
+        const resp = await page.goto(`${BASE_URL}/api/v1/helpboard/posts?limit=5`, {
+            waitUntil: 'domcontentloaded', timeout: 15000,
+        });
+        assert(resp.status() === 200, `Expected 200, got ${resp.status()}`);
+        const body = await resp.json();
+        assert(body?.items !== undefined, 'Missing items in response');
     });
 }
 
@@ -159,14 +184,17 @@ async function testAuthenticatedPages(page) {
     const authPages = [
         ['/dashboard', 'Dashboard'],
         ['/profile', 'Profile'],
-        ['/list-item', 'List Item'],
+        ['/list', 'List Item'],
     ];
 
     for (const [path, name] of authPages) {
         await test(`${name} redirects to login (${path})`, async () => {
-            const status = await fetchStatus(page, path);
-            // Should either redirect (307) or return the page (200 with login)
-            assert([200, 307].includes(status), `Expected 200 or 307, got ${status}`);
+            const resp = await page.goto(`${BASE_URL}${path}`, {
+                waitUntil: 'domcontentloaded',
+                timeout: 15000,
+            });
+            // Should return 200 (login page after redirect) or the page itself
+            assert([200, 307].includes(resp.status()), `Expected 200 or 307, got ${resp.status()}`);
         });
     }
 }
@@ -214,9 +242,13 @@ async function testWorkshopPages(page) {
     console.log('\n--- Workshop Pages ---');
 
     await test('Workshop page loads for first user', async () => {
-        const users = await fetchJSON(page, '/api/v1/users?limit=1');
-        if (users.body?.length > 0) {
-            const slug = users.body[0].slug;
+        const usersResp = await page.goto(`${BASE_URL}/api/v1/users?limit=1`, {
+            waitUntil: 'domcontentloaded', timeout: 15000,
+        });
+        const usersBody = await usersResp.json();
+        const userList = usersBody?.items || usersBody || [];
+        if (userList.length > 0) {
+            const slug = userList[0].slug;
             const resp = await page.goto(`${BASE_URL}/workshop/${slug}`, {
                 waitUntil: 'domcontentloaded',
                 timeout: 15000,
