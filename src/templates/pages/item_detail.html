@@ -358,7 +358,8 @@
                     <p x-show="!reserveMet" class="text-xs text-amber-600 font-medium">{{ t('auction.reserve_not_met') }}</p>
                 </div>
 
-                <!-- Bid form -->
+                <!-- Bid form (progressive disclosure: TRUSTED+ can bid) -->
+                {% if viewer_tier in ['trusted', 'pillar', 'legend'] %}
                 <div x-show="!ended" class="space-y-3">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('auction.your_bid') }}</label>
@@ -377,6 +378,13 @@
                     </button>
                     <p class="text-xs text-center text-gray-400">{{ t('auction.anti_snipe') }}</p>
                 </div>
+                {% else %}
+                <div x-show="!ended" class="p-4 bg-gray-50 rounded-lg text-center">
+                    <svg class="w-6 h-6 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <p class="text-sm text-gray-500 font-medium">{% if lang == 'it' %}Livello Fidato richiesto per fare offerte{% else %}Trusted tier required to place bids{% endif %}</p>
+                    <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Guadagna punti prestando e recensendo{% else %}Earn points by lending and reviewing{% endif %}</p>
+                </div>
+                {% endif %}
 
                 <!-- Success feedback -->
                 <div x-show="bidSuccess" x-cloak x-transition

@@ -233,8 +233,19 @@ async def item_detail(slug: str, request: Request,
         ctx = _ctx(request, token)
         return _render("errors/404.html", ctx, status_code=404)
 
+    # Resolve viewer's badge tier for progressive disclosure
+    viewer_tier = "anonymous"
+    if token:
+        from src.dependencies import get_user as _get_user
+        try:
+            viewer = await _get_user(db, token)
+            viewer_tier = viewer.badge_tier.value
+        except Exception:
+            pass
+
     ctx = _ctx(request, token,
         item=item,
+        viewer_tier=viewer_tier,
         og_title=f"{item.name} - BorrowHood",
         og_description=item.description[:160] if item.description else "Available on BorrowHood",
         og_image=item.media[0].url if item.media else None,
@@ -272,10 +283,21 @@ async def workshop_profile(slug: str, request: Request,
     )
     user_badges = badge_result.scalars().all()
 
+    # Resolve viewer's badge tier for progressive disclosure
+    viewer_tier = "anonymous"
+    if token:
+        from src.dependencies import get_user as _get_user
+        try:
+            viewer = await _get_user(db, token)
+            viewer_tier = viewer.badge_tier.value
+        except Exception:
+            pass
+
     ctx = _ctx(request, token,
         workshop=workshop_owner,
         workshop_badges=user_badges,
         badge_info=BADGE_INFO,
+        viewer_tier=viewer_tier,
         og_title=f"{workshop_owner.workshop_name or workshop_owner.display_name} - BorrowHood",
         og_description=workshop_owner.tagline or "Workshop on BorrowHood",
     )
