@@ -57,11 +57,11 @@
 
         detectLocation() {
             if (!navigator.geolocation) {
-                this.locationStatus = '{% if lang == \"it\" %}Geolocalizzazione non supportata{% else %}Geolocation not supported{% endif %}';
+                this.locationStatus = '{% if lang == 'it' %}Geolocalizzazione non supportata{% else %}Geolocation not supported{% endif %}';
                 return;
             }
             this.locating = true;
-            this.locationStatus = '{% if lang == \"it\" %}Rilevamento posizione...{% else %}Detecting location...{% endif %}';
+            this.locationStatus = '{% if lang == 'it' %}Rilevamento posizione...{% else %}Detecting location...{% endif %}';
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
                     this.profile.latitude = Math.round(pos.coords.latitude * 1000) / 1000;
@@ -69,11 +69,11 @@
                     if (pos.coords.altitude != null) {
                         this.profile.altitude = Math.round(pos.coords.altitude);
                     }
-                    this.locationStatus = '{% if lang == \"it\" %}Posizione rilevata{% else %}Location detected{% endif %}';
+                    this.locationStatus = '{% if lang == 'it' %}Posizione rilevata{% else %}Location detected{% endif %}';
                     this.locating = false;
                 },
                 (err) => {
-                    this.locationStatus = '{% if lang == \"it\" %}Impossibile rilevare la posizione{% else %}Could not detect location{% endif %}';
+                    this.locationStatus = '{% if lang == 'it' %}Impossibile rilevare la posizione{% else %}Could not detect location{% endif %}';
                     this.locating = false;
                 },
                 { enableHighAccuracy: true, timeout: 10000 }

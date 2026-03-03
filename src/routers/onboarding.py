@@ -7,7 +7,7 @@ Creates/updates user profile, workshop details, and languages in one shot.
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from slugify import slugify
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -50,16 +50,37 @@ class ProfileSetup(BaseModel):
     tagline: Optional[str] = Field(None, max_length=200)
     languages: List[LanguageIn] = []
     skills: List[SkillIn] = []
-    # Location (from browser geolocation API)
+    # Location (from browser geolocation API, rounded for privacy)
     latitude: Optional[float] = None
     longitude: Optional[float] = None
-    altitude: Optional[float] = None
+    altitude: Optional[float] = None  # meters ASL
     # Service offers
     offers_delivery: bool = False
     offers_pickup: bool = False
     offers_training: bool = False
     offers_custom_orders: bool = False
     offers_repair: bool = False
+
+    @field_validator("latitude", mode="before")
+    @classmethod
+    def clamp_lat(cls, v: float | None) -> float | None:
+        if v is None:
+            return None
+        return round(max(-90.0, min(90.0, v)), 3)
+
+    @field_validator("longitude", mode="before")
+    @classmethod
+    def clamp_lng(cls, v: float | None) -> float | None:
+        if v is None:
+            return None
+        return round(max(-180.0, min(180.0, v)), 3)
+
+    @field_validator("altitude", mode="before")
+    @classmethod
+    def clamp_alt(cls, v: float | None) -> float | None:
+        if v is None:
+            return None
+        return round(max(-500.0, min(9000.0, v)), 1)
 
 
 async def _unique_slug(db: AsyncSession, base: str) -> str:
@@ -119,13 +140,13 @@ async def setup_profile(
                 pass
         if profile.tagline:
             user.tagline = profile.tagline
-        # Location (round to 3 decimals ~ 111m precision for privacy)
+        # Location (already rounded by schema validators)
         if profile.latitude is not None:
-            user.latitude = round(profile.latitude, 3)
+            user.latitude = profile.latitude
         if profile.longitude is not None:
-            user.longitude = round(profile.longitude, 3)
+            user.longitude = profile.longitude
         if profile.altitude is not None:
-            user.altitude = round(profile.altitude, 1)
+            user.altitude = profile.altitude
         # Service offers
         user.offers_delivery = profile.offers_delivery
         user.offers_pickup = profile.offers_pickup
@@ -154,9 +175,9 @@ async def setup_profile(
             workshop_name=profile.workshop_name,
             workshop_type=workshop_type,
             tagline=profile.tagline,
-            latitude=round(profile.latitude, 3) if profile.latitude else None,
-            longitude=round(profile.longitude, 3) if profile.longitude else None,
-            altitude=round(profile.altitude, 1) if profile.altitude else None,
+            latitude=profile.latitude,
+            longitude=profile.longitude,
+            altitude=profile.altitude,
             offers_delivery=profile.offers_delivery,
             offers_pickup=profile.offers_pickup,
             offers_training=profile.offers_training,
