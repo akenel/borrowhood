@@ -547,6 +547,36 @@
             </div>
             {% endif %}
 
+            <!-- QR Code (shareable link) -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="{
+                qrUrl: '',
+                init() {
+                    var itemUrl = window.location.origin + '/items/{{ item.slug }}';
+                    this.qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=svg&data=' + encodeURIComponent(itemUrl);
+                }
+            }">
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">
+                    {% if lang == 'it' %}Codice QR{% else %}QR Code{% endif %}
+                </h3>
+                <div class="flex flex-col items-center">
+                    <img :src="qrUrl" alt="QR Code" class="w-40 h-40 rounded">
+                    <p class="text-xs text-gray-400 mt-2 text-center">
+                        {% if lang == 'it' %}Scansiona per vedere questo oggetto{% else %}Scan to view this item{% endif %}
+                    </p>
+                    <button @click="
+                        var a = document.createElement('a');
+                        a.href = qrUrl.replace('format=svg', 'format=png').replace('size=200x200', 'size=400x400');
+                        a.download = '{{ item.slug }}-qr.png';
+                        a.click();
+                    " class="mt-2 inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        {% if lang == 'it' %}Scarica PNG{% else %}Download PNG{% endif %}
+                    </button>
+                </div>
+            </div>
+
             <!-- Location map -->
             {% if item.latitude and item.longitude %}
             <div class="bg-white rounded-lg border border-gray-200 p-6">
