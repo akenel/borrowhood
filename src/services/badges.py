@@ -214,6 +214,33 @@ async def check_and_award_badges(db: AsyncSession, user_id: UUID) -> List[BHBadg
         if b:
             awarded.append(b)
 
+    # Originator: first person to list an item in a category
+    if not await _has_badge(db, user_id, BadgeCode.ORIGINATOR):
+        # Get categories this user has items in
+        user_items = await db.execute(
+            select(BHItem.category)
+            .where(BHItem.owner_id == user_id)
+            .where(BHItem.deleted_at.is_(None))
+            .distinct()
+        )
+        user_categories = [row[0] for row in user_items.all()]
+
+        for cat in user_categories:
+            # Find the earliest item in this category
+            earliest = await db.execute(
+                select(BHItem.owner_id)
+                .where(BHItem.category == cat)
+                .where(BHItem.deleted_at.is_(None))
+                .order_by(BHItem.created_at.asc())
+                .limit(1)
+            )
+            first_owner = earliest.scalar()
+            if first_owner == user_id:
+                b = await _award_badge(db, user_id, BadgeCode.ORIGINATOR, f"First in {cat}")
+                if b:
+                    awarded.append(b)
+                break  # One originator badge per user
+
     # Update points and tier
     await _update_points(db, user_id, item_count, rentals_as_renter, reviews_given, five_star_count, giveaways_completed)
     await _update_badge_tier(db, user_id)

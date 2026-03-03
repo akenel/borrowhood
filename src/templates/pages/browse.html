@@ -302,6 +302,27 @@
                     {% endif %}
                     {% endif %}
 
+                    <!-- Seasonal tags -->
+                    {% if item.listings %}
+                    {% set al = item.listings | selectattr('status.value', 'equalto', 'active') | first %}
+                    {% if al %}
+                    {% set today = now().strftime('%Y-%m-%d') %}
+                    <div class="mt-2">
+                        {% if not al.available_from and not al.available_to %}
+                        <span class="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full font-medium">{% if lang == 'it' %}Tutto l'anno{% else %}Year-Round{% endif %}</span>
+                        {% elif al.available_from and al.available_from > today %}
+                        <span class="text-xs px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full font-medium">{% if lang == 'it' %}Disponibile dal{% else %}Coming{% endif %} {{ al.available_from }}</span>
+                        {% elif al.available_from and al.available_to %}
+                            {% if al.available_from <= today and (not al.available_to or al.available_to >= today) %}
+                        <span class="text-xs px-2 py-0.5 bg-green-50 text-green-700 border border-green-200 rounded-full font-medium">{% if lang == 'it' %}Disponibile ora{% else %}Available Now{% endif %}</span>
+                            {% else %}
+                        <span class="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-full font-medium">{% if lang == 'it' %}Stagionale{% else %}Seasonal{% endif %} {{ al.available_from }} - {{ al.available_to }}</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% endif %}
+
                     <div class="mt-3 flex items-center justify-between">
                         <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">{{ t('categories.' + item.category) }}</span>
                         {% if item.owner %}

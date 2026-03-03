@@ -16,9 +16,11 @@ from sqlalchemy.orm import selectinload
 from src.database import get_db
 from src.dependencies import get_user, require_auth
 from src.models.listing import BHListing, ListingType, ListingStatus
+from src.models.notification import NotificationType
 from src.models.rental import BHRental, RentalStatus, validate_rental_transition
 from src.models.user import BHUser
 from src.schemas.rental import RentalCreate, RentalOut, RentalStatusUpdate
+from src.services.notify import notify_rental_event
 
 router = APIRouter(prefix="/api/v1/rentals", tags=["rentals"])
 
@@ -137,6 +139,18 @@ async def create_rental(
         idempotency_key=data.idempotency_key,
     )
     db.add(rental)
+    await db.flush()
+
+    # Notify item owner about the rental request
+    await notify_rental_event(
+        db=db,
+        user_id=listing.item.owner_id,
+        notification_type=NotificationType.RENTAL_REQUEST,
+        item_name=listing.item.name,
+        other_party_name=user.display_name,
+        rental_id=rental.id,
+    )
+
     await db.commit()
     await db.refresh(rental)
     return rental
@@ -239,6 +253,27 @@ async def update_rental_status(
             deposit.status = DepositStatus.RELEASED
             deposit.released_amount = deposit.amount
             deposit.reason = "Auto-released on rental completion"
+
+    # Notify the other party about the status change
+    status_to_type = {
+        RentalStatus.APPROVED: NotificationType.RENTAL_APPROVED,
+        RentalStatus.DECLINED: NotificationType.RENTAL_DECLINED,
+        RentalStatus.PICKED_UP: NotificationType.RENTAL_PICKED_UP,
+        RentalStatus.RETURNED: NotificationType.RENTAL_RETURNED,
+        RentalStatus.COMPLETED: NotificationType.RENTAL_COMPLETED,
+        RentalStatus.CANCELLED: NotificationType.RENTAL_CANCELLED,
+    }
+    notif_type = status_to_type.get(rental.status)
+    if notif_type:
+        notify_user_id = rental.listing.item.owner_id if is_renter else rental.renter_id
+        await notify_rental_event(
+            db=db,
+            user_id=notify_user_id,
+            notification_type=notif_type,
+            item_name=rental.listing.item.name,
+            other_party_name=user.display_name,
+            rental_id=rental.id,
+        )
 
     await db.commit()
     await db.refresh(rental)

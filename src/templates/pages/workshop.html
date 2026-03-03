@@ -328,6 +328,21 @@
                     {% if lang == 'it' %}Reputazione{% else %}Reputation{% endif %}
                 </h3>
 
+                <!-- Trust score -->
+                {% if workshop.trust_score is not none %}
+                <div class="flex items-center justify-center mb-3">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 {% if workshop.trust_score >= 0.7 %}text-emerald-500{% elif workshop.trust_score >= 0.4 %}text-blue-500{% else %}text-gray-400{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5C17.944 5.33 18 5.68 18 6.036 18 12.66 14.627 18.188 10 19.998 5.373 18.188 2 12.66 2 6.036c0-.357.056-.706.166-1.037z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-lg font-bold {% if workshop.trust_score >= 0.7 %}text-emerald-700{% elif workshop.trust_score >= 0.4 %}text-blue-700{% else %}text-gray-700{% endif %}">
+                            {{ (workshop.trust_score * 100) | int }}%
+                        </span>
+                        <span class="text-xs text-gray-500">{% if lang == 'it' %}fiducia{% else %}trust{% endif %}</span>
+                    </div>
+                </div>
+                {% endif %}
+
                 <!-- Tier + points -->
                 <div class="text-center mb-4">
                     <span class="text-3xl font-bold text-gray-900">{{ total }}</span>
@@ -420,7 +435,7 @@
                     {% set color = info.get('color', 'gray') %}
                     <div class="flex items-center space-x-2 p-2 rounded-lg bg-{{ color }}-50 border border-{{ color }}-200" title="{{ info.get('description', '') }}">
                         <span class="text-lg">
-                            {% if info.get('icon') == 'package' %}&#128230;{% elif info.get('icon') == 'handshake' %}&#129309;{% elif info.get('icon') == 'star' %}&#11088;{% elif info.get('icon') == 'sparkles' %}&#10024;{% elif info.get('icon') == 'gift' %}&#127873;{% elif info.get('icon') == 'shield-check' %}&#128737;{% elif info.get('icon') == 'megaphone' %}&#128227;{% elif info.get('icon') == 'globe' %}&#127760;{% elif info.get('icon') == 'wrench' %}&#128295;{% elif info.get('icon') == 'trophy' %}&#127942;{% elif info.get('icon') == 'rocket' %}&#128640;{% elif info.get('icon') == 'crown' %}&#128081;{% elif info.get('icon') == 'heart' %}&#10084;{% elif info.get('icon') == 'building-storefront' %}&#127978;{% else %}&#127941;{% endif %}
+                            {% if info.get('icon') == 'package' %}&#128230;{% elif info.get('icon') == 'handshake' %}&#129309;{% elif info.get('icon') == 'star' %}&#11088;{% elif info.get('icon') == 'sparkles' %}&#10024;{% elif info.get('icon') == 'gift' %}&#127873;{% elif info.get('icon') == 'shield-check' %}&#128737;{% elif info.get('icon') == 'megaphone' %}&#128227;{% elif info.get('icon') == 'globe' %}&#127760;{% elif info.get('icon') == 'wrench' %}&#128295;{% elif info.get('icon') == 'trophy' %}&#127942;{% elif info.get('icon') == 'rocket' %}&#128640;{% elif info.get('icon') == 'crown' %}&#128081;{% elif info.get('icon') == 'heart' %}&#10084;{% elif info.get('icon') == 'building-storefront' %}&#127978;{% elif info.get('icon') == 'flag' %}&#127937;{% else %}&#127941;{% endif %}
                         </span>
                         <span class="text-xs font-medium text-{{ color }}-700 truncate">{{ info.get('name', badge.badge_code.value) }}</span>
                     </div>

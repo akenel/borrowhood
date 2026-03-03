@@ -139,6 +139,19 @@ async def create_review(
 
     await db.flush()
 
+    # Notify the reviewee
+    from src.models.notification import NotificationType
+    from src.services.notify import create_notification
+    await create_notification(
+        db=db,
+        user_id=data.reviewee_id,
+        notification_type=NotificationType.REVIEW_RECEIVED,
+        title=f"{user.display_name} left you a {data.rating}-star review",
+        body=data.title or "",
+        link="/dashboard",
+        entity_type="review",
+    )
+
     # Check and award badges for both parties
     from src.services.badges import check_and_award_badges
     await check_and_award_badges(db, user.id)

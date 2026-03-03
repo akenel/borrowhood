@@ -7,6 +7,7 @@ Keycloak JWT verification with auto-provisioning:
 """
 
 import logging
+from datetime import datetime, timezone
 from functools import lru_cache
 from typing import Optional
 from urllib.parse import quote
@@ -15,12 +16,13 @@ from uuid import UUID
 import httpx
 from fastapi import Depends, HTTPException, Request
 from jose import JWTError, jwt
+from slugify import slugify
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
 from src.database import get_db
-from src.models.user import BHUser
+from src.models.user import BHUser, BHUserPoints
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +65,48 @@ async def get_user(db: AsyncSession, token: dict) -> BHUser:
             await db.refresh(user)
             return user
 
-    raise HTTPException(status_code=403, detail="User not provisioned in BorrowHood")
+    # Auto-provision: create BHUser from JWT claims
+    email = token.get("email", f"{username}@borrowhood.local")
+    display_name = token.get("name") or token.get("preferred_username", "Neighbor")
+    base_slug = slugify(username or display_name, max_length=80)
+
+    # Ensure slug uniqueness
+    slug = base_slug
+    suffix = 1
+    while True:
+        existing = await db.execute(select(BHUser).where(BHUser.slug == slug))
+        if not existing.scalars().first():
+            break
+        slug = f"{base_slug}-{suffix}"
+        suffix += 1
+
+    new_user = BHUser(
+        keycloak_id=kc_id,
+        email=email,
+        display_name=display_name,
+        slug=slug,
+    )
+    db.add(new_user)
+    await db.flush()
+
+    # Create points record
+    new_points = BHUserPoints(user_id=new_user.id, total_points=0)
+    db.add(new_points)
+
+    # Award EARLY_ADOPTER badge if before June 2026
+    if datetime.now(timezone.utc) < datetime(2026, 6, 1, tzinfo=timezone.utc):
+        from src.models.badge import BHBadge, BadgeCode
+        early_badge = BHBadge(
+            user_id=new_user.id,
+            badge_code=BadgeCode.EARLY_ADOPTER,
+            reason="Joined during beta",
+        )
+        db.add(early_badge)
+
+    await db.commit()
+    await db.refresh(new_user)
+    logger.info("Auto-provisioned user '%s' (slug=%s, id=%s)", display_name, slug, new_user.id)
+    return new_user
 
 # Keycloak OIDC discovery cache
 _jwks_client = None

@@ -80,6 +80,7 @@ class BHUser(BHBase, Base):
     # Location (fuzzy -- 3 decimal places max)
     latitude: Mapped[Optional[float]] = mapped_column(Float)
     longitude: Mapped[Optional[float]] = mapped_column(Float)
+    altitude: Mapped[Optional[float]] = mapped_column(Float, default=None)  # meters ASL
     city: Mapped[Optional[str]] = mapped_column(String(100))
     country_code: Mapped[Optional[str]] = mapped_column(String(2))
 
@@ -90,6 +91,9 @@ class BHUser(BHBase, Base):
     badge_tier: Mapped[BadgeTier] = mapped_column(
         Enum(BadgeTier), default=BadgeTier.NEWCOMER, nullable=False
     )
+
+    # Composite trust score (0.0 to 1.0)
+    trust_score: Mapped[Optional[float]] = mapped_column(Float, default=None)
 
     # Service declarations ("I offer...")
     offers_delivery: Mapped[bool] = mapped_column(default=False)

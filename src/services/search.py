@@ -17,10 +17,14 @@ from src.models.listing import BHListing, ListingStatus
 from src.models.user import BHUser, BHUserLanguage
 
 
-def haversine_km(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
-    """Calculate distance between two points in km (Haversine formula).
+def haversine_km(
+    lat1: float, lng1: float, lat2: float, lng2: float,
+    alt1: float = 0.0, alt2: float = 0.0,
+) -> float:
+    """Calculate distance between two points in km (Haversine + altitude).
 
-    Good enough for neighborhood-scale distances (<50km).
+    Sicily has fishermen at sea level and goat farmers at 800m.
+    3km on map can mean 45 min by road when altitude differs.
     """
     R = 6371  # Earth radius in km
     dlat = math.radians(lat2 - lat1)
@@ -31,7 +35,11 @@ def haversine_km(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
         * math.cos(math.radians(lat2))
         * math.sin(dlng / 2) ** 2
     )
-    return R * 2 * math.asin(math.sqrt(a))
+    horizontal = R * 2 * math.asin(math.sqrt(a))
+
+    # Add altitude difference (Pythagorean with horizontal distance)
+    alt_diff_km = (alt2 - alt1) / 1000.0
+    return math.sqrt(horizontal ** 2 + alt_diff_km ** 2)
 
 
 async def search_items(
@@ -97,14 +105,15 @@ async def search_items(
     result = await db.execute(query)
     items = list(result.scalars().unique().all())
 
-    # Post-query distance filtering and sorting (Haversine in Python for v1)
+    # Post-query distance filtering and sorting (Haversine + altitude in Python for v1)
     if user_lat is not None and user_lng is not None:
         items_with_distance = []
         for item in items:
-            item_lat = item.latitude or item.owner.latitude
-            item_lng = item.longitude or item.owner.longitude
+            item_lat = item.latitude or (item.owner.latitude if item.owner else None)
+            item_lng = item.longitude or (item.owner.longitude if item.owner else None)
+            item_alt = item.altitude or (item.owner.altitude if item.owner else None) or 0.0
             if item_lat and item_lng:
-                dist = haversine_km(user_lat, user_lng, item_lat, item_lng)
+                dist = haversine_km(user_lat, user_lng, item_lat, item_lng, alt2=item_alt)
                 if dist <= radius_km:
                     items_with_distance.append((item, dist))
             else:

@@ -118,6 +118,7 @@ class BHItem(BHBase, Base):
     # Location (inherits from owner if not set)
     latitude: Mapped[Optional[float]] = mapped_column(Float)
     longitude: Mapped[Optional[float]] = mapped_column(Float)
+    altitude: Mapped[Optional[float]] = mapped_column(Float, default=None)  # meters ASL
 
     # Story -- the human narrative behind this item
     story: Mapped[Optional[str]] = mapped_column(Text)  # "My father's drill from 1978..."
