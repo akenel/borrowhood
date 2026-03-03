@@ -9993,7 +9993,7 @@
     {
       "slug": "boudiccas-war-chariot",
       "display_name": "Boudicca",
-      "email": "boudicca@borrowhood.local",
+      "email": "boudiccas.war.chariot@borrowhood.local",
       "date_of_birth": "0030-01-01",
       "mother_name": "Unknown -- the Romans erased our women from history, but we remember",
       "father_name": "Unknown -- Iceni nobility, a man who raised a queen to fight empires",
@@ -10053,7 +10053,7 @@
     {
       "slug": "sun-tzus-strategy-pavilion",
       "display_name": "Sun Tzu",
-      "email": "suntzu@borrowhood.local",
+      "email": "sun.tzus.strategy.pavilion@borrowhood.local",
       "date_of_birth": "0544-01-01",
       "mother_name": "Unknown -- the family records of Qi are silent on mothers",
       "father_name": "Sun Wu -- a minor noble of Qi, military lineage",
@@ -10113,7 +10113,7 @@
     {
       "slug": "genghis-khans-ger",
       "display_name": "Genghis Khan",
-      "email": "genghis@borrowhood.local",
+      "email": "genghis.khans.ger@borrowhood.local",
       "date_of_birth": "1162-01-01",
       "mother_name": "Hoelun -- kidnapped bride who raised me after my father was poisoned",
       "father_name": "Yesugei -- chief of the Kiyad, poisoned by Tatars when I was nine",
@@ -10237,7 +10237,7 @@
     {
       "slug": "saladins-citadel",
       "display_name": "Saladin",
-      "email": "saladin@borrowhood.local",
+      "email": "saladins.citadel@borrowhood.local",
       "date_of_birth": "1137-01-01",
       "mother_name": "Unknown -- the chroniclers recorded only my father's line",
       "father_name": "Najm ad-Din Ayyub -- governor of Baalbek, Kurdish soldier who served Zengi",
@@ -10305,7 +10305,7 @@
     {
       "slug": "richards-crusader-keep",
       "display_name": "Richard the Lionheart",
-      "email": "richard@borrowhood.local",
+      "email": "richards.crusader.keep@borrowhood.local",
       "date_of_birth": "1157-09-08",
       "mother_name": "Eleanor of Aquitaine -- the most powerful woman in medieval Europe",
       "father_name": "Henry II -- King of England, who I rebelled against twice",
@@ -10501,7 +10501,7 @@
     {
       "slug": "shakas-kraal",
       "display_name": "Shaka Zulu",
-      "email": "shaka@borrowhood.local",
+      "email": "shakas.kraal@borrowhood.local",
       "date_of_birth": "1787-07-01",
       "mother_name": "Nandi -- the woman they called 'the wasp', exiled with me but never broken",
       "father_name": "Senzangakhona kaJama -- chief of the Zulu who disowned me before birth",
@@ -10561,7 +10561,7 @@
     {
       "slug": "sitting-bulls-lodge",
       "display_name": "Sitting Bull",
-      "email": "sittingbull@borrowhood.local",
+      "email": "sitting.bulls.lodge@borrowhood.local",
       "date_of_birth": "1831-01-01",
       "mother_name": "Her-Holy-Door -- a woman of the Hunkpapa Lakota",
       "father_name": "Returns Again -- a Hunkpapa chief who saw the buffalo path in his son",
@@ -11245,7 +11245,7 @@
     {
       "slug": "tubmans-safe-house",
       "display_name": "Harriet Tubman",
-      "email": "tubman@borrowhood.local",
+      "email": "tubmans.safe.house@borrowhood.local",
       "date_of_birth": "1822-03-01",
       "mother_name": "Harriet Greene (Rit) -- an enslaved woman who fought to keep her children",
       "father_name": "Ben Ross -- an enslaved timber worker who taught me the stars and the forest",
@@ -11433,7 +11433,7 @@
     {
       "slug": "cleopatras-war-council",
       "display_name": "Cleopatra VII",
-      "email": "cleopatra@borrowhood.local",
+      "email": "cleopatras.war.council@borrowhood.local",
       "date_of_birth": "0069-01-01",
       "mother_name": "Cleopatra V Tryphaena -- though the records are disputed",
       "father_name": "Ptolemy XII Auletes -- the Flute Player, a weak king who taught me what not to be",
@@ -12067,7 +12067,7 @@
     {
       "slug": "curies-radiation-lab",
       "display_name": "Marie Sklodowska Curie",
-      "email": "curie@borrowhood.local",
+      "email": "curies.radiation.lab@borrowhood.local",
       "date_of_birth": "1867-11-07",
       "mother_name": "Bronislawa Sklodowska",
       "father_name": "Wladyslaw Sklodowski",
@@ -12139,7 +12139,7 @@
     {
       "slug": "galileos-observatory",
       "display_name": "Galileo Galilei",
-      "email": "galileo@borrowhood.local",
+      "email": "galileos.observatory@borrowhood.local",
       "date_of_birth": "1564-02-15",
       "mother_name": "Giulia Ammannati",
       "father_name": "Vincenzo Galilei",
@@ -12203,7 +12203,7 @@
     {
       "slug": "gutenbergs-print-shop",
       "display_name": "Johannes Gutenberg",
-      "email": "gutenberg@borrowhood.local",
+      "email": "gutenbergs.print.shop@borrowhood.local",
       "date_of_birth": "1400-01-01",
       "mother_name": "Else Wyrich",
       "father_name": "Friele Gensfleisch zur Laden",
@@ -12327,7 +12327,7 @@
     {
       "slug": "franklins-printing-house",
       "display_name": "Benjamin Franklin",
-      "email": "franklin@borrowhood.local",
+      "email": "franklins.printing.house@borrowhood.local",
       "date_of_birth": "1706-01-17",
       "mother_name": "Abiah Folger",
       "father_name": "Josiah Franklin",
@@ -12391,7 +12391,7 @@
     {
       "slug": "einsteins-thought-lab",
       "display_name": "Albert Einstein",
-      "email": "einstein@borrowhood.local",
+      "email": "einsteins.thought.lab@borrowhood.local",
       "date_of_birth": "1879-03-14",
       "mother_name": "Pauline Koch",
       "father_name": "Hermann Einstein",
@@ -12527,7 +12527,7 @@
     {
       "slug": "faradays-magnetic-lab",
       "display_name": "Michael Faraday",
-      "email": "faraday@borrowhood.local",
+      "email": "faradays.magnetic.lab@borrowhood.local",
       "date_of_birth": "1791-09-22",
       "mother_name": "Margaret Hastwell",
       "father_name": "James Faraday",
@@ -12587,7 +12587,7 @@
     {
       "slug": "lamarrs-frequency-lab",
       "display_name": "Hedy Lamarr",
-      "email": "lamarr@borrowhood.local",
+      "email": "lamarrs.frequency.lab@borrowhood.local",
       "date_of_birth": "1914-11-09",
       "mother_name": "Gertrud Kiesler",
       "father_name": "Emil Kiesler",
@@ -13723,7 +13723,7 @@
     {
       "slug": "darwins-study",
       "display_name": "Charles Robert Darwin",
-      "email": "darwin@borrowhood.local",
+      "email": "darwins.study@borrowhood.local",
       "date_of_birth": "1809-02-12",
       "mother_name": "Susannah Wedgwood",
       "father_name": "Robert Waring Darwin",
@@ -13783,7 +13783,7 @@
     {
       "slug": "nightingales-ward",
       "display_name": "Florence Nightingale",
-      "email": "nightingale@borrowhood.local",
+      "email": "nightingales.ward@borrowhood.local",
       "date_of_birth": "1820-05-12",
       "mother_name": "Frances Smith",
       "father_name": "William Edward Nightingale",
