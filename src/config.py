@@ -59,9 +59,10 @@ class BHSettings(BaseSettings):
     google_api_key: str = ""  # Gemini API key for AI agents
     gemini_model: str = "gemini-2.5-flash"
 
-    # Ollama (self-hosted LLM -- unlimited, no API limits)
-    ollama_url: str = ""  # e.g. "http://localhost:11434"
+    # Ollama (local or Turbo cloud at https://ollama.com)
+    ollama_url: str = ""  # "http://localhost:11434" or "https://ollama.com"
     ollama_model: str = "llama3.2"
+    ollama_key: str = ""  # API key for Ollama Cloud (not needed for local)
 
     class Config:
         env_prefix = "BH_"
