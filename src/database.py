@@ -82,20 +82,53 @@ async def run_migrations():
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS per_person_rate FLOAT",
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS max_participants INTEGER",
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS group_discount_pct FLOAT",
-        # 2026-03-03: Wave 2 legend workshop types
-        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'arena'",
-        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'camp'",
-        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'dock'",
-        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'dojo'",
-        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'forge'",
-        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'fortress'",
-        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'laboratory'",
-        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'lodge'",
-        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'observatory'",
-        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'palace'",
-        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'pavilion'",
-        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'study'",
     ]
+    # ALTER TYPE ... ADD VALUE -- SQLAlchemy uses enum .name (UPPERCASE) for PG enums
+    enum_migrations = [
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'ARENA'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'CAMP'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'DOCK'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'DOJO'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'FORGE'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'FORTRESS'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'LABORATORY'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'LODGE'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'OBSERVATORY'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'PALACE'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'PAVILION'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'STUDY'",
+    ]
+    # Fix any previously added lowercase values by renaming to UPPERCASE
+    rename_fixes = [
+        "ALTER TYPE workshoptype RENAME VALUE 'arena' TO 'ARENA'",
+        "ALTER TYPE workshoptype RENAME VALUE 'camp' TO 'CAMP'",
+        "ALTER TYPE workshoptype RENAME VALUE 'dock' TO 'DOCK'",
+        "ALTER TYPE workshoptype RENAME VALUE 'dojo' TO 'DOJO'",
+        "ALTER TYPE workshoptype RENAME VALUE 'forge' TO 'FORGE'",
+        "ALTER TYPE workshoptype RENAME VALUE 'fortress' TO 'FORTRESS'",
+        "ALTER TYPE workshoptype RENAME VALUE 'laboratory' TO 'LABORATORY'",
+        "ALTER TYPE workshoptype RENAME VALUE 'lodge' TO 'LODGE'",
+        "ALTER TYPE workshoptype RENAME VALUE 'observatory' TO 'OBSERVATORY'",
+        "ALTER TYPE workshoptype RENAME VALUE 'palace' TO 'PALACE'",
+        "ALTER TYPE workshoptype RENAME VALUE 'pavilion' TO 'PAVILION'",
+        "ALTER TYPE workshoptype RENAME VALUE 'study' TO 'STUDY'",
+    ]
+    import sqlalchemy as sa
     async with engine.begin() as conn:
         for sql in migrations:
-            await conn.execute(__import__("sqlalchemy").text(sql))
+            await conn.execute(sa.text(sql))
+    # Enum type extensions need autocommit (PG restriction)
+    async with engine.connect() as conn:
+        await conn.execution_options(isolation_level="AUTOCOMMIT")
+        # First try renaming lowercase -> UPPERCASE (from previous bad migration)
+        for sql in rename_fixes:
+            try:
+                await conn.execute(sa.text(sql))
+            except Exception:
+                pass  # Value doesn't exist or already uppercase
+        # Then add any missing UPPERCASE values
+        for sql in enum_migrations:
+            try:
+                await conn.execute(sa.text(sql))
+            except Exception:
+                pass  # Already exists
