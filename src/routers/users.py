@@ -16,6 +16,7 @@ from sqlalchemy.orm import selectinload
 from src.database import get_db
 from src.dependencies import get_current_user_token, get_user, require_auth
 from src.models.user import BadgeTier, BHUser, BHUserFavorite, WorkshopType
+from src.services.search import haversine_km
 
 UPLOAD_DIR = Path(__file__).resolve().parent.parent / "static" / "uploads" / "avatars"
 ALLOWED_AVATAR_TYPES = {"image/jpeg", "image/png", "image/webp"}
@@ -116,12 +117,19 @@ async def list_members(
     city: Optional[str] = None,
     badge_tier: Optional[str] = None,
     workshop_type: Optional[str] = None,
-    sort: str = Query("newest", pattern="^(newest|name_asc|badge_tier)$"),
+    near_lat: Optional[float] = Query(None, ge=-90, le=90),
+    near_lng: Optional[float] = Query(None, ge=-180, le=180),
+    radius_km: float = Query(25.0, ge=1, le=500),
+    sort: str = Query("newest", pattern="^(newest|name_asc|badge_tier|closest)$"),
     limit: int = Query(12, ge=1, le=100),
     offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
 ):
-    """List/search community members. Public endpoint."""
+    """List/search community members. Public endpoint.
+
+    Proximity search: pass near_lat + near_lng to filter by distance.
+    Use sort=closest to order by distance (requires near_lat/near_lng).
+    """
     query = (
         select(BHUser)
         .options(selectinload(BHUser.languages))
@@ -142,21 +150,50 @@ async def list_members(
     if workshop_type:
         query = query.where(BHUser.workshop_type == workshop_type)
 
-    # Total count before pagination
-    count_query = select(func.count()).select_from(query.subquery())
-    total = await db.scalar(count_query) or 0
+    # Proximity: pre-filter to members who have coordinates
+    use_proximity = near_lat is not None and near_lng is not None
+    if use_proximity:
+        query = query.where(BHUser.latitude.isnot(None), BHUser.longitude.isnot(None))
 
-    # Sort
-    if sort == "newest":
+    # Sort (DB-level for non-proximity sorts)
+    if sort == "newest" and not use_proximity:
         query = query.order_by(BHUser.created_at.desc())
     elif sort == "name_asc":
         query = query.order_by(BHUser.display_name.asc())
     elif sort == "badge_tier":
         query = query.order_by(_BADGE_SORT, BHUser.display_name.asc())
 
-    query = query.offset(offset).limit(limit)
-    result = await db.execute(query)
-    members = result.scalars().unique().all()
+    # For proximity search, fetch more candidates for post-query filtering
+    if use_proximity:
+        result = await db.execute(query)
+        all_candidates = list(result.scalars().unique().all())
+
+        # Haversine distance filter (Python-side, same pattern as item search)
+        members_with_dist = []
+        for m in all_candidates:
+            dist = haversine_km(
+                near_lat, near_lng, m.latitude, m.longitude,
+                alt2=m.altitude or 0.0,
+            )
+            if dist <= radius_km:
+                members_with_dist.append((m, dist))
+
+        if sort == "closest":
+            members_with_dist.sort(key=lambda x: x[1])
+        elif sort == "newest":
+            members_with_dist.sort(key=lambda x: x[0].created_at, reverse=True)
+
+        total = len(members_with_dist)
+        page = members_with_dist[offset : offset + limit]
+        members = [m for m, _ in page]
+    else:
+        # Total count before pagination
+        count_query = select(func.count()).select_from(query.subquery())
+        total = await db.scalar(count_query) or 0
+
+        query = query.offset(offset).limit(limit)
+        result = await db.execute(query)
+        members = list(result.scalars().unique().all())
 
     return PaginatedMembers(
         items=members,

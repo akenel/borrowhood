@@ -8,6 +8,7 @@ Run once on first startup or via CLI.
 import json
 import logging
 import uuid
+from datetime import date
 from pathlib import Path
 
 from slugify import slugify
@@ -44,6 +45,17 @@ def _enum_val(enum_class, value):
     return enum_class(value)
 
 
+def _parse_date(value):
+    """Parse date string (YYYY-MM-DD) to date object."""
+    if not value:
+        return None
+    try:
+        parts = value.split("-")
+        return date(int(parts[0]), int(parts[1]), int(parts[2]))
+    except (ValueError, IndexError):
+        return None
+
+
 async def seed_database(db: AsyncSession) -> dict:
     """Load seed data into database. Returns counts of created entities."""
 
@@ -67,6 +79,9 @@ async def seed_database(db: AsyncSession) -> dict:
             email=u["email"],
             display_name=u["display_name"],
             slug=u["slug"],
+            date_of_birth=_parse_date(u.get("date_of_birth")),
+            mother_name=u.get("mother_name"),
+            father_name=u.get("father_name"),
             workshop_name=u.get("workshop_name"),
             workshop_type=_enum_val(WorkshopType, u.get("workshop_type")),
             tagline=u.get("tagline"),
@@ -468,6 +483,9 @@ async def seed_new_users(db: AsyncSession) -> dict:
             email=u["email"],
             display_name=u["display_name"],
             slug=u["slug"],
+            date_of_birth=_parse_date(u.get("date_of_birth")),
+            mother_name=u.get("mother_name"),
+            father_name=u.get("father_name"),
             workshop_name=u.get("workshop_name"),
             workshop_type=_enum_val(WorkshopType, u.get("workshop_type")),
             tagline=u.get("tagline"),

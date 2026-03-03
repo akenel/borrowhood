@@ -62,3 +62,20 @@ async def create_tables():
     """Create all tables. Used for initial setup and testing."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+
+async def run_migrations():
+    """Run lightweight schema migrations.
+
+    Adds columns that create_all won't add to existing tables.
+    Each statement is idempotent (ADD COLUMN IF NOT EXISTS).
+    """
+    migrations = [
+        # 2026-03-03: identity fields for legends seed
+        "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS date_of_birth DATE",
+        "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS mother_name VARCHAR(200)",
+        "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS father_name VARCHAR(200)",
+    ]
+    async with engine.begin() as conn:
+        for sql in migrations:
+            await conn.execute(__import__("sqlalchemy").text(sql))

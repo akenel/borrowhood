@@ -102,6 +102,10 @@ def create_app() -> FastAPI:
         if settings.debug:
             await create_tables()
             logger.info("Database tables created/verified")
+            # Run lightweight migrations (ADD COLUMN IF NOT EXISTS)
+            from src.database import run_migrations
+            await run_migrations()
+            logger.info("Schema migrations applied")
             # Add any new users and items from seed.json that don't exist yet
             from sqlalchemy.ext.asyncio import AsyncSession
             async with async_session() as db:

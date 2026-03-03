@@ -4,9 +4,16 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from src.models.user import AccountStatus, BadgeTier, CEFRLevel, WorkshopType
+
+
+def _clamp_coordinate(v: float | None, lo: float, hi: float, decimals: int = 3) -> float | None:
+    """Round and clamp a coordinate for privacy (~111m at 3dp)."""
+    if v is None:
+        return None
+    return round(max(lo, min(hi, v)), decimals)
 
 
 class UserLanguageOut(BaseModel):
@@ -115,8 +122,26 @@ class UserProfileUpdate(BaseModel):
     country_code: Optional[str] = Field(None, max_length=2)
     latitude: Optional[float] = None
     longitude: Optional[float] = None
+    altitude: Optional[float] = None  # meters ASL
     notify_telegram: Optional[bool] = None
     notify_email: Optional[bool] = None
+
+    @field_validator("latitude", mode="before")
+    @classmethod
+    def clamp_lat(cls, v: float | None) -> float | None:
+        return _clamp_coordinate(v, -90.0, 90.0)
+
+    @field_validator("longitude", mode="before")
+    @classmethod
+    def clamp_lng(cls, v: float | None) -> float | None:
+        return _clamp_coordinate(v, -180.0, 180.0)
+
+    @field_validator("altitude", mode="before")
+    @classmethod
+    def clamp_alt(cls, v: float | None) -> float | None:
+        if v is None:
+            return None
+        return round(max(-500.0, min(9000.0, v)), 1)
 
 
 class UserLanguageCreate(BaseModel):

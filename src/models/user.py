@@ -8,7 +8,7 @@ import uuid
 from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy import DateTime, Enum, Float, ForeignKey, Integer, String, Text, UniqueConstraint, func
+from sqlalchemy import Date, DateTime, Enum, Float, ForeignKey, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -63,6 +63,9 @@ class BHUser(BHBase, Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     display_name: Mapped[str] = mapped_column(String(100), nullable=False)
     slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
+    date_of_birth: Mapped[Optional[datetime]] = mapped_column(Date, nullable=True)
+    mother_name: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    father_name: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
 
     # Workshop profile
     workshop_name: Mapped[Optional[str]] = mapped_column(String(100))
