@@ -36,4 +36,7 @@ google-genai>=1.65.0
 # Telegram notifications
 # (uses httpx -- already listed above)
 
+# Object storage (MinIO)
+minio==7.2.12
+
 # Stripe payments (uses httpx for API calls -- no SDK needed)
