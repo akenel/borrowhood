@@ -271,6 +271,59 @@ async function testFindAMaker(page) {
     });
 }
 
+async function testMakerSearch(page) {
+    console.log('\n--- Maker Search Filters ---');
+
+    await test('Members page with skill filter loads', async () => {
+        const resp = await page.goto(`${BASE_URL}/members?skill=wood`, {
+            waitUntil: 'domcontentloaded', timeout: 15000,
+        });
+        assert(resp.status() === 200, `Expected 200, got ${resp.status()}`);
+    });
+
+    await test('Members page with language filter loads', async () => {
+        const resp = await page.goto(`${BASE_URL}/members?language=it`, {
+            waitUntil: 'domcontentloaded', timeout: 15000,
+        });
+        assert(resp.status() === 200, `Expected 200, got ${resp.status()}`);
+    });
+
+    await test('Members page has skill filter input', async () => {
+        await page.goto(`${BASE_URL}/members`, {
+            waitUntil: 'domcontentloaded', timeout: 15000,
+        });
+        const hasSkillInput = await page.evaluate(() => {
+            return !!document.querySelector('input[name="skill"]');
+        });
+        assert(hasSkillInput, 'No skill filter input found');
+    });
+
+    await test('Members page has language filter dropdown', async () => {
+        const hasLangSelect = await page.evaluate(() => {
+            return !!document.querySelector('select[name="language"]');
+        });
+        assert(hasLangSelect, 'No language filter dropdown found');
+    });
+
+    await test('Members sort has trust option', async () => {
+        const hasTrustSort = await page.evaluate(() => {
+            const sortSelect = document.querySelector('select[name="sort"]');
+            if (!sortSelect) return false;
+            return Array.from(sortSelect.options).some(o => o.value === 'trust');
+        });
+        assert(hasTrustSort, 'No trust sort option found');
+    });
+}
+
+async function testNotificationPrefsAPI(page) {
+    console.log('\n--- Notification Preferences API ---');
+
+    await test('Notification preferences requires auth', async () => {
+        const status = await fetchStatus(page, '/api/v1/notifications/preferences');
+        assert(status === 401 || status === 403, `Expected 401/403, got ${status}`);
+    });
+}
+
 async function testWorkshopPages(page) {
     console.log('\n--- Workshop Pages ---');
 
@@ -332,6 +385,8 @@ async function main() {
         await testAuthenticatedPages(page);
         await testFeatureChecks(page);
         await testFindAMaker(page);
+        await testMakerSearch(page);
+        await testNotificationPrefsAPI(page);
         await testWorkshopPages(page);
     } catch (err) {
         console.error('\nSuite error:', err.message);

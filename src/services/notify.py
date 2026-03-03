@@ -26,11 +26,23 @@ async def create_notification(
     entity_type: Optional[str] = None,
     entity_id: Optional[UUID] = None,
     telegram_chat_id: Optional[str] = None,
-) -> BHNotification:
+) -> Optional[BHNotification]:
     """Create an in-app notification and optionally send to Telegram.
 
     This is the single entry point for all notifications in the system.
     """
+    # Check per-type preference (if user muted this type, skip entirely)
+    from sqlalchemy import select
+    from src.models.notification_pref import BHNotificationPref
+    pref = await db.scalar(
+        select(BHNotificationPref.enabled)
+        .where(BHNotificationPref.user_id == user_id)
+        .where(BHNotificationPref.notification_type == notification_type.value)
+    )
+    if pref is False:
+        logger.debug("Notification type %s muted for user %s", notification_type.value, user_id)
+        return None
+
     notification = BHNotification(
         user_id=user_id,
         notification_type=notification_type,

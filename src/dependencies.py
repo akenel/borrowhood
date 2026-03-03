@@ -199,3 +199,38 @@ def require_role(role: str):
         return token
 
     return check_role
+
+
+# Badge tier ordering for gating comparisons
+_TIER_ORDER = {
+    "newcomer": 0,
+    "active": 1,
+    "trusted": 2,
+    "pillar": 3,
+    "legend": 4,
+}
+
+
+def require_badge_tier(min_tier: str):
+    """Dependency factory: require minimum badge tier.
+
+    Tier hierarchy: NEWCOMER < ACTIVE < TRUSTED < PILLAR < LEGEND
+    Usage: Depends(require_badge_tier("active"))
+    """
+    min_level = _TIER_ORDER.get(min_tier, 0)
+
+    async def check_tier(
+        token: dict = Depends(require_auth),
+        db: AsyncSession = Depends(get_db),
+    ) -> dict:
+        user = await get_user(db, token)
+        user_level = _TIER_ORDER.get(user.badge_tier.value, 0)
+        if user_level < min_level:
+            raise HTTPException(
+                status_code=403,
+                detail=f"Badge tier '{min_tier}' required. You are '{user.badge_tier.value}'. "
+                       f"Earn more points to unlock this action.",
+            )
+        return token
+
+    return check_tier

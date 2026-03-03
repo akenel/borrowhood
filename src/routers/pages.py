@@ -482,6 +482,11 @@ async def members_directory(
     badge_tier: Optional[str] = None,
     workshop_type: Optional[str] = None,
     service: Optional[str] = None,
+    skill: Optional[str] = None,
+    language: Optional[str] = None,
+    lat: Optional[float] = None,
+    lng: Optional[float] = None,
+    radius: float = 25.0,
     sort: str = "newest",
     limit: int = 12,
     offset: int = 0,
@@ -501,7 +506,12 @@ async def members_directory(
         else_=4,
     )
 
+    from src.models.user import BHUserLanguage, BHUserSkill
+
     base_where = [BHUser.deleted_at.is_(None)]
+    need_skill_join = False
+    need_lang_join = False
+
     if q:
         search_term = f"%{q}%"
         base_where.append(
@@ -525,15 +535,33 @@ async def members_directory(
     }
     if service and service in service_filter_map:
         base_where.append(service_filter_map[service].is_(True))
+    # Skill filter
+    if skill:
+        need_skill_join = True
+        base_where.append(BHUserSkill.skill_name.ilike(f"%{skill}%"))
+    # Language filter
+    if language:
+        need_lang_join = True
+        base_where.append(BHUserLanguage.language_code == language)
 
-    count_query = select(func.count(BHUser.id)).where(*base_where)
-    total_count = await db.scalar(count_query) or 0
+    # Build count query with joins if needed
+    count_q = select(func.count(func.distinct(BHUser.id)))
+    if need_skill_join:
+        count_q = count_q.join(BHUserSkill, BHUser.id == BHUserSkill.user_id)
+    if need_lang_join:
+        count_q = count_q.join(BHUserLanguage, BHUser.id == BHUserLanguage.user_id)
+    count_q = count_q.where(*base_where)
+    total_count = await db.scalar(count_q) or 0
 
     query = (
         select(BHUser)
-        .options(selectinload(BHUser.languages))
-        .where(*base_where)
+        .options(selectinload(BHUser.languages), selectinload(BHUser.skills))
     )
+    if need_skill_join:
+        query = query.join(BHUserSkill, BHUser.id == BHUserSkill.user_id)
+    if need_lang_join:
+        query = query.join(BHUserLanguage, BHUser.id == BHUserLanguage.user_id)
+    query = query.where(*base_where)
 
     if sort == "newest":
         query = query.order_by(BHUser.created_at.desc())
@@ -541,10 +569,35 @@ async def members_directory(
         query = query.order_by(BHUser.display_name.asc())
     elif sort == "badge_tier":
         query = query.order_by(_badge_sort, BHUser.display_name.asc())
+    elif sort == "trust":
+        query = query.order_by(BHUser.trust_score.desc().nullslast(), BHUser.display_name.asc())
 
-    query = query.offset(offset).limit(limit)
+    # Distance filtering needs post-query (haversine in Python for v1)
+    if lat is not None and lng is not None:
+        # Fetch more for distance filtering, then trim
+        query = query.limit(limit * 4)
+    else:
+        query = query.offset(offset).limit(limit)
+
     result = await db.execute(query)
-    members = result.scalars().unique().all()
+    members = list(result.scalars().unique().all())
+
+    # Post-query distance filter
+    if lat is not None and lng is not None:
+        from src.services.search import haversine_km
+        members_with_dist = []
+        for m in members:
+            if m.latitude and m.longitude:
+                dist = haversine_km(lat, lng, m.latitude, m.longitude,
+                                    alt2=m.altitude or 0.0)
+                if dist <= radius:
+                    members_with_dist.append((m, dist))
+            else:
+                members_with_dist.append((m, float("inf")))
+        if sort == "closest":
+            members_with_dist.sort(key=lambda x: x[1])
+        total_count = len(members_with_dist)
+        members = [m for m, _ in members_with_dist[offset:offset + limit]]
 
     # Distinct cities for filter dropdown
     cities_result = await db.execute(
@@ -566,9 +619,12 @@ async def members_directory(
         selected_badge=badge_tier,
         selected_workshop_type=workshop_type,
         selected_service=service,
+        selected_skill=skill or "",
+        selected_language=language or "",
         selected_sort=sort,
         selected_limit=limit,
         selected_offset=offset,
+        radius=radius,
     )
     return _render("pages/members.html", ctx)
 

@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import get_user, require_auth
+from src.dependencies import get_user, require_auth, require_badge_tier
 from src.models.item import BHItem, BHItemFavorite, BHItemMedia, MediaType
 from src.models.listing import BHListing, ListingStatus
 from src.models.user import BHUser
@@ -103,10 +103,10 @@ async def get_item(item_id: UUID, db: AsyncSession = Depends(get_db)):
 @router.post("", response_model=ItemOut, status_code=201)
 async def create_item(
     data: ItemCreate,
-    token: dict = Depends(require_auth),
+    token: dict = Depends(require_badge_tier("active")),
     db: AsyncSession = Depends(get_db),
 ):
-    """Create a new item. Requires authentication."""
+    """Create a new item. Requires ACTIVE badge tier or higher."""
     user = await get_user(db, token)
     slug = await _unique_slug(db, data.name)
 
@@ -124,8 +124,8 @@ async def create_item(
         model=data.model,
         needs_equipment=data.needs_equipment,
         compatible_with=data.compatible_with,
-        latitude=data.latitude or user.latitude,
-        longitude=data.longitude or user.longitude,
+        latitude=round(data.latitude, 3) if data.latitude else (round(user.latitude, 3) if user.latitude else None),
+        longitude=round(data.longitude, 3) if data.longitude else (round(user.longitude, 3) if user.longitude else None),
     )
     db.add(item)
     await db.flush()

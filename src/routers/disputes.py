@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import get_user, require_auth
+from src.dependencies import get_user, require_auth, require_badge_tier
 from src.models.dispute import BHDispute, DisputeReason, DisputeResolution, DisputeStatus
 from src.models.notification import NotificationType
 from src.models.rental import BHRental, RentalStatus
@@ -74,10 +74,10 @@ class DisputeSummary(BaseModel):
 @router.post("", response_model=DisputeOut, status_code=201)
 async def file_dispute(
     dispute_in: DisputeCreate,
-    token: dict = Depends(require_auth),
+    token: dict = Depends(require_badge_tier("trusted")),
     db: AsyncSession = Depends(get_db),
 ):
-    """File a dispute on a rental. Either the renter or item owner can file."""
+    """File a dispute on a rental. Requires TRUSTED tier. Either party can file."""
     user = await get_user(db, token)
 
     # Get rental with listing + item

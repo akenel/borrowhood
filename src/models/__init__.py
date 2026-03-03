@@ -17,11 +17,14 @@ from src.models.deposit import BHDeposit
 from src.models.dispute import BHDispute
 from src.models.payment import BHPayment
 from src.models.notification import BHNotification
+from src.models.notification_pref import BHNotificationPref
 from src.models.badge import BHBadge
 from src.models.qa import BHTestResult, BHBugReport, BHBugActivity, BHBugCommit
 from src.models.backlog import BHBacklogItem, BHBacklogActivity
 from src.models.translation import BHContentTranslation
 from src.models.helpboard import BHHelpPost, BHHelpReply
+from src.models.lockbox import BHLockBoxAccess
+from src.models.skill_verification import BHSkillVerification
 from src.models.telegram import BHTelegramLink
 
 __all__ = [
@@ -43,6 +46,7 @@ __all__ = [
     "BHDispute",
     "BHPayment",
     "BHNotification",
+    "BHNotificationPref",
     "BHBadge",
     "BHTestResult",
     "BHBugReport",
@@ -53,5 +57,7 @@ __all__ = [
     "BHContentTranslation",
     "BHHelpPost",
     "BHHelpReply",
+    "BHLockBoxAccess",
+    "BHSkillVerification",
     "BHTelegramLink",
 ]

@@ -36,7 +36,7 @@
     </div>
 
     <!-- Search + Filters -->
-    <div x-data="{ filtersOpen: false }">
+    <div x-data="membersFilter()">
         <!-- Search bar -->
         <form method="GET" action="/members" class="flex gap-2">
             <div class="flex-1 relative">
@@ -61,62 +61,129 @@
         <!-- Filter panel -->
         <div class="mt-4 p-4 bg-white rounded-lg border border-gray-200"
              :class="{ 'hidden md:block': !filtersOpen, 'block': filtersOpen }">
-            <form method="GET" action="/members" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <form method="GET" action="/members" id="filter-form">
                 <input type="hidden" name="q" value="{{ q }}">
+                {% if selected_service %}<input type="hidden" name="service" value="{{ selected_service }}">{% endif %}
+                <input type="hidden" name="lat" :value="lat" x-show="false">
+                <input type="hidden" name="lng" :value="lng" x-show="false">
 
-                <!-- City -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('members.filter_city') }}</label>
-                    <select name="city" class="w-full border border-gray-300 rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[44px]">
-                        <option value="">{{ t('members.all_cities') }}</option>
-                        {% for c in cities %}
-                        <option value="{{ c }}" {% if selected_city == c %}selected{% endif %}>{{ c }}</option>
-                        {% endfor %}
-                    </select>
+                <!-- Row 1: main filters -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- City -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('members.filter_city') }}</label>
+                        <select name="city" class="w-full border border-gray-300 rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[44px]">
+                            <option value="">{{ t('members.all_cities') }}</option>
+                            {% for c in cities %}
+                            <option value="{{ c }}" {% if selected_city == c %}selected{% endif %}>{{ c }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Badge tier -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('members.filter_badge') }}</label>
+                        <select name="badge_tier" class="w-full border border-gray-300 rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[44px]">
+                            <option value="">{{ t('members.all_badges') }}</option>
+                            {% for bt in badge_tiers %}
+                            <option value="{{ bt }}" {% if selected_badge == bt %}selected{% endif %}>{{ t('badges.' + bt) }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Skill search -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Competenza{% else %}Skill{% endif %}</label>
+                        <input type="text" name="skill" value="{{ selected_skill }}"
+                               placeholder="{% if lang == 'it' %}es. falegnameria{% else %}e.g. woodworking{% endif %}"
+                               class="w-full border border-gray-300 rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[44px]">
+                    </div>
+
+                    <!-- Language -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Lingua{% else %}Language{% endif %}</label>
+                        <select name="language" class="w-full border border-gray-300 rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[44px]">
+                            <option value="">{% if lang == 'it' %}Tutte le lingue{% else %}All languages{% endif %}</option>
+                            {% for code, flag in lang_flags.items() %}
+                            <option value="{{ code }}" {% if selected_language == code %}selected{% endif %}>{{ flag }} {{ code | upper }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Badge tier -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('members.filter_badge') }}</label>
-                    <select name="badge_tier" class="w-full border border-gray-300 rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[44px]">
-                        <option value="">{{ t('members.all_badges') }}</option>
-                        {% for bt in badge_tiers %}
-                        <option value="{{ bt }}" {% if selected_badge == bt %}selected{% endif %}>{{ t('badges.' + bt) }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                <!-- Row 2: workshop type, sort, proximity, actions -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+                    <!-- Workshop type -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('members.filter_workshop_type') }}</label>
+                        <select name="workshop_type" class="w-full border border-gray-300 rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[44px]">
+                            <option value="">{{ t('members.all_workshop_types') }}</option>
+                            {% for wt in workshop_types %}
+                            <option value="{{ wt }}" {% if selected_workshop_type == wt %}selected{% endif %}>{{ wt | replace('_', ' ') | title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                <!-- Workshop type -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('members.filter_workshop_type') }}</label>
-                    <select name="workshop_type" class="w-full border border-gray-300 rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[44px]">
-                        <option value="">{{ t('members.all_workshop_types') }}</option>
-                        {% for wt in workshop_types %}
-                        <option value="{{ wt }}" {% if selected_workshop_type == wt %}selected{% endif %}>{{ wt | replace('_', ' ') | title }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                    <!-- Sort -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('members.sort') }}</label>
+                        <select name="sort" class="w-full border border-gray-300 rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[44px]">
+                            <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>{{ t('members.sort_newest') }}</option>
+                            <option value="name_asc" {% if selected_sort == 'name_asc' %}selected{% endif %}>{{ t('members.sort_name') }}</option>
+                            <option value="badge_tier" {% if selected_sort == 'badge_tier' %}selected{% endif %}>{{ t('members.sort_badge') }}</option>
+                            <option value="trust" {% if selected_sort == 'trust' %}selected{% endif %}>{% if lang == 'it' %}Punteggio fiducia{% else %}Trust score{% endif %}</option>
+                            <option value="closest" {% if selected_sort == 'closest' %}selected{% endif %}>{% if lang == 'it' %}Piu vicini{% else %}Nearest{% endif %}</option>
+                        </select>
+                    </div>
 
-                <!-- Sort -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('members.sort') }}</label>
-                    <select name="sort" class="w-full border border-gray-300 rounded-lg py-2.5 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[44px]">
-                        <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>{{ t('members.sort_newest') }}</option>
-                        <option value="name_asc" {% if selected_sort == 'name_asc' %}selected{% endif %}>{{ t('members.sort_name') }}</option>
-                        <option value="badge_tier" {% if selected_sort == 'badge_tier' %}selected{% endif %}>{{ t('members.sort_badge') }}</option>
-                    </select>
-                </div>
+                    <!-- Near me -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Prossimita{% else %}Proximity{% endif %}</label>
+                        <button type="button" @click="detectLocation()"
+                                :disabled="locating"
+                                class="w-full flex items-center justify-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[44px]"
+                                :class="lat ? 'bg-emerald-50 text-emerald-700 border border-emerald-300' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'">
+                            <template x-if="!locating">
+                                <span class="flex items-center space-x-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    <span x-text="lat ? '{% if lang == 'it' %}Posizione rilevata{% else %}Location set{% endif %}' : '{% if lang == 'it' %}Usa la mia posizione{% else %}Use my location{% endif %}'"></span>
+                                </span>
+                            </template>
+                            <template x-if="locating">
+                                <span class="flex items-center space-x-1">
+                                    <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                    </svg>
+                                    <span>{% if lang == 'it' %}Rilevamento...{% else %}Detecting...{% endif %}</span>
+                                </span>
+                            </template>
+                        </button>
+                        <div x-show="lat" class="mt-1">
+                            <select name="radius" class="w-full border border-gray-300 rounded-lg py-1.5 px-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                                <option value="5" {% if radius == 5.0 %}selected{% endif %}>5 km</option>
+                                <option value="10" {% if radius == 10.0 %}selected{% endif %}>10 km</option>
+                                <option value="25" {% if radius == 25.0 %}selected{% endif %}>25 km</option>
+                                <option value="50" {% if radius == 50.0 %}selected{% endif %}>50 km</option>
+                                <option value="100" {% if radius == 100.0 %}selected{% endif %}>100 km</option>
+                            </select>
+                        </div>
+                    </div>
 
-                <!-- Apply + Clear -->
-                <div class="flex items-end gap-2">
-                    <button type="submit"
-                            class="flex-1 px-4 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px]">
-                        {{ t('browse.apply') }}
-                    </button>
-                    <a href="/members"
-                       class="flex-1 px-4 py-2.5 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 text-center min-h-[44px] flex items-center justify-center">
-                        {{ t('browse.clear') }}
-                    </a>
+                    <!-- Apply + Clear -->
+                    <div class="flex items-end gap-2">
+                        <button type="submit"
+                                class="flex-1 px-4 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px]">
+                            {{ t('browse.apply') }}
+                        </button>
+                        <a href="/members"
+                           class="flex-1 px-4 py-2.5 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 text-center min-h-[44px] flex items-center justify-center">
+                            {{ t('browse.clear') }}
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>
@@ -209,6 +276,17 @@
                                     {% else %}bg-gray-100 text-gray-600{% endif %}">
                                     {{ t('badges.' + member.badge_tier.value) }}
                                 </span>
+                                <!-- Trust score -->
+                                {% if member.trust_score is not none %}
+                                <span class="inline-flex items-center text-xs font-medium
+                                    {% if member.trust_score >= 0.7 %}text-emerald-600{% elif member.trust_score >= 0.4 %}text-blue-600{% else %}text-gray-500{% endif %}"
+                                    title="{% if lang == 'it' %}Punteggio fiducia{% else %}Trust score{% endif %}">
+                                    <svg class="w-3.5 h-3.5 mr-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5C17.944 5.33 18 5.68 18 6.036 18 12.66 14.627 18.188 10 19.998 5.373 18.188 2 12.66 2 6.036c0-.357.056-.706.166-1.037z" clip-rule="evenodd"/>
+                                    </svg>
+                                    {{ (member.trust_score * 100) | int }}%
+                                </span>
+                                {% endif %}
                                 <!-- City -->
                                 {% if member.city %}
                                 <span class="text-xs text-gray-400">{{ member.city }}{% if member.country_code %}, {{ member.country_code }}{% endif %}</span>
@@ -236,7 +314,7 @@
         {% set total_pages = ((total_count - 1) // selected_limit) + 1 if total_count > 0 else 1 %}
         {% set range_start = selected_offset + 1 %}
         {% set range_end = [selected_offset + selected_limit, total_count] | min %}
-        {% macro page_url(page_num) %}?{% if q %}q={{ q }}&{% endif %}{% if selected_city %}city={{ selected_city }}&{% endif %}{% if selected_badge %}badge_tier={{ selected_badge }}&{% endif %}{% if selected_workshop_type %}workshop_type={{ selected_workshop_type }}&{% endif %}{% if selected_sort != 'newest' %}sort={{ selected_sort }}&{% endif %}limit={{ selected_limit }}&offset={{ (page_num - 1) * selected_limit }}{% endmacro %}
+        {% macro page_url(page_num) %}?{% if q %}q={{ q }}&{% endif %}{% if selected_city %}city={{ selected_city }}&{% endif %}{% if selected_badge %}badge_tier={{ selected_badge }}&{% endif %}{% if selected_workshop_type %}workshop_type={{ selected_workshop_type }}&{% endif %}{% if selected_service %}service={{ selected_service }}&{% endif %}{% if selected_skill %}skill={{ selected_skill }}&{% endif %}{% if selected_language %}language={{ selected_language }}&{% endif %}{% if selected_sort != 'newest' %}sort={{ selected_sort }}&{% endif %}limit={{ selected_limit }}&offset={{ (page_num - 1) * selected_limit }}{% endmacro %}
 
         <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3">
@@ -293,6 +371,35 @@
 
 {% block scripts %}
 <script>
+function membersFilter() {
+    return {
+        filtersOpen: false,
+        locating: false,
+        lat: null,
+        lng: null,
+        detectLocation() {
+            if (!navigator.geolocation) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Geolocation not supported' } }));
+                return;
+            }
+            this.locating = true;
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    this.lat = pos.coords.latitude.toFixed(6);
+                    this.lng = pos.coords.longitude.toFixed(6);
+                    this.locating = false;
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Location detected' } }));
+                },
+                (err) => {
+                    this.locating = false;
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Location access denied' } }));
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+    };
+}
+
 function membersFavorites() {
     return {
         favoriteIds: new Set(),
