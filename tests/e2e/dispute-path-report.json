@@ -1,0 +1,150 @@
+{
+  "base_url": "https://46.62.138.218",
+  "timestamp": "2026-03-03T12:33:04.035Z",
+  "summary": {
+    "passed": 25,
+    "failed": 0,
+    "total": 25
+  },
+  "artifacts": {
+    "lunaCookie": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJoc3pjWnp1MWZ3RGZwS21uUnZPYzR0M29MRVNQQW1YZUNyMm9TaWhhTTRFIn0.eyJleHAiOjE3NzI1NDI5NzcsImlhdCI6MTc3MjU0MTE3NywianRpIjoiNTRmM2IwNTgtZDg3OC00NTFlLWEyMDgtZjA5OTRlNDlkMjU0IiwiaXNzIjoiaHR0cHM6Ly80Ni42Mi4xMzguMjE4L3JlYWxtcy9ib3Jyb3dob29kIiwic3ViIjoiMTFlOWM0MjItMTI4OS00YWViLThjOGMtNjliOWNhNDQ4NDA2IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYm9ycm93aG9vZC13ZWIiLCJzZXNzaW9uX3N0YXRlIjoiNDlhYjM4YjQtNzBkNi00NzI1LTk3ZTctY2JmMDg1ZTkxN2NkIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHBzOi8vNDYuNjIuMTM4LjIxOCIsImh0dHBzOi8vaGVsaXgubG9jYWwiLCJodHRwczovLzQ2LjYyLjEzOC4yMTg6ODQ0MyIsImh0dHBzOi8vYm9ycm93aG9vZC5oZWxpeC5sb2NhbCIsImh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiYmgtbGVuZGVyIiwiYmgtbWVtYmVyIiwiYmgtbW9kZXJhdG9yIiwiZGVmYXVsdC1yb2xlcy1ib3Jyb3dob29kIl19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiI0OWFiMzhiNC03MGQ2LTQ3MjUtOTdlNy1jYmYwODVlOTE3Y2QiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6Ikx1bmEgR3JlY28iLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJsdW5hIiwiZ2l2ZW5fbmFtZSI6Ikx1bmEiLCJmYW1pbHlfbmFtZSI6IkdyZWNvIiwiZW1haWwiOiJsdW5hQGJvcnJvd2hvb2QudGVzdCJ9.cVb52cB61VJxJCyBxn4BMEqz0BZ9UwkI0-BIo8CCljTKRGzJLVLtwvGDCbYeQfT-RgCemu4ACsLqy9ak5EB8qjsfNoQArfNy6hFXOvQ_ZU--bitE_nmJbqOAOYmmgR-3jSx8mBb5CD005FbXmw2cT9yz-eSMkp8b6RCGrXWkqLLCD85GoXlOo3pRCKe23V9jHyvsuGUXftbtx5Uamfly85Q1_bnY_5C4WQTp9vg9-adQDq4PqleSbjvcuAK9rU2OCpuRm-xJsxlo_skDaxviKmWyucO6Sl_X62E43rShMPqVe51AHzIGostbRFXNJm76hTCcNbbafMJbKqlEH1GqQg",
+    "jakeCookie": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJoc3pjWnp1MWZ3RGZwS21uUnZPYzR0M29MRVNQQW1YZUNyMm9TaWhhTTRFIn0.eyJleHAiOjE3NzI1NDI5NzgsImlhdCI6MTc3MjU0MTE3OCwianRpIjoiMjU0NDhlNTYtMzE5OS00MWIwLTk3NzQtZmVmNmE3OGRkZjJhIiwiaXNzIjoiaHR0cHM6Ly80Ni42Mi4xMzguMjE4L3JlYWxtcy9ib3Jyb3dob29kIiwic3ViIjoiYTEyY2ViYjItY2Q1Ni00N2EyLWJjMDMtYzgyMjM5MGQ0YWYwIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYm9ycm93aG9vZC13ZWIiLCJzZXNzaW9uX3N0YXRlIjoiMTVlZDY5ODgtYTc1Ni00OTQ0LWE5OTMtNWY0OGMwMjU3ZmVmIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHBzOi8vNDYuNjIuMTM4LjIxOCIsImh0dHBzOi8vaGVsaXgubG9jYWwiLCJodHRwczovLzQ2LjYyLjEzOC4yMTg6ODQ0MyIsImh0dHBzOi8vYm9ycm93aG9vZC5oZWxpeC5sb2NhbCIsImh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiYmgtbGVuZGVyIiwiYmgtbWVtYmVyIiwiZGVmYXVsdC1yb2xlcy1ib3Jyb3dob29kIl19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiIxNWVkNjk4OC1hNzU2LTQ5NDQtYTk5My01ZjQ4YzAyNTdmZWYiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6Ikpha2UgQ2hlbiIsInByZWZlcnJlZF91c2VybmFtZSI6Impha2UiLCJnaXZlbl9uYW1lIjoiSmFrZSIsImZhbWlseV9uYW1lIjoiQ2hlbiIsImVtYWlsIjoiamFrZUBib3Jyb3dob29kLnRlc3QifQ.SvYIFSIbZ7mHJs01mAukgcsIYoJascHT3Wy43oyBoDS4mERmUjgijwWgolMmn2DwhRf07tMzYwL4NOIiHU4SWRNupF9LvCwsX3AxVYcceN3LXECBuIIy1f88enwBqqHMdOHpddLpbiYPHq7wYRgWo6TuXrXDYqK-34dl-M6oQXUzLWAncvnDsDGxtx9R8DO19h3Dz42B1-RbzKQ2BvQNhCNQdmb07hJWxr4GtH-G9L0pOnAwdmxBJWDsGnzn7hAvvf0HWnt0D4tdAaWGAyMcLzta-N0Qny4_315l-MERBy61BzVwJo7Tl_haol3IvqOPv10MyKnSUKyeedgBxGElLA",
+    "lunaUserId": "1a45aa60-b810-4f85-9721-5a6c4ce3218c",
+    "jakeUserId": "8a60073f-6743-46c0-b4d5-49d57bd9dc25",
+    "itemId": "76d3ca85-ca31-43b1-85e9-5c54b3411e38",
+    "itemSlug": "dispute-path-welding-torch-1772541178928",
+    "listingId": "69fffb8a-08b3-42d3-b400-037be824b737",
+    "rentalId": "a8b345ef-5f7f-4a09-a00d-59e55e305ee7",
+    "pickupCode": "R6K5EMUF",
+    "returnCode": "H2UEFGYW",
+    "depositId": "1c6fa264-1af8-4831-877a-bddb2a6efcbb",
+    "disputeId": "e81159c4-1af3-40fd-bd3f-e79a7e055403"
+  },
+  "steps": [
+    {
+      "name": "Step 1: Luna logs in",
+      "status": "pass",
+      "ms": 1697
+    },
+    {
+      "name": "Step 2: Jake logs in",
+      "status": "pass",
+      "ms": 1187
+    },
+    {
+      "name": "Step 3: Luna fetches her profile",
+      "status": "pass",
+      "ms": 171
+    },
+    {
+      "name": "Step 4: Jake fetches his profile",
+      "status": "pass",
+      "ms": 157
+    },
+    {
+      "name": "Step 5: Luna creates an item (Welding Torch)",
+      "status": "pass",
+      "ms": 594
+    },
+    {
+      "name": "Step 6: Luna creates a RENT listing with deposit",
+      "status": "pass",
+      "ms": 152
+    },
+    {
+      "name": "Step 7: Jake requests rental (2 days)",
+      "status": "pass",
+      "ms": 182
+    },
+    {
+      "name": "Step 8: Luna approves the rental",
+      "status": "pass",
+      "ms": 192
+    },
+    {
+      "name": "Step 9: Luna generates lockbox codes",
+      "status": "pass",
+      "ms": 162
+    },
+    {
+      "name": "Step 10: Jake picks up (lockbox)",
+      "status": "pass",
+      "ms": 469
+    },
+    {
+      "name": "Step 11: Jake returns (lockbox)",
+      "status": "pass",
+      "ms": 171
+    },
+    {
+      "name": "Step 12: Jake holds deposit (EUR 200)",
+      "status": "pass",
+      "ms": 162
+    },
+    {
+      "name": "Step 13: Duplicate deposit is rejected (409)",
+      "status": "pass",
+      "ms": 923
+    },
+    {
+      "name": "Step 14: Luna files dispute (item_damaged)",
+      "status": "pass",
+      "ms": 173
+    },
+    {
+      "name": "Step 15: Rental status is now DISPUTED",
+      "status": "pass",
+      "ms": 149
+    },
+    {
+      "name": "Step 16: Duplicate dispute is rejected",
+      "status": "pass",
+      "ms": 185
+    },
+    {
+      "name": "Step 17: ACTIVE user (Jake) cannot file dispute (badge tier)",
+      "status": "pass",
+      "ms": 145
+    },
+    {
+      "name": "Step 18: Luna cannot respond to own dispute",
+      "status": "pass",
+      "ms": 161
+    },
+    {
+      "name": "Step 19: Jake responds to dispute",
+      "status": "pass",
+      "ms": 217
+    },
+    {
+      "name": "Step 20: Luna resolves dispute with deposit_forfeited",
+      "status": "pass",
+      "ms": 166
+    },
+    {
+      "name": "Step 21: Rental status is now COMPLETED",
+      "status": "pass",
+      "ms": 177
+    },
+    {
+      "name": "Step 22: Deposit status is FORFEITED",
+      "status": "pass",
+      "ms": 166
+    },
+    {
+      "name": "Step 23: Dispute summary shows filed count",
+      "status": "pass",
+      "ms": 187
+    },
+    {
+      "name": "Step 24: Luna has dispute notifications",
+      "status": "pass",
+      "ms": 193
+    },
+    {
+      "name": "Step 25: Jake has dispute notifications",
+      "status": "pass",
+      "ms": 177
+    }
+  ]
+}

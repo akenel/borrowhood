@@ -1,0 +1,160 @@
+{
+  "base_url": "https://46.62.138.218",
+  "timestamp": "2026-03-03T12:40:20.264Z",
+  "summary": {
+    "passed": 28,
+    "failed": 0,
+    "total": 28
+  },
+  "artifacts": {
+    "lunaCookie": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJoc3pjWnp1MWZ3RGZwS21uUnZPYzR0M29MRVNQQW1YZUNyMm9TaWhhTTRFIn0.eyJleHAiOjE3NzI1NDM0MTQsImlhdCI6MTc3MjU0MTYxNCwianRpIjoiZjM4YmY2YjItNzZjZC00YTg4LTgxNzAtNTM4MmIxNDk0OTBiIiwiaXNzIjoiaHR0cHM6Ly80Ni42Mi4xMzguMjE4L3JlYWxtcy9ib3Jyb3dob29kIiwic3ViIjoiMTFlOWM0MjItMTI4OS00YWViLThjOGMtNjliOWNhNDQ4NDA2IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYm9ycm93aG9vZC13ZWIiLCJzZXNzaW9uX3N0YXRlIjoiNDFlOGYzMjctNTkwMC00NTlhLWIwMWQtMzY4NWYwMGY4NjU5IiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHBzOi8vNDYuNjIuMTM4LjIxOCIsImh0dHBzOi8vaGVsaXgubG9jYWwiLCJodHRwczovLzQ2LjYyLjEzOC4yMTg6ODQ0MyIsImh0dHBzOi8vYm9ycm93aG9vZC5oZWxpeC5sb2NhbCIsImh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiYmgtbGVuZGVyIiwiYmgtbWVtYmVyIiwiYmgtbW9kZXJhdG9yIiwiZGVmYXVsdC1yb2xlcy1ib3Jyb3dob29kIl19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiI0MWU4ZjMyNy01OTAwLTQ1OWEtYjAxZC0zNjg1ZjAwZjg2NTkiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6Ikx1bmEgR3JlY28iLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJsdW5hIiwiZ2l2ZW5fbmFtZSI6Ikx1bmEiLCJmYW1pbHlfbmFtZSI6IkdyZWNvIiwiZW1haWwiOiJsdW5hQGJvcnJvd2hvb2QudGVzdCJ9.bM8m-PZ0m-J-dEV96EFwts_584NW0GRtrly3rYKIZkAkgwTfD1b_0MgSOt1aeQ3Z9fJxkzhp_ka3Iy_TbUYLcMJJzWGr7b_uoEa2PZ0ixolIDI4oT41g0CQ2OaQCLI6Z_i59EjinMHy-yBmRave0Gr4_lkxjMdi86PE7gxTVj4GrkItD40BjZPaUusDAPQJsTvxbaCixXHt6CrT7df0VKzLCuJoVG6sjlI-LH6vLjeK_pSzN_xLvmlRRaZWqSphYylj2CIcZG7ZI_9LkDQrHroG5rE1NfU_czPH0igcGkCZ2BppVzBtLBC5E4AEDjgdr3j9fJxS4nP2LMz1sAM5yAw",
+    "jakeCookie": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJoc3pjWnp1MWZ3RGZwS21uUnZPYzR0M29MRVNQQW1YZUNyMm9TaWhhTTRFIn0.eyJleHAiOjE3NzI1NDM0MTUsImlhdCI6MTc3MjU0MTYxNSwianRpIjoiZmI5M2UwYjYtZTYwNy00YTU3LTkwMTgtMGFlOWFiOWM0ZTJhIiwiaXNzIjoiaHR0cHM6Ly80Ni42Mi4xMzguMjE4L3JlYWxtcy9ib3Jyb3dob29kIiwic3ViIjoiYTEyY2ViYjItY2Q1Ni00N2EyLWJjMDMtYzgyMjM5MGQ0YWYwIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYm9ycm93aG9vZC13ZWIiLCJzZXNzaW9uX3N0YXRlIjoiNGExNGY0ODUtYTVmYy00YWIwLWI3NTktZTE3MTdkNmE2NzI3IiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHBzOi8vNDYuNjIuMTM4LjIxOCIsImh0dHBzOi8vaGVsaXgubG9jYWwiLCJodHRwczovLzQ2LjYyLjEzOC4yMTg6ODQ0MyIsImh0dHBzOi8vYm9ycm93aG9vZC5oZWxpeC5sb2NhbCIsImh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiYmgtbGVuZGVyIiwiYmgtbWVtYmVyIiwiZGVmYXVsdC1yb2xlcy1ib3Jyb3dob29kIl19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiI0YTE0ZjQ4NS1hNWZjLTRhYjAtYjc1OS1lMTcxN2Q2YTY3MjciLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6Ikpha2UgQ2hlbiIsInByZWZlcnJlZF91c2VybmFtZSI6Impha2UiLCJnaXZlbl9uYW1lIjoiSmFrZSIsImZhbWlseV9uYW1lIjoiQ2hlbiIsImVtYWlsIjoiamFrZUBib3Jyb3dob29kLnRlc3QifQ.dB7Wc4mdBLSb2wr6zX_1kXQWV-O6-XfDZnILUpe1CipoQEIAUrH9bdIjc9Li3ilBDU5HpNUJTU1pC9qUdgTLCjnb_Pb-OMn5qzcTP-9wgGwzrUmtTHoTGY4Xwn0uFVfudeZfwLjTKVbP0MALxcvYHC-um2nThEhUajxKwu2zIUSFgExQPE-j6QGjZneRSeZXcTxS9ALGKWj48ejwN8vAcIAs4rDAu8egve6I7vDyncAjzEKFTsMpo_FIuOn1poKXt2vZqmwx151RvRLPow1CgFn-aa2f2fYahUjaeGczbU6VCo1KHMKluuO8CjAZXGJwct1DzvnKaguTE7NNjN6jIw",
+    "lunaUserId": "1a45aa60-b810-4f85-9721-5a6c4ce3218c",
+    "jakeUserId": "8a60073f-6743-46c0-b4d5-49d57bd9dc25",
+    "itemId": "2184b951-f346-4f2d-a413-6b5de8634210",
+    "listingId": "1715c39f-5898-4399-9d33-5a9350b56f66",
+    "rentalId": "29fb54a2-4817-41ec-ab24-3c1770143558"
+  },
+  "steps": [
+    {
+      "name": "Step 1: Luna logs in",
+      "status": "pass",
+      "ms": 1132
+    },
+    {
+      "name": "Step 2: Jake logs in",
+      "status": "pass",
+      "ms": 883
+    },
+    {
+      "name": "Step 3: Fetch user IDs",
+      "status": "pass",
+      "ms": 353
+    },
+    {
+      "name": "Step 4: Luna creates item + listing",
+      "status": "pass",
+      "ms": 367
+    },
+    {
+      "name": "Step 5: Jake creates rental",
+      "status": "pass",
+      "ms": 162
+    },
+    {
+      "name": "Step 6: PayPal create-order requires auth",
+      "status": "pass",
+      "ms": 126
+    },
+    {
+      "name": "Step 7: PayPal capture requires auth",
+      "status": "pass",
+      "ms": 147
+    },
+    {
+      "name": "Step 8: Payment list requires auth",
+      "status": "pass",
+      "ms": 161
+    },
+    {
+      "name": "Step 9: Stripe create-session requires auth",
+      "status": "pass",
+      "ms": 176
+    },
+    {
+      "name": "Step 10: Create-order rejects bad rental_id",
+      "status": "pass",
+      "ms": 167
+    },
+    {
+      "name": "Step 11: Create-order rejects owner as payer",
+      "status": "pass",
+      "ms": 163
+    },
+    {
+      "name": "Step 12: Create-order rejects zero amount",
+      "status": "pass",
+      "ms": 163
+    },
+    {
+      "name": "Step 13: Create-order rejects negative amount",
+      "status": "pass",
+      "ms": 139
+    },
+    {
+      "name": "Step 14: Create-order returns 502 when PayPal not configured",
+      "status": "pass",
+      "ms": 184
+    },
+    {
+      "name": "Step 15: Stripe create-session rejects bad rental",
+      "status": "pass",
+      "ms": 161
+    },
+    {
+      "name": "Step 16: Stripe create-session rejects owner as payer",
+      "status": "pass",
+      "ms": 160
+    },
+    {
+      "name": "Step 17: Stripe create-session returns 502 when not configured",
+      "status": "pass",
+      "ms": 177
+    },
+    {
+      "name": "Step 18: Capture rejects non-existent payment",
+      "status": "pass",
+      "ms": 194
+    },
+    {
+      "name": "Step 19: Refund rejects non-existent payment",
+      "status": "pass",
+      "ms": 174
+    },
+    {
+      "name": "Step 20: Stripe confirm rejects non-existent payment",
+      "status": "pass",
+      "ms": 161
+    },
+    {
+      "name": "Step 21: Stripe refund rejects non-existent payment",
+      "status": "pass",
+      "ms": 194
+    },
+    {
+      "name": "Step 22: Jake can list his payments (empty or existing)",
+      "status": "pass",
+      "ms": 163
+    },
+    {
+      "name": "Step 23: Luna can list her payments (empty or existing)",
+      "status": "pass",
+      "ms": 174
+    },
+    {
+      "name": "Step 24: PayPal accepts payment_type=\"rental\"",
+      "status": "pass",
+      "ms": 160
+    },
+    {
+      "name": "Step 25: PayPal accepts payment_type=\"deposit\"",
+      "status": "pass",
+      "ms": 192
+    },
+    {
+      "name": "Step 26: PayPal accepts payment_type=\"purchase\"",
+      "status": "pass",
+      "ms": 177
+    },
+    {
+      "name": "Step 27: PayPal accepts payment_type=\"auction\"",
+      "status": "pass",
+      "ms": 176
+    },
+    {
+      "name": "Step 28: PayPal accepts payment_type=\"service\"",
+      "status": "pass",
+      "ms": 177
+    }
+  ]
+}

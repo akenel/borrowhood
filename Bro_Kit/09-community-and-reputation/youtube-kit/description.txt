@@ -1,0 +1,43 @@
+What happens after the rental is done? This video goes beyond borrowing and returning. It shows the community features that make BorrowHood a real neighborhood -- not just a rental platform. Reviews, badges, member discovery, favorites, and a helpboard where neighbors help neighbors.
+
+REVIEWS -- SAYING THANKS
+Mike just finished a rental with Sally. She returned his drill in perfect condition. He opens BorrowHood and leaves her a 5-star review with a note: "Sally is the kind of neighbor you want." The review appears on her profile instantly. Her review summary updates. Trust is building.
+
+BADGES -- EARNING REPUTATION
+Every action in BorrowHood earns points. Points unlock badges. After leaving the review, Mike checks his profile and earns a new badge. There are 14 badges total: First Listing, First Rental, Trusted Renter, Community Voice, Neighborhood Hero, and more. Your badge tier (Newcomer, Active, Trusted, Pillar, Legend) determines the weight of your reviews.
+
+NOTIFICATIONS -- STAYING IN THE LOOP
+Sally logs in and sees a notification on the bell icon. "Mike left you a 5-star review." She opens it, reads it, marks it as read. Every important event -- reviews, badge earned, rental updates -- triggers a notification. No surprises.
+
+MEMBERS DIRECTORY -- DISCOVERING NEIGHBORS
+Sally opens the Members page. She can filter by badge tier, city, workshop type, or search by name. She filters for "Trusted" members and discovers Maria's Garden -- a neighbor she has never met. She favorites Maria with a single click. Then she visits Maria's workshop page and sees her items, skills, languages, and reviews.
+
+HELPBOARD -- NEIGHBORS HELPING NEIGHBORS
+Not everything is about renting. Sally needs to hang floating shelves but does not know which wall anchors work on old plaster walls. She posts a need on the Helpboard: "Toggle bolts? Molly bolts? Anyone dealt with this?" Maria sees the post and replies: "Toggle bolts are the way to go! I hung my cabinets with them two years ago." Sally reads the reply and marks the post as resolved. Problem solved. No transaction. Just neighbors.
+
+WEIGHTED REPUTATION
+Not all reviews are equal. A review from a Legend-tier member carries 10x the weight of a Newcomer. This means you cannot game the system with fake accounts. Real reputation comes from real participation over time.
+
+CHAPTERS
+0:00 Intro -- Beyond the Rental
+0:12 Where We Left Off
+0:30 Mike Reviews Sally (5 Stars)
+0:55 Mike Earns a Badge
+1:10 Sally Gets a Notification
+1:30 Sally's Profile -- Badges Growing
+2:00 Members Directory -- Browse and Filter
+2:35 Sally Favorites Maria
+2:55 The Helpboard
+3:15 Helpboard Overview -- Existing Posts
+3:35 Sally Posts a Need
+4:15 Maria Replies
+4:45 Problem Solved -- Post Resolved
+5:10 Badge Catalog (14 Badges)
+5:25 Weighted Reputation
+5:40 Outro -- More Than a Rental Platform
+
+Tech stack: FastAPI, Jinja2, Tailwind CSS, Alpine.js, Keycloak OIDC, Docker, Hetzner Cloud
+AI co-pilot: Claude Code by Anthropic
+Built from a camper van in Trapani, Sicily.
+
+"Every neighborhood has a garage like his."

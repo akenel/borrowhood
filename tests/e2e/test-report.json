@@ -1,0 +1,156 @@
+{
+  "base_url": "https://46.62.138.218",
+  "timestamp": "2026-03-03T14:43:13.308Z",
+  "summary": {
+    "passed": 29,
+    "failed": 0,
+    "total": 29
+  },
+  "tests": [
+    {
+      "name": "Health endpoint returns ok",
+      "status": "pass",
+      "ms": 631
+    },
+    {
+      "name": "Home page loads (/)",
+      "status": "pass",
+      "ms": 1919
+    },
+    {
+      "name": "Browse page loads (/browse)",
+      "status": "pass",
+      "ms": 1583
+    },
+    {
+      "name": "Members page loads (/members)",
+      "status": "pass",
+      "ms": 935
+    },
+    {
+      "name": "Helpboard page loads (/helpboard)",
+      "status": "pass",
+      "ms": 488
+    },
+    {
+      "name": "Terms page loads (/terms)",
+      "status": "pass",
+      "ms": 456
+    },
+    {
+      "name": "Items API returns list",
+      "status": "pass",
+      "ms": 265
+    },
+    {
+      "name": "Users API returns paginated list",
+      "status": "pass",
+      "ms": 272
+    },
+    {
+      "name": "Reviews summary returns data",
+      "status": "pass",
+      "ms": 590
+    },
+    {
+      "name": "Badges catalog returns list",
+      "status": "pass",
+      "ms": 193
+    },
+    {
+      "name": "Helpboard summary returns counts",
+      "status": "pass",
+      "ms": 283
+    },
+    {
+      "name": "Helpboard posts returns paginated",
+      "status": "pass",
+      "ms": 318
+    },
+    {
+      "name": "Demo login page loads",
+      "status": "pass",
+      "ms": 690
+    },
+    {
+      "name": "Dashboard redirects to login (/dashboard)",
+      "status": "pass",
+      "ms": 676
+    },
+    {
+      "name": "Profile redirects to login (/profile)",
+      "status": "pass",
+      "ms": 449
+    },
+    {
+      "name": "List Item redirects to login (/list)",
+      "status": "pass",
+      "ms": 666
+    },
+    {
+      "name": "Browse page has search form",
+      "status": "pass",
+      "ms": 818
+    },
+    {
+      "name": "Home page has category links",
+      "status": "pass",
+      "ms": 589
+    },
+    {
+      "name": "Members page shows user cards",
+      "status": "pass",
+      "ms": 658
+    },
+    {
+      "name": "Home page has Find a Maker button",
+      "status": "pass",
+      "ms": 447
+    },
+    {
+      "name": "Members page with service filter loads",
+      "status": "pass",
+      "ms": 623
+    },
+    {
+      "name": "Members page shows service filter pills",
+      "status": "pass",
+      "ms": 603
+    },
+    {
+      "name": "Members page with skill filter loads",
+      "status": "pass",
+      "ms": 550
+    },
+    {
+      "name": "Members page with language filter loads",
+      "status": "pass",
+      "ms": 1538
+    },
+    {
+      "name": "Members page has skill filter input",
+      "status": "pass",
+      "ms": 516
+    },
+    {
+      "name": "Members page has language filter dropdown",
+      "status": "pass",
+      "ms": 3
+    },
+    {
+      "name": "Members sort has trust option",
+      "status": "pass",
+      "ms": 2
+    },
+    {
+      "name": "Notification preferences requires auth",
+      "status": "pass",
+      "ms": 166
+    },
+    {
+      "name": "Workshop page loads for first user",
+      "status": "pass",
+      "ms": 793
+    }
+  ]
+}

@@ -336,8 +336,8 @@ LEGENDS_INVENTORS = [
         "languages": [
             {"language_code": "pl", "proficiency": "native"},
             {"language_code": "fr", "proficiency": "native"},
-            {"language_code": "ru", "proficiency": "fluent"},
-            {"language_code": "de", "proficiency": "conversational"}
+            {"language_code": "ru", "proficiency": "C2"},
+            {"language_code": "de", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Radiochemistry", "category": "science", "self_rating": 5, "years_experience": 35},
@@ -414,7 +414,7 @@ LEGENDS_INVENTORS = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "it", "proficiency": "native"},
-            {"language_code": "la", "proficiency": "fluent"}
+            {"language_code": "la", "proficiency": "C2"}
         ],
         "skills": [
             {"skill_name": "Astronomy", "category": "science", "self_rating": 5, "years_experience": 40},
@@ -491,7 +491,7 @@ LEGENDS_INVENTORS = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "de", "proficiency": "native"},
-            {"language_code": "la", "proficiency": "fluent"}
+            {"language_code": "la", "proficiency": "C2"}
         ],
         "skills": [
             {"skill_name": "Letterpress Printing", "category": "tools", "self_rating": 5, "years_experience": 30},
@@ -644,7 +644,7 @@ LEGENDS_INVENTORS = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "fr", "proficiency": "fluent"}
+            {"language_code": "fr", "proficiency": "C2"}
         ],
         "skills": [
             {"skill_name": "Electrical Science", "category": "science", "self_rating": 5, "years_experience": 40},
@@ -721,9 +721,9 @@ LEGENDS_INVENTORS = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "de", "proficiency": "native"},
-            {"language_code": "en", "proficiency": "fluent"},
-            {"language_code": "fr", "proficiency": "conversational"},
-            {"language_code": "it", "proficiency": "conversational"}
+            {"language_code": "en", "proficiency": "C2"},
+            {"language_code": "fr", "proficiency": "B1"},
+            {"language_code": "it", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Theoretical Physics", "category": "science", "self_rating": 5, "years_experience": 50},
@@ -800,7 +800,7 @@ LEGENDS_INVENTORS = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "la", "proficiency": "fluent"}
+            {"language_code": "la", "proficiency": "C2"}
         ],
         "skills": [
             {"skill_name": "Mathematics", "category": "science", "self_rating": 5, "years_experience": 55},
@@ -881,8 +881,8 @@ LEGENDS_INVENTORS = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "de", "proficiency": "native"},
-            {"language_code": "en", "proficiency": "fluent"},
-            {"language_code": "fr", "proficiency": "conversational"}
+            {"language_code": "en", "proficiency": "C2"},
+            {"language_code": "fr", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Radio Engineering", "category": "electronics", "self_rating": 5, "years_experience": 30},
@@ -960,7 +960,7 @@ LEGENDS_INVENTORS = [
         "latitude": 42.380,
         "longitude": -71.061,
         "badge_tier": "legend",
-        "languages": [{"language_code": "en", "proficiency": "native"}, {"language_code": "fr", "proficiency": "conversational"}],
+        "languages": [{"language_code": "en", "proficiency": "native"}, {"language_code": "fr", "proficiency": "B1"}],
         "skills": [
             {"skill_name": "Telegraphy", "category": "electronics", "self_rating": 5, "years_experience": 35},
             {"skill_name": "Portrait Painting", "category": "art", "self_rating": 5, "years_experience": 30},
@@ -1037,7 +1037,7 @@ LEGENDS_INVENTORS = [
         "latitude": 47.095,
         "longitude": 5.492,
         "badge_tier": "legend",
-        "languages": [{"language_code": "fr", "proficiency": "native"}, {"language_code": "la", "proficiency": "fluent"}],
+        "languages": [{"language_code": "fr", "proficiency": "native"}, {"language_code": "la", "proficiency": "C2"}],
         "skills": [
             {"skill_name": "Microbiology", "category": "science", "self_rating": 5, "years_experience": 45},
             {"skill_name": "Immunology", "category": "science", "self_rating": 5, "years_experience": 30},
@@ -1114,7 +1114,7 @@ LEGENDS_INVENTORS = [
         "latitude": 44.494,
         "longitude": 11.347,
         "badge_tier": "legend",
-        "languages": [{"language_code": "it", "proficiency": "native"}, {"language_code": "en", "proficiency": "fluent"}],
+        "languages": [{"language_code": "it", "proficiency": "native"}, {"language_code": "en", "proficiency": "C2"}],
         "skills": [
             {"skill_name": "Radio Engineering", "category": "electronics", "self_rating": 5, "years_experience": 40},
             {"skill_name": "Wireless Communication", "category": "electronics", "self_rating": 5, "years_experience": 40},
@@ -1268,7 +1268,7 @@ LEGENDS_INVENTORS = [
         "latitude": 51.509,
         "longitude": -0.197,
         "badge_tier": "legend",
-        "languages": [{"language_code": "en", "proficiency": "native"}, {"language_code": "fr", "proficiency": "fluent"}],
+        "languages": [{"language_code": "en", "proficiency": "native"}, {"language_code": "fr", "proficiency": "C2"}],
         "skills": [
             {"skill_name": "X-Ray Crystallography", "category": "science", "self_rating": 5, "years_experience": 15},
             {"skill_name": "Physical Chemistry", "category": "science", "self_rating": 5, "years_experience": 18},
@@ -1347,10 +1347,10 @@ LEGENDS_INVENTORS = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "sv", "proficiency": "native"},
-            {"language_code": "fr", "proficiency": "fluent"},
-            {"language_code": "en", "proficiency": "fluent"},
-            {"language_code": "de", "proficiency": "fluent"},
-            {"language_code": "ru", "proficiency": "fluent"}
+            {"language_code": "fr", "proficiency": "C2"},
+            {"language_code": "en", "proficiency": "C2"},
+            {"language_code": "de", "proficiency": "C2"},
+            {"language_code": "ru", "proficiency": "C2"}
         ],
         "skills": [
             {"skill_name": "Chemistry", "category": "science", "self_rating": 5, "years_experience": 45},
@@ -1389,7 +1389,7 @@ LEGENDS_INVENTORS = [
         "latitude": 55.953,
         "longitude": -3.189,
         "badge_tier": "legend",
-        "languages": [{"language_code": "en", "proficiency": "native"}, {"language_code": "la", "proficiency": "fluent"}],
+        "languages": [{"language_code": "en", "proficiency": "native"}, {"language_code": "la", "proficiency": "C2"}],
         "skills": [
             {"skill_name": "Mathematical Physics", "category": "science", "self_rating": 5, "years_experience": 30},
             {"skill_name": "Electromagnetism", "category": "science", "self_rating": 5, "years_experience": 25},
@@ -1427,7 +1427,7 @@ LEGENDS_INVENTORS = [
         "latitude": 58.198,
         "longitude": 68.254,
         "badge_tier": "legend",
-        "languages": [{"language_code": "ru", "proficiency": "native"}, {"language_code": "de", "proficiency": "fluent"}, {"language_code": "fr", "proficiency": "conversational"}],
+        "languages": [{"language_code": "ru", "proficiency": "native"}, {"language_code": "de", "proficiency": "C2"}, {"language_code": "fr", "proficiency": "B1"}],
         "skills": [
             {"skill_name": "Chemistry", "category": "science", "self_rating": 5, "years_experience": 45},
             {"skill_name": "Pattern Recognition", "category": "science", "self_rating": 5, "years_experience": 40},
@@ -1465,7 +1465,7 @@ LEGENDS_INVENTORS = [
         "latitude": 48.884,
         "longitude": 2.815,
         "badge_tier": "legend",
-        "languages": [{"language_code": "fr", "proficiency": "native"}, {"language_code": "la", "proficiency": "conversational"}],
+        "languages": [{"language_code": "fr", "proficiency": "native"}, {"language_code": "la", "proficiency": "B1"}],
         "skills": [
             {"skill_name": "Tactile Communication", "category": "education", "self_rating": 5, "years_experience": 25},
             {"skill_name": "Music", "category": "music", "self_rating": 5, "years_experience": 30},
@@ -1619,7 +1619,7 @@ LEGENDS_INVENTORS = [
         "latitude": 43.769,
         "longitude": 11.256,
         "badge_tier": "legend",
-        "languages": [{"language_code": "en", "proficiency": "native"}, {"language_code": "fr", "proficiency": "fluent"}, {"language_code": "de", "proficiency": "conversational"}, {"language_code": "it", "proficiency": "conversational"}],
+        "languages": [{"language_code": "en", "proficiency": "native"}, {"language_code": "fr", "proficiency": "C2"}, {"language_code": "de", "proficiency": "B1"}, {"language_code": "it", "proficiency": "B1"}],
         "skills": [
             {"skill_name": "Nursing", "category": "science", "self_rating": 5, "years_experience": 50},
             {"skill_name": "Statistics", "category": "science", "self_rating": 5, "years_experience": 40},
@@ -1658,7 +1658,7 @@ LEGENDS_INVENTORS = [
         "latitude": 49.794,
         "longitude": 9.929,
         "badge_tier": "legend",
-        "languages": [{"language_code": "de", "proficiency": "native"}, {"language_code": "en", "proficiency": "fluent"}],
+        "languages": [{"language_code": "de", "proficiency": "native"}, {"language_code": "en", "proficiency": "C2"}],
         "skills": [
             {"skill_name": "Quantum Mechanics", "category": "science", "self_rating": 5, "years_experience": 45},
             {"skill_name": "Theoretical Physics", "category": "science", "self_rating": 5, "years_experience": 50},
@@ -1696,7 +1696,7 @@ LEGENDS_INVENTORS = [
         "latitude": 51.553,
         "longitude": 0.002,
         "badge_tier": "legend",
-        "languages": [{"language_code": "en", "proficiency": "native"}, {"language_code": "fr", "proficiency": "conversational"}],
+        "languages": [{"language_code": "en", "proficiency": "native"}, {"language_code": "fr", "proficiency": "B1"}],
         "skills": [
             {"skill_name": "Surgery", "category": "science", "self_rating": 5, "years_experience": 45},
             {"skill_name": "Antiseptic Technique", "category": "science", "self_rating": 5, "years_experience": 40},
