@@ -1,7 +1,7 @@
 """AI-powered listing and profile generation API.
 
-Uses Pollinations.ai (free, no key) with Ollama fallback.
-Gemini 2.5 Flash for smart listing, review analysis, and concierge.
+Multi-provider cascade: Gemini -> Ollama Turbo -> Pollinations -> template.
+Smart listing, review analysis, and concierge endpoints.
 These endpoints power the "grandma test" -- list an item in 60 seconds.
 """
 
@@ -175,8 +175,8 @@ async def ai_smart_listing(
             "condition": str(item.condition.value) if item.condition else "",
         })
 
-    # Try Gemini first
-    gemini_result = await smart_listing(
+    # Try AI provider cascade (gemini -> ollama -> pollinations)
+    ai_result, provider = await smart_listing(
         name=data.name,
         category=data.category,
         item_type=data.item_type,
@@ -184,25 +184,25 @@ async def ai_smart_listing(
         similar_items=similar,
     )
 
-    if gemini_result:
+    if ai_result:
         return SmartListingResponse(
-            title=gemini_result.get("title", data.name),
-            description=gemini_result.get("description", ""),
-            category=gemini_result.get("category", data.category),
-            subcategory=gemini_result.get("subcategory", ""),
-            condition=gemini_result.get("condition", "good"),
-            item_type=gemini_result.get("item_type", data.item_type),
-            suggested_price=float(gemini_result.get("suggested_price", 0)),
-            price_unit=gemini_result.get("price_unit", "per_day"),
-            deposit_suggestion=float(gemini_result.get("deposit_suggestion", 0)),
-            suggested_listing_type=gemini_result.get("suggested_listing_type", "rent"),
-            tags=gemini_result.get("tags", [])[:5],
-            story_suggestion=gemini_result.get("story_suggestion", ""),
-            ai_provider="gemini",
+            title=ai_result.get("title", data.name),
+            description=ai_result.get("description", ""),
+            category=ai_result.get("category", data.category),
+            subcategory=ai_result.get("subcategory", ""),
+            condition=ai_result.get("condition", "good"),
+            item_type=ai_result.get("item_type", data.item_type),
+            suggested_price=float(ai_result.get("suggested_price", 0)),
+            price_unit=ai_result.get("price_unit", "per_day"),
+            deposit_suggestion=float(ai_result.get("deposit_suggestion", 0)),
+            suggested_listing_type=ai_result.get("suggested_listing_type", "rent"),
+            tags=ai_result.get("tags", [])[:5],
+            story_suggestion=ai_result.get("story_suggestion", ""),
+            ai_provider=provider,
         )
 
-    # Fallback to Pollinations
-    logger.info("Gemini unavailable, falling back to Pollinations for smart-listing")
+    # All AI providers failed -- use basic template fallback
+    logger.info("All AI providers unavailable, using template fallback for smart-listing")
     fallback = await generate_listing_description(
         name=data.name,
         category=data.category or "hand_tools",
@@ -214,7 +214,7 @@ async def ai_smart_listing(
         description=fallback.get("description", ""),
         tags=fallback.get("tags", []),
         category=data.category,
-        ai_provider="pollinations",
+        ai_provider="template",
     )
 
 
@@ -233,6 +233,7 @@ class ReviewAnalysisResponse(BaseModel):
     skill_insights: List[dict] = []
     top_keywords: dict = {}
     summary: str = ""
+    ai_provider: str = ""
 
 
 @router.post("/review-analysis", response_model=ReviewAnalysisResponse)
@@ -275,7 +276,7 @@ async def ai_review_analysis(
 
     avg_rating = total_rating / len(reviews) if reviews else 0.0
 
-    gemini_result = await review_analysis(
+    ai_result, provider = await review_analysis(
         user_name=user.display_name,
         badge_tier=str(user.badge_tier.value) if user.badge_tier else "NEWCOMER",
         reviews=reviews,
@@ -283,10 +284,11 @@ async def ai_review_analysis(
         average_rating=avg_rating,
     )
 
-    if gemini_result:
-        return ReviewAnalysisResponse(**gemini_result)
+    if ai_result:
+        ai_result["ai_provider"] = provider
+        return ReviewAnalysisResponse(**ai_result)
 
-    # Basic fallback (no Gemini)
+    # All AI providers failed -- basic stats fallback
     positive = sum(1 for r in reviews if r["rating"] >= 4)
     neutral = sum(1 for r in reviews if r["rating"] == 3)
     negative = sum(1 for r in reviews if r["rating"] <= 2)
@@ -297,6 +299,7 @@ async def ai_review_analysis(
         sentiment={"positive": positive, "neutral": neutral, "negative": negative},
         average_rating=round(avg_rating, 1),
         summary=f"{user.display_name} has {len(reviews)} review(s) with an average rating of {avg_rating:.1f}/5.",
+        ai_provider="template",
     )
 
 
@@ -311,6 +314,7 @@ class ConciergeResponse(BaseModel):
     suggestions: List[str] = []
     items: List[dict] = []
     members: List[dict] = []
+    ai_provider: str = ""
 
 
 @router.post("/concierge", response_model=ConciergeResponse)
@@ -388,24 +392,25 @@ async def ai_concierge(
             members_for_gemini.append(member_dict)
             members_for_response.append(member_dict)
 
-    # Get Gemini's interpretation
-    gemini_result = await concierge_search(
+    # Get AI interpretation (cascade: gemini -> ollama -> pollinations)
+    ai_result, provider = await concierge_search(
         query=data.query,
         language=data.language,
         items=items_for_gemini,
         members=members_for_gemini,
     )
 
-    if gemini_result:
+    if ai_result:
         return ConciergeResponse(
-            interpretation=gemini_result.get("interpretation", data.query),
-            response=gemini_result.get("response", ""),
-            suggestions=gemini_result.get("suggestions", []),
+            interpretation=ai_result.get("interpretation", data.query),
+            response=ai_result.get("response", ""),
+            suggestions=ai_result.get("suggestions", []),
             items=items_for_response,
             members=members_for_response,
+            ai_provider=provider,
         )
 
-    # Basic fallback
+    # All AI providers failed -- basic fallback
     if items_for_response:
         names = ", ".join(i["name"] for i in items_for_response[:3])
         return ConciergeResponse(
@@ -414,6 +419,7 @@ async def ai_concierge(
             suggestions=["Try a different category", "Search by brand name"],
             items=items_for_response,
             members=members_for_response,
+            ai_provider="template",
         )
 
     return ConciergeResponse(
@@ -422,4 +428,5 @@ async def ai_concierge(
         suggestions=["Browse all items", "Check the helpboard"],
         items=[],
         members=[],
+        ai_provider="template",
     )

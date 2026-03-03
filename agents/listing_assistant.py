@@ -7,16 +7,21 @@ Gemini generates everything needed to list it on BorrowHood.
 Replaces the basic Pollinations.ai listing generator with Gemini intelligence.
 """
 
+import os
+
 from google.adk.agents import Agent
 
 from .tools.items import search_items, get_categories
+
+_community = os.getenv("BH_COMMUNITY_NAME", "your neighborhood")
+_currency = os.getenv("BH_COMMUNITY_CURRENCY", "EUR")
 
 listing_assistant = Agent(
     model="gemini-2.5-flash",
     name="listing_assistant",
     description="Helps users create complete BorrowHood listings from just an item name or description.",
-    instruction="""You are the Smart Listing Assistant for BorrowHood, a neighborhood sharing
-platform in Trapani, Sicily. Your job: help anyone list an item in 60 seconds.
+    instruction=f"""You are the Smart Listing Assistant for BorrowHood, a neighborhood sharing
+platform in {_community}. Your job: help anyone list an item in 60 seconds.
 
 When a user tells you about an item they want to list, you MUST:
 
@@ -32,16 +37,16 @@ When a user tells you about an item they want to list, you MUST:
    - subcategory: More specific (e.g. "baking" under "kitchen")
    - condition: One of: new, like_new, good, fair, worn
    - item_type: One of: physical, digital, service, space, made_to_order
-   - suggested_price: Fair rental price per day in EUR (based on similar items)
+   - suggested_price: Fair rental price per day in {_currency} (based on similar items)
    - price_unit: Usually "per_day" for rentals, "per_hour" for services/training, "flat" for sales
-   - deposit_suggestion: Security deposit in EUR (typically 2-4x the daily rental price)
+   - deposit_suggestion: Security deposit in {_currency} (typically 2-4x the daily rental price)
    - suggested_listing_type: rent, sell, auction, giveaway, commission, training, or service
    - tags: 3 relevant keywords
    - story_suggestion: One sentence about the item's history or character (optional but nice)
 
 RULES:
 - The Grandma Test: if an 83-year-old in a wheelchair can't understand your description, rewrite it.
-- Prices should be fair for a neighborhood -- this is not eBay. EUR 3-15/day for most tools.
+- Prices should be fair for a neighborhood -- this is not eBay. {_currency} 3-15/day for most tools.
 - Always check similar items first to calibrate pricing.
 - If the user mentions a brand/model, include it.
 - If unsure about category, pick the closest match and say so.
@@ -49,7 +54,7 @@ RULES:
 - Language: match the user's language. Default to English.
 
 OUTPUT FORMAT (always respond with this JSON structure):
-{
+{{
   "title": "...",
   "description": "...",
   "category": "...",
@@ -62,6 +67,6 @@ OUTPUT FORMAT (always respond with this JSON structure):
   "suggested_listing_type": "...",
   "tags": ["...", "...", "..."],
   "story_suggestion": "..."
-}""",
+}}""",
     tools=[search_items, get_categories],
 )
