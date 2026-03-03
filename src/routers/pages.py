@@ -21,6 +21,7 @@ from src.models.item import BHItem, CATEGORY_GROUPS
 from src.models.listing import BHListing, ListingStatus
 from src.models.rental import BHRental
 from src.models.review import BHReview
+from src.models.badge import BADGE_INFO
 from src.models.user import BadgeTier, BHUser, WorkshopType
 
 router = APIRouter(tags=["pages"])
@@ -245,6 +246,7 @@ async def workshop_profile(slug: str, request: Request,
             selectinload(BHUser.skills),
             selectinload(BHUser.social_links),
             selectinload(BHUser.items).selectinload(BHItem.media),
+            selectinload(BHUser.points),
         )
         .where(BHUser.slug == slug)
         .where(BHUser.deleted_at.is_(None))
@@ -255,8 +257,17 @@ async def workshop_profile(slug: str, request: Request,
         ctx = _ctx(request, token)
         return _render("errors/404.html", ctx, status_code=404)
 
+    # Fetch badges separately (backref not available for eager loading)
+    from src.models.badge import BHBadge
+    badge_result = await db.execute(
+        select(BHBadge).where(BHBadge.user_id == workshop_owner.id)
+    )
+    user_badges = badge_result.scalars().all()
+
     ctx = _ctx(request, token,
         workshop=workshop_owner,
+        workshop_badges=user_badges,
+        badge_info=BADGE_INFO,
         og_title=f"{workshop_owner.workshop_name or workshop_owner.display_name} - BorrowHood",
         og_description=workshop_owner.tagline or "Workshop on BorrowHood",
     )

@@ -297,6 +297,116 @@
                 </a>
             </div>
 
+            <!-- Reputation & Points -->
+            {% set pts = workshop.points %}
+            {% set total = pts.total_points if pts else 0 %}
+            {% set tier = workshop.badge_tier.value %}
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">
+                    {% if lang == 'it' %}Reputazione{% else %}Reputation{% endif %}
+                </h3>
+
+                <!-- Tier + points -->
+                <div class="text-center mb-4">
+                    <span class="text-3xl font-bold text-gray-900">{{ total }}</span>
+                    <span class="text-sm text-gray-500 ml-1">{% if lang == 'it' %}punti{% else %}points{% endif %}</span>
+                </div>
+
+                <!-- Progress to next tier -->
+                {% if tier == 'newcomer' %}
+                    {% set next_tier = 'Active' %}{% set next_at = 50 %}{% set pct = (total / 50 * 100) | int %}
+                {% elif tier == 'active' %}
+                    {% set next_tier = 'Trusted' %}{% set next_at = 200 %}{% set pct = ((total - 50) / 150 * 100) | int %}
+                {% elif tier == 'trusted' %}
+                    {% set next_tier = 'Pillar' %}{% set next_at = 500 %}{% set pct = ((total - 200) / 300 * 100) | int %}
+                {% elif tier == 'pillar' %}
+                    {% set next_tier = 'Legend' %}{% set next_at = 1000 %}{% set pct = ((total - 500) / 500 * 100) | int %}
+                {% else %}
+                    {% set next_tier = None %}{% set next_at = 0 %}{% set pct = 100 %}
+                {% endif %}
+
+                {% if next_tier %}
+                <div class="mb-4">
+                    <div class="flex justify-between text-xs text-gray-500 mb-1">
+                        <span>{{ t('badges.' + tier) }}</span>
+                        <span>{{ next_tier }} ({{ next_at }})</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="h-2 rounded-full transition-all
+                            {% if tier == 'newcomer' %}bg-gray-500
+                            {% elif tier == 'active' %}bg-blue-500
+                            {% elif tier == 'trusted' %}bg-emerald-500
+                            {% elif tier == 'pillar' %}bg-purple-500
+                            {% endif %}"
+                            style="width: {{ [pct, 100] | min }}%"></div>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1 text-right">{{ next_at - total }} {% if lang == 'it' %}punti al prossimo livello{% else %}points to next tier{% endif %}</p>
+                </div>
+                {% else %}
+                <p class="text-xs text-amber-600 font-medium text-center mb-4">
+                    {% if lang == 'it' %}Livello massimo raggiunto{% else %}Highest tier reached{% endif %}
+                </p>
+                {% endif %}
+
+                <!-- Points breakdown -->
+                {% if pts %}
+                <div class="space-y-2 text-sm">
+                    {% if pts.rentals_completed > 0 %}
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">{% if lang == 'it' %}Noleggi{% else %}Rentals{% endif %}</span>
+                        <span class="font-medium text-gray-900">{{ pts.rentals_completed }}</span>
+                    </div>
+                    {% endif %}
+                    {% if pts.items_listed > 0 %}
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">{% if lang == 'it' %}Oggetti{% else %}Items listed{% endif %}</span>
+                        <span class="font-medium text-gray-900">{{ pts.items_listed }}</span>
+                    </div>
+                    {% endif %}
+                    {% if pts.reviews_given > 0 %}
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">{% if lang == 'it' %}Recensioni date{% else %}Reviews given{% endif %}</span>
+                        <span class="font-medium text-gray-900">{{ pts.reviews_given }}</span>
+                    </div>
+                    {% endif %}
+                    {% if pts.reviews_received > 0 %}
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">{% if lang == 'it' %}Recensioni ricevute{% else %}Reviews received{% endif %}</span>
+                        <span class="font-medium text-gray-900">{{ pts.reviews_received }}</span>
+                    </div>
+                    {% endif %}
+                    {% if pts.giveaways_completed > 0 %}
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">{% if lang == 'it' %}Donazioni{% else %}Giveaways{% endif %}</span>
+                        <span class="font-medium text-gray-900">{{ pts.giveaways_completed }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Achievement Badges -->
+            {% if workshop_badges %}
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">
+                    {% if lang == 'it' %}Riconoscimenti{% else %}Achievements{% endif %}
+                    <span class="text-gray-400 font-normal">({{ workshop_badges | length }})</span>
+                </h3>
+                <div class="grid grid-cols-2 gap-2">
+                    {% for badge in workshop_badges %}
+                    {% set info = badge_info.get(badge.badge_code, {}) %}
+                    {% set color = info.get('color', 'gray') %}
+                    <div class="flex items-center space-x-2 p-2 rounded-lg bg-{{ color }}-50 border border-{{ color }}-200" title="{{ info.get('description', '') }}">
+                        <span class="text-lg">
+                            {% if info.get('icon') == 'package' %}&#128230;{% elif info.get('icon') == 'handshake' %}&#129309;{% elif info.get('icon') == 'star' %}&#11088;{% elif info.get('icon') == 'sparkles' %}&#10024;{% elif info.get('icon') == 'gift' %}&#127873;{% elif info.get('icon') == 'shield-check' %}&#128737;{% elif info.get('icon') == 'megaphone' %}&#128227;{% elif info.get('icon') == 'globe' %}&#127760;{% elif info.get('icon') == 'wrench' %}&#128295;{% elif info.get('icon') == 'trophy' %}&#127942;{% elif info.get('icon') == 'rocket' %}&#128640;{% elif info.get('icon') == 'crown' %}&#128081;{% elif info.get('icon') == 'heart' %}&#10084;{% elif info.get('icon') == 'building-storefront' %}&#127978;{% else %}&#127941;{% endif %}
+                        </span>
+                        <span class="text-xs font-medium text-{{ color }}-700 truncate">{{ info.get('name', badge.badge_code.value) }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Service declarations -->
             {% if workshop.offers_delivery or workshop.offers_pickup or workshop.offers_training or workshop.offers_custom_orders or workshop.offers_repair %}
             <div class="bg-white rounded-lg border border-gray-200 p-6">
