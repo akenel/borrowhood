@@ -481,6 +481,7 @@ async def members_directory(
     city: Optional[str] = None,
     badge_tier: Optional[str] = None,
     workshop_type: Optional[str] = None,
+    service: Optional[str] = None,
     sort: str = "newest",
     limit: int = 12,
     offset: int = 0,
@@ -514,6 +515,16 @@ async def members_directory(
         base_where.append(BHUser.badge_tier == badge_tier)
     if workshop_type:
         base_where.append(BHUser.workshop_type == workshop_type)
+    # Service offer filter (from Find a Maker links)
+    service_filter_map = {
+        "repair": BHUser.offers_repair,
+        "custom_orders": BHUser.offers_custom_orders,
+        "training": BHUser.offers_training,
+        "delivery": BHUser.offers_delivery,
+        "pickup": BHUser.offers_pickup,
+    }
+    if service and service in service_filter_map:
+        base_where.append(service_filter_map[service].is_(True))
 
     count_query = select(func.count(BHUser.id)).where(*base_where)
     total_count = await db.scalar(count_query) or 0
@@ -554,6 +565,7 @@ async def members_directory(
         selected_city=city,
         selected_badge=badge_tier,
         selected_workshop_type=workshop_type,
+        selected_service=service,
         selected_sort=sort,
         selected_limit=limit,
         selected_offset=offset,

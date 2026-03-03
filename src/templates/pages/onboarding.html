@@ -8,12 +8,17 @@
         step: 1,
         loading: false,
         bioGenerating: false,
+        locating: false,
+        locationStatus: '',
         profile: {
             display_name: '',
             city: '',
             country_code: '',
             bio: '',
             telegram_username: '',
+            latitude: null,
+            longitude: null,
+            altitude: null,
         },
         workshop: {
             workshop_name: '',
@@ -21,6 +26,14 @@
             tagline: '',
         },
         languages: [{ language_code: 'en', proficiency: 'B2' }],
+        skills: [],
+        offers: {
+            offers_delivery: false,
+            offers_pickup: false,
+            offers_training: false,
+            offers_custom_orders: false,
+            offers_repair: false,
+        },
         item: {
             name: '',
             description: '',
@@ -35,6 +48,37 @@
         removeLanguage(i) {
             this.languages.splice(i, 1);
         },
+        addSkill() {
+            this.skills.push({ skill_name: '', category: 'general', self_rating: 3, years_experience: null });
+        },
+        removeSkill(i) {
+            this.skills.splice(i, 1);
+        },
+
+        detectLocation() {
+            if (!navigator.geolocation) {
+                this.locationStatus = '{% if lang == \"it\" %}Geolocalizzazione non supportata{% else %}Geolocation not supported{% endif %}';
+                return;
+            }
+            this.locating = true;
+            this.locationStatus = '{% if lang == \"it\" %}Rilevamento posizione...{% else %}Detecting location...{% endif %}';
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    this.profile.latitude = Math.round(pos.coords.latitude * 1000) / 1000;
+                    this.profile.longitude = Math.round(pos.coords.longitude * 1000) / 1000;
+                    if (pos.coords.altitude != null) {
+                        this.profile.altitude = Math.round(pos.coords.altitude);
+                    }
+                    this.locationStatus = '{% if lang == \"it\" %}Posizione rilevata{% else %}Location detected{% endif %}';
+                    this.locating = false;
+                },
+                (err) => {
+                    this.locationStatus = '{% if lang == \"it\" %}Impossibile rilevare la posizione{% else %}Could not detect location{% endif %}';
+                    this.locating = false;
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        },
 
         async finish(skipItem) {
             this.loading = true;
@@ -43,7 +87,9 @@
                 const profileData = {
                     ...this.profile,
                     ...this.workshop,
+                    ...this.offers,
                     languages: this.languages.filter(l => l.language_code),
+                    skills: this.skills.filter(s => s.skill_name),
                 };
                 const profResp = await fetch('/api/v1/onboarding/profile', {
                     method: 'POST',
@@ -158,6 +204,33 @@
                        class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                        placeholder="{{ t('onboarding.telegram_placeholder') }}">
             </div>
+
+            <!-- Location detection -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    {% if lang == 'it' %}La tua posizione{% else %}Your Location{% endif %}
+                </label>
+                <div class="flex items-center gap-3">
+                    <button type="button" @click="detectLocation()" :disabled="locating"
+                            class="inline-flex items-center px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors">
+                        <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span x-text="locating ? '{% if lang == 'it' %}Rilevamento...{% else %}Detecting...{% endif %}' : '{% if lang == 'it' %}Rileva Posizione{% else %}Detect Location{% endif %}'"></span>
+                    </button>
+                    <span x-show="profile.latitude" class="text-xs text-green-600 font-medium" x-cloak>
+                        <span x-text="profile.latitude"></span>, <span x-text="profile.longitude"></span>
+                        <template x-if="profile.altitude">
+                            <span x-text="' (' + profile.altitude + 'm)'"></span>
+                        </template>
+                    </span>
+                    <span x-show="locationStatus && !profile.latitude" class="text-xs text-gray-500" x-text="locationStatus" x-cloak></span>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">
+                    {% if lang == 'it' %}Aiuta i vicini a trovarti. La posizione viene arrotondata per privacy.{% else %}Help neighbors find you. Location is rounded for privacy.{% endif %}
+                </p>
+            </div>
         </div>
 
         <div class="mt-8 flex justify-end">
@@ -224,6 +297,73 @@
                 <button @click="addLanguage()" class="text-sm text-indigo-600 hover:underline mt-1">
                     + {{ t('onboarding.add_language') }}
                 </button>
+            </div>
+
+            <!-- Skills -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    {% if lang == 'it' %}Le tue competenze{% else %}Your Skills{% endif %}
+                </label>
+                <template x-for="(skill, i) in skills" :key="i">
+                    <div class="flex items-center gap-2 mb-2">
+                        <input x-model="skill.skill_name" type="text"
+                               class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                               placeholder="{% if lang == 'it' %}es. Falegnameria{% else %}e.g. Woodworking{% endif %}">
+                        <select x-model="skill.category"
+                                class="w-28 rounded-lg border border-gray-300 px-2 py-2 text-sm">
+                            <option value="general">{% if lang == 'it' %}Generale{% else %}General{% endif %}</option>
+                            <option value="woodworking">{% if lang == 'it' %}Legno{% else %}Woodworking{% endif %}</option>
+                            <option value="metalworking">{% if lang == 'it' %}Metallo{% else %}Metalworking{% endif %}</option>
+                            <option value="electronics">{% if lang == 'it' %}Elettronica{% else %}Electronics{% endif %}</option>
+                            <option value="cooking">{% if lang == 'it' %}Cucina{% else %}Cooking{% endif %}</option>
+                            <option value="gardening">{% if lang == 'it' %}Giardinaggio{% else %}Gardening{% endif %}</option>
+                            <option value="sewing">{% if lang == 'it' %}Cucito{% else %}Sewing{% endif %}</option>
+                            <option value="repair">{% if lang == 'it' %}Riparazione{% else %}Repair{% endif %}</option>
+                            <option value="art">{% if lang == 'it' %}Arte{% else %}Art{% endif %}</option>
+                        </select>
+                        <select x-model.number="skill.self_rating"
+                                class="w-16 rounded-lg border border-gray-300 px-2 py-2 text-sm">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                        <button @click="removeSkill(i)" class="text-red-500 hover:text-red-700 text-sm">&times;</button>
+                    </div>
+                </template>
+                <button @click="addSkill()" class="text-sm text-indigo-600 hover:underline mt-1">
+                    + {% if lang == 'it' %}Aggiungi competenza{% else %}Add Skill{% endif %}
+                </button>
+            </div>
+
+            <!-- Service Offers -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    {% if lang == 'it' %}I tuoi servizi{% else %}What You Offer{% endif %}
+                </label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" x-model="offers.offers_pickup" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="text-sm text-gray-700">{% if lang == 'it' %}Ritiro disponibile{% else %}Pickup Available{% endif %}</span>
+                    </label>
+                    <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" x-model="offers.offers_delivery" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="text-sm text-gray-700">{% if lang == 'it' %}Consegna a domicilio{% else %}Home Delivery{% endif %}</span>
+                    </label>
+                    <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" x-model="offers.offers_training" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="text-sm text-gray-700">{% if lang == 'it' %}Formazione / Lezioni{% else %}Training / Lessons{% endif %}</span>
+                    </label>
+                    <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" x-model="offers.offers_custom_orders" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="text-sm text-gray-700">{% if lang == 'it' %}Ordini personalizzati{% else %}Custom Orders{% endif %}</span>
+                    </label>
+                    <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" x-model="offers.offers_repair" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="text-sm text-gray-700">{% if lang == 'it' %}Servizio riparazione{% else %}Repair Service{% endif %}</span>
+                    </label>
+                </div>
             </div>
         </div>
 
