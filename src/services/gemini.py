@@ -118,7 +118,11 @@ def _parse_json_from_text(text: str) -> Optional[dict]:
 
 
 async def _ollama_generate(prompt: str, json_mode: bool = True) -> Optional[str]:
-    """Call Ollama /api/generate. Returns raw text response or None."""
+    """Call Ollama /api/generate. Works with local or Turbo cloud.
+
+    Local:  BH_OLLAMA_URL=http://localhost:11434 (no key needed)
+    Cloud:  BH_OLLAMA_URL=https://ollama.com + BH_OLLAMA_KEY
+    """
     s = _get_settings()
     if not s.ollama_url:
         return None
@@ -131,15 +135,21 @@ async def _ollama_generate(prompt: str, json_mode: bool = True) -> Optional[str]
     if json_mode:
         payload["format"] = "json"
 
+    headers = {"Content-Type": "application/json"}
+    if s.ollama_key:
+        headers["Authorization"] = f"Bearer {s.ollama_key}"
+
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
             resp = await client.post(
-                f"{s.ollama_url}/api/generate",
+                f"{s.ollama_url.rstrip('/')}/api/generate",
                 json=payload,
+                headers=headers,
             )
             if resp.status_code == 200:
                 data = resp.json()
                 return data.get("response", "")
+            logger.warning("Ollama API returned %s: %s", resp.status_code, resp.text[:200])
     except Exception as e:
         logger.warning("Ollama API failed: %s", e)
     return None
