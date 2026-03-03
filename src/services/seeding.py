@@ -482,17 +482,20 @@ async def seed_new_users(db: AsyncSession) -> dict:
     with open(SEED_FILE) as f:
         data = json.load(f)
 
-    # Get existing user slugs
-    result = await db.execute(select(BHUser.slug))
-    existing_slugs = {row[0] for row in result.all()}
+    # Get existing user slugs AND emails (protect against partial seeds)
+    result = await db.execute(select(BHUser.slug, BHUser.email))
+    existing = {(row[0], row[1]) for row in result.all()}
+    existing_slugs = {s for s, e in existing}
+    existing_emails = {e for s, e in existing}
 
     if not existing_slugs:
         logger.info("No users in DB -- run full seed first")
         return {"status": "no_users"}
 
     added = 0
+    skipped = 0
     for u in data["users"]:
-        if u["slug"] in existing_slugs:
+        if u["slug"] in existing_slugs or u["email"] in existing_emails:
             continue
 
         user = BHUser(
