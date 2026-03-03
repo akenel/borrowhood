@@ -126,12 +126,8 @@ async function main() {
         });
 
         await step('Luna fetches her profile', async () => {
-            // Get user ID from the JWT (decode payload)
-            const payload = JSON.parse(
-                Buffer.from(state.lunaCookie.split('.')[1], 'base64').toString()
-            );
-            // Find Luna's BH user via slug
-            const resp = await api('GET', '/api/v1/users?limit=50', null, state.lunaCookie);
+            // Search by name to handle large user counts
+            const resp = await api('GET', '/api/v1/users?q=Luna+Chen&limit=10', null, state.lunaCookie);
             assert(resp.status === 200, `Users API: ${resp.status}`);
             const users = resp.body?.items || resp.body || [];
             const luna = users.find(u => u.slug === 'lunas-studio' || u.display_name?.includes('Luna'));
@@ -140,7 +136,7 @@ async function main() {
         });
 
         await step('Jake fetches his profile', async () => {
-            const resp = await api('GET', '/api/v1/users?limit=50', null, state.jakeCookie);
+            const resp = await api('GET', '/api/v1/users?q=Jake+Morrison&limit=10', null, state.jakeCookie);
             assert(resp.status === 200, `Users API: ${resp.status}`);
             const users = resp.body?.items || resp.body || [];
             const jake = users.find(u => u.slug === 'jakes-electronics' || u.display_name?.includes('Jake'));
