@@ -238,6 +238,39 @@ async function testFeatureChecks(page) {
     });
 }
 
+async function testFindAMaker(page) {
+    console.log('\n--- Find a Maker ---');
+
+    await test('Home page has Find a Maker button', async () => {
+        await page.goto(`${BASE_URL}/`, {
+            waitUntil: 'domcontentloaded', timeout: 15000,
+        });
+        const hasButton = await page.evaluate(() => {
+            const links = Array.from(document.querySelectorAll('a'));
+            return links.some(a => a.textContent.includes('Find a Maker') || a.textContent.includes('Trova un Maker'));
+        });
+        assert(hasButton, 'No Find a Maker button found on home page');
+    });
+
+    await test('Members page with service filter loads', async () => {
+        const resp = await page.goto(`${BASE_URL}/members?service=repair`, {
+            waitUntil: 'domcontentloaded', timeout: 15000,
+        });
+        assert(resp.status() === 200, `Expected 200, got ${resp.status()}`);
+    });
+
+    await test('Members page shows service filter pills', async () => {
+        await page.goto(`${BASE_URL}/members`, {
+            waitUntil: 'domcontentloaded', timeout: 15000,
+        });
+        const hasPills = await page.evaluate(() => {
+            const links = Array.from(document.querySelectorAll('a'));
+            return links.some(a => a.href && a.href.includes('service=repair'));
+        });
+        assert(hasPills, 'No service filter pills found on members page');
+    });
+}
+
 async function testWorkshopPages(page) {
     console.log('\n--- Workshop Pages ---');
 
@@ -298,6 +331,7 @@ async function main() {
         await testDemoLogin(page);
         await testAuthenticatedPages(page);
         await testFeatureChecks(page);
+        await testFindAMaker(page);
         await testWorkshopPages(page);
     } catch (err) {
         console.error('\nSuite error:', err.message);

@@ -11,6 +11,30 @@
         <p class="text-sm text-gray-500 mt-1">{{ t('members.subtitle') }}</p>
     </div>
 
+    <!-- Service quick-filter pills -->
+    <div class="flex flex-wrap gap-2 mb-4">
+        {% set services = [
+            ('repair', 'Repair' if lang != 'it' else 'Riparazione'),
+            ('custom_orders', 'Custom Orders' if lang != 'it' else 'Su Misura'),
+            ('training', 'Training' if lang != 'it' else 'Formazione'),
+            ('delivery', 'Delivery' if lang != 'it' else 'Consegna'),
+            ('pickup', 'Pickup' if lang != 'it' else 'Ritiro'),
+        ] %}
+        {% for svc_key, svc_label in services %}
+        <a href="/members?service={{ svc_key }}{% if q %}&q={{ q }}{% endif %}"
+           class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition-colors
+                  {% if selected_service == svc_key %}bg-emerald-600 text-white{% else %}bg-white text-gray-700 border border-gray-200 hover:bg-emerald-50 hover:border-emerald-200{% endif %}">
+            {{ svc_label }}
+        </a>
+        {% endfor %}
+        {% if selected_service %}
+        <a href="/members{% if q %}?q={{ q }}{% endif %}"
+           class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors">
+            &#10005; {% if lang == 'it' %}Rimuovi filtro{% else %}Clear filter{% endif %}
+        </a>
+        {% endif %}
+    </div>
+
     <!-- Search + Filters -->
     <div x-data="{ filtersOpen: false }">
         <!-- Search bar -->
@@ -151,6 +175,27 @@
                                 {% endif %}
                             </div>
                         </div>
+
+                        <!-- Service offer badges -->
+                        {% if member.offers_repair or member.offers_custom_orders or member.offers_training or member.offers_delivery or member.offers_pickup %}
+                        <div class="mt-3 flex flex-wrap gap-1">
+                            {% if member.offers_repair %}
+                            <span class="text-xs px-1.5 py-0.5 bg-emerald-50 text-emerald-700 rounded font-medium">{% if lang == 'it' %}Riparazione{% else %}Repair{% endif %}</span>
+                            {% endif %}
+                            {% if member.offers_custom_orders %}
+                            <span class="text-xs px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded font-medium">{% if lang == 'it' %}Su Misura{% else %}Custom{% endif %}</span>
+                            {% endif %}
+                            {% if member.offers_training %}
+                            <span class="text-xs px-1.5 py-0.5 bg-cyan-50 text-cyan-700 rounded font-medium">{% if lang == 'it' %}Formazione{% else %}Training{% endif %}</span>
+                            {% endif %}
+                            {% if member.offers_delivery %}
+                            <span class="text-xs px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded font-medium">{% if lang == 'it' %}Consegna{% else %}Delivery{% endif %}</span>
+                            {% endif %}
+                            {% if member.offers_pickup %}
+                            <span class="text-xs px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded font-medium">{% if lang == 'it' %}Ritiro{% else %}Pickup{% endif %}</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
 
                         <!-- Meta row -->
                         <div class="mt-4 flex items-center justify-between">

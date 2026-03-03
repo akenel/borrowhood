@@ -19,6 +19,7 @@ from src.models.user import (
     BadgeTier,
     BHUser,
     BHUserLanguage,
+    BHUserSkill,
     CEFRLevel,
     WorkshopType,
 )
@@ -31,6 +32,13 @@ class LanguageIn(BaseModel):
     proficiency: str = Field(default="B2", max_length=10)
 
 
+class SkillIn(BaseModel):
+    skill_name: str = Field(..., min_length=1, max_length=100)
+    category: str = Field(default="general", max_length=50)
+    self_rating: int = Field(default=3, ge=1, le=5)
+    years_experience: Optional[int] = None
+
+
 class ProfileSetup(BaseModel):
     display_name: str = Field(..., min_length=2, max_length=100)
     city: Optional[str] = Field(None, max_length=100)
@@ -41,6 +49,17 @@ class ProfileSetup(BaseModel):
     workshop_type: Optional[str] = Field(None, max_length=20)
     tagline: Optional[str] = Field(None, max_length=200)
     languages: List[LanguageIn] = []
+    skills: List[SkillIn] = []
+    # Location (from browser geolocation API)
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    altitude: Optional[float] = None
+    # Service offers
+    offers_delivery: bool = False
+    offers_pickup: bool = False
+    offers_training: bool = False
+    offers_custom_orders: bool = False
+    offers_repair: bool = False
 
 
 async def _unique_slug(db: AsyncSession, base: str) -> str:
@@ -100,6 +119,19 @@ async def setup_profile(
                 pass
         if profile.tagline:
             user.tagline = profile.tagline
+        # Location
+        if profile.latitude is not None:
+            user.latitude = profile.latitude
+        if profile.longitude is not None:
+            user.longitude = profile.longitude
+        if profile.altitude is not None:
+            user.altitude = profile.altitude
+        # Service offers
+        user.offers_delivery = profile.offers_delivery
+        user.offers_pickup = profile.offers_pickup
+        user.offers_training = profile.offers_training
+        user.offers_custom_orders = profile.offers_custom_orders
+        user.offers_repair = profile.offers_repair
     else:
         # Create new
         slug = await _unique_slug(db, profile.display_name)
@@ -122,6 +154,14 @@ async def setup_profile(
             workshop_name=profile.workshop_name,
             workshop_type=workshop_type,
             tagline=profile.tagline,
+            latitude=profile.latitude,
+            longitude=profile.longitude,
+            altitude=profile.altitude,
+            offers_delivery=profile.offers_delivery,
+            offers_pickup=profile.offers_pickup,
+            offers_training=profile.offers_training,
+            offers_custom_orders=profile.offers_custom_orders,
+            offers_repair=profile.offers_repair,
             account_status=AccountStatus.ACTIVE,
             badge_tier=BadgeTier.NEWCOMER,
         )
@@ -149,6 +189,24 @@ async def setup_profile(
                     user_id=user.id,
                     language_code=lang.language_code,
                     proficiency=proficiency,
+                ))
+
+    # Update skills
+    if profile.skills:
+        existing_skills = await db.execute(
+            select(BHUserSkill).where(BHUserSkill.user_id == user.id)
+        )
+        for skill in existing_skills.scalars().all():
+            await db.delete(skill)
+
+        for skill in profile.skills:
+            if skill.skill_name:
+                db.add(BHUserSkill(
+                    user_id=user.id,
+                    skill_name=skill.skill_name,
+                    category=skill.category,
+                    self_rating=skill.self_rating,
+                    years_experience=skill.years_experience,
                 ))
 
     await db.flush()
