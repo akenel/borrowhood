@@ -26,6 +26,10 @@ class ListingOut(BaseModel):
     auction_end: Optional[datetime] = None
     starting_bid: Optional[float] = None
     bid_increment: Optional[float] = None
+    minimum_charge: Optional[float] = None
+    per_person_rate: Optional[float] = None
+    max_participants: Optional[int] = None
+    group_discount_pct: Optional[float] = None
 
     class Config:
         from_attributes = True
@@ -47,6 +51,10 @@ class ListingCreate(BaseModel):
     starting_bid: Optional[float] = Field(None, ge=0)
     reserve_price: Optional[float] = Field(None, ge=0)
     bid_increment: Optional[float] = Field(None, ge=0)
+    minimum_charge: Optional[float] = Field(None, ge=0)
+    per_person_rate: Optional[float] = Field(None, ge=0)
+    max_participants: Optional[int] = Field(None, ge=1)
+    group_discount_pct: Optional[float] = Field(None, ge=0, le=100)
 
 
 class ListingUpdate(BaseModel):
@@ -61,3 +69,7 @@ class ListingUpdate(BaseModel):
     starting_bid: Optional[float] = Field(None, ge=0)
     reserve_price: Optional[float] = Field(None, ge=0)
     bid_increment: Optional[float] = Field(None, ge=0)
+    minimum_charge: Optional[float] = Field(None, ge=0)
+    per_person_rate: Optional[float] = Field(None, ge=0)
+    max_participants: Optional[int] = Field(None, ge=1)
+    group_discount_pct: Optional[float] = Field(None, ge=0, le=100)
