@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1280px; height: 720px;
+  overflow: hidden;
+  font-family: 'Outfit', sans-serif;
+  color: white;
+  background: #08030f;
+  position: relative;
+}
+
+/* ── Scanline overlay ── */
+body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255,255,255,0.012) 2px,
+    rgba(255,255,255,0.012) 4px
+  );
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* ── Ambient glow blobs ── */
+.glow-1 {
+  position: absolute;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(220,38,38,0.12) 0%, transparent 70%);
+  top: -100px; left: -80px;
+  z-index: 0;
+}
+.glow-2 {
+  position: absolute;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%);
+  bottom: -80px; right: 100px;
+  z-index: 0;
+}
+.glow-3 {
+  position: absolute;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(234,88,12,0.08) 0%, transparent 70%);
+  top: 200px; left: 500px;
+  z-index: 0;
+}
+
+/* ── Caution stripe (diagonal) ── */
+.caution-stripe {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: repeating-linear-gradient(
+    -45deg,
+    #D97706, #D97706 8px,
+    #08030f 8px, #08030f 16px
+  );
+  z-index: 40;
+}
+
+/* ── Layout ── */
+.container {
+  display: flex;
+  width: 100%; height: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+/* ── LEFT SIDE ── */
+.left {
+  width: 55%;
+  padding: 52px 36px 40px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.badge-edge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  border-radius: 4px;
+  border: 2px solid #DC2626;
+  background: rgba(220,38,38,0.1);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: #DC2626;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  width: fit-content;
+  margin-bottom: 20px;
+}
+.badge-edge::before {
+  content: '';
+  width: 8px; height: 8px;
+  background: #DC2626;
+  border-radius: 50%;
+  animation: blink-dot 1.5s ease-in-out infinite;
+}
+@keyframes blink-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.heading {
+  font-size: 64px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -1px;
+  margin-bottom: 32px;
+  background: linear-gradient(180deg, #ffffff 30%, #a0a0b0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Scenario list ── */
+.scenarios {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.scenario-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.scenario-dot {
+  width: 14px; height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.scenario-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: #c8c8d4;
+  letter-spacing: 0.5px;
+}
+.dot-red { background: #DC2626; box-shadow: 0 0 12px rgba(220,38,38,0.5); }
+.dot-amber { background: #D97706; box-shadow: 0 0 12px rgba(217,119,6,0.5); }
+.dot-orange { background: #EA580C; box-shadow: 0 0 12px rgba(234,88,12,0.5); }
+.dot-purple { background: #7C3AED; box-shadow: 0 0 12px rgba(124,58,237,0.5); }
+
+/* ── Duration badge ── */
+.duration {
+  position: absolute;
+  bottom: 40px; left: 56px;
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 14px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: #7a7a8e;
+  letter-spacing: 1px;
+}
+.duration-icon {
+  font-size: 13px;
+}
+
+/* ── Vertical divider ── */
+.divider {
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent 5%,
+    rgba(220,38,38,0.3) 20%,
+    rgba(234,88,12,0.2) 50%,
+    rgba(124,58,237,0.3) 80%,
+    transparent 95%
+  );
+  align-self: stretch;
+  margin: 30px 0;
+}
+
+/* ── RIGHT SIDE ── */
+.right {
+  width: 45%;
+  padding: 40px 44px 40px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+}
+
+/* ── Status cards ── */
+.status-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  overflow: hidden;
+}
+.status-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+}
+.card-red::before { background: #DC2626; box-shadow: 0 0 20px rgba(220,38,38,0.4); }
+.card-amber::before { background: #D97706; box-shadow: 0 0 20px rgba(217,119,6,0.4); }
+.card-orange::before { background: #EA580C; box-shadow: 0 0 20px rgba(234,88,12,0.4); }
+.card-purple::before { background: #7C3AED; box-shadow: 0 0 20px rgba(124,58,237,0.4); }
+
+.card-red { border-color: rgba(220,38,38,0.15); }
+.card-amber { border-color: rgba(217,119,6,0.15); }
+.card-orange { border-color: rgba(234,88,12,0.15); }
+.card-purple { border-color: rgba(124,58,237,0.15); }
+
+.card-icon {
+  width: 48px; height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.icon-red { background: rgba(220,38,38,0.15); color: #DC2626; }
+.icon-amber { background: rgba(217,119,6,0.15); color: #D97706; }
+.icon-orange { background: rgba(234,88,12,0.15); color: #EA580C; }
+.icon-purple { background: rgba(124,58,237,0.15); color: #7C3AED; }
+
+.card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.card-status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.text-red { color: #f87171; }
+.text-amber { color: #fbbf24; }
+.text-orange { color: #fb923c; }
+.text-purple { color: #a78bfa; }
+
+.card-desc {
+  font-size: 13px;
+  color: #5a5a6e;
+  font-weight: 400;
+}
+
+/* ── Bottom right brand ── */
+.brand {
+  position: absolute;
+  bottom: 40px; right: 44px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #4a4a5c;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.brand-dot {
+  width: 4px; height: 4px;
+  background: #4a4a5c;
+  border-radius: 50%;
+}
+</style></head>
+<body>
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+  <div class="glow-3"></div>
+  <div class="caution-stripe"></div>
+
+  <div class="container">
+    <div class="left">
+      <div class="badge-edge">EDGE CASES</div>
+      <div class="heading">WHEN<br>THINGS<br>GO WRONG</div>
+      <div class="scenarios">
+        <div class="scenario-row">
+          <div class="scenario-dot dot-red"></div>
+          <div class="scenario-label">Declined</div>
+        </div>
+        <div class="scenario-row">
+          <div class="scenario-dot dot-amber"></div>
+          <div class="scenario-label">Cancelled</div>
+        </div>
+        <div class="scenario-row">
+          <div class="scenario-dot dot-orange"></div>
+          <div class="scenario-label">Wrong Code</div>
+        </div>
+        <div class="scenario-row">
+          <div class="scenario-dot dot-purple"></div>
+          <div class="scenario-label">Disputed</div>
+        </div>
+      </div>
+      <div class="duration">
+        <span class="duration-icon">&#9654;</span>
+        5 MIN
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="right">
+      <div class="status-card card-red">
+        <div class="card-icon icon-red">&#10007;</div>
+        <div class="card-text">
+          <div class="card-status text-red">DECLINED</div>
+          <div class="card-desc">Request rejected by owner</div>
+        </div>
+      </div>
+
+      <div class="status-card card-amber">
+        <div class="card-icon icon-amber">&#9995;</div>
+        <div class="card-text">
+          <div class="card-status text-amber">CANCELLED</div>
+          <div class="card-desc">Renter backs out before pickup</div>
+        </div>
+      </div>
+
+      <div class="status-card card-orange">
+        <div class="card-icon icon-orange">&#128274;</div>
+        <div class="card-text">
+          <div class="card-status text-orange">INVALID CODE</div>
+          <div class="card-desc">Wrong lockbox code entered</div>
+        </div>
+      </div>
+
+      <div class="status-card card-purple">
+        <div class="card-icon icon-purple">&#9878;</div>
+        <div class="card-text">
+          <div class="card-status text-purple">DISPUTED</div>
+          <div class="card-desc">Item damaged, partial refund</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="brand">
+    <span class="brand-text">BorrowHood</span>
+    <span class="brand-dot"></span>
+    <span class="brand-text">Garage Sessions</span>
+  </div>
+</body></html>

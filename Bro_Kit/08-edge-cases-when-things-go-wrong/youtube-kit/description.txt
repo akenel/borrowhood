@@ -1,0 +1,21 @@
+What happens when a rental does not go perfectly? This video walks through four real edge cases in BorrowHood -- a neighborhood sharing platform -- and shows how the system handles each one. No scripts, no staging. Just two neighbors, real scenarios, and a real app running on a live server.
+
+SCENARIO 1 -- THE DECLINE
+Sally finds Mike's Bosch drill on BorrowHood and requests a rental. Mike is away this week and declines the request. Sally sees the DECLINED status on her dashboard. No hard feelings. She will try again another time.
+
+SCENARIO 2 -- THE CANCEL
+Sally rents Mike's floor jack for a tire change. Mike approves the request. But Sally finds one next door and no longer needs it. She cancels before pickup. The rental shows CANCELLED. Clean exit for both sides.
+
+SCENARIO 3 -- WRONG LOCKBOX CODE
+Sally rents the drill again. Mike approves and generates lockbox codes for contactless pickup. Sally goes to the shed but types the code wrong. The system rejects it: "Invalid code." She double-checks, enters the correct code, and pickup is confirmed. She returns the drill and Mike completes the rental.
+
+SCENARIO 4 -- THE DISPUTE
+Sally rents the drill one more time. Everything goes smoothly until Mike checks the drill after return. The housing has a crack. Mike files a dispute through the system. Sally responds, acknowledging she should have reported it at pickup. They agree on a partial refund. Dispute resolved. Rental completed.
+
+Every edge case handled. Every step transparent.
+
+Tech stack: FastAPI, Jinja2, Tailwind CSS, Alpine.js, Keycloak OIDC, Docker, Hetzner Cloud
+AI co-pilot: Claude Code by Anthropic
+Built from a camper van in Trapani, Sicily.
+
+"Every neighborhood has a garage like his."

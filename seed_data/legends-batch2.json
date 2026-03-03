@@ -1,0 +1,2321 @@
+{
+  "users": [
+    {
+      "slug": "tesla-lab",
+      "display_name": "Nikola Tesla",
+      "email": "nikola-tesla@borrowhood.local",
+      "workshop_name": "Tesla Free Energy Lab",
+      "workshop_type": "workshop",
+      "tagline": "The present is theirs. The future is mine.",
+      "bio": "Serbian-American inventor. Alternating current, Tesla coil, radio fundamentals. Held 300 patents. Died broke in a New York hotel room while pigeons kept him company.",
+      "city": "New York",
+      "country_code": "US",
+      "latitude": 40.748,
+      "longitude": -73.986,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "C2"
+        },
+        {
+          "language_code": "de",
+          "proficiency": "B2"
+        },
+        {
+          "language_code": "hr",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Electrical Engineering",
+          "category": "engineering",
+          "self_rating": 5,
+          "years_experience": 45
+        },
+        {
+          "skill_name": "Invention",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 45
+        }
+      ],
+      "points": {
+        "total_points": 1950,
+        "rentals_completed": 60,
+        "reviews_given": 40,
+        "reviews_received": 55,
+        "items_listed": 12
+      },
+      "offers_training": true,
+      "offers_repair": true
+    },
+    {
+      "slug": "vinci-bottega",
+      "display_name": "Leonardo di ser Piero da Vinci",
+      "email": "davinci@borrowhood.local",
+      "workshop_name": "Bottega di Leonardo",
+      "workshop_type": "studio",
+      "tagline": "Simplicity is the ultimate sophistication",
+      "bio": "Painter, sculptor, architect, musician, mathematician, engineer, inventor, anatomist, geologist, botanist. The original Renaissance man. Painted the Mona Lisa between helicopter sketches.",
+      "city": "Vinci",
+      "country_code": "IT",
+      "latitude": 43.787,
+      "longitude": 10.925,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "it",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "la",
+          "proficiency": "C1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Painting",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 50
+        },
+        {
+          "skill_name": "Engineering Design",
+          "category": "engineering",
+          "self_rating": 5,
+          "years_experience": 40
+        },
+        {
+          "skill_name": "Anatomy",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 30
+        }
+      ],
+      "points": {
+        "total_points": 2000,
+        "rentals_completed": 70,
+        "reviews_given": 50,
+        "reviews_received": 65,
+        "items_listed": 15
+      },
+      "offers_training": true,
+      "offers_custom_orders": true
+    },
+    {
+      "slug": "frida-casa-azul",
+      "display_name": "Magdalena Carmen Frida Kahlo Calderon",
+      "email": "frida-kahlo@borrowhood.local",
+      "workshop_name": "Casa Azul Studio",
+      "workshop_type": "studio",
+      "tagline": "I paint my own reality",
+      "bio": "Mexican painter known for self-portraits and works inspired by nature and Mexican folk art. Survived polio, a bus accident, and Diego Rivera. The eyebrows stayed.",
+      "city": "Coyoacan",
+      "country_code": "MX",
+      "latitude": 19.355,
+      "longitude": -99.162,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "es",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "en",
+          "proficiency": "B2"
+        },
+        {
+          "language_code": "de",
+          "proficiency": "B1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Oil Painting",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 25
+        },
+        {
+          "skill_name": "Self-portraiture",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 25
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 55,
+        "reviews_given": 35,
+        "reviews_received": 50,
+        "items_listed": 10
+      },
+      "offers_custom_orders": true
+    },
+    {
+      "slug": "michelangelo-sistina",
+      "display_name": "Michelangelo di Lodovico Buonarroti Simoni",
+      "email": "michelangelo-buonarroti@borrowhood.local",
+      "workshop_name": "Sistine Workshop",
+      "workshop_type": "workshop",
+      "tagline": "I saw the angel in the marble and carved until I set him free",
+      "bio": "Sculptor, painter, architect, poet. Carved David from a rejected marble block. Painted the Sistine Chapel ceiling on his back. Designed St. Peter's Basilica dome. Complained the whole time.",
+      "city": "Roma",
+      "country_code": "IT",
+      "latitude": 41.902,
+      "longitude": 12.496,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "it",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "la",
+          "proficiency": "C2"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Sculpture",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 60
+        },
+        {
+          "skill_name": "Fresco Painting",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 40
+        },
+        {
+          "skill_name": "Architecture",
+          "category": "engineering",
+          "self_rating": 5,
+          "years_experience": 30
+        }
+      ],
+      "points": {
+        "total_points": 1980,
+        "rentals_completed": 65,
+        "reviews_given": 45,
+        "reviews_received": 60,
+        "items_listed": 14
+      },
+      "offers_training": true,
+      "offers_custom_orders": true,
+      "offers_repair": true
+    },
+    {
+      "slug": "mozart-salzburg",
+      "display_name": "Johannes Chrysostomus Wolfgangus Theophilus Mozart",
+      "email": "wolfgang-mozart@borrowhood.local",
+      "workshop_name": "Salzburg Music Room",
+      "workshop_type": "studio",
+      "tagline": "The music is not in the notes but in the silence between",
+      "bio": "Austrian composer. First composition at age 5. Over 600 works. Wrote The Magic Flute, Don Giovanni, Requiem. Died at 35, buried in a common grave. His music outlived every emperor.",
+      "city": "Salzburg",
+      "country_code": "AT",
+      "latitude": 47.8,
+      "longitude": 13.044,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "de",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "it",
+          "proficiency": "C1"
+        },
+        {
+          "language_code": "fr",
+          "proficiency": "B2"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Composition",
+          "category": "music",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Piano",
+          "category": "music",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Violin",
+          "category": "music",
+          "self_rating": 4,
+          "years_experience": 25
+        }
+      ],
+      "points": {
+        "total_points": 1950,
+        "rentals_completed": 60,
+        "reviews_given": 40,
+        "reviews_received": 55,
+        "items_listed": 11
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "queen-vic-palace",
+      "display_name": "Alexandrina Victoria",
+      "email": "victoria@borrowhood.local",
+      "workshop_name": "Windsor Needlework Room",
+      "workshop_type": "studio",
+      "tagline": "We are not amused. But we are productive.",
+      "bio": "Queen of the United Kingdom for 63 years. Empress of India. Nine children married into royal families across Europe. The Victorian era wasn't just named after her -- she shaped it.",
+      "city": "London",
+      "country_code": "GB",
+      "latitude": 51.501,
+      "longitude": -0.142,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "de",
+          "proficiency": "C1"
+        },
+        {
+          "language_code": "fr",
+          "proficiency": "B2"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Diplomacy",
+          "category": "leadership",
+          "self_rating": 5,
+          "years_experience": 63
+        },
+        {
+          "skill_name": "Needlework",
+          "category": "textile",
+          "self_rating": 4,
+          "years_experience": 50
+        }
+      ],
+      "points": {
+        "total_points": 1800,
+        "rentals_completed": 50,
+        "reviews_given": 30,
+        "reviews_received": 45,
+        "items_listed": 8
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "archimedes-bath",
+      "display_name": "Archimedes of Syracuse",
+      "email": "archimedes-syracuse@borrowhood.local",
+      "workshop_name": "Syracuse Mechanics Lab",
+      "workshop_type": "workshop",
+      "tagline": "Give me a lever long enough and I shall move the world",
+      "bio": "Greek mathematician, physicist, engineer, inventor, astronomer. Discovered the principle of buoyancy in a bathtub and ran through the streets naked shouting Eureka. The original move fast and break things.",
+      "city": "Siracusa",
+      "country_code": "IT",
+      "latitude": 37.075,
+      "longitude": 15.286,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "el",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Mathematics",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 40
+        },
+        {
+          "skill_name": "Mechanical Engineering",
+          "category": "engineering",
+          "self_rating": 5,
+          "years_experience": 35
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 55,
+        "reviews_given": 38,
+        "reviews_received": 50,
+        "items_listed": 9
+      },
+      "offers_repair": true
+    },
+    {
+      "slug": "florence-lamp",
+      "display_name": "Florence Nightingale",
+      "email": "nightingale@borrowhood.local",
+      "workshop_name": "The Lamp Workshop",
+      "workshop_type": "workshop",
+      "tagline": "I attribute my success to this: I never gave or took an excuse",
+      "bio": "Founder of modern nursing. Statistician who used data visualization to convince Parliament. Reduced Crimean War hospital mortality from 42% to 2%. The lady with the lamp and the spreadsheet.",
+      "city": "London",
+      "country_code": "GB",
+      "latitude": 51.499,
+      "longitude": -0.174,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "fr",
+          "proficiency": "C1"
+        },
+        {
+          "language_code": "de",
+          "proficiency": "B2"
+        },
+        {
+          "language_code": "it",
+          "proficiency": "B2"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Nursing",
+          "category": "healthcare",
+          "self_rating": 5,
+          "years_experience": 50
+        },
+        {
+          "skill_name": "Statistics",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 40
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 52,
+        "reviews_given": 35,
+        "reviews_received": 48,
+        "items_listed": 8
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "confucius-temple",
+      "display_name": "Kong Qiu",
+      "email": "confucius@borrowhood.local",
+      "workshop_name": "Temple of Learning",
+      "workshop_type": "workshop",
+      "tagline": "It does not matter how slowly you go as long as you do not stop",
+      "bio": "Chinese philosopher and teacher. Founded Confucianism. His teachings on ethics, family, and governance shaped East Asian civilization for 2,500 years. Had 3,000 students. The original influencer.",
+      "city": "Qufu",
+      "country_code": "CN",
+      "latitude": 35.596,
+      "longitude": 116.99,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "zh",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Philosophy",
+          "category": "humanities",
+          "self_rating": 5,
+          "years_experience": 40
+        },
+        {
+          "skill_name": "Teaching",
+          "category": "education",
+          "self_rating": 5,
+          "years_experience": 40
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 55,
+        "reviews_given": 40,
+        "reviews_received": 52,
+        "items_listed": 7
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "nefertiti-amarna",
+      "display_name": "Neferneferuaten Nefertiti",
+      "email": "nefertiti@borrowhood.local",
+      "workshop_name": "Amarna Artisan Studio",
+      "workshop_type": "studio",
+      "tagline": "A beautiful woman has come",
+      "bio": "Queen of Egypt. Co-ruled with Akhenaten during the richest period of ancient Egyptian history. Her painted limestone bust is the most copied work of ancient Egyptian art. Beauty that launched a thousand excavations.",
+      "city": "Luxor",
+      "country_code": "EG",
+      "latitude": 25.687,
+      "longitude": 32.639,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "ar",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Governance",
+          "category": "leadership",
+          "self_rating": 5,
+          "years_experience": 20
+        },
+        {
+          "skill_name": "Art Patronage",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 20
+        }
+      ],
+      "points": {
+        "total_points": 1800,
+        "rentals_completed": 48,
+        "reviews_given": 30,
+        "reviews_received": 45,
+        "items_listed": 7
+      },
+      "offers_custom_orders": true
+    },
+    {
+      "slug": "darwin-beagle",
+      "display_name": "Charles Robert Darwin",
+      "email": "charles-darwin@borrowhood.local",
+      "workshop_name": "Down House Laboratory",
+      "workshop_type": "workshop",
+      "tagline": "It is not the strongest that survives but the most adaptable",
+      "bio": "English naturalist. Five-year voyage on the Beagle. Theory of evolution by natural selection. Waited 20 years to publish because he knew the world wasn't ready. Also wrote a book about earthworms.",
+      "city": "Downe",
+      "country_code": "GB",
+      "latitude": 51.332,
+      "longitude": 0.053,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "es",
+          "proficiency": "B1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Biology",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 50
+        },
+        {
+          "skill_name": "Taxidermy",
+          "category": "craft",
+          "self_rating": 3,
+          "years_experience": 10
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 53,
+        "reviews_given": 36,
+        "reviews_received": 48,
+        "items_listed": 9
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "bob-marley-trenchtown",
+      "display_name": "Robert Nesta Marley",
+      "email": "bob-marley@borrowhood.local",
+      "workshop_name": "Tuff Gong Studio",
+      "workshop_type": "studio",
+      "tagline": "One good thing about music: when it hits you, you feel no pain",
+      "bio": "Jamaican singer, songwriter, musician. Pioneered reggae worldwide. Songs of love, resistance, and unity. Shot in 1976, played a concert two days later. Sold 75 million records and counting.",
+      "city": "Kingston",
+      "country_code": "JM",
+      "latitude": 18.017,
+      "longitude": -76.81,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Songwriting",
+          "category": "music",
+          "self_rating": 5,
+          "years_experience": 20
+        },
+        {
+          "skill_name": "Guitar",
+          "category": "music",
+          "self_rating": 5,
+          "years_experience": 20
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 55,
+        "reviews_given": 38,
+        "reviews_received": 50,
+        "items_listed": 10
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "sun-tzu-strategy",
+      "display_name": "Sun Wu",
+      "email": "suntzu@borrowhood.local",
+      "workshop_name": "Art of War Academy",
+      "workshop_type": "workshop",
+      "tagline": "Every battle is won before it is fought",
+      "bio": "Chinese military strategist and philosopher. Wrote The Art of War -- still required reading at West Point, Harvard Business School, and in every startup CEO's bookshelf (unread).",
+      "city": "Suzhou",
+      "country_code": "CN",
+      "latitude": 31.299,
+      "longitude": 120.585,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "zh",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Military Strategy",
+          "category": "leadership",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Philosophy",
+          "category": "humanities",
+          "self_rating": 5,
+          "years_experience": 30
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 50,
+        "reviews_given": 35,
+        "reviews_received": 48,
+        "items_listed": 5
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "marie-antoinette-versailles",
+      "display_name": "Maria Antonia Josepha Johanna",
+      "email": "antoinette@borrowhood.local",
+      "workshop_name": "Petit Trianon Patisserie",
+      "workshop_type": "workshop",
+      "tagline": "Let them borrow tools",
+      "bio": "Queen of France. Austrian-born, married Louis XVI at 14. Patron of the arts, fashion icon. Never actually said 'let them eat cake.' That was Rousseau. History has a bad memory.",
+      "city": "Versailles",
+      "country_code": "FR",
+      "latitude": 48.805,
+      "longitude": 2.121,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "fr",
+          "proficiency": "C2"
+        },
+        {
+          "language_code": "de",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "it",
+          "proficiency": "B2"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Pastry Making",
+          "category": "food",
+          "self_rating": 4,
+          "years_experience": 15
+        },
+        {
+          "skill_name": "Fashion Design",
+          "category": "textile",
+          "self_rating": 5,
+          "years_experience": 20
+        }
+      ],
+      "points": {
+        "total_points": 1700,
+        "rentals_completed": 45,
+        "reviews_given": 28,
+        "reviews_received": 40,
+        "items_listed": 8
+      },
+      "offers_custom_orders": true
+    },
+    {
+      "slug": "ibn-battuta-rihla",
+      "display_name": "Abu Abdullah Muhammad Ibn Battuta",
+      "email": "battuta@borrowhood.local",
+      "workshop_name": "Rihla Travel Workshop",
+      "workshop_type": "workshop",
+      "tagline": "Traveling leaves you speechless then turns you into a storyteller",
+      "bio": "Moroccan scholar and explorer. Traveled 120,000 km over 30 years across Africa, Middle East, India, China, Southeast Asia. Three times the distance of Marco Polo. Wrote the Rihla. The original travel blogger.",
+      "city": "Tangier",
+      "country_code": "MA",
+      "latitude": 35.759,
+      "longitude": -5.834,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "ar",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "tr",
+          "proficiency": "B2"
+        },
+        {
+          "language_code": "fa",
+          "proficiency": "B1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Navigation",
+          "category": "exploration",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Travel Writing",
+          "category": "writing",
+          "self_rating": 5,
+          "years_experience": 25
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 55,
+        "reviews_given": 40,
+        "reviews_received": 48,
+        "items_listed": 9
+      },
+      "offers_delivery": true
+    },
+    {
+      "slug": "ada-lovelace-engine",
+      "display_name": "Augusta Ada King, Countess of Lovelace",
+      "email": "lovelace@borrowhood.local",
+      "workshop_name": "Analytical Engine Lab",
+      "workshop_type": "workshop",
+      "tagline": "The engine weaves algebraic patterns just as the Jacquard loom weaves flowers",
+      "bio": "English mathematician. Wrote the first computer program in 1843 -- for a machine that hadn't been built yet. Daughter of Lord Byron. The original software engineer, 100 years before software existed.",
+      "city": "London",
+      "country_code": "GB",
+      "latitude": 51.509,
+      "longitude": -0.076,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "fr",
+          "proficiency": "C1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Programming",
+          "category": "technology",
+          "self_rating": 5,
+          "years_experience": 15
+        },
+        {
+          "skill_name": "Mathematics",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 20
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 55,
+        "reviews_given": 38,
+        "reviews_received": 50,
+        "items_listed": 8
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "genghis-khan-steppe",
+      "display_name": "Temujin Borjigin",
+      "email": "genghis@borrowhood.local",
+      "workshop_name": "Great Khan Forge",
+      "workshop_type": "workshop",
+      "tagline": "If you are afraid, do not do it. If you do it, do not be afraid.",
+      "bio": "Founder of the Mongol Empire -- largest contiguous land empire in history. United nomadic tribes, established religious freedom, created postal system, connected East to West. 0.5% of the world carries his DNA.",
+      "city": "Ulaanbaatar",
+      "country_code": "MN",
+      "latitude": 47.921,
+      "longitude": 106.906,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "mn",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Horse Archery",
+          "category": "sport",
+          "self_rating": 5,
+          "years_experience": 50
+        },
+        {
+          "skill_name": "Military Strategy",
+          "category": "leadership",
+          "self_rating": 5,
+          "years_experience": 40
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 58,
+        "reviews_given": 35,
+        "reviews_received": 52,
+        "items_listed": 10
+      },
+      "offers_delivery": true
+    },
+    {
+      "slug": "turing-enigma",
+      "display_name": "Alan Mathison Turing",
+      "email": "turing@borrowhood.local",
+      "workshop_name": "Bletchley Park Lab",
+      "workshop_type": "workshop",
+      "tagline": "Those who can imagine anything can create the impossible",
+      "bio": "English mathematician, computer scientist, logician. Broke the Enigma code and shortened WWII by an estimated 2 years. Father of theoretical computer science and AI. Prosecuted for being himself. Pardoned 59 years too late.",
+      "city": "Manchester",
+      "country_code": "GB",
+      "latitude": 53.483,
+      "longitude": -2.244,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "de",
+          "proficiency": "B2"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Computer Science",
+          "category": "technology",
+          "self_rating": 5,
+          "years_experience": 20
+        },
+        {
+          "skill_name": "Cryptography",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 15
+        }
+      ],
+      "points": {
+        "total_points": 1950,
+        "rentals_completed": 60,
+        "reviews_given": 42,
+        "reviews_received": 55,
+        "items_listed": 10
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "wangari-greenbelt",
+      "display_name": "Wangari Muta Maathai",
+      "email": "maathai@borrowhood.local",
+      "workshop_name": "Green Belt Workshop",
+      "workshop_type": "workshop",
+      "tagline": "When we plant trees, we plant the seeds of peace",
+      "bio": "Kenyan environmental activist. Founded the Green Belt Movement -- planted 51 million trees. First African woman Nobel Peace Prize laureate. First woman in East Africa to earn a PhD. Fought deforestation and dictatorship simultaneously.",
+      "city": "Nairobi",
+      "country_code": "KE",
+      "latitude": -1.286,
+      "longitude": 36.817,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "C2"
+        },
+        {
+          "language_code": "sw",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Environmental Science",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 35
+        },
+        {
+          "skill_name": "Community Organizing",
+          "category": "leadership",
+          "self_rating": 5,
+          "years_experience": 30
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 52,
+        "reviews_given": 38,
+        "reviews_received": 48,
+        "items_listed": 9
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "marco-polo-silk",
+      "display_name": "Marco Polo",
+      "email": "marco-polo@borrowhood.local",
+      "workshop_name": "Silk Road Trading Post",
+      "workshop_type": "workshop",
+      "tagline": "I did not tell half of what I saw",
+      "bio": "Venetian merchant and explorer. Traveled the Silk Road to China at 17. Spent 24 years abroad. Served Kublai Khan. Dictated his travels from a Genoese prison. The world's first travel influencer.",
+      "city": "Venezia",
+      "country_code": "IT",
+      "latitude": 45.44,
+      "longitude": 12.316,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "it",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "fr",
+          "proficiency": "B2"
+        },
+        {
+          "language_code": "zh",
+          "proficiency": "B1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Trade",
+          "category": "commerce",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Navigation",
+          "category": "exploration",
+          "self_rating": 5,
+          "years_experience": 25
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 55,
+        "reviews_given": 35,
+        "reviews_received": 48,
+        "items_listed": 10
+      },
+      "offers_delivery": true
+    },
+    {
+      "slug": "pythagoras-samos",
+      "display_name": "Pythagoras of Samos",
+      "email": "pythagoras@borrowhood.local",
+      "workshop_name": "Samos Mathematics School",
+      "workshop_type": "workshop",
+      "tagline": "Number is the ruler of forms and ideas",
+      "bio": "Greek mathematician and philosopher. The theorem, the cup, the tuning. Founded a school that was part math cult, part commune. Members weren't allowed to eat beans. Seriously.",
+      "city": "Crotone",
+      "country_code": "IT",
+      "latitude": 39.081,
+      "longitude": 17.127,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "el",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Mathematics",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 40
+        },
+        {
+          "skill_name": "Music Theory",
+          "category": "music",
+          "self_rating": 4,
+          "years_experience": 30
+        }
+      ],
+      "points": {
+        "total_points": 1800,
+        "rentals_completed": 48,
+        "reviews_given": 32,
+        "reviews_received": 45,
+        "items_listed": 7
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "boudicca-iceni",
+      "display_name": "Boudicca of the Iceni",
+      "email": "boudicca@borrowhood.local",
+      "workshop_name": "Iceni Chariot Works",
+      "workshop_type": "workshop",
+      "tagline": "Win the battle, or perish. That is what I, a woman, will do.",
+      "bio": "Queen of the Iceni tribe in Britain. Led a massive uprising against the Roman Empire in 60 AD. Burned Londinium to the ground. The Romans had 70,000 soldiers. She had a chariot and a grudge.",
+      "city": "Norwich",
+      "country_code": "GB",
+      "latitude": 52.63,
+      "longitude": 1.297,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Chariot Building",
+          "category": "craft",
+          "self_rating": 5,
+          "years_experience": 15
+        },
+        {
+          "skill_name": "Leadership",
+          "category": "leadership",
+          "self_rating": 5,
+          "years_experience": 10
+        }
+      ],
+      "points": {
+        "total_points": 1800,
+        "rentals_completed": 50,
+        "reviews_given": 30,
+        "reviews_received": 45,
+        "items_listed": 6
+      },
+      "offers_repair": true
+    },
+    {
+      "slug": "maya-angelou-cage",
+      "display_name": "Marguerite Annie Johnson",
+      "email": "angelou@borrowhood.local",
+      "workshop_name": "Caged Bird Writing Studio",
+      "workshop_type": "studio",
+      "tagline": "Still I rise",
+      "bio": "American poet, memoirist, civil rights activist. 'I Know Why the Caged Bird Sings' changed American literature. Spoke six languages. Read a poem at Clinton's inauguration. Every word was a weapon and a balm.",
+      "city": "Winston-Salem",
+      "country_code": "US",
+      "latitude": 36.099,
+      "longitude": -80.244,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "fr",
+          "proficiency": "C1"
+        },
+        {
+          "language_code": "es",
+          "proficiency": "B2"
+        },
+        {
+          "language_code": "it",
+          "proficiency": "B1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Poetry",
+          "category": "writing",
+          "self_rating": 5,
+          "years_experience": 50
+        },
+        {
+          "skill_name": "Memoir Writing",
+          "category": "writing",
+          "self_rating": 5,
+          "years_experience": 40
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 52,
+        "reviews_given": 38,
+        "reviews_received": 48,
+        "items_listed": 9
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "hedy-lamarr-freq",
+      "display_name": "Hedwig Eva Maria Kiesler",
+      "email": "lamarr@borrowhood.local",
+      "workshop_name": "Frequency Hopping Lab",
+      "workshop_type": "workshop",
+      "tagline": "Any girl can be glamorous. All you have to do is stand still and look stupid.",
+      "bio": "Austrian-American actress AND inventor. Hollywood star by day, patent holder by night. Co-invented frequency-hopping spread spectrum -- the basis for WiFi, GPS, and Bluetooth. The most beautiful mind in the room.",
+      "city": "Los Angeles",
+      "country_code": "US",
+      "latitude": 34.089,
+      "longitude": -118.389,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "C2"
+        },
+        {
+          "language_code": "de",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "fr",
+          "proficiency": "B2"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Radio Engineering",
+          "category": "engineering",
+          "self_rating": 5,
+          "years_experience": 20
+        },
+        {
+          "skill_name": "Acting",
+          "category": "cinema",
+          "self_rating": 5,
+          "years_experience": 30
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 52,
+        "reviews_given": 36,
+        "reviews_received": 48,
+        "items_listed": 8
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "rumi-konya",
+      "display_name": "Jalal ad-Din Muhammad Balkhi",
+      "email": "jalal-rumi@borrowhood.local",
+      "workshop_name": "Konya Calligraphy Studio",
+      "workshop_type": "studio",
+      "tagline": "What you seek is seeking you",
+      "bio": "13th-century Persian poet, scholar, Sufi mystic. 70,000 verses of poetry. Best-selling poet in the United States. His whirling dervishes still spin. 800 years later, his words are still on Instagram.",
+      "city": "Konya",
+      "country_code": "TR",
+      "latitude": 37.872,
+      "longitude": 32.493,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "fa",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "ar",
+          "proficiency": "C2"
+        },
+        {
+          "language_code": "tr",
+          "proficiency": "C1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Poetry",
+          "category": "writing",
+          "self_rating": 5,
+          "years_experience": 40
+        },
+        {
+          "skill_name": "Calligraphy",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 30
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 55,
+        "reviews_given": 40,
+        "reviews_received": 52,
+        "items_listed": 10
+      },
+      "offers_custom_orders": true
+    },
+    {
+      "slug": "viking-leif",
+      "display_name": "Leif Erikson",
+      "email": "leif@borrowhood.local",
+      "workshop_name": "Vinland Boatyard",
+      "workshop_type": "workshop",
+      "tagline": "The sea grants every man new hope",
+      "bio": "Norse explorer. Son of Erik the Red. Reached North America 500 years before Columbus. Called it Vinland for the wild grapes. Didn't claim he discovered it -- just sailed there, looked around, and went home.",
+      "city": "Reykjavik",
+      "country_code": "IS",
+      "latitude": 64.147,
+      "longitude": -21.943,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "is",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Shipbuilding",
+          "category": "craft",
+          "self_rating": 5,
+          "years_experience": 25
+        },
+        {
+          "skill_name": "Navigation",
+          "category": "exploration",
+          "self_rating": 5,
+          "years_experience": 20
+        }
+      ],
+      "points": {
+        "total_points": 1800,
+        "rentals_completed": 50,
+        "reviews_given": 30,
+        "reviews_received": 45,
+        "items_listed": 8
+      },
+      "offers_delivery": true,
+      "offers_repair": true
+    },
+    {
+      "slug": "hypatia-alexandria",
+      "display_name": "Hypatia of Alexandria",
+      "email": "hypatia-alexandria@borrowhood.local",
+      "workshop_name": "Alexandria Mathematics Library",
+      "workshop_type": "workshop",
+      "tagline": "Reserve your right to think, for even to think wrongly is better than not to think at all",
+      "bio": "Greek mathematician, astronomer, philosopher. Head of the Neoplatonist school in Alexandria. Built astrolabes and hydrometers. Murdered by a mob in 415 AD because she was too smart and too influential. History repeated itself.",
+      "city": "Alexandria",
+      "country_code": "EG",
+      "latitude": 31.201,
+      "longitude": 29.919,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "el",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Mathematics",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 25
+        },
+        {
+          "skill_name": "Astronomy",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 20
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 52,
+        "reviews_given": 36,
+        "reviews_received": 48,
+        "items_listed": 8
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "sitting-bull-lakota",
+      "display_name": "Tatanka Iyotanka",
+      "email": "sittingbull@borrowhood.local",
+      "workshop_name": "Lakota Medicine Lodge",
+      "workshop_type": "workshop",
+      "tagline": "Let us put our minds together and see what life we can make for our children",
+      "bio": "Hunkpapa Lakota leader. Unified the Sioux tribes against US expansion. Led the resistance at Little Bighorn. Performed the Sun Dance for two days straight. Buffalo Bill put him in a Wild West show. He gave his salary to street kids.",
+      "city": "Standing Rock",
+      "country_code": "US",
+      "latitude": 46.086,
+      "longitude": -100.631,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "B1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Leatherwork",
+          "category": "craft",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Horsemanship",
+          "category": "sport",
+          "self_rating": 5,
+          "years_experience": 40
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 50,
+        "reviews_given": 35,
+        "reviews_received": 48,
+        "items_listed": 7
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "hokusai-wave",
+      "display_name": "Katsushika Hokusai",
+      "email": "hokusai@borrowhood.local",
+      "workshop_name": "Great Wave Print Studio",
+      "workshop_type": "studio",
+      "tagline": "From the age of six I had a mania for drawing",
+      "bio": "Japanese ukiyo-e artist. The Great Wave off Kanagawa is the most recognized Japanese artwork ever. Changed his name 30 times. Moved house 93 times. Painted until age 88. Said he'd be great by 100. Almost made it.",
+      "city": "Tokyo",
+      "country_code": "JP",
+      "latitude": 35.689,
+      "longitude": 139.691,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "ja",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Woodblock Printing",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 70
+        },
+        {
+          "skill_name": "Illustration",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 70
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 58,
+        "reviews_given": 38,
+        "reviews_received": 52,
+        "items_listed": 12
+      },
+      "offers_custom_orders": true
+    },
+    {
+      "slug": "sappho-lesbos",
+      "display_name": "Sappho of Lesbos",
+      "email": "sappho-lesbos@borrowhood.local",
+      "workshop_name": "Mytilene Lyre Studio",
+      "workshop_type": "studio",
+      "tagline": "What is beautiful is good, and who is good will soon be beautiful",
+      "bio": "Greek lyric poet from Lesbos. Called the Tenth Muse by Plato. Wrote nine volumes of poetry. Most burned by medieval monks. What survived still makes people weep 2,600 years later.",
+      "city": "Mytilene",
+      "country_code": "GR",
+      "latitude": 39.109,
+      "longitude": 26.556,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "el",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Poetry",
+          "category": "writing",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Lyre Playing",
+          "category": "music",
+          "self_rating": 5,
+          "years_experience": 25
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 52,
+        "reviews_given": 36,
+        "reviews_received": 48,
+        "items_listed": 8
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "saladin-ayyubid",
+      "display_name": "Salah ad-Din Yusuf ibn Ayyub",
+      "email": "saladin@borrowhood.local",
+      "workshop_name": "Damascus Steel Works",
+      "workshop_type": "workshop",
+      "tagline": "I warn you against shedding blood. It never sleeps.",
+      "bio": "Sultan of Egypt and Syria. Recaptured Jerusalem from the Crusaders in 1187. Known for chivalry even by his enemies. Richard the Lionheart called him the greatest knight. When he died, his treasury held one gold coin and 47 silver.",
+      "city": "Damascus",
+      "country_code": "SY",
+      "latitude": 33.513,
+      "longitude": 36.292,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "ar",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "ku",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Swordsmithing",
+          "category": "metalwork",
+          "self_rating": 5,
+          "years_experience": 25
+        },
+        {
+          "skill_name": "Diplomacy",
+          "category": "leadership",
+          "self_rating": 5,
+          "years_experience": 30
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 58,
+        "reviews_given": 38,
+        "reviews_received": 52,
+        "items_listed": 9
+      },
+      "offers_repair": true
+    },
+    {
+      "slug": "sor-juana-convent",
+      "display_name": "Juana Ines de Asbaje y Ramirez de Santillana",
+      "email": "sorjuana@borrowhood.local",
+      "workshop_name": "San Jeronimo Writing Desk",
+      "workshop_type": "studio",
+      "tagline": "One can perfectly well philosophize while cooking supper",
+      "bio": "Mexican scholar, poet, nun. Self-taught polymath. Wrote poetry, plays, philosophy. Her personal library had 4,000 volumes. The Church told her to stop writing. She sold her library to feed the poor. Then kept writing.",
+      "city": "Mexico City",
+      "country_code": "MX",
+      "latitude": 19.432,
+      "longitude": -99.133,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "es",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "la",
+          "proficiency": "C2"
+        },
+        {
+          "language_code": "pt",
+          "proficiency": "B1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Poetry",
+          "category": "writing",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Philosophy",
+          "category": "humanities",
+          "self_rating": 5,
+          "years_experience": 25
+        }
+      ],
+      "points": {
+        "total_points": 1800,
+        "rentals_completed": 48,
+        "reviews_given": 35,
+        "reviews_received": 45,
+        "items_listed": 8
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "gutenberg-press",
+      "display_name": "Johannes Gensfleisch zur Laden zum Gutenberg",
+      "email": "gutenberg@borrowhood.local",
+      "workshop_name": "Mainz Printing Press",
+      "workshop_type": "workshop",
+      "tagline": "God suffers in the multitude of souls whom His word cannot reach",
+      "bio": "German inventor. Movable type printing press. Printed the Bible. Changed everything. Literacy rates, the Reformation, the Scientific Revolution, democracy, newspapers -- all downstream of one guy who figured out how to stamp letters into paper.",
+      "city": "Mainz",
+      "country_code": "DE",
+      "latitude": 49.993,
+      "longitude": 8.247,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "de",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "la",
+          "proficiency": "C1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Printing",
+          "category": "craft",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Metalwork",
+          "category": "metalwork",
+          "self_rating": 5,
+          "years_experience": 25
+        }
+      ],
+      "points": {
+        "total_points": 1950,
+        "rentals_completed": 62,
+        "reviews_given": 42,
+        "reviews_received": 55,
+        "items_listed": 11
+      },
+      "offers_repair": true
+    },
+    {
+      "slug": "ramanujan-numbers",
+      "display_name": "Srinivasa Ramanujan Aiyangar",
+      "email": "ramanujan@borrowhood.local",
+      "workshop_name": "Kumbakonam Chalkboard",
+      "workshop_type": "workshop",
+      "tagline": "An equation for me has no meaning unless it expresses a thought of God",
+      "bio": "Indian mathematician. Self-taught genius from Madras. Produced 3,900 results. Infinite series, continued fractions, number theory. Went to Cambridge, got sick, came home, died at 32. His notebooks are still yielding new discoveries.",
+      "city": "Chennai",
+      "country_code": "IN",
+      "latitude": 13.083,
+      "longitude": 80.27,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "ta",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "en",
+          "proficiency": "C1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Mathematics",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 15
+        },
+        {
+          "skill_name": "Number Theory",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 15
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 55,
+        "reviews_given": 38,
+        "reviews_received": 50,
+        "items_listed": 8
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "shaka-zulu-kraal",
+      "display_name": "Shaka kaSenzangakhona",
+      "email": "shaka@borrowhood.local",
+      "workshop_name": "Zulu Shield Workshop",
+      "workshop_type": "workshop",
+      "tagline": "Strike an enemy once and for all",
+      "bio": "Zulu king who transformed a small clan into the most powerful military force in southern Africa. Reinvented warfare tactics: short stabbing spear, bull horn formation, barefoot regiment speed. Built an empire from a chieftaincy.",
+      "city": "Eshowe",
+      "country_code": "ZA",
+      "latitude": -28.885,
+      "longitude": 31.46,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "zu",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Shield Making",
+          "category": "craft",
+          "self_rating": 5,
+          "years_experience": 20
+        },
+        {
+          "skill_name": "Spear Forging",
+          "category": "metalwork",
+          "self_rating": 5,
+          "years_experience": 15
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 52,
+        "reviews_given": 34,
+        "reviews_received": 48,
+        "items_listed": 8
+      },
+      "offers_repair": true
+    },
+    {
+      "slug": "hildegard-bingen",
+      "display_name": "Hildegard von Bingen",
+      "email": "hildegard@borrowhood.local",
+      "workshop_name": "Bingen Herbarium",
+      "workshop_type": "workshop",
+      "tagline": "The earth which sustains humanity must not be injured, it must not be destroyed",
+      "bio": "German abbess, writer, composer, philosopher, mystic, herbalist. 10th child, donated to the church. Wrote on theology, botany, medicine, music. 77 choral compositions. Invented a language. The original polymath, 300 years before Leonardo.",
+      "city": "Bingen am Rhein",
+      "country_code": "DE",
+      "latitude": 49.968,
+      "longitude": 7.895,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "de",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "la",
+          "proficiency": "C2"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Herbal Medicine",
+          "category": "healthcare",
+          "self_rating": 5,
+          "years_experience": 50
+        },
+        {
+          "skill_name": "Musical Composition",
+          "category": "music",
+          "self_rating": 5,
+          "years_experience": 45
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 52,
+        "reviews_given": 38,
+        "reviews_received": 48,
+        "items_listed": 9
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "avicenna-canon",
+      "display_name": "Abu Ali al-Husayn ibn Abd Allah ibn Sina",
+      "email": "avicenna@borrowhood.local",
+      "workshop_name": "Canon of Medicine Lab",
+      "workshop_type": "workshop",
+      "tagline": "The knowledge of anything since all things have causes is not acquired except through the knowledge of its causes",
+      "bio": "Persian polymath. The Canon of Medicine was the standard medical textbook in Europe for 600 years. Also wrote on philosophy, astronomy, alchemy, geography, geology, psychology, theology, logic, mathematics, physics, and poetry. At 18.",
+      "city": "Isfahan",
+      "country_code": "IR",
+      "latitude": 32.654,
+      "longitude": 51.668,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "fa",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "ar",
+          "proficiency": "C2"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Medicine",
+          "category": "healthcare",
+          "self_rating": 5,
+          "years_experience": 40
+        },
+        {
+          "skill_name": "Philosophy",
+          "category": "humanities",
+          "self_rating": 5,
+          "years_experience": 35
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 58,
+        "reviews_given": 40,
+        "reviews_received": 52,
+        "items_listed": 10
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "pachacuti-cusco",
+      "display_name": "Pachacuti Inca Yupanqui",
+      "email": "pachacuti@borrowhood.local",
+      "workshop_name": "Cusco Stoneworks",
+      "workshop_type": "workshop",
+      "tagline": "When the world is in disorder, it is time for the great to rebuild",
+      "bio": "Ninth Sapa Inca. Transformed Cusco from a small kingdom into the Inca Empire -- largest empire in pre-Columbian America. Built Machu Picchu. Earthquake-proof masonry without mortar. Engineers still can't explain how.",
+      "city": "Cusco",
+      "country_code": "PE",
+      "latitude": -13.532,
+      "longitude": -71.968,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "qu",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Stonemasonry",
+          "category": "craft",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Architecture",
+          "category": "engineering",
+          "self_rating": 5,
+          "years_experience": 25
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 52,
+        "reviews_given": 35,
+        "reviews_received": 48,
+        "items_listed": 9
+      },
+      "offers_repair": true
+    },
+    {
+      "slug": "ibn-khaldun-muqaddimah",
+      "display_name": "Abd al-Rahman ibn Muhammad ibn Khaldun",
+      "email": "khaldun@borrowhood.local",
+      "workshop_name": "Muqaddimah Study",
+      "workshop_type": "workshop",
+      "tagline": "Geography is destiny",
+      "bio": "Tunisian historian, philosopher, sociologist. The Muqaddimah introduced the scientific method to history. Father of sociology, historiography, demography, economics. 600 years ahead of his time. Most Europeans still haven't read him.",
+      "city": "Tunis",
+      "country_code": "TN",
+      "latitude": 36.806,
+      "longitude": 10.182,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "ar",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "fr",
+          "proficiency": "B1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Historiography",
+          "category": "humanities",
+          "self_rating": 5,
+          "years_experience": 35
+        },
+        {
+          "skill_name": "Sociology",
+          "category": "humanities",
+          "self_rating": 5,
+          "years_experience": 30
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 52,
+        "reviews_given": 38,
+        "reviews_received": 48,
+        "items_listed": 8
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "gracia-mendes-ferrara",
+      "display_name": "Gracia Mendes Nasi",
+      "email": "gracia@borrowhood.local",
+      "workshop_name": "House of Mendes Trading",
+      "workshop_type": "workshop",
+      "tagline": "Wealth is a tool, not a trophy",
+      "bio": "Portuguese-born Sephardic Jewish banker and philanthropist. Ran one of the largest banking empires in 16th-century Europe. Organized an underground railroad for Jews fleeing the Inquisition. Used her wealth to save thousands of lives.",
+      "city": "Istanbul",
+      "country_code": "TR",
+      "latitude": 41.009,
+      "longitude": 28.98,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "pt",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "es",
+          "proficiency": "C2"
+        },
+        {
+          "language_code": "it",
+          "proficiency": "C1"
+        },
+        {
+          "language_code": "tr",
+          "proficiency": "B2"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Banking",
+          "category": "commerce",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Diplomacy",
+          "category": "leadership",
+          "self_rating": 5,
+          "years_experience": 25
+        }
+      ],
+      "points": {
+        "total_points": 1800,
+        "rentals_completed": 48,
+        "reviews_given": 35,
+        "reviews_received": 45,
+        "items_listed": 8
+      },
+      "offers_delivery": true
+    },
+    {
+      "slug": "zheng-he-treasure",
+      "display_name": "Zheng He",
+      "email": "zhenghe@borrowhood.local",
+      "workshop_name": "Treasure Fleet Shipyard",
+      "workshop_type": "workshop",
+      "tagline": "We have traversed more than 100,000 li of immense water spaces",
+      "bio": "Chinese admiral and explorer. Led seven massive expeditions with 300 ships and 28,000 men across Southeast Asia, India, Arabia, and East Africa. His flagship was 120 meters long. Columbus had 3 ships. Total.",
+      "city": "Nanjing",
+      "country_code": "CN",
+      "latitude": 32.06,
+      "longitude": 118.796,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "zh",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "ar",
+          "proficiency": "B2"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Shipbuilding",
+          "category": "craft",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Navigation",
+          "category": "exploration",
+          "self_rating": 5,
+          "years_experience": 25
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 58,
+        "reviews_given": 38,
+        "reviews_received": 52,
+        "items_listed": 10
+      },
+      "offers_delivery": true
+    },
+    {
+      "slug": "faraday-lab",
+      "display_name": "Michael Faraday",
+      "email": "faraday@borrowhood.local",
+      "workshop_name": "Royal Institution Laboratory",
+      "workshop_type": "workshop",
+      "tagline": "Nothing is too wonderful to be true if it be consistent with the laws of nature",
+      "bio": "English scientist. Self-educated bookbinder's apprentice who became one of history's greatest experimentalists. Discovered electromagnetic induction, benzene, electrolysis. Every electric motor on Earth exists because of him.",
+      "city": "London",
+      "country_code": "GB",
+      "latitude": 51.509,
+      "longitude": -0.139,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Electrical Engineering",
+          "category": "engineering",
+          "self_rating": 5,
+          "years_experience": 40
+        },
+        {
+          "skill_name": "Chemistry",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 35
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 58,
+        "reviews_given": 40,
+        "reviews_received": 52,
+        "items_listed": 10
+      },
+      "offers_training": true,
+      "offers_repair": true
+    },
+    {
+      "slug": "mansa-musa-mali",
+      "display_name": "Mansa Musa I of Mali",
+      "email": "musa@borrowhood.local",
+      "workshop_name": "Timbuktu Gold Workshop",
+      "workshop_type": "workshop",
+      "tagline": "Education is the light of the mind",
+      "bio": "Emperor of Mali. Richest person in recorded history. His hajj to Mecca crashed the gold market in Cairo and Medina. Built the Djinguereber Mosque and the University of Sankore. Timbuktu was his Oxford.",
+      "city": "Timbuktu",
+      "country_code": "ML",
+      "latitude": 16.773,
+      "longitude": -3.005,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "fr",
+          "proficiency": "B1"
+        },
+        {
+          "language_code": "ar",
+          "proficiency": "C1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Goldsmithing",
+          "category": "metalwork",
+          "self_rating": 5,
+          "years_experience": 25
+        },
+        {
+          "skill_name": "Architecture",
+          "category": "engineering",
+          "self_rating": 4,
+          "years_experience": 20
+        }
+      ],
+      "points": {
+        "total_points": 1950,
+        "rentals_completed": 62,
+        "reviews_given": 42,
+        "reviews_received": 55,
+        "items_listed": 12
+      },
+      "offers_custom_orders": true
+    },
+    {
+      "slug": "james-baldwin-fire",
+      "display_name": "James Arthur Baldwin",
+      "email": "james-baldwin@borrowhood.local",
+      "workshop_name": "Fire Next Time Writing Room",
+      "workshop_type": "studio",
+      "tagline": "Not everything that is faced can be changed, but nothing can be changed until it is faced",
+      "bio": "American writer, poet, activist. 'The Fire Next Time' and 'Notes of a Native Son' dissected race in America with surgical precision. Moved to Paris to survive. Wrote the truth back to the country that couldn't handle it.",
+      "city": "New York",
+      "country_code": "US",
+      "latitude": 40.814,
+      "longitude": -73.946,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "fr",
+          "proficiency": "C1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Essay Writing",
+          "category": "writing",
+          "self_rating": 5,
+          "years_experience": 35
+        },
+        {
+          "skill_name": "Public Speaking",
+          "category": "communication",
+          "self_rating": 5,
+          "years_experience": 30
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 52,
+        "reviews_given": 38,
+        "reviews_received": 48,
+        "items_listed": 9
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "grace-hopper-debug",
+      "display_name": "Grace Brewster Murray Hopper",
+      "email": "hopper@borrowhood.local",
+      "workshop_name": "COBOL Debugging Bay",
+      "workshop_type": "workshop",
+      "tagline": "It is easier to ask forgiveness than permission",
+      "bio": "US Navy Rear Admiral and computer scientist. Invented the first compiler. Popularized machine-independent programming. Found the first actual computer bug (a moth). Retired at 79. Oldest active-duty commissioned officer in the US Navy.",
+      "city": "Arlington",
+      "country_code": "US",
+      "latitude": 38.88,
+      "longitude": -77.107,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Programming",
+          "category": "technology",
+          "self_rating": 5,
+          "years_experience": 40
+        },
+        {
+          "skill_name": "Systems Engineering",
+          "category": "engineering",
+          "self_rating": 5,
+          "years_experience": 35
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 58,
+        "reviews_given": 40,
+        "reviews_received": 52,
+        "items_listed": 10
+      },
+      "offers_training": true,
+      "offers_repair": true
+    },
+    {
+      "slug": "ta-moko-master",
+      "display_name": "Wiremu Te Moko",
+      "email": "temoko@borrowhood.local",
+      "workshop_name": "Rotorua Ta Moko Studio",
+      "workshop_type": "studio",
+      "tagline": "The moko tells the story of who you are",
+      "bio": "Master of traditional Maori tattooing (ta moko). Each design encodes whakapapa (genealogy), tribal identity, and personal achievements. Uses uhi (chisel) not needle. Preservation through practice -- keeping the old ways alive with every line.",
+      "city": "Rotorua",
+      "country_code": "NZ",
+      "latitude": -38.137,
+      "longitude": 176.251,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "mi",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "en",
+          "proficiency": "C1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Ta Moko",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Wood Carving",
+          "category": "craft",
+          "self_rating": 5,
+          "years_experience": 25
+        }
+      ],
+      "points": {
+        "total_points": 1800,
+        "rentals_completed": 48,
+        "reviews_given": 32,
+        "reviews_received": 45,
+        "items_listed": 8
+      },
+      "offers_custom_orders": true
+    },
+    {
+      "slug": "rosalind-dna",
+      "display_name": "Rosalind Elsie Franklin",
+      "email": "rosalind-franklin@borrowhood.local",
+      "workshop_name": "Photo 51 X-Ray Lab",
+      "workshop_type": "workshop",
+      "tagline": "Science and everyday life cannot and should not be separated",
+      "bio": "English chemist and X-ray crystallographer. Photo 51 proved the helical structure of DNA. Watson and Crick used her data without credit. She died at 37 of ovarian cancer. Nobel went to three men. History knows better now.",
+      "city": "London",
+      "country_code": "GB",
+      "latitude": 51.524,
+      "longitude": -0.134,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "fr",
+          "proficiency": "C1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "X-Ray Crystallography",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 15
+        },
+        {
+          "skill_name": "Chemistry",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 20
+        }
+      ],
+      "points": {
+        "total_points": 1850,
+        "rentals_completed": 52,
+        "reviews_given": 36,
+        "reviews_received": 48,
+        "items_listed": 8
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "marie-curie-radium",
+      "display_name": "Irene Joliot-Curie",
+      "email": "irene-curie@borrowhood.local",
+      "workshop_name": "Radium Institute Lab",
+      "workshop_type": "workshop",
+      "tagline": "That one must do some work seriously and must be independent",
+      "bio": "French scientist. Daughter of Marie and Pierre Curie. Won her own Nobel Prize for discovering artificial radioactivity. Husband Frederic and she were the only married couple with independent Nobel Prizes.",
+      "city": "Paris",
+      "country_code": "FR",
+      "latitude": 48.846,
+      "longitude": 2.356,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "fr",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "en",
+          "proficiency": "B2"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Nuclear Physics",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 25
+        },
+        {
+          "skill_name": "Chemistry",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 20
+        }
+      ],
+      "points": {
+        "total_points": 1800,
+        "rentals_completed": 48,
+        "reviews_given": 32,
+        "reviews_received": 45,
+        "items_listed": 7
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "nikola-tartaglia",
+      "display_name": "Niccolo Fontana Tartaglia",
+      "email": "tartaglia@borrowhood.local",
+      "workshop_name": "Brescia Mathematics Workshop",
+      "workshop_type": "workshop",
+      "tagline": "Mathematics is the alphabet with which God has written the universe",
+      "bio": "Italian mathematician. Solved the cubic equation. Self-taught after a French soldier slashed his jaw at 12, leaving him with a stammer (tartaglia = stutterer). Turned disability into identity, identity into mathematical revolution.",
+      "city": "Brescia",
+      "country_code": "IT",
+      "latitude": 45.54,
+      "longitude": 10.213,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "it",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "la",
+          "proficiency": "C1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Mathematics",
+          "category": "science",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Ballistics",
+          "category": "engineering",
+          "self_rating": 4,
+          "years_experience": 15
+        }
+      ],
+      "points": {
+        "total_points": 1750,
+        "rentals_completed": 45,
+        "reviews_given": 30,
+        "reviews_received": 42,
+        "items_listed": 6
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "yi-sun-sin-turtle",
+      "display_name": "Yi Sun-sin",
+      "email": "yisunsin@borrowhood.local",
+      "workshop_name": "Turtle Ship Dockyard",
+      "workshop_type": "workshop",
+      "tagline": "Those willing to die will live. Those willing to live will die.",
+      "bio": "Korean naval commander. Won 23 battles with zero defeats. Invented the turtle ship (geobukseon) -- iron-plated, dragon-headed, spike-roofed. Defeated 333 Japanese ships with 13. The greatest admiral who ever lived.",
+      "city": "Asan",
+      "country_code": "KR",
+      "latitude": 36.784,
+      "longitude": 127.004,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "ko",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Shipbuilding",
+          "category": "craft",
+          "self_rating": 5,
+          "years_experience": 25
+        },
+        {
+          "skill_name": "Naval Strategy",
+          "category": "leadership",
+          "self_rating": 5,
+          "years_experience": 20
+        }
+      ],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 58,
+        "reviews_given": 38,
+        "reviews_received": 52,
+        "items_listed": 10
+      },
+      "offers_repair": true
+    }
+  ]
+}

@@ -1,0 +1,217 @@
+{
+  "base_url": "https://46.62.138.218",
+  "timestamp": "2026-03-03T14:49:11.643Z",
+  "summary": {
+    "passed": 28,
+    "failed": 11,
+    "total": 39
+  },
+  "tests": [
+    {
+      "name": "Luna logs in",
+      "status": "pass",
+      "ms": 942
+    },
+    {
+      "name": "Jake logs in",
+      "status": "pass",
+      "ms": 765
+    },
+    {
+      "name": "Luna profile loads",
+      "status": "fail",
+      "ms": 192,
+      "error": "Expected 200, got 422"
+    },
+    {
+      "name": "Jake profile loads",
+      "status": "fail",
+      "ms": 130,
+      "error": "Expected 200, got 422"
+    },
+    {
+      "name": "Create item with team pricing",
+      "status": "fail",
+      "ms": 188,
+      "error": "Expected 201, got 422"
+    },
+    {
+      "name": "Create listing with team pricing fields",
+      "status": "fail",
+      "ms": 183,
+      "error": "Expected 201, got 422: {\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"item_id\"],\"msg\":\"Field required\",\"input\":{\"listing_type\":\"service\",\"price_per_day\":50,\"currency\":\"EUR\",\"minimum_charge\":25,\"per_person_rate\":15,\"max_participants\":10,\"group_discount_pct\":20}}]}"
+    },
+    {
+      "name": "Update listing team pricing",
+      "status": "fail",
+      "ms": 180,
+      "error": "Expected 200, got 422"
+    },
+    {
+      "name": "Team pricing validation -- negative minimum_charge rejected",
+      "status": "pass",
+      "ms": 204
+    },
+    {
+      "name": "Team pricing validation -- discount over 100 rejected",
+      "status": "pass",
+      "ms": 203
+    },
+    {
+      "name": "Jake requests a quote on Luna's service listing",
+      "status": "fail",
+      "ms": 195,
+      "error": "Expected 201, got 422: {\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"listing_id\"],\"msg\":\"Field required\",\"input\":{\"description\":\"Need a 3-hour pottery workshop for 5 people\",\"preferred_date\":\"2026-04-15\"}},{\"type\":\"missing\",\"loc\":[\"body\",\"request_description\"],\"msg\":\"Field required\",\"input\":{\"description\":\"Need a 3-hour pottery workshop for 5 people\",\"preferred_date\":\"2026-04-15\"}}]}"
+    },
+    {
+      "name": "Translation endpoint exists",
+      "status": "pass",
+      "ms": 170
+    },
+    {
+      "name": "Translation with missing params returns 422",
+      "status": "pass",
+      "ms": 238
+    },
+    {
+      "name": "Get rental for calendar test",
+      "status": "pass",
+      "ms": 189
+    },
+    {
+      "name": "Calendar .ics downloads with correct content-type",
+      "status": "pass",
+      "ms": 162
+    },
+    {
+      "name": "Calendar .ics has valid VCALENDAR structure",
+      "status": "pass",
+      "ms": 206
+    },
+    {
+      "name": "Calendar .ics has Content-Disposition header",
+      "status": "pass",
+      "ms": 313
+    },
+    {
+      "name": "Calendar .ics returns 403 for non-participant",
+      "status": "pass",
+      "ms": 198
+    },
+    {
+      "name": "Calendar .ics returns 401 without auth",
+      "status": "pass",
+      "ms": 158
+    },
+    {
+      "name": "Item detail page has QR code",
+      "status": "fail",
+      "ms": 952,
+      "error": "No QR code found on item detail"
+    },
+    {
+      "name": "Luna has notifications",
+      "status": "pass",
+      "ms": 238
+    },
+    {
+      "name": "Jake has notifications",
+      "status": "pass",
+      "ms": 157
+    },
+    {
+      "name": "Notification types include rental events",
+      "status": "pass",
+      "ms": 151
+    },
+    {
+      "name": "Unread count endpoint works",
+      "status": "pass",
+      "ms": 291
+    },
+    {
+      "name": "Badges catalog returns list",
+      "status": "pass",
+      "ms": 135
+    },
+    {
+      "name": "Luna has badges",
+      "status": "fail",
+      "ms": 129,
+      "error": "Expected 200, got 422"
+    },
+    {
+      "name": "Points summary exists",
+      "status": "pass",
+      "ms": 255
+    },
+    {
+      "name": "Helpboard summary loads",
+      "status": "pass",
+      "ms": 153
+    },
+    {
+      "name": "Helpboard posts paginate",
+      "status": "pass",
+      "ms": 160
+    },
+    {
+      "name": "Create helpboard post (need type)",
+      "status": "pass",
+      "ms": 208
+    },
+    {
+      "name": "Helpboard page renders",
+      "status": "pass",
+      "ms": 574
+    },
+    {
+      "name": "Workshop page shows contact gating for anonymous",
+      "status": "fail",
+      "ms": 2035,
+      "error": "No contact gating or telegram link found"
+    },
+    {
+      "name": "Item detail shows auction gating",
+      "status": "pass",
+      "ms": 409
+    },
+    {
+      "name": "Deposit endpoint exists",
+      "status": "pass",
+      "ms": 224
+    },
+    {
+      "name": "Review summary for Luna",
+      "status": "fail",
+      "ms": 207,
+      "error": "Expected 200, got 422"
+    },
+    {
+      "name": "Review summary for Jake",
+      "status": "fail",
+      "ms": 132,
+      "error": "Expected 200, got 422"
+    },
+    {
+      "name": "Onboarding schema includes tos_accepted",
+      "status": "pass",
+      "ms": 854
+    },
+    {
+      "name": "Items search by query",
+      "status": "pass",
+      "ms": 189
+    },
+    {
+      "name": "Items search by category",
+      "status": "pass",
+      "ms": 165
+    },
+    {
+      "name": "Users search by city",
+      "status": "pass",
+      "ms": 157
+    }
+  ]
+}

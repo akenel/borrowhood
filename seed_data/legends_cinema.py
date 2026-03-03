@@ -183,7 +183,7 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "ko", "proficiency": "intermediate"}
+            {"language_code": "ko", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Tang Soo Do", "category": "sports", "self_rating": 5, "years_experience": 60},
@@ -259,7 +259,7 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "fr", "proficiency": "intermediate"}
+            {"language_code": "fr", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Method Acting", "category": "art", "self_rating": 5, "years_experience": 50},
@@ -336,9 +336,9 @@ LEGENDS_CINEMA = [
         "languages": [
             {"language_code": "en", "proficiency": "native"},
             {"language_code": "nl", "proficiency": "native"},
-            {"language_code": "fr", "proficiency": "fluent"},
-            {"language_code": "it", "proficiency": "fluent"},
-            {"language_code": "es", "proficiency": "intermediate"}
+            {"language_code": "fr", "proficiency": "C2"},
+            {"language_code": "it", "proficiency": "C2"},
+            {"language_code": "es", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Screen Acting", "category": "art", "self_rating": 5, "years_experience": 40},
@@ -631,7 +631,7 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "ja", "proficiency": "native"},
-            {"language_code": "zh", "proficiency": "fluent"}
+            {"language_code": "zh", "proficiency": "C2"}
         ],
         "skills": [
             {"skill_name": "Samurai Swordsmanship", "category": "sports", "self_rating": 5, "years_experience": 45},
@@ -932,7 +932,7 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "fr", "proficiency": "intermediate"}
+            {"language_code": "fr", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Dramatic Acting", "category": "art", "self_rating": 5, "years_experience": 65},
@@ -1075,7 +1075,7 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "es", "proficiency": "intermediate"}
+            {"language_code": "es", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Film Directing", "category": "art", "self_rating": 5, "years_experience": 45},
@@ -1152,9 +1152,9 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "zh", "proficiency": "native"},
-            {"language_code": "en", "proficiency": "fluent"},
-            {"language_code": "ko", "proficiency": "intermediate"},
-            {"language_code": "ja", "proficiency": "intermediate"}
+            {"language_code": "en", "proficiency": "C2"},
+            {"language_code": "ko", "proficiency": "B1"},
+            {"language_code": "ja", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Kung Fu Comedy", "category": "sports", "self_rating": 5, "years_experience": 55},
@@ -1230,7 +1230,7 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "it", "proficiency": "intermediate"}
+            {"language_code": "it", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Film Directing", "category": "art", "self_rating": 5, "years_experience": 55},
@@ -1298,7 +1298,7 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "it", "proficiency": "intermediate"}
+            {"language_code": "it", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Method Acting", "category": "art", "self_rating": 5, "years_experience": 55},
@@ -1374,7 +1374,7 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "it", "proficiency": "intermediate"}
+            {"language_code": "it", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Method Acting", "category": "art", "self_rating": 5, "years_experience": 55},
@@ -1450,9 +1450,9 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "de", "proficiency": "intermediate"},
-            {"language_code": "it", "proficiency": "intermediate"},
-            {"language_code": "pl", "proficiency": "intermediate"}
+            {"language_code": "de", "proficiency": "B1"},
+            {"language_code": "it", "proficiency": "B1"},
+            {"language_code": "pl", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Character Transformation", "category": "art", "self_rating": 5, "years_experience": 50},
@@ -1670,8 +1670,8 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "it", "proficiency": "native"},
-            {"language_code": "en", "proficiency": "fluent"},
-            {"language_code": "fr", "proficiency": "fluent"}
+            {"language_code": "en", "proficiency": "C2"},
+            {"language_code": "fr", "proficiency": "C2"}
         ],
         "skills": [
             {"skill_name": "Screen Acting", "category": "art", "self_rating": 5, "years_experience": 65},
@@ -1748,9 +1748,9 @@ LEGENDS_CINEMA = [
         "languages": [
             {"language_code": "sv", "proficiency": "native"},
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "it", "proficiency": "fluent"},
-            {"language_code": "de", "proficiency": "fluent"},
-            {"language_code": "fr", "proficiency": "fluent"}
+            {"language_code": "it", "proficiency": "C2"},
+            {"language_code": "de", "proficiency": "C2"},
+            {"language_code": "fr", "proficiency": "C2"}
         ],
         "skills": [
             {"skill_name": "Screen Acting", "category": "art", "self_rating": 5, "years_experience": 45},
@@ -1894,7 +1894,7 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "fr", "proficiency": "intermediate"}
+            {"language_code": "fr", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Tap Dance", "category": "sports", "self_rating": 5, "years_experience": 55},
@@ -2112,7 +2112,7 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "fr", "proficiency": "intermediate"}
+            {"language_code": "fr", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Action Film Acting", "category": "art", "self_rating": 5, "years_experience": 35},
@@ -2189,7 +2189,7 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "cy", "proficiency": "intermediate"}
+            {"language_code": "cy", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Dramatic Acting", "category": "art", "self_rating": 5, "years_experience": 60},
@@ -2265,9 +2265,9 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "zh", "proficiency": "fluent"},
-            {"language_code": "de", "proficiency": "fluent"},
-            {"language_code": "fr", "proficiency": "fluent"}
+            {"language_code": "zh", "proficiency": "C2"},
+            {"language_code": "de", "proficiency": "C2"},
+            {"language_code": "fr", "proficiency": "C2"}
         ],
         "skills": [
             {"skill_name": "Screen Acting", "category": "art", "self_rating": 5, "years_experience": 35},
@@ -2336,7 +2336,7 @@ LEGENDS_CINEMA = [
         "languages": [
             {"language_code": "bn", "proficiency": "native"},
             {"language_code": "en", "proficiency": "native"},
-            {"language_code": "hi", "proficiency": "fluent"}
+            {"language_code": "hi", "proficiency": "C2"}
         ],
         "skills": [
             {"skill_name": "Film Directing", "category": "art", "self_rating": 5, "years_experience": 40},
@@ -2413,7 +2413,7 @@ LEGENDS_CINEMA = [
         "badge_tier": "legend",
         "languages": [
             {"language_code": "it", "proficiency": "native"},
-            {"language_code": "fr", "proficiency": "intermediate"}
+            {"language_code": "fr", "proficiency": "B1"}
         ],
         "skills": [
             {"skill_name": "Film Directing", "category": "art", "self_rating": 5, "years_experience": 45},
