@@ -69,6 +69,14 @@ class ItemCategory(str, enum.Enum):
     CUSTOM_ORDERS = "custom_orders"
     # Other
     OTHER = "other"
+    # Wave 2 legend categories
+    CRAFTS = "crafts"
+    EDUCATION = "education"
+    ENGINEERING = "engineering"
+    FOOD = "food"
+    OUTDOOR = "outdoor"
+    SCIENCE = "science"
+    TOOLS = "tools"
 
 
 CATEGORY_GROUPS = {
@@ -78,8 +86,9 @@ CATEGORY_GROUPS = {
     "creative": ["art", "music", "photography", "sewing"],
     "tech": ["electronics", "computers", "drones"],
     "spaces_transport": ["spaces", "vehicles"],
-    "services": ["repairs", "training_service", "custom_orders"],
-    "other": ["other"],
+    "services": ["repairs", "training_service", "custom_orders", "education"],
+    "science_engineering": ["science", "engineering"],
+    "other": ["other", "crafts", "food", "outdoor", "tools"],
 }
 
 
