@@ -82,6 +82,27 @@ async def run_migrations():
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS per_person_rate FLOAT",
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS max_participants INTEGER",
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS group_discount_pct FLOAT",
+        # 2026-03-03: Wave 2 legend workshop types
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'arena'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'camp'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'dock'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'dojo'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'forge'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'fortress'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'laboratory'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'lodge'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'observatory'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'palace'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'pavilion'",
+        "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'study'",
+        # 2026-03-03: Wave 2 legend item categories
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'crafts'",
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'education'",
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'engineering'",
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'food'",
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'outdoor'",
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'science'",
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'tools'",
     ]
     async with engine.begin() as conn:
         for sql in migrations:
