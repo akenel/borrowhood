@@ -15,10 +15,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
 from src.database import async_session, create_tables, get_db
-from src.routers import ai, auth, badges, bids, deposits, disputes, health, helpboard, items, listings, lockbox, notifications, onboarding, pages, payments, rentals, reports, reviews, service_quotes, skills, telegram, translation, users
+from src.routers import ai, auth, badges, bids, communities, deposits, disputes, health, helpboard, insurance, items, listings, lockbox, notifications, onboarding, pages, payments, rentals, reports, reviews, service_quotes, skills, telegram, translation, users
 from src.routers import qa as qa_router_mod
 from src.routers import backlog as backlog_router_mod
-from src.services.seeding import seed_database, seed_new_users, seed_new_items
+from src.services.seeding import seed_database, seed_new_users, seed_new_items, seed_default_community
 from src.services.qa_seeding import seed_qa_checklist
 from src.services.backlog_seeding import seed_backlog_data
 
@@ -65,6 +65,8 @@ def create_app() -> FastAPI:
     app.include_router(service_quotes.router)
     app.include_router(telegram.router)
     app.include_router(translation.router)
+    app.include_router(insurance.router)
+    app.include_router(communities.router)
 
     # Demo login (debug only)
     if settings.debug:
@@ -115,6 +117,8 @@ def create_app() -> FastAPI:
                 logger.info("Incremental user seed: %s", user_result)
                 result = await seed_new_items(db)
                 logger.info("Incremental item seed: %s", result)
+                community_result = await seed_default_community(db)
+                logger.info("Default community seed: %s", community_result)
 
         # Start Telegram bot if configured (skip placeholder tokens)
         if (settings.telegram_enabled

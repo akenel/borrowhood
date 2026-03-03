@@ -75,6 +75,10 @@ class BHPayment(BHBase, Base):
     provider_capture_id: Mapped[Optional[str]] = mapped_column(String(200))  # PayPal capture ID
     provider_refund_id: Mapped[Optional[str]] = mapped_column(String(200))
 
+    # Marketplace split (Stripe Connect)
+    platform_fee: Mapped[Optional[float]] = mapped_column(Float)
+    seller_payout_amount: Mapped[Optional[float]] = mapped_column(Float)
+
     # Refund tracking
     refund_amount: Mapped[Optional[float]] = mapped_column(Float)
     refund_reason: Mapped[Optional[str]] = mapped_column(Text)

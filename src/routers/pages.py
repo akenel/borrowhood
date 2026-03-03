@@ -683,6 +683,14 @@ async def demo_login_page(
     return _render("pages/demo_login.html", ctx)
 
 
+@router.get("/chat", response_class=HTMLResponse)
+async def chat_page(request: Request,
+                    token: Optional[dict] = Depends(get_current_user_token)):
+    """AI Concierge chat page. Backend: POST /api/v1/ai/concierge."""
+    ctx = _ctx(request, token)
+    return _render("pages/chat.html", ctx)
+
+
 @router.get("/terms", response_class=HTMLResponse)
 async def terms(request: Request,
                 token: Optional[dict] = Depends(get_current_user_token)):
