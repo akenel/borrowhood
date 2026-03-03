@@ -81,6 +81,12 @@ STYLE_MAP = {
     "nomad": "open-peeps",
     # Soul/gospel -- micah (soulful, warm colors)
     "soul": "micah",
+    # Cinema -- personas (dramatic faces)
+    "cinema": "personas",
+    # Warriors -- avataaars (bold, iconic)
+    "warriors": "avataaars",
+    # Inventors -- pixel-art (lab/tech aesthetic)
+    "inventors": "pixel-art",
 }
 
 
@@ -155,6 +161,49 @@ def get_style_category(user: dict) -> str:
     # Activist
     if any(k in slug for k in ["baldwin", "maya-angelou", "fela"]):
         return "activist"
+
+    # Cinema legends (Wave 9)
+    cinema_slugs = [
+        "bruces-dojo", "syds-screenplay", "chucks-training", "brandos-method",
+        "audreys-atelier", "bogarts-gin", "marilyns-mirror", "sidneys-stage",
+        "mifunes-sword", "kurosawas-editing", "hitchcocks-suspense", "kubricks-control",
+        "kates-rehearsal", "bettes-dressing", "welles-radio", "jackies-stunt",
+        "eastwoods-ranch", "deniros-workshop", "pacinos-stage", "streeps-transformation",
+        "denzels-stage", "freemans-porch", "sophias-cucina", "ingrids-dressing",
+        "mcqueens-garage", "kellys-dance", "astaires-dance", "gingers-rehearsal",
+        "keanus-dojo", "hopkins-painting", "annas-lantern", "rays-editing",
+        "fellinis-dream", "grants-drawing",
+    ]
+    if any(slug.startswith(c.split("-")[0]) or slug == c for c in cinema_slugs):
+        return "cinema"
+
+    # Warrior legends (Wave 10)
+    warrior_slugs = [
+        "spartacus", "leonidas", "alexanders-war", "hannibals", "caesars-war",
+        "boudiccas", "sun-tzu", "genghis", "joans-banner", "saladins",
+        "richards-crusader", "wallaces", "musashis", "shakas", "sitting-bull",
+        "geronimos", "attilas", "vercingetorix", "ragnars", "el-cid",
+        "tomoes", "khalids", "tecumsehs", "zhuge", "mulans",
+        "tubmans", "bolivars", "crazy-horse", "cleopatras", "tokugawas",
+        "achilles", "vlads", "lakshmibais", "samoris",
+    ]
+    if any(slug.startswith(w) for w in warrior_slugs):
+        return "warriors"
+
+    # Inventor legends (Wave 11)
+    inventor_slugs = [
+        "edisons", "bells-speaking", "orvilles", "wilburs-drafting",
+        "curies", "galileos", "gutenbergs", "watts-engine",
+        "franklins-printing", "einsteins", "newtons-principia", "faradays",
+        "lamarrs", "carvers-plant", "morses", "flemings-petri",
+        "pasteurs", "goddards", "marconis", "fords-assembly",
+        "walkers-beauty", "kwoleks", "franklins-xray", "carsons-field",
+        "nobels", "maxwells", "mendeleevs", "brailles",
+        "farnsworths", "whitneys", "darwins", "nightingales",
+        "heisenbergs", "listers",
+    ]
+    if any(slug.startswith(i) for i in inventor_slugs):
+        return "inventors"
 
     # Community members (original 34)
     if badge != "legend":
