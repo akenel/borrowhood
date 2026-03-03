@@ -7337,6 +7337,138 @@
         "helpful_flags": 28
       },
       "offers_training": true
+    },
+    {
+      "slug": "banksys-wall",
+      "display_name": "Banksy",
+      "email": "banksy@borrowhood.local",
+      "date_of_birth": "1974-01-01",
+      "mother_name": "Unknown -- and she's not telling either",
+      "father_name": "Unknown -- possibly a photocopier technician from Bristol, if you believe the rumors",
+      "workshop_name": "Banksy's Wall",
+      "workshop_type": "studio",
+      "tagline": "Art should comfort the disturbed and disturb the comfortable",
+      "bio": "Identity unknown. Probably from Bristol, England. Probably born around 1974. Probably male. Everything is probably because nobody knows for certain and that's the whole point. I started spraying stencils on walls in the 1990s. Girl with a Balloon. Flower Thrower. Kissing Coppers. Rat series. I put a painting through a shredder at auction the moment it sold for 1.4 million pounds -- it was titled Love is in the Bin after that, and then sold again for 25 million. I opened Dismaland, a dystopian theme park in Weston-super-Mare. I painted murals in Palestine, in New York, in New Orleans after Katrina. I am the most famous artist in the world and nobody knows what I look like. The art world hates that. Good. The art world is a playground for billionaires who confuse price tags with meaning. My art is free. It's on walls. It belongs to everyone who walks past it. The only crime is making art that nobody cares about.",
+      "telegram_username": "rat_stencil",
+      "city": "Bristol",
+      "country_code": "GB",
+      "latitude": 51.455,
+      "longitude": -2.588,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Stencil Art",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Social Commentary",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Anonymity",
+          "category": "other",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Spray Painting",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Installation Art",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 20
+        }
+      ],
+      "social_links": [],
+      "points": {
+        "total_points": 1900,
+        "rentals_completed": 52,
+        "reviews_given": 10,
+        "reviews_received": 65,
+        "items_listed": 8,
+        "helpful_flags": 40
+      },
+      "offers_training": true
+    },
+    {
+      "slug": "max-igans-crowhouse",
+      "display_name": "Max Igan",
+      "email": "max.igan@borrowhood.local",
+      "date_of_birth": "1967-01-01",
+      "mother_name": "Unknown -- Max keeps his family private, as any Skitso should",
+      "father_name": "Unknown -- same reason",
+      "workshop_name": "The Crowhouse",
+      "workshop_type": "other",
+      "tagline": "Music is the weapon of the future -- and the truth is the ammunition",
+      "bio": "Australian. Musician. Filmmaker. Truth-teller. Nomad. I ran The Crowhouse for over a decade -- broadcasting from wherever I happened to be, which eventually became everywhere because staying in one place became impossible. I was in Australia when they tried to lock the whole country down. I left. I've been moving ever since -- Central America, Mexico, wherever the signal reaches. No garage. No fixed workshop. Just a laptop, a camera, a microphone, and the stubborn belief that people deserve to know what's actually happening. I map the systems of control -- the financial system, the surveillance grid, the manipulation of perception. I don't tell people what to think. I show them the pattern and let them decide. The normies call me crazy. The psychos call me dangerous. The Skitsos just nod, because they already knew. 'We need to vote Skitsos into office.' That's not a joke. That's a survival strategy.",
+      "telegram_username": "crowhouse_max",
+      "city": "Nomad",
+      "country_code": "AU",
+      "latitude": -33.868,
+      "longitude": 151.209,
+      "badge_tier": "legend",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Documentary Filmmaking",
+          "category": "art",
+          "self_rating": 5,
+          "years_experience": 20
+        },
+        {
+          "skill_name": "Pattern Recognition",
+          "category": "other",
+          "self_rating": 5,
+          "years_experience": 25
+        },
+        {
+          "skill_name": "Guitar",
+          "category": "music",
+          "self_rating": 4,
+          "years_experience": 30
+        },
+        {
+          "skill_name": "Live Broadcasting",
+          "category": "other",
+          "self_rating": 5,
+          "years_experience": 15
+        },
+        {
+          "skill_name": "Surviving on the Road",
+          "category": "other",
+          "self_rating": 5,
+          "years_experience": 10
+        }
+      ],
+      "social_links": [],
+      "points": {
+        "total_points": 1200,
+        "rentals_completed": 30,
+        "reviews_given": 35,
+        "reviews_received": 45,
+        "items_listed": 4,
+        "helpful_flags": 40
+      },
+      "offers_training": true
     }
   ],
   "items": [
@@ -13788,6 +13920,99 @@
         }
       ],
       "owner_slug": "felas-shrine",
+      "content_language": "en",
+      "media": []
+    },
+    {
+      "name": "Stencil Making Workshop -- Your Message on Any Wall",
+      "slug": "stencil-making-workshop-message-wall",
+      "description": "I'll teach you to cut stencils, mix paint ratios, and get your message up in under sixty seconds. The art is in the preparation -- the execution takes less time than a traffic light. We practice on canvas first. What you do after that is your business. I never saw you. You were never here.",
+      "item_type": "service",
+      "category": "art",
+      "listings": [
+        {
+          "listing_type": "training",
+          "price": 0.0,
+          "price_unit": "free",
+          "currency": "EUR",
+          "notes": "Free. Always. If someone charges you for Banksy lessons, it's not Banksy."
+        }
+      ],
+      "owner_slug": "banksys-wall",
+      "content_language": "en",
+      "media": []
+    },
+    {
+      "name": "Professional Stencil Kit (Multi-Layer)",
+      "slug": "professional-stencil-kit-multi-layer",
+      "description": "Mylar sheets, precision craft knife, self-healing cutting mat, spray paint adaptor for even coverage. Everything you need to make multi-layer stencils that look like they were screenprinted. Also includes a hoodie. You'll need the hoodie.",
+      "item_type": "physical",
+      "category": "art",
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 5.0,
+          "price_unit": "per_day",
+          "currency": "EUR"
+        }
+      ],
+      "owner_slug": "banksys-wall",
+      "content_language": "en",
+      "media": []
+    },
+    {
+      "name": "Rat (Signed Print -- Or Is It?)",
+      "slug": "rat-signed-print-or-is-it",
+      "description": "A print of one of my rats. Signed. Or is it? That's the question with everything I make. Authentication in the art world is a racket. This print is real if you believe it's real. Isn't that how all art works? Comes with a certificate of ambiguity.",
+      "item_type": "physical",
+      "category": "art",
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 1.0,
+          "price_unit": "per_week",
+          "currency": "EUR",
+          "notes": "Display it. Enjoy it. Return it. Or don't. I'll deny it exists either way."
+        }
+      ],
+      "owner_slug": "banksys-wall",
+      "content_language": "en",
+      "media": []
+    },
+    {
+      "name": "Documentary Filmmaking Workshop -- Truth on a Budget",
+      "slug": "documentary-filmmaking-truth-budget",
+      "description": "You don't need a studio. You don't need a crew. You need a camera, a microphone, a laptop, and something worth saying. I'll teach you to research, script, edit, and publish a documentary that changes how people see the world. The mainstream won't touch your story? Good. Publish it yourself. That's what the internet is for.",
+      "item_type": "service",
+      "category": "art",
+      "listings": [
+        {
+          "listing_type": "training",
+          "price": 10.0,
+          "price_unit": "per_session",
+          "currency": "EUR"
+        }
+      ],
+      "owner_slug": "max-igans-crowhouse",
+      "content_language": "en",
+      "media": []
+    },
+    {
+      "name": "Mobile Broadcasting Kit (Laptop + Mic + Camera)",
+      "slug": "mobile-broadcasting-kit-laptop-mic",
+      "description": "Everything you need to broadcast from anywhere on Earth. Laptop, USB condenser mic, webcam with decent low-light, portable ring light, and a VPN because you'll need one. I've broadcast from jungles, hotel rooms, and the back of vans. The truth doesn't need a studio.",
+      "item_type": "physical",
+      "category": "tools",
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 15.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 100.0
+        }
+      ],
+      "owner_slug": "max-igans-crowhouse",
       "content_language": "en",
       "media": []
     }
