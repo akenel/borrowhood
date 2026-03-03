@@ -78,6 +78,10 @@ async def create_review(
 ):
     """Submit a review after a completed rental. Requires authentication."""
     user = await get_user(db, token)
+    # Eagerly load points for reputation update
+    await db.execute(
+        select(BHUser).options(selectinload(BHUser.points)).where(BHUser.id == user.id)
+    )
 
     # Verify rental exists and is completed
     result = await db.execute(
@@ -123,11 +127,11 @@ async def create_review(
     )
     db.add(review)
 
-    # Update reviewee's reputation points
-    reviewee_points = await db.execute(
-        select(BHUser).where(BHUser.id == data.reviewee_id)
+    # Update reviewee's reputation points (eagerly load points)
+    reviewee_result = await db.execute(
+        select(BHUser).options(selectinload(BHUser.points)).where(BHUser.id == data.reviewee_id)
     )
-    reviewee = reviewee_points.scalars().first()
+    reviewee = reviewee_result.scalars().first()
     if reviewee and reviewee.points:
         reviewee.points.reviews_received += 1
         reviewee.points.total_points += int(data.rating * weight)
