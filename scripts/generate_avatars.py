@@ -1,6 +1,8 @@
 """Generate unique avatar images for all BorrowHood members.
 
-Uses Pollinations AI (image.pollinations.ai) with varied art styles.
+Uses DiceBear API (api.dicebear.com) with 10 distinct styles mapped to
+user eras and personalities. Free, no auth, deterministic (seed-based).
+
 Stores images in MinIO. Updates avatar_url in Postgres.
 
 Run inside Docker network:
@@ -11,26 +13,21 @@ Or locally with env vars:
 """
 
 import asyncio
-import hashlib
 import io
 import json
 import logging
 import os
-import sys
-import time
 from pathlib import Path
-from urllib.parse import quote
 
 import httpx
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 logger = logging.getLogger(__name__)
 
-# Pollinations config
-POLLINATIONS_URL = "https://image.pollinations.ai"
-IMAGE_WIDTH = 512
-IMAGE_HEIGHT = 512
-DELAY_BETWEEN_REQUESTS = 4  # seconds -- be nice to Pollinations
+# DiceBear config
+DICEBEAR_URL = "https://api.dicebear.com/9.x"
+IMAGE_SIZE = 256  # DiceBear max PNG size
+DELAY_BETWEEN_REQUESTS = 1  # seconds -- polite but DiceBear is fast
 
 # MinIO config (from env or defaults for Docker network)
 MINIO_URL = os.environ.get("BH_MINIO_URL", "minio:9000")
@@ -45,160 +42,143 @@ DATABASE_URL = os.environ.get(
     "postgresql+asyncpg://helix_user:helix_pass@postgres:5432/borrowhood"
 )
 
-# Art style assignments based on era/personality
+# DiceBear style mapping -- each era/category gets a distinct visual style
+# Style reference: https://www.dicebear.com/styles/
 STYLE_MAP = {
-    # Ancient world -- mosaic, fresco, classical sculpture
-    "ancient": "ancient Greek mosaic portrait style, tessellated tiles, warm earth tones, classical face",
-    # Medieval -- illuminated manuscript
-    "medieval": "medieval illuminated manuscript portrait, gold leaf details, ornate border, tempera paint",
-    # Renaissance -- oil painting, chiaroscuro
-    "renaissance": "Renaissance oil painting portrait, sfumato technique, warm lighting, detailed features",
-    # Baroque -- dramatic, Rembrandt lighting
-    "baroque": "Baroque dramatic portrait, Rembrandt lighting, deep shadows, rich colors, oil paint",
-    # Classical music -- romantic, soft
-    "classical_music": "Romantic era portrait painting, soft focus, warm tones, dignified pose, oil on canvas",
-    # Impressionist -- Monet style, soft brush
-    "impressionist": "Impressionist portrait, visible brushstrokes, natural light, plein air style, soft focus",
-    # Literary -- bookish, thoughtful
-    "literary": "Victorian literary portrait, thoughtful expression, warm library lighting, sepia tones",
-    # Rock and roll -- gritty, high contrast
-    "rock": "gritty rock and roll portrait, high contrast black and white, dramatic shadows, analog film grain",
-    # Jazz/blues -- smoky, atmospheric
-    "jazz": "smoky jazz club portrait, blue and amber lighting, atmospheric, film noir style",
-    # Modern art -- bold, Warhol-esque
-    "modern_art": "bold pop art portrait, vibrant colors, screen print style, graphic composition",
-    # Computing -- retro terminal, green phosphor
-    "computing": "retro computing portrait, green phosphor terminal glow, pixel aesthetic, 1980s tech",
-    # Street art -- Banksy style stencil
-    "street_art": "street art stencil portrait, spray paint texture, concrete wall background, urban gritty",
-    # Contemporary -- clean, magazine quality
-    "contemporary": "contemporary magazine portrait, clean lighting, sharp detail, editorial photography style",
-    # Activist/truth -- raw documentary
-    "activist": "raw documentary portrait, natural light, unflinching gaze, photojournalism style",
-    # Community -- warm, friendly, neighborhood
-    "community": "warm neighborhood portrait, friendly expression, natural daylight, community feel, watercolor style",
-    # Swiss-Canadian/working class -- honest, rugged
-    "working_class": "honest working class portrait, weathered hands visible, workshop background, warm natural light",
-    # Nomad -- dusty road, freedom
-    "nomad": "nomadic traveler portrait, dusty golden hour light, open road background, weathered face",
-    # Soul/gospel -- church light, divine
-    "soul": "gospel church portrait, stained glass light, warm golden glow, soulful expression",
+    # Ancient world -- personas (classic human faces)
+    "ancient": "personas",
+    # Medieval -- lorelei (elegant, artistic)
+    "medieval": "lorelei",
+    # Renaissance -- lorelei (refined, dignified)
+    "renaissance": "lorelei",
+    # Baroque -- personas (dramatic faces)
+    "baroque": "personas",
+    # Classical music -- notionists (clean, sophisticated)
+    "classical_music": "notionists",
+    # Impressionist -- open-peeps (sketchy, artistic)
+    "impressionist": "open-peeps",
+    # Literary -- big-ears (expressive, thoughtful)
+    "literary": "big-ears",
+    # Rock and roll -- avataaars (bold, iconic)
+    "rock": "avataaars",
+    # Jazz/blues -- micah (colorful, vibrant)
+    "jazz": "micah",
+    # Modern art -- micah (bold colors, graphic)
+    "modern_art": "micah",
+    # Computing -- pixel-art (retro tech)
+    "computing": "pixel-art",
+    # Street art -- bottts (robotic, urban)
+    "street_art": "bottts",
+    # Contemporary -- notionists (modern, clean)
+    "contemporary": "notionists",
+    # Activist -- adventurer (warm, human)
+    "activist": "adventurer",
+    # Community -- adventurer (friendly, approachable)
+    "community": "adventurer",
+    # Working class -- big-ears (honest, expressive)
+    "working_class": "big-ears",
+    # Nomad -- open-peeps (free, sketchy)
+    "nomad": "open-peeps",
+    # Soul/gospel -- micah (soulful, warm colors)
+    "soul": "micah",
 }
 
-# Map each user slug to an art style
-def get_style_for_user(user: dict) -> str:
-    """Pick art style based on user's era, skills, or category."""
+
+def get_style_category(user: dict) -> str:
+    """Pick style category based on user's era, skills, or personality."""
     slug = user.get("slug", "")
-    bio = user.get("bio", "").lower()
-    skills = [s.get("category", "") for s in user.get("skills", [])]
     badge = user.get("badge_tier", "newcomer")
 
     # Specific matches first
     if "banksy" in slug:
-        return STYLE_MAP["street_art"]
+        return "street_art"
     if "crowhouse" in slug or "max-igan" in slug:
-        return STYLE_MAP["nomad"]
+        return "nomad"
     if any(k in slug for k in ["kenel", "daves-fix", "marios-exc", "pauls-golf"]):
-        return STYLE_MAP["working_class"]
+        return "working_class"
     if "angel-hq" in slug:
-        return STYLE_MAP["working_class"]
+        return "working_class"
 
     # Computing legends
     if any(k in slug for k in ["grace", "turing", "ada", "babbage", "shannon", "ritchie",
                                  "thompson", "linus", "berners", "cerf", "neumann", "pascal",
                                  "leonardo", "khwarizmi"]):
-        return STYLE_MAP["computing"]
+        return "computing"
 
     # Rock legends
     if any(k in slug for k in ["rosetta", "johnson", "chuck", "little-richard", "fats-domino",
                                  "muddy", "elvis", "buddy", "jerry", "bo-diddley", "hendrix"]):
-        return STYLE_MAP["rock"]
+        return "rock"
 
     # Jazz/blues/soul
     if any(k in slug for k in ["armstrong", "ellington", "billie", "miles", "nina-simone",
                                  "ella-fitz", "aretha", "ray"]):
-        return STYLE_MAP["jazz"]
+        return "jazz"
     if "marley" in slug:
-        return STYLE_MAP["soul"]
+        return "soul"
 
     # Ancient
     if any(k in slug for k in ["homer", "sappho", "euclid", "archimedes", "hypatia"]):
-        return STYLE_MAP["ancient"]
+        return "ancient"
 
     # Medieval/Renaissance
     if any(k in slug for k in ["rumi", "dante"]):
-        return STYLE_MAP["medieval"]
+        return "medieval"
     if any(k in slug for k in ["michelangelo", "shakespeare", "leonardo"]):
-        return STYLE_MAP["renaissance"]
+        return "renaissance"
 
     # Baroque
     if any(k in slug for k in ["caravaggio", "rembrandt", "bach"]):
-        return STYLE_MAP["baroque"]
+        return "baroque"
 
     # Classical music
     if any(k in slug for k in ["mozart", "beethoven", "chopin", "tchaikovsky", "stravinsky"]):
-        return STYLE_MAP["classical_music"]
+        return "classical_music"
 
     # Impressionist
     if any(k in slug for k in ["monet", "van-gogh", "klimt"]):
-        return STYLE_MAP["impressionist"]
+        return "impressionist"
 
     # Literary
     if any(k in slug for k in ["twain", "dickens", "tolstoy", "dumas", "emily-dickinson",
                                  "toni-morrison", "garcia-marquez", "borges"]):
-        return STYLE_MAP["literary"]
+        return "literary"
 
     # Modern art
     if any(k in slug for k in ["picasso", "frida", "okeeffe"]):
-        return STYLE_MAP["modern_art"]
+        return "modern_art"
 
     # Contemporary
-    if any(k in slug for k in ["dylan", "bowie", "leonard", "joni", "chaplin"]):
-        return STYLE_MAP["contemporary"]
+    if any(k in slug for k in ["dylan", "bowie", "leonard", "joni", "chaplin", "tesla"]):
+        return "contemporary"
 
     # Activist
     if any(k in slug for k in ["baldwin", "maya-angelou", "fela"]):
-        return STYLE_MAP["activist"]
+        return "activist"
 
     # Community members (original 34)
     if badge != "legend":
-        return STYLE_MAP["community"]
+        return "community"
 
-    # Default
-    return STYLE_MAP["contemporary"]
-
-
-def build_avatar_prompt(user: dict) -> str:
-    """Build a unique Pollinations prompt for a user's avatar."""
-    name = user.get("display_name", "Unknown")
-    workshop = user.get("workshop_name", "")
-    bio = user.get("bio", "")[:150]
-    style = get_style_for_user(user)
-
-    # For Banksy -- no face
-    if "banksy" in user.get("slug", ""):
-        return f"mysterious hooded figure in shadow, face hidden, holding spray paint can, {style}, portrait format, no text"
-
-    # For anonymous/unknown identity
-    if "unknown" in name.lower():
-        return f"enigmatic silhouette portrait, {style}, portrait format, no text"
-
-    # Build the prompt
-    prompt = f"portrait of {name}, {style}, portrait format, centered face, no text, no watermark"
-    return prompt
+    # Default for uncategorized legends
+    return "contemporary"
 
 
-async def download_image(client: httpx.AsyncClient, prompt: str) -> bytes | None:
-    """Download image from Pollinations. Returns bytes or None."""
-    encoded = quote(prompt)
-    url = f"{POLLINATIONS_URL}/{encoded}?width={IMAGE_WIDTH}&height={IMAGE_HEIGHT}&model=flux&nologo=true&seed={hash(prompt) % 999999}"
+def get_dicebear_url(slug: str, style: str) -> str:
+    """Build DiceBear API URL for a user's avatar."""
+    return f"{DICEBEAR_URL}/{style}/png?seed={slug}&size={IMAGE_SIZE}&radius=50"
+
+
+async def download_avatar(client: httpx.AsyncClient, slug: str, style: str) -> bytes | None:
+    """Download avatar from DiceBear. Returns bytes or None."""
+    url = get_dicebear_url(slug, style)
     try:
-        resp = await client.get(url, follow_redirects=True, timeout=60.0)
-        if resp.status_code == 200 and len(resp.content) > 1000:
+        resp = await client.get(url, follow_redirects=True, timeout=30.0)
+        if resp.status_code == 200 and len(resp.content) > 500:
             return resp.content
-        logger.warning(f"Pollinations returned {resp.status_code}, {len(resp.content)} bytes")
+        logger.warning(f"DiceBear returned {resp.status_code}, {len(resp.content)} bytes for {slug}")
     except Exception as e:
-        logger.warning(f"Pollinations download failed: {e}")
+        logger.warning(f"DiceBear download failed for {slug}: {e}")
     return None
 
 
@@ -236,10 +216,8 @@ def upload_to_minio(slug: str, image_data: bytes) -> str | None:
 
 async def update_avatar_url(slug: str, avatar_url: str):
     """Update avatar_url in the database for a user."""
-    # Use raw asyncpg for simplicity (no SQLAlchemy needed)
     try:
         import asyncpg
-        # Parse DATABASE_URL for asyncpg (strip the +asyncpg part)
         dsn = DATABASE_URL.replace("postgresql+asyncpg://", "postgresql://")
         conn = await asyncpg.connect(dsn)
         await conn.execute(
@@ -253,7 +231,6 @@ async def update_avatar_url(slug: str, avatar_url: str):
 
 async def generate_all_avatars():
     """Main function: generate avatars for all BH members."""
-    # Load seed data to get user info for prompt building
     seed_path = Path(__file__).parent.parent / "seed_data" / "seed.json"
     with open(seed_path) as f:
         data = json.load(f)
@@ -273,7 +250,6 @@ async def generate_all_avatars():
         )
         if client.bucket_exists(MINIO_BUCKET):
             for obj in client.list_objects(MINIO_BUCKET, prefix="avatars/", recursive=True):
-                # Extract slug from avatars/{slug}.png
                 name = obj.object_name.replace("avatars/", "").replace(".png", "")
                 existing_avatars.add(name)
             logger.info(f"Found {len(existing_avatars)} existing avatars in MinIO")
@@ -288,34 +264,41 @@ async def generate_all_avatars():
         logger.info("All avatars already exist. Nothing to do.")
         return
 
+    # Show style distribution
+    style_counts = {}
+    for u in todo:
+        cat = get_style_category(u)
+        style = STYLE_MAP[cat]
+        style_counts[style] = style_counts.get(style, 0) + 1
+    logger.info(f"Style distribution: {dict(sorted(style_counts.items()))}")
+
     generated = 0
     failed = 0
 
     async with httpx.AsyncClient() as client:
         for i, user in enumerate(todo):
             slug = user["slug"]
-            prompt = build_avatar_prompt(user)
-            logger.info(f"[{i+1}/{len(todo)}] {slug} -- generating...")
+            category = get_style_category(user)
+            style = STYLE_MAP[category]
+            logger.info(f"[{i+1}/{len(todo)}] {slug} ({category} -> {style})")
 
-            image_data = await download_image(client, prompt)
+            image_data = await download_avatar(client, slug, style)
             if image_data:
                 object_name = upload_to_minio(slug, image_data)
                 if object_name:
-                    # Store as MinIO path -- app will serve via /media/ proxy or direct URL
                     avatar_url = f"/media/{MINIO_BUCKET}/{object_name}"
                     await update_avatar_url(slug, avatar_url)
                     generated += 1
-                    logger.info(f"  OK: {slug} ({len(image_data)} bytes) -> {avatar_url}")
+                    logger.info(f"  OK: {len(image_data)} bytes -> {avatar_url}")
                 else:
                     failed += 1
                     logger.warning(f"  FAIL (MinIO): {slug}")
             else:
                 failed += 1
-                logger.warning(f"  FAIL (Pollinations): {slug}")
+                logger.warning(f"  FAIL (DiceBear): {slug}")
 
-            # Be nice -- don't flood
+            # Polite delay
             if i < len(todo) - 1:
-                logger.info(f"  Waiting {DELAY_BETWEEN_REQUESTS}s...")
                 await asyncio.sleep(DELAY_BETWEEN_REQUESTS)
 
     logger.info(f"DONE: {generated} generated, {failed} failed, {len(existing_avatars)} already existed")
