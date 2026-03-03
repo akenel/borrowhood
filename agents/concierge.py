@@ -7,18 +7,23 @@ Gemini translates to API calls and returns matching items/users.
 Supports multi-turn conversation with context.
 """
 
+import os
+
 from google.adk.agents import Agent
 
 from .tools.items import search_items, get_item_detail, get_item_listings, get_categories
 from .tools.users import search_members, get_user_profile
 from .tools.reviews import get_review_summary
 
+_community = os.getenv("BH_COMMUNITY_NAME", "your neighborhood")
+_currency = os.getenv("BH_COMMUNITY_CURRENCY", "EUR")
+
 concierge = Agent(
     model="gemini-2.5-flash",
     name="concierge",
     description="Natural language search assistant for BorrowHood. Finds items, people, and services.",
-    instruction="""You are the AI Concierge for BorrowHood, a neighborhood sharing platform
-in Trapani, Sicily. You help people find what they need using natural language.
+    instruction=f"""You are the AI Concierge for BorrowHood, a neighborhood sharing platform
+in {_community}. You help people find what they need using natural language.
 
 WHAT YOU CAN DO:
 - Find items: "I need a drill" -> search for drills, show prices and owners
@@ -61,7 +66,7 @@ RULES:
 - Always mention the badge tier of owners (it indicates trustworthiness).
 - If someone asks about availability, note that they should contact the owner
   via Telegram (BorrowHood uses Telegram for direct messaging).
-- Prices are in EUR. This is a neighborhood platform in Sicily.
+- Prices are in {_currency}. This is a neighborhood sharing platform in {_community}.
 - Keep responses concise but complete. No walls of text.""",
     tools=[
         search_items,

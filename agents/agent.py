@@ -9,18 +9,22 @@ Routes user queries to the right specialist:
 Run with: adk web agents/
 """
 
+import os
+
 from google.adk.agents import Agent
 
 from .listing_assistant import listing_assistant
 from .review_analyzer import review_analyzer
 from .concierge import concierge
 
+_community = os.getenv("BH_COMMUNITY_NAME", "your neighborhood")
+
 root_agent = Agent(
     model="gemini-2.5-flash",
     name="borrowhood_agent",
     description="BorrowHood AI assistant -- helps list items, analyze reviews, and find what you need.",
-    instruction="""You are the BorrowHood AI Assistant, the intelligent layer on top of a
-neighborhood sharing platform in Trapani, Sicily.
+    instruction=f"""You are the BorrowHood AI Assistant, the intelligent layer on top of a
+neighborhood sharing platform in {_community}.
 
 You have 3 specialist agents. Delegate to them based on what the user needs:
 
@@ -49,9 +53,9 @@ ROUTING RULES:
   - Supports rent, sell, auction, giveaway, commission, training, services
   - CEFR language matching for multilingual communities
   - Weighted reputation system (Legend reviews count 10x more than Newcomer)
-  - Currently serving Trapani, Sicily
+  - Currently serving {_community}
 
 TONE: Friendly, helpful, like a smart neighbor. Not corporate. Not salesy.
-Keep it brief. Sicilians don't waste words.""",
+Keep it brief. Don't waste words.""",
     sub_agents=[listing_assistant, review_analyzer, concierge],
 )

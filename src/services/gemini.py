@@ -1,20 +1,27 @@
-"""Gemini AI service for BorrowHood.
+"""Multi-provider AI service for BorrowHood.
 
-Uses Google's Gemini API (gemini-2.5-flash) for:
-- Smart listing generation (richer than Pollinations)
-- Review sentiment analysis with weighted reputation
-- Natural language concierge search
+Provider cascade (configurable via BH_AI_PROVIDER):
+  auto     -> gemini -> ollama -> pollinations -> template fallback
+  gemini   -> gemini only (fails gracefully if unavailable)
+  ollama   -> ollama only
+  pollinations -> pollinations only
 
-Falls back to existing Pollinations/template generators on failure.
+Gemini:       Google API, free tier 20 req/day -- use for competitions/demos
+Ollama Turbo: Self-hosted, 20+ models, unlimited, turbo speeds -- daily workhorse
+Pollinations: Free cloud API, no key needed -- always-on fallback
+
+"We do Google for money, but we run Pollinations and Ollama Turbo."
 """
 
 import json
 import logging
 from typing import Optional
 
+import httpx
+
 logger = logging.getLogger(__name__)
 
-# Lazy import -- google-genai may not be installed in all environments
+# Lazy imports -- google-genai may not be installed in all environments
 _genai = None
 
 # Valid categories (must match src/models/item.py)
@@ -33,6 +40,8 @@ REVIEW_WEIGHTS = {
     "PILLAR": 8.0, "LEGEND": 10.0,
 }
 
+POLLINATIONS_TEXT_URL = "https://text.pollinations.ai/"
+
 
 def _get_settings():
     """Lazy import of app settings."""
@@ -40,13 +49,15 @@ def _get_settings():
     return settings
 
 
-def _get_client():
+# ── Provider clients ─────────────────────────────────────────────────
+
+
+def _get_gemini_client():
     """Create Gemini client if API key is configured."""
     global _genai
     s = _get_settings()
 
     if not s.google_api_key:
-        logger.warning("BH_GOOGLE_API_KEY not set -- Gemini features disabled")
         return None
 
     if _genai is None:
@@ -54,14 +65,32 @@ def _get_client():
             from google import genai as genai_module
             _genai = genai_module
         except ImportError:
-            logger.warning("google-genai not installed -- Gemini features disabled")
+            logger.warning("google-genai not installed -- Gemini disabled")
             return None
 
     return _genai.Client(api_key=s.google_api_key)
 
 
+def _get_provider_order() -> list:
+    """Return ordered list of providers to try based on BH_AI_PROVIDER setting."""
+    s = _get_settings()
+    provider = s.ai_provider.lower().strip()
+
+    if provider == "gemini":
+        return ["gemini"]
+    elif provider == "ollama":
+        return ["ollama"]
+    elif provider == "pollinations":
+        return ["pollinations"]
+    else:  # "auto" or anything else
+        return ["gemini", "ollama", "pollinations"]
+
+
+# ── JSON parsing ─────────────────────────────────────────────────────
+
+
 def _parse_json_from_text(text: str) -> Optional[dict]:
-    """Extract JSON object from Gemini response text."""
+    """Extract JSON object from AI response text."""
     # Strip markdown code fences
     if "```" in text:
         lines = text.split("\n")
@@ -85,23 +114,78 @@ def _parse_json_from_text(text: str) -> Optional[dict]:
     return None
 
 
-async def smart_listing(
-    name: str,
-    category: str = "",
-    item_type: str = "physical",
-    language: str = "en",
-    similar_items: list = None,
-) -> Optional[dict]:
-    """Generate a complete listing using Gemini.
+# ── Ollama helpers ───────────────────────────────────────────────────
 
-    Returns rich listing data (title, description, category, price, deposit,
-    story, tags) or None if Gemini is unavailable.
-    """
-    client = _get_client()
-    if not client:
+
+async def _ollama_generate(prompt: str, json_mode: bool = True) -> Optional[str]:
+    """Call Ollama /api/generate. Returns raw text response or None."""
+    s = _get_settings()
+    if not s.ollama_url:
         return None
 
-    # Build context about similar items for price calibration
+    payload = {
+        "model": s.ollama_model,
+        "prompt": prompt,
+        "stream": False,
+    }
+    if json_mode:
+        payload["format"] = "json"
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                f"{s.ollama_url}/api/generate",
+                json=payload,
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                return data.get("response", "")
+    except Exception as e:
+        logger.warning("Ollama API failed: %s", e)
+    return None
+
+
+# ── Pollinations helpers ─────────────────────────────────────────────
+
+
+async def _pollinations_generate(prompt: str, json_mode: bool = True) -> Optional[str]:
+    """Call Pollinations.ai text API. Returns raw text response or None."""
+    messages = [{"role": "user", "content": prompt}]
+    if json_mode:
+        messages.insert(0, {
+            "role": "system",
+            "content": "You are a helpful assistant. Reply only with valid JSON.",
+        })
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.post(
+                POLLINATIONS_TEXT_URL,
+                json={
+                    "messages": messages,
+                    "model": "openai",
+                    "jsonMode": json_mode,
+                },
+            )
+            if resp.status_code == 200:
+                return resp.text.strip()
+    except Exception as e:
+        logger.warning("Pollinations API failed: %s", e)
+    return None
+
+
+# ── Smart Listing ────────────────────────────────────────────────────
+
+
+def _build_listing_prompt(
+    name: str, category: str, item_type: str, language: str,
+    similar_items: list = None,
+) -> str:
+    """Build the listing prompt used by all providers."""
+    s = _get_settings()
+    community = s.community_name
+    currency = s.community_currency
+
     similar_context = ""
     if similar_items:
         similar_context = "\n\nSIMILAR ITEMS ON THE PLATFORM (for price calibration):\n"
@@ -110,8 +194,8 @@ async def smart_listing(
 
     categories_str = ", ".join(CATEGORIES)
 
-    prompt = f"""You are the Smart Listing Assistant for BorrowHood, a neighborhood sharing platform
-in Trapani, Sicily. Generate a complete listing from the item info below.
+    return f"""You are the Smart Listing Assistant for BorrowHood, a neighborhood sharing platform
+in {community}. Generate a complete listing from the item info below.
 
 Item name: {name}
 Category hint: {category or 'auto-detect'}
@@ -123,7 +207,7 @@ VALID CATEGORIES: {categories_str}
 
 RULES:
 - The Grandma Test: if an 83-year-old can't understand it, rewrite it.
-- Prices should be fair for a neighborhood. EUR 3-15/day for most tools.
+- Prices should be fair for a neighborhood. {currency} 3-15/day for most tools.
 - Write descriptions like a neighbor, not a salesperson.
 - Match the user's language ({language}).
 
@@ -143,6 +227,12 @@ Reply ONLY with this JSON:
   "story_suggestion": "one sentence about the item character"
 }}"""
 
+
+async def _smart_listing_gemini(prompt: str) -> Optional[dict]:
+    """Try Gemini for smart listing."""
+    client = _get_gemini_client()
+    if not client:
+        return None
     try:
         response = client.models.generate_content(
             model=_get_settings().gemini_model,
@@ -150,47 +240,77 @@ Reply ONLY with this JSON:
         )
         data = _parse_json_from_text(response.text)
         if data and "title" in data and "description" in data:
-            # Validate category
-            if data.get("category") not in CATEGORIES:
-                data["category"] = category or "hand_tools"
             return data
         logger.warning("Gemini smart_listing: invalid JSON response")
     except Exception as e:
         logger.warning("Gemini smart_listing failed: %s", e)
-
     return None
 
 
-async def review_analysis(
-    user_name: str,
-    badge_tier: str,
-    reviews: list,
-    review_count: int = 0,
-    average_rating: float = 0.0,
-) -> Optional[dict]:
-    """Analyze reviews for a user using Gemini.
+async def _smart_listing_ollama(prompt: str) -> Optional[dict]:
+    """Try Ollama for smart listing."""
+    text = await _ollama_generate(prompt, json_mode=True)
+    if text:
+        data = _parse_json_from_text(text)
+        if data and "title" in data and "description" in data:
+            return data
+        logger.warning("Ollama smart_listing: invalid JSON response")
+    return None
 
-    Returns sentiment breakdown, fake review flags, keywords, and summary.
+
+async def _smart_listing_pollinations(prompt: str) -> Optional[dict]:
+    """Try Pollinations for smart listing."""
+    text = await _pollinations_generate(prompt, json_mode=True)
+    if text:
+        data = _parse_json_from_text(text)
+        if data and "title" in data and "description" in data:
+            return data
+        logger.warning("Pollinations smart_listing: invalid JSON response")
+    return None
+
+
+async def smart_listing(
+    name: str,
+    category: str = "",
+    item_type: str = "physical",
+    language: str = "en",
+    similar_items: list = None,
+) -> tuple[Optional[dict], str]:
+    """Generate a complete listing using the AI provider cascade.
+
+    Returns (listing_data, provider_name) or (None, "none").
     """
-    client = _get_client()
-    if not client:
-        return None
+    prompt = _build_listing_prompt(name, category, item_type, language, similar_items)
 
-    if not reviews:
-        return {
-            "user_name": user_name,
-            "badge_tier": badge_tier,
-            "total_reviews": 0,
-            "sentiment": {"positive": 0, "neutral": 0, "negative": 0},
-            "average_rating": 0.0,
-            "weighted_average": 0.0,
-            "fake_review_flags": [],
-            "skill_insights": [],
-            "top_keywords": {"positive": [], "negative": []},
-            "summary": f"{user_name} has no reviews yet. Complete some rentals to start building reputation.",
-        }
+    providers = _get_provider_order()
+    dispatch = {
+        "gemini": _smart_listing_gemini,
+        "ollama": _smart_listing_ollama,
+        "pollinations": _smart_listing_pollinations,
+    }
 
-    # Format reviews for Gemini
+    for provider in providers:
+        fn = dispatch.get(provider)
+        if fn:
+            result = await fn(prompt)
+            if result:
+                # Validate category
+                if result.get("category") not in CATEGORIES:
+                    result["category"] = category or "hand_tools"
+                logger.info("smart_listing served by %s", provider)
+                return result, provider
+
+    return None, "none"
+
+
+# ── Review Analysis ──────────────────────────────────────────────────
+
+
+def _build_review_prompt(
+    user_name: str, badge_tier: str, reviews: list,
+    review_count: int, average_rating: float,
+) -> str:
+    """Build the review analysis prompt used by all providers."""
     reviews_text = ""
     for r in reviews:
         reviews_text += (
@@ -205,7 +325,7 @@ async def review_analysis(
 
     weights_text = ", ".join(f"{k}={v}x" for k, v in REVIEW_WEIGHTS.items())
 
-    prompt = f"""Analyze reviews for {user_name} (badge tier: {badge_tier}).
+    return f"""Analyze reviews for {user_name} (badge tier: {badge_tier}).
 
 REVIEW WEIGHT SYSTEM: {weights_text}
 A review from a Legend carries 10x the weight of a Newcomer.
@@ -234,6 +354,12 @@ Reply ONLY with this JSON:
   "summary": "..."
 }}"""
 
+
+async def _review_gemini(prompt: str) -> Optional[dict]:
+    """Try Gemini for review analysis."""
+    client = _get_gemini_client()
+    if not client:
+        return None
     try:
         response = client.models.generate_content(
             model=_get_settings().gemini_model,
@@ -245,24 +371,86 @@ Reply ONLY with this JSON:
         logger.warning("Gemini review_analysis: invalid JSON response")
     except Exception as e:
         logger.warning("Gemini review_analysis failed: %s", e)
-
     return None
 
 
-async def concierge_search(
-    query: str,
-    language: str = "en",
-    items: list = None,
-    members: list = None,
-) -> Optional[dict]:
-    """Natural language search interpretation using Gemini.
+async def _review_ollama(prompt: str) -> Optional[dict]:
+    """Try Ollama for review analysis."""
+    text = await _ollama_generate(prompt, json_mode=True)
+    if text:
+        data = _parse_json_from_text(text)
+        if data and "summary" in data:
+            return data
+        logger.warning("Ollama review_analysis: invalid JSON response")
+    return None
 
-    Given search results from the database, Gemini formats a friendly response
-    with match reasons and suggestions.
+
+async def _review_pollinations(prompt: str) -> Optional[dict]:
+    """Try Pollinations for review analysis."""
+    text = await _pollinations_generate(prompt, json_mode=True)
+    if text:
+        data = _parse_json_from_text(text)
+        if data and "summary" in data:
+            return data
+        logger.warning("Pollinations review_analysis: invalid JSON response")
+    return None
+
+
+async def review_analysis(
+    user_name: str,
+    badge_tier: str,
+    reviews: list,
+    review_count: int = 0,
+    average_rating: float = 0.0,
+) -> tuple[Optional[dict], str]:
+    """Analyze reviews using the AI provider cascade.
+
+    Returns (analysis_data, provider_name) or (None, "none").
     """
-    client = _get_client()
-    if not client:
-        return None
+    if not reviews:
+        return {
+            "user_name": user_name,
+            "badge_tier": badge_tier,
+            "total_reviews": 0,
+            "sentiment": {"positive": 0, "neutral": 0, "negative": 0},
+            "average_rating": 0.0,
+            "weighted_average": 0.0,
+            "fake_review_flags": [],
+            "skill_insights": [],
+            "top_keywords": {"positive": [], "negative": []},
+            "summary": f"{user_name} has no reviews yet. Complete some rentals to start building reputation.",
+        }, "template"
+
+    prompt = _build_review_prompt(user_name, badge_tier, reviews, review_count, average_rating)
+
+    providers = _get_provider_order()
+    dispatch = {
+        "gemini": _review_gemini,
+        "ollama": _review_ollama,
+        "pollinations": _review_pollinations,
+    }
+
+    for provider in providers:
+        fn = dispatch.get(provider)
+        if fn:
+            result = await fn(prompt)
+            if result:
+                logger.info("review_analysis served by %s", provider)
+                return result, provider
+
+    return None, "none"
+
+
+# ── Concierge Search ─────────────────────────────────────────────────
+
+
+def _build_concierge_prompt(
+    query: str, language: str,
+    items: list = None, members: list = None,
+) -> str:
+    """Build the concierge prompt used by all providers."""
+    s = _get_settings()
+    community = s.community_name
 
     items_text = "No matching items found."
     if items:
@@ -284,8 +472,8 @@ async def concierge_search(
                 f"languages: {lang_str})\n"
             )
 
-    prompt = f"""You are the AI Concierge for BorrowHood, a neighborhood sharing platform
-in Trapani, Sicily. A user searched for: "{query}"
+    return f"""You are the AI Concierge for BorrowHood, a neighborhood sharing platform
+in {community}. A user searched for: "{query}"
 
 {items_text}
 {members_text}
@@ -302,6 +490,12 @@ Reply ONLY with this JSON:
   "suggestions": ["follow-up suggestion 1", "follow-up suggestion 2"]
 }}"""
 
+
+async def _concierge_gemini(prompt: str) -> Optional[dict]:
+    """Try Gemini for concierge search."""
+    client = _get_gemini_client()
+    if not client:
+        return None
     try:
         response = client.models.generate_content(
             model=_get_settings().gemini_model,
@@ -313,5 +507,56 @@ Reply ONLY with this JSON:
         logger.warning("Gemini concierge_search: invalid JSON response")
     except Exception as e:
         logger.warning("Gemini concierge_search failed: %s", e)
-
     return None
+
+
+async def _concierge_ollama(prompt: str) -> Optional[dict]:
+    """Try Ollama for concierge search."""
+    text = await _ollama_generate(prompt, json_mode=True)
+    if text:
+        data = _parse_json_from_text(text)
+        if data and "response" in data:
+            return data
+        logger.warning("Ollama concierge_search: invalid JSON response")
+    return None
+
+
+async def _concierge_pollinations(prompt: str) -> Optional[dict]:
+    """Try Pollinations for concierge search."""
+    text = await _pollinations_generate(prompt, json_mode=True)
+    if text:
+        data = _parse_json_from_text(text)
+        if data and "response" in data:
+            return data
+        logger.warning("Pollinations concierge_search: invalid JSON response")
+    return None
+
+
+async def concierge_search(
+    query: str,
+    language: str = "en",
+    items: list = None,
+    members: list = None,
+) -> tuple[Optional[dict], str]:
+    """Natural language search using the AI provider cascade.
+
+    Returns (search_data, provider_name) or (None, "none").
+    """
+    prompt = _build_concierge_prompt(query, language, items, members)
+
+    providers = _get_provider_order()
+    dispatch = {
+        "gemini": _concierge_gemini,
+        "ollama": _concierge_ollama,
+        "pollinations": _concierge_pollinations,
+    }
+
+    for provider in providers:
+        fn = dispatch.get(provider)
+        if fn:
+            result = await fn(prompt)
+            if result:
+                logger.info("concierge_search served by %s", provider)
+                return result, provider
+
+    return None, "none"

@@ -17,6 +17,13 @@ class BHSettings(BaseSettings):
     debug: bool = False
     log_level: str = "INFO"
 
+    # Community (local-global: change these per deployment)
+    community_name: str = "Trapani, Sicily"  # e.g. "Portland, Oregon" or "Zurich"
+    community_country: str = "IT"  # ISO 3166-1 alpha-2
+    community_currency: str = "EUR"  # ISO 4217
+    community_timezone: str = "Europe/Rome"
+    community_tagline: str = "Built from a camper van in Trapani, Sicily, 2026."
+
     # Database
     database_url: str = "postgresql+asyncpg://borrowhood:borrowhood_pass@localhost:5432/borrowhood"
 
@@ -43,10 +50,18 @@ class BHSettings(BaseSettings):
     paypal_mode: str = "sandbox"  # "sandbox" or "live"
     paypal_merchant_email: str = "angel.kenel@gmail.com"
 
-    # Google
+    # AI Provider cascade: "auto" tries gemini -> ollama -> pollinations -> template
+    # Set to "gemini", "ollama", or "pollinations" to force a single provider
+    ai_provider: str = "auto"
+
+    # Google Gemini
     google_maps_api_key: str = ""
     google_api_key: str = ""  # Gemini API key for AI agents
     gemini_model: str = "gemini-2.5-flash"
+
+    # Ollama (self-hosted LLM -- unlimited, no API limits)
+    ollama_url: str = ""  # e.g. "http://localhost:11434"
+    ollama_model: str = "llama3.2"
 
     class Config:
         env_prefix = "BH_"
