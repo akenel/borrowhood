@@ -39,10 +39,25 @@ SEED_FILE = Path(__file__).parent.parent.parent / "seed_data" / "seed.json"
 
 
 def _enum_val(enum_class, value):
-    """Safely get enum value."""
+    """Safely get enum value, with fallback mapping for CEFR levels."""
     if value is None:
         return None
-    return enum_class(value)
+    try:
+        return enum_class(value)
+    except ValueError:
+        # Map common natural-language proficiency to CEFR
+        from src.models.user import CEFRLevel
+        if enum_class is CEFRLevel:
+            _map = {
+                "beginner": "A1", "elementary": "A2",
+                "intermediate": "B1", "conversational": "B1",
+                "upper_intermediate": "B2", "advanced": "C1",
+                "fluent": "C2", "proficient": "C2",
+            }
+            mapped = _map.get(value.lower())
+            if mapped:
+                return CEFRLevel(mapped)
+        raise
 
 
 def _parse_date(value):
