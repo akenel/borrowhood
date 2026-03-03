@@ -53,6 +53,14 @@ htmlcov/
 .pytest_cache/
 .tox/
 
+# E2E test reports (may contain auth tokens)
+tests/e2e/*-report.json
+tests/e2e/*.har
+
+# Never commit secrets or tokens
+*.token
+*.jwt
+
 # Alembic
 alembic/versions/__pycache__/
 
