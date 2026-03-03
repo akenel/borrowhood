@@ -410,7 +410,8 @@ function initBrowseMap() {
     var items = [
         {% for item in items %}
         {% if item.latitude and item.longitude %}
-        { lat: {{ item.latitude }}, lng: {{ item.longitude }}, name: {{ item.name | tojson }}, slug: "{{ item.slug }}", category: "{{ item.category }}" },
+        {% set blurred = blur(item.latitude, item.longitude, item.id|string) %}
+        { lat: {{ blurred[0] }}, lng: {{ blurred[1] }}, name: {{ item.name | tojson }}, slug: "{{ item.slug }}", category: "{{ item.category }}" },
         {% endif %}
         {% endfor %}
     ];
