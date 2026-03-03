@@ -31,6 +31,10 @@ templates = Jinja2Templates(directory="src/templates")
 from datetime import datetime
 templates.env.globals["now"] = datetime.now
 
+# Location privacy: 500m blur for public display
+from src.services.location_privacy import blur_coordinates
+templates.env.globals["blur"] = blur_coordinates
+
 # Language code -> flag emoji mapping (available in all templates as lang_flags)
 templates.env.globals["lang_flags"] = {
     "de": "\U0001f1e9\U0001f1ea", "en": "\U0001f1ec\U0001f1e7",

@@ -631,13 +631,14 @@
 
 {% block scripts %}
 {% if item.latitude and item.longitude %}
+{% set blurred = blur(item.latitude, item.longitude, item.id|string) %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var map = L.map('item-map', { scrollWheelZoom: false }).setView([{{ item.latitude }}, {{ item.longitude }}], 14);
+        var map = L.map('item-map', { scrollWheelZoom: false }).setView([{{ blurred[0] }}, {{ blurred[1] }}], 14);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
-        L.circle([{{ item.latitude }}, {{ item.longitude }}], {
+        L.circle([{{ blurred[0] }}, {{ blurred[1] }}], {
             radius: 500, color: '#4F46E5', fillColor: '#4F46E5', fillOpacity: 0.15, weight: 2
         }).addTo(map);
     });

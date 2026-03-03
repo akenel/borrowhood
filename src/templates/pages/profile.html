@@ -92,9 +92,10 @@
                 <span>{{ profile_user.city }}{% if profile_user.country_code %}, {{ profile_user.country_code | upper }}{% endif %}</span>
             </div>
             {% if profile_user.latitude and profile_user.longitude %}
+            {% set blurred = blur(profile_user.latitude, profile_user.longitude, profile_user.id|string) %}
             <div class="mt-3 rounded-lg overflow-hidden border border-gray-200">
                 <iframe
-                    src="https://www.openstreetmap.org/export/embed.html?bbox={{ profile_user.longitude - 0.015 }},{{ profile_user.latitude - 0.01 }},{{ profile_user.longitude + 0.015 }},{{ profile_user.latitude + 0.01 }}&layer=mapnik&marker={{ profile_user.latitude }},{{ profile_user.longitude }}"
+                    src="https://www.openstreetmap.org/export/embed.html?bbox={{ blurred[1] - 0.015 }},{{ blurred[0] - 0.01 }},{{ blurred[1] + 0.015 }},{{ blurred[0] + 0.01 }}&layer=mapnik&marker={{ blurred[0] }},{{ blurred[1] }}"
                     class="w-full h-40"
                     style="border:0"
                     loading="lazy"
