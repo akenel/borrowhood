@@ -120,6 +120,10 @@ async def create_listing(
         starting_bid=data.starting_bid,
         reserve_price=data.reserve_price,
         bid_increment=data.bid_increment,
+        minimum_charge=data.minimum_charge,
+        per_person_rate=data.per_person_rate,
+        max_participants=data.max_participants,
+        group_discount_pct=data.group_discount_pct,
     )
     db.add(listing)
     await db.commit()

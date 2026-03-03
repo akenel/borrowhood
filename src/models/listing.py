@@ -64,6 +64,12 @@ class BHListing(BHBase, Base):
     pickup_only: Mapped[bool] = mapped_column(default=True)
     notes: Mapped[Optional[str]] = mapped_column(Text)
 
+    # Minimum charge + team pricing (service/training listings)
+    minimum_charge: Mapped[Optional[float]] = mapped_column(Float)     # Floor price regardless of hours/days
+    per_person_rate: Mapped[Optional[float]] = mapped_column(Float)    # Per-participant rate (training/workshops)
+    max_participants: Mapped[Optional[int]] = mapped_column(Integer)   # Group size cap
+    group_discount_pct: Mapped[Optional[float]] = mapped_column(Float) # % discount for 3+ people (0-100)
+
     # Auction fields (only used when listing_type == AUCTION)
     auction_end: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     starting_bid: Mapped[Optional[float]] = mapped_column(Float)
