@@ -336,13 +336,13 @@
 
                 <!-- Progress to next tier -->
                 {% if tier == 'newcomer' %}
-                    {% set next_tier = 'Active' %}{% set next_at = 50 %}{% set pct = (total / 50 * 100) | int %}
+                    {% set next_tier = 'Active' %}{% set next_at = 50 %}{% set pct = [[(total / 50 * 100) | int, 0] | max, 100] | min %}
                 {% elif tier == 'active' %}
-                    {% set next_tier = 'Trusted' %}{% set next_at = 200 %}{% set pct = ((total - 50) / 150 * 100) | int %}
+                    {% set next_tier = 'Trusted' %}{% set next_at = 200 %}{% set pct = [[((total - 50) / 150 * 100) | int, 0] | max, 100] | min %}
                 {% elif tier == 'trusted' %}
-                    {% set next_tier = 'Pillar' %}{% set next_at = 500 %}{% set pct = ((total - 200) / 300 * 100) | int %}
+                    {% set next_tier = 'Pillar' %}{% set next_at = 500 %}{% set pct = [[((total - 200) / 300 * 100) | int, 0] | max, 100] | min %}
                 {% elif tier == 'pillar' %}
-                    {% set next_tier = 'Legend' %}{% set next_at = 1000 %}{% set pct = ((total - 500) / 500 * 100) | int %}
+                    {% set next_tier = 'Legend' %}{% set next_at = 1000 %}{% set pct = [[((total - 500) / 500 * 100) | int, 0] | max, 100] | min %}
                 {% else %}
                     {% set next_tier = None %}{% set next_at = 0 %}{% set pct = 100 %}
                 {% endif %}
