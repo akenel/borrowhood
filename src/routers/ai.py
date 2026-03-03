@@ -1,19 +1,28 @@
 """AI-powered listing and profile generation API.
 
 Uses Pollinations.ai (free, no key) with Ollama fallback.
+Gemini 2.5 Flash for smart listing, review analysis, and concierge.
 These endpoints power the "grandma test" -- list an item in 60 seconds.
 """
 
+import logging
 from typing import List, Optional
+from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field
+from sqlalchemy import select, func
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.database import get_db
 from src.dependencies import require_auth
 from src.services.ai import (
     generate_listing_description, generate_skill_bio,
     generate_image_url, build_image_prompt, generate_image,
 )
+from src.services.gemini import smart_listing, review_analysis, concierge_search
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/ai", tags=["ai"])
 
@@ -112,3 +121,305 @@ async def ai_generate_image(
         "prompt": prompt,
         "ai_generated": result["ai_generated"],
     }
+
+
+# ── Gemini-powered endpoints ──────────────────────────────────────────
+
+
+class SmartListingRequest(BaseModel):
+    name: str = Field(..., min_length=2, max_length=200)
+    category: str = Field(default="", max_length=50)
+    item_type: str = Field(default="physical", max_length=30)
+    language: str = Field(default="en", max_length=5)
+
+
+class SmartListingResponse(BaseModel):
+    title: str
+    description: str
+    category: str = ""
+    subcategory: str = ""
+    condition: str = ""
+    item_type: str = "physical"
+    suggested_price: float = 0.0
+    price_unit: str = "per_day"
+    deposit_suggestion: float = 0.0
+    suggested_listing_type: str = "rent"
+    tags: List[str] = []
+    story_suggestion: str = ""
+    ai_provider: str = "gemini"
+
+
+@router.post("/smart-listing", response_model=SmartListingResponse)
+async def ai_smart_listing(
+    data: SmartListingRequest,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Generate a complete listing with Gemini intelligence.
+
+    Returns price, deposit, story, subcategory -- everything needed to list.
+    Falls back to Pollinations.ai if Gemini is unavailable.
+    """
+    from src.models.item import BHItem
+
+    # Fetch similar items for price calibration
+    similar = []
+    stmt = select(BHItem).where(
+        BHItem.name.ilike(f"%{data.name.split()[0]}%")
+    ).limit(5)
+    result = await db.execute(stmt)
+    for item in result.scalars():
+        similar.append({
+            "name": item.name,
+            "category": item.category,
+            "condition": str(item.condition.value) if item.condition else "",
+        })
+
+    # Try Gemini first
+    gemini_result = await smart_listing(
+        name=data.name,
+        category=data.category,
+        item_type=data.item_type,
+        language=data.language,
+        similar_items=similar,
+    )
+
+    if gemini_result:
+        return SmartListingResponse(
+            title=gemini_result.get("title", data.name),
+            description=gemini_result.get("description", ""),
+            category=gemini_result.get("category", data.category),
+            subcategory=gemini_result.get("subcategory", ""),
+            condition=gemini_result.get("condition", "good"),
+            item_type=gemini_result.get("item_type", data.item_type),
+            suggested_price=float(gemini_result.get("suggested_price", 0)),
+            price_unit=gemini_result.get("price_unit", "per_day"),
+            deposit_suggestion=float(gemini_result.get("deposit_suggestion", 0)),
+            suggested_listing_type=gemini_result.get("suggested_listing_type", "rent"),
+            tags=gemini_result.get("tags", [])[:5],
+            story_suggestion=gemini_result.get("story_suggestion", ""),
+            ai_provider="gemini",
+        )
+
+    # Fallback to Pollinations
+    logger.info("Gemini unavailable, falling back to Pollinations for smart-listing")
+    fallback = await generate_listing_description(
+        name=data.name,
+        category=data.category or "hand_tools",
+        item_type=data.item_type,
+        language=data.language,
+    )
+    return SmartListingResponse(
+        title=fallback.get("title", data.name),
+        description=fallback.get("description", ""),
+        tags=fallback.get("tags", []),
+        category=data.category,
+        ai_provider="pollinations",
+    )
+
+
+class ReviewAnalysisRequest(BaseModel):
+    user_id: UUID
+
+
+class ReviewAnalysisResponse(BaseModel):
+    user_name: str = ""
+    badge_tier: str = ""
+    total_reviews: int = 0
+    sentiment: dict = {}
+    average_rating: float = 0.0
+    weighted_average: float = 0.0
+    fake_review_flags: List[str] = []
+    skill_insights: List[dict] = []
+    top_keywords: dict = {}
+    summary: str = ""
+
+
+@router.post("/review-analysis", response_model=ReviewAnalysisResponse)
+async def ai_review_analysis(
+    data: ReviewAnalysisRequest,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Analyze reviews for a user using Gemini AI.
+
+    Returns sentiment breakdown, fake review flags, skill insights,
+    and a human-readable summary.
+    """
+    from src.models.user import BHUser
+    from src.models.review import BHReview
+
+    # Get user
+    user = await db.get(BHUser, data.user_id)
+    if not user:
+        return ReviewAnalysisResponse(summary="User not found.")
+
+    # Get reviews
+    stmt = select(BHReview).where(BHReview.reviewee_id == data.user_id)
+    result = await db.execute(stmt)
+    db_reviews = result.scalars().all()
+
+    reviews = []
+    total_rating = 0.0
+    for r in db_reviews:
+        reviews.append({
+            "rating": r.rating,
+            "title": r.title or "",
+            "body": r.body or "",
+            "reviewer_tier": r.reviewer_tier,
+            "weight": r.weight,
+            "skill_name": r.skill_name,
+            "skill_rating": r.skill_rating,
+        })
+        total_rating += r.rating
+
+    avg_rating = total_rating / len(reviews) if reviews else 0.0
+
+    gemini_result = await review_analysis(
+        user_name=user.display_name,
+        badge_tier=str(user.badge_tier.value) if user.badge_tier else "NEWCOMER",
+        reviews=reviews,
+        review_count=len(reviews),
+        average_rating=avg_rating,
+    )
+
+    if gemini_result:
+        return ReviewAnalysisResponse(**gemini_result)
+
+    # Basic fallback (no Gemini)
+    positive = sum(1 for r in reviews if r["rating"] >= 4)
+    neutral = sum(1 for r in reviews if r["rating"] == 3)
+    negative = sum(1 for r in reviews if r["rating"] <= 2)
+    return ReviewAnalysisResponse(
+        user_name=user.display_name,
+        badge_tier=str(user.badge_tier.value) if user.badge_tier else "NEWCOMER",
+        total_reviews=len(reviews),
+        sentiment={"positive": positive, "neutral": neutral, "negative": negative},
+        average_rating=round(avg_rating, 1),
+        summary=f"{user.display_name} has {len(reviews)} review(s) with an average rating of {avg_rating:.1f}/5.",
+    )
+
+
+class ConciergeRequest(BaseModel):
+    query: str = Field(..., min_length=2, max_length=500)
+    language: str = Field(default="en", max_length=5)
+
+
+class ConciergeResponse(BaseModel):
+    interpretation: str = ""
+    response: str = ""
+    suggestions: List[str] = []
+    items: List[dict] = []
+    members: List[dict] = []
+
+
+@router.post("/concierge", response_model=ConciergeResponse)
+async def ai_concierge(
+    data: ConciergeRequest,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Natural language search powered by Gemini.
+
+    User asks in plain language, we search the DB, Gemini formats
+    a friendly response with match reasons and suggestions.
+    """
+    from src.models.item import BHItem
+    from src.models.user import BHUser, BHUserLanguage
+    from sqlalchemy.orm import selectinload
+
+    # Search items
+    words = data.query.lower().split()
+    item_stmt = select(BHItem).options(selectinload(BHItem.owner)).limit(10)
+    for word in words[:3]:  # Use first 3 words for search
+        if len(word) > 2:
+            item_stmt = item_stmt.where(
+                BHItem.name.ilike(f"%{word}%") | BHItem.description.ilike(f"%{word}%")
+            )
+    result = await db.execute(item_stmt)
+    db_items = result.scalars().all()
+
+    items_for_gemini = []
+    items_for_response = []
+    for item in db_items:
+        item_dict = {
+            "id": str(item.id),
+            "name": item.name,
+            "category": item.category,
+            "condition": str(item.condition.value) if item.condition else "",
+            "owner_name": item.owner.display_name if item.owner else "",
+            "owner_badge": str(item.owner.badge_tier.value) if item.owner and item.owner.badge_tier else "",
+        }
+        items_for_gemini.append(item_dict)
+        items_for_response.append(item_dict)
+
+    # Search members (if query seems people-related)
+    people_words = {"who", "speak", "speaks", "language", "member", "person", "someone"}
+    search_members = any(w in words for w in people_words)
+
+    members_for_gemini = []
+    members_for_response = []
+    if search_members:
+        member_stmt = (
+            select(BHUser)
+            .options(selectinload(BHUser.languages))
+            .limit(5)
+        )
+        for word in words[:3]:
+            if len(word) > 2 and word not in people_words:
+                member_stmt = member_stmt.where(
+                    BHUser.display_name.ilike(f"%{word}%")
+                    | BHUser.workshop_name.ilike(f"%{word}%")
+                )
+        result = await db.execute(member_stmt)
+        db_members = result.scalars().all()
+        for m in db_members:
+            langs = [
+                f"{l.language_code} ({l.proficiency})"
+                for l in (m.languages or [])
+            ]
+            member_dict = {
+                "id": str(m.id),
+                "display_name": m.display_name,
+                "badge_tier": str(m.badge_tier.value) if m.badge_tier else "NEWCOMER",
+                "languages": langs,
+                "workshop_name": m.workshop_name or "",
+            }
+            members_for_gemini.append(member_dict)
+            members_for_response.append(member_dict)
+
+    # Get Gemini's interpretation
+    gemini_result = await concierge_search(
+        query=data.query,
+        language=data.language,
+        items=items_for_gemini,
+        members=members_for_gemini,
+    )
+
+    if gemini_result:
+        return ConciergeResponse(
+            interpretation=gemini_result.get("interpretation", data.query),
+            response=gemini_result.get("response", ""),
+            suggestions=gemini_result.get("suggestions", []),
+            items=items_for_response,
+            members=members_for_response,
+        )
+
+    # Basic fallback
+    if items_for_response:
+        names = ", ".join(i["name"] for i in items_for_response[:3])
+        return ConciergeResponse(
+            interpretation=data.query,
+            response=f"I found some items that might match: {names}",
+            suggestions=["Try a different category", "Search by brand name"],
+            items=items_for_response,
+            members=members_for_response,
+        )
+
+    return ConciergeResponse(
+        interpretation=data.query,
+        response="I couldn't find anything matching your search. Try different keywords or browse by category.",
+        suggestions=["Browse all items", "Check the helpboard"],
+        items=[],
+        members=[],
+    )
