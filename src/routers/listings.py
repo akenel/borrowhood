@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import get_user, require_auth
+from src.dependencies import get_user, require_auth, require_badge_tier
 from src.models.item import BHItem
 from src.models.listing import BHListing, ListingStatus, ListingType
 from src.models.user import BHUser
@@ -86,6 +86,16 @@ async def create_listing(
         raise HTTPException(status_code=404, detail="Item not found")
     if item.owner_id != user.id:
         raise HTTPException(status_code=403, detail="Not your item")
+
+    # Auction listings require TRUSTED tier
+    if data.listing_type == ListingType.AUCTION:
+        from src.dependencies import _TIER_ORDER
+        user_level = _TIER_ORDER.get(user.badge_tier.value, 0)
+        if user_level < _TIER_ORDER["trusted"]:
+            raise HTTPException(
+                status_code=403,
+                detail="Badge tier 'trusted' required to create auction listings.",
+            )
 
     # Parse auction_end from ISO string if provided
     auction_end_dt = None

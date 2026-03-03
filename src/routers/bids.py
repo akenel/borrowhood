@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import get_user, require_auth
+from src.dependencies import get_user, require_auth, require_badge_tier
 from src.models.bid import BHBid, BidStatus
 from src.models.listing import BHListing, ListingStatus, ListingType
 from src.models.user import BHUser
@@ -28,10 +28,10 @@ router = APIRouter(prefix="/api/v1/bids", tags=["bids"])
 @router.post("", response_model=BidOut, status_code=201)
 async def place_bid(
     bid_in: BidCreate,
-    token: dict = Depends(require_auth),
+    token: dict = Depends(require_badge_tier("active")),
     db: AsyncSession = Depends(get_db),
 ):
-    """Place a bid on an auction listing.
+    """Place a bid on an auction listing. Requires ACTIVE tier.
 
     Validates:
     - Listing exists, is AUCTION type, and is ACTIVE

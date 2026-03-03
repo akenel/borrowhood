@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_db
 from src.dependencies import get_user, require_auth
 from src.models.notification import BHNotification, NotificationType
+from src.models.notification_pref import BHNotificationPref
 from src.models.user import BHUser
 
 router = APIRouter(prefix="/api/v1/notifications", tags=["notifications"])
@@ -137,3 +138,93 @@ async def mark_all_read(
     )
     await db.commit()
     return {"status": "ok"}
+
+
+# --- Notification Preferences ---
+
+class PrefItem(BaseModel):
+    notification_type: str
+    enabled: bool
+
+
+class PrefUpdate(BaseModel):
+    preferences: List[PrefItem]
+
+
+@router.get("/preferences")
+async def get_notification_preferences(
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get notification preferences for the authenticated user.
+
+    Returns all notification types with their enabled status.
+    Types not explicitly set default to True (enabled).
+    """
+    user = await get_user(db, token)
+
+    # Fetch user's overrides
+    result = await db.execute(
+        select(BHNotificationPref)
+        .where(BHNotificationPref.user_id == user.id)
+    )
+    overrides = {p.notification_type: p.enabled for p in result.scalars().all()}
+
+    # Build full list with defaults
+    prefs = []
+    for nt in NotificationType:
+        prefs.append({
+            "notification_type": nt.value,
+            "enabled": overrides.get(nt.value, True),
+        })
+
+    return {
+        "notify_telegram": user.notify_telegram,
+        "notify_email": user.notify_email,
+        "preferences": prefs,
+    }
+
+
+@router.put("/preferences")
+async def update_notification_preferences(
+    body: PrefUpdate,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update per-type notification preferences.
+
+    Only types included in the request body are updated.
+    """
+    user = await get_user(db, token)
+
+    valid_types = {nt.value for nt in NotificationType}
+
+    for item in body.preferences:
+        if item.notification_type not in valid_types:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid notification type: {item.notification_type}",
+            )
+
+        # Upsert: check if pref exists
+        existing = await db.scalar(
+            select(BHNotificationPref.id)
+            .where(BHNotificationPref.user_id == user.id)
+            .where(BHNotificationPref.notification_type == item.notification_type)
+        )
+
+        if existing:
+            await db.execute(
+                update(BHNotificationPref)
+                .where(BHNotificationPref.id == existing)
+                .values(enabled=item.enabled)
+            )
+        else:
+            db.add(BHNotificationPref(
+                user_id=user.id,
+                notification_type=item.notification_type,
+                enabled=item.enabled,
+            ))
+
+    await db.commit()
+    return {"status": "ok", "updated": len(body.preferences)}

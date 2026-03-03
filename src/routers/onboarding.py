@@ -119,13 +119,13 @@ async def setup_profile(
                 pass
         if profile.tagline:
             user.tagline = profile.tagline
-        # Location
+        # Location (round to 3 decimals ~ 111m precision for privacy)
         if profile.latitude is not None:
-            user.latitude = profile.latitude
+            user.latitude = round(profile.latitude, 3)
         if profile.longitude is not None:
-            user.longitude = profile.longitude
+            user.longitude = round(profile.longitude, 3)
         if profile.altitude is not None:
-            user.altitude = profile.altitude
+            user.altitude = round(profile.altitude, 1)
         # Service offers
         user.offers_delivery = profile.offers_delivery
         user.offers_pickup = profile.offers_pickup
@@ -154,9 +154,9 @@ async def setup_profile(
             workshop_name=profile.workshop_name,
             workshop_type=workshop_type,
             tagline=profile.tagline,
-            latitude=profile.latitude,
-            longitude=profile.longitude,
-            altitude=profile.altitude,
+            latitude=round(profile.latitude, 3) if profile.latitude else None,
+            longitude=round(profile.longitude, 3) if profile.longitude else None,
+            altitude=round(profile.altitude, 1) if profile.altitude else None,
             offers_delivery=profile.offers_delivery,
             offers_pickup=profile.offers_pickup,
             offers_training=profile.offers_training,
