@@ -25,7 +25,9 @@ class NotificationType(str, enum.Enum):
     RENTAL_CANCELLED = "rental_cancelled"     # Rental cancelled
     REVIEW_RECEIVED = "review_received"       # Someone reviewed you
     DISPUTE_FILED = "dispute_filed"           # Dispute opened on your rental
+    DISPUTE_RESPONDED = "dispute_responded"   # Other party responded to dispute
     DISPUTE_RESOLVED = "dispute_resolved"     # Dispute resolved
+    DEPOSIT_FORFEITED = "deposit_forfeited"   # Your deposit was forfeited
     BID_PLACED = "bid_placed"                 # Someone bid on your auction
     BID_OUTBID = "bid_outbid"                 # You've been outbid
     AUCTION_WON = "auction_won"              # You won an auction

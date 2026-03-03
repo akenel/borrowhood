@@ -114,11 +114,15 @@ def create_app() -> FastAPI:
                 result = await seed_new_items(db)
                 logger.info("Incremental item seed: %s", result)
 
-        # Start Telegram bot if configured
-        if settings.telegram_enabled and settings.telegram_bot_token:
+        # Start Telegram bot if configured (skip placeholder tokens)
+        if (settings.telegram_enabled
+                and settings.telegram_bot_token
+                and settings.telegram_bot_token not in ("", "SET_ON_SERVER")):
             from src.services.telegram_bot import bot
             app.state.telegram_bot_task = asyncio.create_task(bot.start())
             logger.info("Telegram bot started")
+        elif settings.telegram_enabled:
+            logger.warning("Telegram enabled but bot token not configured -- bot not started")
 
     @app.on_event("shutdown")
     async def shutdown():

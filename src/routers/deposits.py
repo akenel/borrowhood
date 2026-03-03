@@ -260,12 +260,24 @@ async def forfeit_deposit(
         deposit.released_amount = deposit.amount - forfeited
         deposit.status = DepositStatus.PARTIAL_RELEASE
 
-    # Notify renter
+    # Notify renter (deposit forfeited)
     await create_notification(
         db=db,
         user_id=deposit.payer_id,
-        notification_type=NotificationType.SYSTEM,
+        notification_type=NotificationType.DEPOSIT_FORFEITED,
         title=f"Your deposit of {forfeited:.2f} {deposit.currency} has been forfeited",
+        body=body.reason,
+        link="/dashboard",
+        entity_type="deposit",
+        entity_id=deposit.rental_id,
+    )
+
+    # Notify owner (deposit retained)
+    await create_notification(
+        db=db,
+        user_id=deposit.recipient_id,
+        notification_type=NotificationType.SYSTEM,
+        title=f"Deposit of {forfeited:.2f} {deposit.currency} has been retained in your favor",
         body=body.reason,
         link="/dashboard",
         entity_type="deposit",

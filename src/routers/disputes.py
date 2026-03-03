@@ -283,7 +283,7 @@ async def respond_to_dispute(
     await create_notification(
         db=db,
         user_id=dispute.filed_by_id,
-        notification_type=NotificationType.DISPUTE_FILED,
+        notification_type=NotificationType.DISPUTE_RESPONDED,
         title="The other party has responded to your dispute",
         link="/dashboard",
         entity_type="dispute",
