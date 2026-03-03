@@ -249,6 +249,14 @@ async function testServiceQuoting(state) {
             info(`Status: ${r.body.status}`);
         });
 
+        await test('Luna starts work on the quote', async () => {
+            const r = await api('PATCH', `/api/v1/service-quotes/${state.quoteId}/status`, {
+                status: 'in_progress',
+            }, state.lunaCookie);
+            assert(r.status === 200, `Expected 200, got ${r.status}: ${r.text}`);
+            info(`Status: ${r.body.status}`);
+        });
+
         await test('Luna completes the quote', async () => {
             const r = await api('PATCH', `/api/v1/service-quotes/${state.quoteId}/status`, {
                 status: 'completed',
@@ -380,6 +388,10 @@ async function testQRCodes(page, state) {
 async function testNotifications(state) {
     console.log('\n--- Notification Coverage ---');
 
+    // Re-login to ensure fresh cookies (long test suites can expire)
+    state.lunaCookie = await login('luna');
+    state.jakeCookie = await login('jake');
+
     await test('Luna has notifications', async () => {
         const r = await api('GET', '/api/v1/notifications?limit=5', null, state.lunaCookie);
         assert(r.status === 200, `Expected 200, got ${r.status}`);
@@ -417,6 +429,9 @@ async function testNotifications(state) {
 
 async function testBadgesAndPoints(state) {
     console.log('\n--- Badges & Points ---');
+
+    // Re-login for fresh cookies
+    state.lunaCookie = await login('luna');
 
     await test('Badges catalog returns list', async () => {
         const r = await api('GET', '/api/v1/badges/catalog');
@@ -586,7 +601,7 @@ async function testOnboardingToS() {
     console.log('\n--- ToS Acceptance ---');
 
     await test('Onboarding schema includes tos_accepted', async () => {
-        const r = await apiRaw('GET', `${BASE_URL}/openapi.json`);
+        const r = await apiRaw('GET', '/openapi.json');
         assert(r.status === 200, `Expected 200, got ${r.status}`);
         const spec = JSON.parse(r.text);
         const schemas = spec?.components?.schemas || {};
