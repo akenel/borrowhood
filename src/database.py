@@ -95,14 +95,6 @@ async def run_migrations():
         "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'palace'",
         "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'pavilion'",
         "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'study'",
-        # 2026-03-03: Wave 2 legend item categories
-        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'crafts'",
-        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'education'",
-        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'engineering'",
-        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'food'",
-        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'outdoor'",
-        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'science'",
-        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'tools'",
     ]
     async with engine.begin() as conn:
         for sql in migrations:
