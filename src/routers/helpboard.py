@@ -184,6 +184,22 @@ async def create_reply(
     )
     db.add(reply)
     post.reply_count += 1
+    await db.flush()
+
+    # Notify the post author (unless replying to own post)
+    if post.author_id != user.id:
+        from src.models.notification import NotificationType
+        from src.services.notify import create_notification
+        await create_notification(
+            db=db,
+            user_id=post.author_id,
+            notification_type=NotificationType.SYSTEM,
+            title=f"{user.display_name} replied to your post: {post.title}",
+            link="/helpboard",
+            entity_type="helpboard",
+            entity_id=post.id,
+        )
+
     await db.commit()
     await db.refresh(reply)
     return reply

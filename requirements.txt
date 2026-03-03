@@ -35,3 +35,5 @@ google-genai>=1.65.0
 
 # Telegram notifications
 # (uses httpx -- already listed above)
+
+# Stripe payments (uses httpx for API calls -- no SDK needed)

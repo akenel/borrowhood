@@ -50,6 +50,11 @@ class BHSettings(BaseSettings):
     paypal_mode: str = "sandbox"  # "sandbox" or "live"
     paypal_merchant_email: str = "angel.kenel@gmail.com"
 
+    # Stripe
+    stripe_secret_key: str = ""         # sk_test_... or sk_live_...
+    stripe_publishable_key: str = ""    # pk_test_... or pk_live_...
+    stripe_webhook_secret: str = ""     # whsec_...
+
     # AI Provider cascade: "auto" tries gemini -> ollama -> pollinations -> template
     # Set to "gemini", "ollama", or "pollinations" to force a single provider
     ai_provider: str = "auto"

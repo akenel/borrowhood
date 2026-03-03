@@ -30,6 +30,7 @@ class BadgeCode(str, enum.Enum):
     NEIGHBORHOOD_HERO = "neighborhood_hero"   # 50+ transactions
     WORKSHOP_PRO = "workshop_pro"             # Complete profile + banner + bio
     GENEROUS_NEIGHBOR = "generous_neighbor"   # Gave away 3+ items
+    ORIGINATOR = "originator"                 # First to list in a category
 
 
 # Badge metadata (display info)
@@ -123,6 +124,12 @@ BADGE_INFO = {
         "description": "Gave away 3 or more items to the community",
         "icon": "gift",
         "color": "rose",
+    },
+    BadgeCode.ORIGINATOR: {
+        "name": "Originator",
+        "description": "First person to list an item in a category",
+        "icon": "flag",
+        "color": "indigo",
     },
 }
 

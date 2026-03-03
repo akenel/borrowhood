@@ -18,10 +18,10 @@ Badge thresholds:
 
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.models.user import BadgeTier, BHUser, BHUserPoints
+from src.models.user import BadgeTier, BHUser, BHUserPoints, BHUserSkill
 
 
 # Points values
@@ -86,5 +86,80 @@ async def award_points(
     if user and user.badge_tier != new_tier:
         user.badge_tier = new_tier
 
+    # Recalculate trust score
+    await calculate_trust_score(db, user_id)
+
     await db.flush()
     return user_points
+
+
+# Tier numeric values for trust score calculation
+TIER_VALUES = {
+    BadgeTier.NEWCOMER: 0.0,
+    BadgeTier.ACTIVE: 0.25,
+    BadgeTier.TRUSTED: 0.5,
+    BadgeTier.PILLAR: 0.75,
+    BadgeTier.LEGEND: 1.0,
+}
+
+
+async def calculate_trust_score(db: AsyncSession, user_id: UUID) -> float:
+    """Calculate composite trust score (0.0 to 1.0).
+
+    Formula:
+    - 35% from points (capped at 1000)
+    - 40% from weighted review average (1-5 scaled to 0-1)
+    - 15% from badge tier (0.0 newcomer to 1.0 legend)
+    - 10% from skill verifications (capped at 10)
+    """
+    # Points component
+    points_result = await db.execute(
+        select(BHUserPoints).where(BHUserPoints.user_id == user_id)
+    )
+    points = points_result.scalars().first()
+    total_points = points.total_points if points else 0
+    points_score = min(total_points / 1000.0, 1.0)
+
+    # Review component
+    from src.models.review import BHReview
+    review_result = await db.execute(
+        select(
+            func.sum(BHReview.rating * BHReview.weight),
+            func.sum(BHReview.weight),
+        )
+        .where(BHReview.reviewee_id == user_id)
+        .where(BHReview.visible == True)
+    )
+    row = review_result.one()
+    if row[1] and row[1] > 0:
+        weighted_avg = row[0] / row[1]  # 1.0 to 5.0
+        review_score = (weighted_avg - 1.0) / 4.0  # Scale to 0.0-1.0
+    else:
+        review_score = 0.0
+
+    # Tier component
+    user_result = await db.execute(select(BHUser).where(BHUser.id == user_id))
+    user = user_result.scalars().first()
+    if not user:
+        return 0.0
+    tier_score = TIER_VALUES.get(user.badge_tier, 0.0)
+
+    # Skill verifications component
+    verified_skills = await db.scalar(
+        select(func.coalesce(func.sum(BHUserSkill.verified_by_count), 0))
+        .where(BHUserSkill.user_id == user_id)
+    ) or 0
+    skill_score = min(verified_skills / 10.0, 1.0)
+
+    # Weighted composite
+    trust = (
+        0.35 * points_score
+        + 0.40 * review_score
+        + 0.15 * tier_score
+        + 0.10 * skill_score
+    )
+    trust = round(trust, 3)
+
+    # Update user record
+    user.trust_score = trust
+    return trust

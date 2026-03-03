@@ -209,6 +209,17 @@
                             {% else %}
                             <p class="text-lg font-bold text-gray-900">{{ t('common.negotiable') | title }}</p>
                             {% endif %}
+                            <!-- Seasonal tag -->
+                            {% set today = now().strftime('%Y-%m-%d') %}
+                            {% if not listing.available_from and not listing.available_to %}
+                            <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">{% if lang == 'it' %}Tutto l'anno{% else %}Year-Round{% endif %}</span>
+                            {% elif listing.available_from and listing.available_from > today %}
+                            <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full">{% if lang == 'it' %}Dal{% else %}From{% endif %} {{ listing.available_from }}</span>
+                            {% elif listing.available_from and listing.available_to and listing.available_from <= today and listing.available_to >= today %}
+                            <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-green-50 text-green-700 border border-green-200 rounded-full">{% if lang == 'it' %}Disponibile{% else %}Available Now{% endif %}</span>
+                            {% elif listing.available_from and listing.available_to %}
+                            <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-full">{% if lang == 'it' %}Stagionale{% else %}Seasonal{% endif %}</span>
+                            {% endif %}
                         </div>
                     </div>
                     {% endif %}

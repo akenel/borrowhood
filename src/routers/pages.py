@@ -27,6 +27,10 @@ from src.models.user import BadgeTier, BHUser, WorkshopType
 router = APIRouter(tags=["pages"])
 templates = Jinja2Templates(directory="src/templates")
 
+# Make datetime.now() available in templates for seasonal tag logic
+from datetime import datetime
+templates.env.globals["now"] = datetime.now
+
 # Language code -> flag emoji mapping (available in all templates as lang_flags)
 templates.env.globals["lang_flags"] = {
     "de": "\U0001f1e9\U0001f1ea", "en": "\U0001f1ec\U0001f1e7",
