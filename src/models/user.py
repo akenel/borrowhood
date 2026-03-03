@@ -118,6 +118,14 @@ class BHUser(BHBase, Base):
     offers_custom_orders: Mapped[bool] = mapped_column(default=False)
     offers_repair: Mapped[bool] = mapped_column(default=False)
 
+    # Stripe Connect (marketplace payouts)
+    stripe_account_id: Mapped[Optional[str]] = mapped_column(String(200), default=None)
+
+    # Multi-community federation
+    default_community_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_community.id"), nullable=True
+    )
+
     # Terms of Service acceptance
     tos_accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), default=None)
 

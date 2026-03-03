@@ -18,6 +18,13 @@
     <meta name="twitter:title" content="{{ og_title | default(t('app.name')) }}">
     <meta name="twitter:description" content="{{ og_description | default(t('app.tagline')) }}">
 
+    <!-- PWA -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/static/images/icon-192.svg">
+
     <!-- Tailwind CSS (FULL CDN -- Rule 1: NEVER a bundled subset) -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -71,6 +78,7 @@
                         <a href="/browse" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.browse') }}</a>
                         <a href="/helpboard" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.helpboard') }}</a>
                         <a href="/members" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.members') }}</a>
+                        <a href="/chat" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{% if lang == 'it' %}Concierge{% else %}Concierge{% endif %}</a>
                         {% if user %}
                         <a href="/dashboard" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.dashboard') }}</a>
                         <a href="/testing" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">QA</a>
@@ -193,6 +201,7 @@
                 <a href="/browse" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.browse') }}</a>
                 <a href="/helpboard" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.helpboard') }}</a>
                 <a href="/members" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.members') }}</a>
+                <a href="/chat" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">Concierge</a>
                 <a href="/list" class="block px-3 py-3 text-base font-semibold text-indigo-600 hover:bg-indigo-50 rounded-lg min-h-[44px]">{{ t('nav.list_item') }}</a>
                 {% if user %}
                 <a href="/dashboard" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.dashboard') }}</a>
@@ -427,6 +436,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         BHTranslate.autoTranslatePage();
     });
+    </script>
+
+    <!-- Service Worker registration -->
+    <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/static/sw.js').catch(function() {});
+    }
     </script>
 
     {% block scripts %}{% endblock %}

@@ -657,3 +657,29 @@ async def seed_new_items(db: AsyncSession) -> dict:
 
     logger.info("Incremental seed: %d new items added (%d already existed)", added, len(existing_slugs))
     return {"new_items": added, "existing_items": len(existing_slugs)}
+
+
+async def seed_default_community(db: AsyncSession) -> dict:
+    """Seed the default community from config settings if it doesn't exist."""
+    from src.config import settings
+    from src.models.community import BHCommunity
+
+    existing = await db.scalar(
+        select(BHCommunity.id).where(BHCommunity.is_default == True)
+    )
+    if existing:
+        return {"status": "exists"}
+
+    community = BHCommunity(
+        name=settings.community_name,
+        slug=slugify(settings.community_name),
+        country_code=settings.community_country,
+        currency=settings.community_currency,
+        timezone=settings.community_timezone,
+        tagline=settings.community_tagline,
+        is_default=True,
+    )
+    db.add(community)
+    await db.commit()
+    logger.info("Default community seeded: %s", settings.community_name)
+    return {"status": "created", "name": settings.community_name}

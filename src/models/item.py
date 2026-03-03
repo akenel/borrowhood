@@ -129,6 +129,11 @@ class BHItem(BHBase, Base):
     longitude: Mapped[Optional[float]] = mapped_column(Float)
     altitude: Mapped[Optional[float]] = mapped_column(Float, default=None)  # meters ASL
 
+    # Community (multi-community federation)
+    community_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_community.id"), nullable=True, index=True
+    )
+
     # Story -- the human narrative behind this item
     story: Mapped[Optional[str]] = mapped_column(Text)  # "My father's drill from 1978..."
 

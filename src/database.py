@@ -82,6 +82,13 @@ async def run_migrations():
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS per_person_rate FLOAT",
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS max_participants INTEGER",
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS group_discount_pct FLOAT",
+        # 2026-03-03: Stripe Connect marketplace payouts
+        "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS stripe_account_id VARCHAR(200)",
+        "ALTER TABLE bh_payment ADD COLUMN IF NOT EXISTS platform_fee FLOAT",
+        "ALTER TABLE bh_payment ADD COLUMN IF NOT EXISTS seller_payout_amount FLOAT",
+        # 2026-03-03: Multi-community federation
+        "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS default_community_id UUID REFERENCES bh_community(id)",
+        "ALTER TABLE bh_item ADD COLUMN IF NOT EXISTS community_id UUID REFERENCES bh_community(id)",
     ]
     # ALTER TYPE ... ADD VALUE -- SQLAlchemy uses enum .name (UPPERCASE) for PG enums
     enum_migrations = [
