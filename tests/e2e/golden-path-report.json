@@ -1,0 +1,158 @@
+{
+  "base_url": "https://46.62.138.218",
+  "timestamp": "2026-03-03T11:16:10.803Z",
+  "summary": {
+    "passed": 27,
+    "failed": 0,
+    "total": 27
+  },
+  "artifacts": {
+    "lunaCookie": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJoc3pjWnp1MWZ3RGZwS21uUnZPYzR0M29MRVNQQW1YZUNyMm9TaWhhTTRFIn0.eyJleHAiOjE3NzI1MzgzNTgsImlhdCI6MTc3MjUzNjU1OCwianRpIjoiNzc0NDM4NmItOTRiOS00MjI5LTk4OGEtNTg0OWU3NGNlNmY0IiwiaXNzIjoiaHR0cHM6Ly80Ni42Mi4xMzguMjE4L3JlYWxtcy9ib3Jyb3dob29kIiwic3ViIjoiMTFlOWM0MjItMTI4OS00YWViLThjOGMtNjliOWNhNDQ4NDA2IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYm9ycm93aG9vZC13ZWIiLCJzZXNzaW9uX3N0YXRlIjoiYmI3Yjk1YjctMmNiOS00Y2U5LTkzYTUtMTNkMTQ1NjIxNGIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHBzOi8vNDYuNjIuMTM4LjIxOCIsImh0dHBzOi8vaGVsaXgubG9jYWwiLCJodHRwczovLzQ2LjYyLjEzOC4yMTg6ODQ0MyIsImh0dHBzOi8vYm9ycm93aG9vZC5oZWxpeC5sb2NhbCIsImh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiYmgtbGVuZGVyIiwiYmgtbWVtYmVyIiwiYmgtbW9kZXJhdG9yIiwiZGVmYXVsdC1yb2xlcy1ib3Jyb3dob29kIl19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiJiYjdiOTViNy0yY2I5LTRjZTktOTNhNS0xM2QxNDU2MjE0YjEiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6Ikx1bmEgR3JlY28iLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJsdW5hIiwiZ2l2ZW5fbmFtZSI6Ikx1bmEiLCJmYW1pbHlfbmFtZSI6IkdyZWNvIiwiZW1haWwiOiJsdW5hQGJvcnJvd2hvb2QudGVzdCJ9.RtzKqIEZFacSgQ-ZwR59AqNUM0g9TRRfF6c9aywO4oW1u6W72GCG8tJaio0MemcvfBUzVHbH2fqoC8Wk53QDr7aqG7W09IMMkyS5S5oNauoUj_SIyxVb2dnOMlkLRj3JwXv4EIKJi40-_ZjTOaV8EFxzoSBZrFrCbbUDnmgLsCwhnPirikacYYJz26Te1QQm-vdWFI48MtzZXPSH5RxH4eQ5_ogM5QujZRulsSAhKDBT-kfhvvJvoGqClbjn59YhKupPlxDE7Q3ndqwba3KOo9Mayl6PDfoS347UOmmjSqPFRvPl3ouxi20YhawkOX8oWmTdo9LUWtCv8g1p-HrC_A",
+    "jakeCookie": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJoc3pjWnp1MWZ3RGZwS21uUnZPYzR0M29MRVNQQW1YZUNyMm9TaWhhTTRFIn0.eyJleHAiOjE3NzI1MzgzNTgsImlhdCI6MTc3MjUzNjU1OCwianRpIjoiZjc4ZGY0ZjctODk1Ny00ZDdmLTg1MjUtYmZkODAxZjU3YWU5IiwiaXNzIjoiaHR0cHM6Ly80Ni42Mi4xMzguMjE4L3JlYWxtcy9ib3Jyb3dob29kIiwic3ViIjoiYTEyY2ViYjItY2Q1Ni00N2EyLWJjMDMtYzgyMjM5MGQ0YWYwIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYm9ycm93aG9vZC13ZWIiLCJzZXNzaW9uX3N0YXRlIjoiZjdlZTAxMTctNDc5NC00MGYyLWFmOGEtNjkxMjE5ZDM2NmY4IiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHBzOi8vNDYuNjIuMTM4LjIxOCIsImh0dHBzOi8vaGVsaXgubG9jYWwiLCJodHRwczovLzQ2LjYyLjEzOC4yMTg6ODQ0MyIsImh0dHBzOi8vYm9ycm93aG9vZC5oZWxpeC5sb2NhbCIsImh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiYmgtbGVuZGVyIiwiYmgtbWVtYmVyIiwiZGVmYXVsdC1yb2xlcy1ib3Jyb3dob29kIl19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiJmN2VlMDExNy00Nzk0LTQwZjItYWY4YS02OTEyMTlkMzY2ZjgiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6Ikpha2UgQ2hlbiIsInByZWZlcnJlZF91c2VybmFtZSI6Impha2UiLCJnaXZlbl9uYW1lIjoiSmFrZSIsImZhbWlseV9uYW1lIjoiQ2hlbiIsImVtYWlsIjoiamFrZUBib3Jyb3dob29kLnRlc3QifQ.aUIM4wngu8bkhqVMZHt2PmZyQb3lkX8vPb1Peim2QBrqjHhPC4eArIW2qVi3inyPfQ4LljS3fO3-pNCH9OaKKDl5XRV_trmkkBJiSN1cS2vxzMg2Bv327qggMVo8gExUlLdKP1sgZ1PR1PSLBQGaZkokUlNS3L5i6Kh2IXSc05gkrDHax2ca4yMH6furIT20iSvNgEnmz_C2KVhqxNnK5H_0YJKnM73pM2huFN6tiCizK6NmHhqWF5WmDxojqjHg12AQQD9K6-TYRT0lUJ3mhOu_n5_4d0xXg1KMrBtUQMmzV6C0UKNZ31ZzsQSdHIHHW2MuO53ShYFolcyINgAZcA",
+    "lunaUserId": "1a45aa60-b810-4f85-9721-5a6c4ce3218c",
+    "jakeUserId": "8a60073f-6743-46c0-b4d5-49d57bd9dc25",
+    "itemId": "926fef8c-a982-47f9-84b1-40864ef33901",
+    "itemSlug": "golden-path-ceramic-kiln-1772536559707",
+    "listingId": "228b5964-ab83-42dd-961a-246f57308985",
+    "rentalId": "4d837517-e568-4d9d-9b96-625bbbd7d0ac",
+    "pickupCode": "RJZQ9C7A",
+    "returnCode": "EEDPZ3J3"
+  },
+  "steps": [
+    {
+      "name": "Step 1: Luna logs in",
+      "status": "pass",
+      "ms": 898
+    },
+    {
+      "name": "Step 2: Jake logs in",
+      "status": "pass",
+      "ms": 693
+    },
+    {
+      "name": "Step 3: Luna fetches her profile",
+      "status": "pass",
+      "ms": 516
+    },
+    {
+      "name": "Step 4: Jake fetches his profile",
+      "status": "pass",
+      "ms": 341
+    },
+    {
+      "name": "Step 5: Luna creates an item (Ceramic Kiln)",
+      "status": "pass",
+      "ms": 265
+    },
+    {
+      "name": "Step 6: Luna creates a RENT listing",
+      "status": "pass",
+      "ms": 180
+    },
+    {
+      "name": "Step 7: Listing appears in public API",
+      "status": "pass",
+      "ms": 132
+    },
+    {
+      "name": "Step 8: Item appears on browse page",
+      "status": "pass",
+      "ms": 243
+    },
+    {
+      "name": "Step 9: Jake requests rental (3 days)",
+      "status": "pass",
+      "ms": 170
+    },
+    {
+      "name": "Step 10: Jake cannot rent his own items (validation)",
+      "status": "pass",
+      "ms": 195
+    },
+    {
+      "name": "Step 11: Luna approves the rental",
+      "status": "pass",
+      "ms": 198
+    },
+    {
+      "name": "Step 12: Luna generates lockbox codes",
+      "status": "pass",
+      "ms": 189
+    },
+    {
+      "name": "Step 13: Duplicate lockbox generation returns 409",
+      "status": "pass",
+      "ms": 143
+    },
+    {
+      "name": "Step 14: Wrong code is rejected",
+      "status": "pass",
+      "ms": 186
+    },
+    {
+      "name": "Step 15: Jake verifies pickup code",
+      "status": "pass",
+      "ms": 922
+    },
+    {
+      "name": "Step 16: Rental status is now picked_up",
+      "status": "pass",
+      "ms": 161
+    },
+    {
+      "name": "Step 17: Jake verifies return code",
+      "status": "pass",
+      "ms": 248
+    },
+    {
+      "name": "Step 18: Luna marks rental complete",
+      "status": "pass",
+      "ms": 409
+    },
+    {
+      "name": "Step 19: Jake reviews Luna (5 stars)",
+      "status": "pass",
+      "ms": 256
+    },
+    {
+      "name": "Step 20: Luna reviews Jake (5 stars)",
+      "status": "pass",
+      "ms": 256
+    },
+    {
+      "name": "Step 21: Duplicate review is rejected (409)",
+      "status": "pass",
+      "ms": 141
+    },
+    {
+      "name": "Step 22: Luna review summary shows new review",
+      "status": "pass",
+      "ms": 157
+    },
+    {
+      "name": "Step 23: Jake review summary shows new review",
+      "status": "pass",
+      "ms": 214
+    },
+    {
+      "name": "Step 24: Notifications were created for Luna",
+      "status": "pass",
+      "ms": 170
+    },
+    {
+      "name": "Step 25: Notifications were created for Jake",
+      "status": "pass",
+      "ms": 240
+    },
+    {
+      "name": "Step 26: Item detail page loads in browser",
+      "status": "pass",
+      "ms": 3031
+    },
+    {
+      "name": "Step 27: Workshop page shows Luna reputation",
+      "status": "pass",
+      "ms": 2985
+    }
+  ]
+}
