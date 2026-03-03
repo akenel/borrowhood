@@ -23,6 +23,19 @@ class WorkshopType(str, enum.Enum):
     STUDIO = "studio"
     OFFICE = "office"
     OTHER = "other"
+    # Wave 2 legend workshop types
+    ARENA = "arena"
+    CAMP = "camp"
+    DOCK = "dock"
+    DOJO = "dojo"
+    FORGE = "forge"
+    FORTRESS = "fortress"
+    LABORATORY = "laboratory"
+    LODGE = "lodge"
+    OBSERVATORY = "observatory"
+    PALACE = "palace"
+    PAVILION = "pavilion"
+    STUDY = "study"
 
 
 class AccountStatus(str, enum.Enum):
