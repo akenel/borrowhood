@@ -4,6 +4,7 @@ Handles new user profile setup after first Keycloak login.
 Creates/updates user profile, workshop details, and languages in one shot.
 """
 
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -60,6 +61,7 @@ class ProfileSetup(BaseModel):
     offers_training: bool = False
     offers_custom_orders: bool = False
     offers_repair: bool = False
+    tos_accepted: bool = False
 
     @field_validator("latitude", mode="before")
     @classmethod
@@ -153,6 +155,8 @@ async def setup_profile(
         user.offers_training = profile.offers_training
         user.offers_custom_orders = profile.offers_custom_orders
         user.offers_repair = profile.offers_repair
+        if profile.tos_accepted and not user.tos_accepted_at:
+            user.tos_accepted_at = datetime.now(timezone.utc)
     else:
         # Create new
         slug = await _unique_slug(db, profile.display_name)
@@ -185,6 +189,7 @@ async def setup_profile(
             offers_repair=profile.offers_repair,
             account_status=AccountStatus.ACTIVE,
             badge_tier=BadgeTier.NEWCOMER,
+            tos_accepted_at=datetime.now(timezone.utc) if profile.tos_accepted else None,
         )
         db.add(user)
         await db.flush()

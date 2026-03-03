@@ -302,13 +302,20 @@
         <!-- Right sidebar -->
         <div class="space-y-6">
 
-            <!-- Contact -->
+            <!-- Contact (progressive disclosure: ACTIVE+ sees direct contact) -->
             <div class="bg-white rounded-lg border border-gray-200 p-6 space-y-3">
                 {% if workshop.telegram_username %}
+                {% if viewer_tier in ['active', 'trusted', 'pillar', 'legend'] %}
                 <a href="https://t.me/{{ workshop.telegram_username }}" target="_blank" rel="noopener"
                    class="w-full flex items-center justify-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors min-h-[44px]">
                     {{ t('workshop.message_telegram') }}
                 </a>
+                {% else %}
+                <div class="w-full flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-400 font-medium rounded-lg min-h-[44px]">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    {% if lang == 'it' %}Raggiungi il livello Attivo per contattare{% else %}Reach Active tier to contact{% endif %}
+                </div>
+                {% endif %}
                 {% endif %}
                 <a href="/workshop/{{ workshop.slug }}/export"
                    class="w-full flex items-center justify-center px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px]">

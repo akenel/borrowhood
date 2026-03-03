@@ -105,6 +105,9 @@ class BHUser(BHBase, Base):
     offers_custom_orders: Mapped[bool] = mapped_column(default=False)
     offers_repair: Mapped[bool] = mapped_column(default=False)
 
+    # Terms of Service acceptance
+    tos_accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), default=None)
+
     # Notification preferences
     notify_telegram: Mapped[bool] = mapped_column(default=True)
     notify_email: Mapped[bool] = mapped_column(default=True)

@@ -5,10 +5,13 @@ Branch: PENDING -> DECLINED | CANCELLED
 Branch: any active -> DISPUTED -> COMPLETED | CANCELLED
 """
 
+from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import PlainTextResponse
+
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -278,3 +281,56 @@ async def update_rental_status(
     await db.commit()
     await db.refresh(rental)
     return rental
+
+
+@router.get("/{rental_id}/calendar")
+async def rental_calendar(
+    rental_id: UUID,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Download .ics calendar file for a rental's dates."""
+    user = await get_user(db, token)
+
+    result = await db.execute(
+        select(BHRental)
+        .options(selectinload(BHRental.listing).selectinload(BHListing.item))
+        .where(BHRental.id == rental_id)
+    )
+    rental = result.scalars().first()
+    if not rental:
+        raise HTTPException(status_code=404, detail="Rental not found")
+
+    is_renter = rental.renter_id == user.id
+    is_owner = rental.listing.item.owner_id == user.id
+    if not (is_renter or is_owner):
+        raise HTTPException(status_code=403, detail="Not your rental")
+
+    item_name = rental.listing.item.name
+    now = datetime.now(timezone.utc)
+    dtstart = rental.requested_start or now
+    dtend = rental.requested_end or dtstart
+
+    def _ics_dt(dt) -> str:
+        return dt.strftime("%Y%m%dT%H%M%SZ")
+
+    ics = (
+        "BEGIN:VCALENDAR\r\n"
+        "VERSION:2.0\r\n"
+        "PRODID:-//BorrowHood//Rental//EN\r\n"
+        "BEGIN:VEVENT\r\n"
+        f"UID:{rental.id}@borrowhood\r\n"
+        f"DTSTAMP:{_ics_dt(now)}\r\n"
+        f"DTSTART:{_ics_dt(dtstart)}\r\n"
+        f"DTEND:{_ics_dt(dtend)}\r\n"
+        f"SUMMARY:BorrowHood: {item_name}\r\n"
+        f"DESCRIPTION:Rental of {item_name} via BorrowHood. Status: {rental.status.value}.\r\n"
+        "END:VEVENT\r\n"
+        "END:VCALENDAR\r\n"
+    )
+
+    return PlainTextResponse(
+        content=ics,
+        media_type="text/calendar",
+        headers={"Content-Disposition": f'attachment; filename="rental-{rental.id}.ics"'},
+    )
