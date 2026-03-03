@@ -2057,7 +2057,7 @@ LEGENDS = [
     {
         "slug": "daves-fix-it-shop",
         "display_name": "Dave Kenel",
-        "email": "dave@borrowhood.local",
+        "email": "dave.kenel@borrowhood.local",
         "date_of_birth": "1965-01-15",
         "mother_name": "Maria Kenel",
         "father_name": "Albert Kenel",
@@ -2109,7 +2109,7 @@ LEGENDS = [
     {
         "slug": "marios-excavation-yard",
         "display_name": "Mario Kenel",
-        "email": "mario@borrowhood.local",
+        "email": "mario.kenel@borrowhood.local",
         "date_of_birth": "1963-01-15",
         "mother_name": "Maria Kenel",
         "father_name": "Albert Kenel",
@@ -2162,7 +2162,7 @@ LEGENDS = [
     {
         "slug": "pauls-golf-office",
         "display_name": "Paul Kenel",
-        "email": "paul@borrowhood.local",
+        "email": "paul.kenel@borrowhood.local",
         "date_of_birth": "1960-01-15",
         "mother_name": "Maria Kenel",
         "father_name": "Albert Kenel",
