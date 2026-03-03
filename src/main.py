@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
 from src.database import async_session, create_tables, get_db
-from src.routers import ai, auth, badges, bids, deposits, disputes, health, helpboard, items, listings, lockbox, notifications, onboarding, pages, payments, rentals, reports, reviews, skills, telegram, translation, users
+from src.routers import ai, auth, badges, bids, deposits, disputes, health, helpboard, items, listings, lockbox, notifications, onboarding, pages, payments, rentals, reports, reviews, service_quotes, skills, telegram, translation, users
 from src.routers import qa as qa_router_mod
 from src.routers import backlog as backlog_router_mod
 from src.services.seeding import seed_database, seed_new_users, seed_new_items
@@ -62,6 +62,7 @@ def create_app() -> FastAPI:
     app.include_router(helpboard.router)
     app.include_router(skills.router)
     app.include_router(users.router)
+    app.include_router(service_quotes.router)
     app.include_router(telegram.router)
     app.include_router(translation.router)
 
