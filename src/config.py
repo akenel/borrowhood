@@ -55,6 +55,10 @@ class BHSettings(BaseSettings):
     stripe_publishable_key: str = ""    # pk_test_... or pk_live_...
     stripe_webhook_secret: str = ""     # whsec_...
 
+    # LibreTranslate (self-hosted translation)
+    libretranslate_url: str = ""  # e.g. "http://libretranslate:5000"
+    libretranslate_enabled: bool = False
+
     # AI Provider cascade: "auto" tries gemini -> ollama -> pollinations -> template
     # Set to "gemini", "ollama", or "pollinations" to force a single provider
     ai_provider: str = "auto"
