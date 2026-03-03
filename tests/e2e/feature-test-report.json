@@ -1,217 +1,218 @@
 {
   "base_url": "https://46.62.138.218",
-  "timestamp": "2026-03-03T14:49:11.643Z",
+  "timestamp": "2026-03-03T14:56:37.884Z",
   "summary": {
-    "passed": 28,
-    "failed": 11,
-    "total": 39
+    "passed": 3,
+    "failed": 32,
+    "total": 35
   },
   "tests": [
     {
       "name": "Luna logs in",
-      "status": "pass",
-      "ms": 942
+      "status": "fail",
+      "ms": 2525,
+      "error": "Login failed for luna: 502"
     },
     {
       "name": "Jake logs in",
-      "status": "pass",
-      "ms": 765
+      "status": "fail",
+      "ms": 826,
+      "error": "Login failed for jake: 502"
     },
     {
       "name": "Luna profile loads",
       "status": "fail",
-      "ms": 192,
-      "error": "Expected 200, got 422"
+      "ms": 285,
+      "error": "Users API: 502"
     },
     {
       "name": "Jake profile loads",
       "status": "fail",
-      "ms": 130,
-      "error": "Expected 200, got 422"
+      "ms": 479,
+      "error": "Users API: 502"
     },
     {
-      "name": "Create item with team pricing",
+      "name": "Create item for team pricing test",
       "status": "fail",
-      "ms": 188,
-      "error": "Expected 201, got 422"
+      "ms": 322,
+      "error": "Expected 201, got 502: "
     },
     {
       "name": "Create listing with team pricing fields",
       "status": "fail",
-      "ms": 183,
-      "error": "Expected 201, got 422: {\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"item_id\"],\"msg\":\"Field required\",\"input\":{\"listing_type\":\"service\",\"price_per_day\":50,\"currency\":\"EUR\",\"minimum_charge\":25,\"per_person_rate\":15,\"max_participants\":10,\"group_discount_pct\":20}}]}"
+      "ms": 1063,
+      "error": "Expected 201, got 502: "
     },
     {
       "name": "Update listing team pricing",
       "status": "fail",
-      "ms": 180,
-      "error": "Expected 200, got 422"
+      "ms": 0,
+      "error": "No listing to update"
     },
     {
       "name": "Team pricing validation -- negative minimum_charge rejected",
-      "status": "pass",
-      "ms": 204
+      "status": "fail",
+      "ms": 260,
+      "error": "Expected 422 validation error, got 502"
     },
     {
       "name": "Team pricing validation -- discount over 100 rejected",
-      "status": "pass",
-      "ms": 203
+      "status": "fail",
+      "ms": 224,
+      "error": "Expected 422 validation error, got 502"
     },
     {
       "name": "Jake requests a quote on Luna's service listing",
       "status": "fail",
-      "ms": 195,
-      "error": "Expected 201, got 422: {\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"listing_id\"],\"msg\":\"Field required\",\"input\":{\"description\":\"Need a 3-hour pottery workshop for 5 people\",\"preferred_date\":\"2026-04-15\"}},{\"type\":\"missing\",\"loc\":[\"body\",\"request_description\"],\"msg\":\"Field required\",\"input\":{\"description\":\"Need a 3-hour pottery workshop for 5 people\",\"preferred_date\":\"2026-04-15\"}}]}"
+      "ms": 0,
+      "error": "No listing for quote"
     },
     {
       "name": "Translation endpoint exists",
       "status": "pass",
-      "ms": 170
+      "ms": 351
     },
     {
       "name": "Translation with missing params returns 422",
-      "status": "pass",
-      "ms": 238
+      "status": "fail",
+      "ms": 300,
+      "error": "Expected 422/400, got 502"
     },
     {
       "name": "Get rental for calendar test",
-      "status": "pass",
-      "ms": 189
-    },
-    {
-      "name": "Calendar .ics downloads with correct content-type",
-      "status": "pass",
-      "ms": 162
-    },
-    {
-      "name": "Calendar .ics has valid VCALENDAR structure",
-      "status": "pass",
-      "ms": 206
-    },
-    {
-      "name": "Calendar .ics has Content-Disposition header",
-      "status": "pass",
-      "ms": 313
-    },
-    {
-      "name": "Calendar .ics returns 403 for non-participant",
-      "status": "pass",
-      "ms": 198
-    },
-    {
-      "name": "Calendar .ics returns 401 without auth",
-      "status": "pass",
-      "ms": 158
-    },
-    {
-      "name": "Item detail page has QR code",
       "status": "fail",
-      "ms": 952,
-      "error": "No QR code found on item detail"
+      "ms": 300,
+      "error": "Expected 200, got 502"
+    },
+    {
+      "name": "Item detail page has QR code section",
+      "status": "fail",
+      "ms": 262,
+      "error": "No items"
+    },
+    {
+      "name": "QR code API endpoint responds",
+      "status": "fail",
+      "ms": 184,
+      "error": "Cannot read properties of null (reading '0')"
     },
     {
       "name": "Luna has notifications",
-      "status": "pass",
-      "ms": 238
+      "status": "fail",
+      "ms": 207,
+      "error": "Expected 200, got 502"
     },
     {
       "name": "Jake has notifications",
-      "status": "pass",
-      "ms": 157
+      "status": "fail",
+      "ms": 328,
+      "error": "Expected 200, got 502"
     },
     {
       "name": "Notification types include rental events",
-      "status": "pass",
-      "ms": 151
+      "status": "fail",
+      "ms": 339,
+      "error": "Cannot read properties of null (reading 'map')"
     },
     {
       "name": "Unread count endpoint works",
       "status": "pass",
-      "ms": 291
+      "ms": 203
     },
     {
       "name": "Badges catalog returns list",
-      "status": "pass",
-      "ms": 135
+      "status": "fail",
+      "ms": 2377,
+      "error": "Expected 200, got 502"
     },
     {
       "name": "Luna has badges",
       "status": "fail",
-      "ms": 129,
-      "error": "Expected 200, got 422"
+      "ms": 1,
+      "error": "Luna ID not set"
     },
     {
       "name": "Points summary exists",
-      "status": "pass",
-      "ms": 255
+      "status": "fail",
+      "ms": 0,
+      "error": "Luna ID not set"
     },
     {
       "name": "Helpboard summary loads",
-      "status": "pass",
-      "ms": 153
+      "status": "fail",
+      "ms": 1161,
+      "error": "Expected 200, got 502"
     },
     {
       "name": "Helpboard posts paginate",
-      "status": "pass",
-      "ms": 160
+      "status": "fail",
+      "ms": 432,
+      "error": "Expected 200, got 502"
     },
     {
-      "name": "Create helpboard post (need type)",
-      "status": "pass",
-      "ms": 208
+      "name": "Create helpboard post",
+      "status": "fail",
+      "ms": 336,
+      "error": "Expected 201, got 502"
     },
     {
       "name": "Helpboard page renders",
-      "status": "pass",
-      "ms": 574
-    },
-    {
-      "name": "Workshop page shows contact gating for anonymous",
       "status": "fail",
-      "ms": 2035,
-      "error": "No contact gating or telegram link found"
+      "ms": 293,
+      "error": "Expected 200, got 502"
     },
     {
-      "name": "Item detail shows auction gating",
-      "status": "pass",
-      "ms": 409
+      "name": "Workshop page renders for anonymous users",
+      "status": "fail",
+      "ms": 0,
+      "error": "Luna slug not set"
+    },
+    {
+      "name": "Item detail shows auction bid section",
+      "status": "fail",
+      "ms": 306,
+      "error": "Cannot read properties of null (reading 'length')"
     },
     {
       "name": "Deposit endpoint exists",
       "status": "pass",
-      "ms": 224
+      "ms": 187
     },
     {
       "name": "Review summary for Luna",
       "status": "fail",
-      "ms": 207,
-      "error": "Expected 200, got 422"
+      "ms": 0,
+      "error": "Luna ID not set"
     },
     {
       "name": "Review summary for Jake",
       "status": "fail",
-      "ms": 132,
-      "error": "Expected 200, got 422"
+      "ms": 1,
+      "error": "Jake ID not set"
     },
     {
       "name": "Onboarding schema includes tos_accepted",
-      "status": "pass",
-      "ms": 854
+      "status": "fail",
+      "ms": 323,
+      "error": "fetch failed"
     },
     {
       "name": "Items search by query",
-      "status": "pass",
-      "ms": 189
+      "status": "fail",
+      "ms": 351,
+      "error": "Expected 200, got 502"
     },
     {
       "name": "Items search by category",
-      "status": "pass",
-      "ms": 165
+      "status": "fail",
+      "ms": 400,
+      "error": "Expected 200, got 502"
     },
     {
       "name": "Users search by city",
-      "status": "pass",
-      "ms": 157
+      "status": "fail",
+      "ms": 467,
+      "error": "Expected 200, got 502"
     }
   ]
 }
