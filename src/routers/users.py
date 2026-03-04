@@ -11,7 +11,8 @@ from pathlib import Path
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFile, File
+from fastapi.responses import JSONResponse
 from sqlalchemy import case, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -247,7 +248,11 @@ async def delete_my_account(
     ))
 
     await db.commit()
-    return {"status": "deleted"}
+
+    # Clear the httponly session cookie so the user is logged out
+    response = JSONResponse(content={"status": "deleted"})
+    response.delete_cookie("bh_session")
+    return response
 
 
 # ── Public endpoints ──

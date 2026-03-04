@@ -681,19 +681,16 @@
                         window.dispatchEvent(new CustomEvent('toast', {
                             detail: { type: 'error', message: err.detail || '{{ t("account.delete_blocked") }}' }
                         }));
+                        this.deleting = false;
                         return;
                     }
-                    window.dispatchEvent(new CustomEvent('toast', {
-                        detail: { type: 'success', message: '{{ t("account.delete_success") }}' }
-                    }));
-                    // Clear session cookie and redirect to home
-                    document.cookie = 'bh_session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT';
-                    setTimeout(() => { window.location.href = '/'; }, 1500);
+                    // Server clears the httponly cookie in the response.
+                    // Redirect to home -- nav will show Log In (no session).
+                    window.location.href = '/';
                 } catch (err) {
                     window.dispatchEvent(new CustomEvent('toast', {
                         detail: { type: 'error', message: err.message }
                     }));
-                } finally {
                     this.deleting = false;
                 }
             }

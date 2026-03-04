@@ -1,0 +1,52 @@
+What happens when a rented drone crashes? Deposits, disputes, and rebuttals -- the financial safety net that protects both sides.
+
+Act 1: Sally rents Pietro's DJI Mini 4 Pro. EUR 100 deposit held. She picks it up, flies it, returns it with a cracked gimbal. Pietro files a dispute. Sally responds: wind gust, not negligence. Resolution: partial deposit -- EUR 70 to Pietro for repairs, EUR 30 back to Sally.
+
+Act 2: Sally still can't delete her account -- she has an active service quote from Episode 14. She cancels the quote, tries again, and this time the account deletes. Profile gone. Listings paused. Clean exit.
+
+Two stories. One video. The full lifecycle of money and membership.
+
+No voiceover. Just the feature, live on Hetzner.
+
+0:00 The Crash
+0:12 Pietro's Drone Fleet
+0:30 Sally Rents the Mini 4 Pro
+0:50 Deposit Held -- EUR 100
+1:05 Pickup Day
+1:20 The Return -- Damage Report
+1:40 Pietro Files a Dispute
+2:05 Sally's Rebuttal
+2:25 Resolution -- Partial Deposit
+2:45 The Clean Exit
+3:05 Sally Resolves Her Quote
+3:20 Account Deleted
+3:40 Feature Complete
+
+How deposits work:
+- Deposit collected when rental starts (HELD status)
+- Released back to renter on successful return
+- Forfeited to owner if item is damaged or lost
+- Partial release splits the deposit -- damage cost deducted, remainder returned
+- Every deposit links to a rental, a payer, and a recipient
+
+How disputes work:
+- Either party files a dispute (reason + description + evidence)
+- Other party responds with their side (the rebuttal)
+- Status moves to UNDER_REVIEW
+- Resolution options: full refund, partial refund, deposit forfeited, deposit returned, no action, account warning, account suspended
+- Resolution updates the deposit status automatically
+
+Account deletion safety gates:
+- Active rentals (as renter or owner) block deletion
+- Held deposits block deletion
+- Open disputes block deletion
+- Active service quotes block deletion
+- Resolve everything first, then delete cleanly
+
+Stack: FastAPI, SQLAlchemy, PostgreSQL, Jinja2, Alpine.js, Tailwind CSS.
+
+Built with Claude Code (Opus). Deployed on Hetzner (EUR 7.59/mo).
+
+BorrowHood -- The neighborhood marketplace where your deposit protects both sides.
+
+#BorrowHood #Drones #Deposits #Disputes #AccountDeletion #FastAPI #Python #Marketplace #ClaudeCode #Anthropic
