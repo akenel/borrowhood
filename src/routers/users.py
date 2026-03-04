@@ -24,6 +24,7 @@ from src.models.dispute import BHDispute, DisputeStatus
 from src.models.item import BHItem
 from src.models.listing import BHListing, ListingStatus
 from src.models.rental import BHRental, RentalStatus
+from src.models.quote import BHServiceQuote, QuoteStatus
 from src.models.telegram import BHTelegramLink
 from src.models.user import AccountStatus, BadgeTier, BHUser, BHUserFavorite, WorkshopType
 from src.services.search import haversine_km
@@ -185,6 +186,23 @@ async def delete_my_account(
     )
     if dispute_count:
         blockers.append(f"{dispute_count} open dispute(s)")
+
+    # Check 5: active service quotes (as customer or provider)
+    _active_quote_statuses = [
+        QuoteStatus.REQUESTED, QuoteStatus.QUOTED,
+        QuoteStatus.ACCEPTED, QuoteStatus.IN_PROGRESS,
+    ]
+    quote_count = await db.scalar(
+        select(func.count())
+        .select_from(BHServiceQuote)
+        .where(or_(
+            BHServiceQuote.customer_id == user.id,
+            BHServiceQuote.provider_id == user.id,
+        ))
+        .where(BHServiceQuote.status.in_(_active_quote_statuses))
+    )
+    if quote_count:
+        blockers.append(f"{quote_count} active service quote(s)")
 
     if blockers:
         raise HTTPException(
