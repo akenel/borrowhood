@@ -528,6 +528,14 @@
     "notifications_disabled": "Notifiche Telegram disattivate",
     "unlink_confirm": "Sei sicuro di voler scollegare Telegram?"
   },
+  "account": {
+    "delete": "Elimina Account",
+    "delete_title": "Zona Pericolosa",
+    "delete_description": "Elimina permanentemente il tuo account e nascondi il tuo profilo. I tuoi annunci verranno messi in pausa e verrai disconnesso. Questa azione non può essere annullata.",
+    "delete_confirm": "Sei sicuro di voler eliminare permanentemente il tuo account? Questa azione non può essere annullata.",
+    "delete_success": "Account eliminato. Arrivederci.",
+    "delete_blocked": "Impossibile eliminare l'account"
+  },
   "giveaway": {
     "claim": "Richiedi Questo Oggetto",
     "claim_message_placeholder": "Ciao! Mi piacerebbe averlo. Posso ritirarlo...",
