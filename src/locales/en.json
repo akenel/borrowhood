@@ -528,6 +528,14 @@
     "notifications_disabled": "Telegram notifications disabled",
     "unlink_confirm": "Are you sure you want to unlink Telegram?"
   },
+  "account": {
+    "delete": "Delete Account",
+    "delete_title": "Danger Zone",
+    "delete_description": "Permanently delete your account and hide your profile. Your listings will be paused and you will be logged out. This cannot be undone.",
+    "delete_confirm": "Are you sure you want to permanently delete your account? This action cannot be undone.",
+    "delete_success": "Account deleted. Goodbye.",
+    "delete_blocked": "Cannot delete account"
+  },
   "giveaway": {
     "claim": "Claim This Item",
     "claim_message_placeholder": "Hi! I would love to have this. I can pick it up...",

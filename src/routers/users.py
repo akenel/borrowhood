@@ -1,21 +1,31 @@
-"""Users API: members directory listing, single profile, and favorites CRUD.
+"""Users API: members directory listing, single profile, favorites CRUD,
+and account deletion.
 
-Public reads for member discovery, auth-gated favorites.
+Public reads for member discovery, auth-gated favorites and account management.
 """
 
+import json
 import uuid as uuid_mod
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
-from sqlalchemy import case, func, select
+from sqlalchemy import case, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
 from src.dependencies import get_current_user_token, get_user, require_auth
-from src.models.user import BadgeTier, BHUser, BHUserFavorite, WorkshopType
+from src.models.audit import BHAuditLog
+from src.models.deposit import BHDeposit, DepositStatus
+from src.models.dispute import BHDispute, DisputeStatus
+from src.models.item import BHItem
+from src.models.listing import BHListing, ListingStatus
+from src.models.rental import BHRental, RentalStatus
+from src.models.telegram import BHTelegramLink
+from src.models.user import AccountStatus, BadgeTier, BHUser, BHUserFavorite, WorkshopType
 from src.services.search import haversine_km
 
 UPLOAD_DIR = Path(__file__).resolve().parent.parent / "static" / "uploads" / "avatars"
@@ -106,6 +116,120 @@ async def list_my_favorite_ids(
     )
     ids = [str(row[0]) for row in result.all()]
     return {"ids": ids}
+
+
+# ── Account deletion ── must be BEFORE /{user_id} routes ──
+
+# Rental statuses that indicate an active obligation
+_ACTIVE_RENTAL_STATUSES = [
+    RentalStatus.PENDING,
+    RentalStatus.APPROVED,
+    RentalStatus.PICKED_UP,
+    RentalStatus.RETURNED,
+    RentalStatus.DISPUTED,
+]
+
+
+@router.delete("/me", status_code=200)
+async def delete_my_account(
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Soft-delete the current user's account.
+
+    Blocked if user has active rentals (as renter or owner), held deposits,
+    or open disputes. Sets deleted_at, deactivates account, pauses listings,
+    clears Telegram link.
+    """
+    user = await get_user(db, token)
+    blockers = []
+
+    # Check 1: active rentals as renter
+    renter_count = await db.scalar(
+        select(func.count())
+        .select_from(BHRental)
+        .where(BHRental.renter_id == user.id)
+        .where(BHRental.status.in_(_ACTIVE_RENTAL_STATUSES))
+    )
+    if renter_count:
+        blockers.append(f"{renter_count} active rental(s) as renter")
+
+    # Check 2: active rentals as item owner (rental -> listing -> item -> owner)
+    owner_count = await db.scalar(
+        select(func.count())
+        .select_from(BHRental)
+        .join(BHListing, BHRental.listing_id == BHListing.id)
+        .join(BHItem, BHListing.item_id == BHItem.id)
+        .where(BHItem.owner_id == user.id)
+        .where(BHRental.status.in_(_ACTIVE_RENTAL_STATUSES))
+    )
+    if owner_count:
+        blockers.append(f"{owner_count} active rental(s) as item owner")
+
+    # Check 3: held deposits (payer or recipient)
+    deposit_count = await db.scalar(
+        select(func.count())
+        .select_from(BHDeposit)
+        .where(or_(BHDeposit.payer_id == user.id, BHDeposit.recipient_id == user.id))
+        .where(BHDeposit.status == DepositStatus.HELD)
+    )
+    if deposit_count:
+        blockers.append(f"{deposit_count} held deposit(s)")
+
+    # Check 4: open disputes
+    dispute_count = await db.scalar(
+        select(func.count())
+        .select_from(BHDispute)
+        .where(BHDispute.filed_by_id == user.id)
+        .where(BHDispute.status.in_([DisputeStatus.FILED, DisputeStatus.UNDER_REVIEW]))
+    )
+    if dispute_count:
+        blockers.append(f"{dispute_count} open dispute(s)")
+
+    if blockers:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Cannot delete account: {'; '.join(blockers)}. "
+            "Resolve these before deleting your account.",
+        )
+
+    # ── All clear -- soft-delete ──
+
+    old_status = user.account_status.value if user.account_status else None
+    user.deleted_at = datetime.now(timezone.utc)
+    user.account_status = AccountStatus.DEACTIVATED
+    user.telegram_chat_id = None
+    user.notify_telegram = False
+
+    # Pause all active listings owned by user
+    active_listings = await db.execute(
+        select(BHListing)
+        .join(BHItem, BHListing.item_id == BHItem.id)
+        .where(BHItem.owner_id == user.id)
+        .where(BHListing.status == ListingStatus.ACTIVE)
+    )
+    for listing in active_listings.scalars().all():
+        listing.status = ListingStatus.PAUSED
+
+    # Clean up pending Telegram link codes
+    pending_links = await db.execute(
+        select(BHTelegramLink).where(BHTelegramLink.user_id == user.id)
+    )
+    for link in pending_links.scalars().all():
+        await db.delete(link)
+
+    # Audit trail
+    db.add(BHAuditLog(
+        user_id=user.id,
+        action="account_deleted",
+        entity_type="user",
+        entity_id=user.id,
+        old_value=json.dumps({"account_status": old_status}),
+        new_value=json.dumps({"account_status": "deactivated"}),
+    ))
+
+    await db.commit()
+    return {"status": "deleted"}
 
 
 # ── Public endpoints ──
