@@ -425,42 +425,109 @@ async function showErrorBanner(page, message) {
   }
   console.log(`  Mini 4 Pro rent listing ID: ${miniRentListingId}`);
 
-  // Try the Rent This Item button
+  // Calculate dates for the rental (3 days from now, return 5 days from now)
+  const startDate = new Date(Date.now() + 3 * 86400000);
+  const endDate = new Date(Date.now() + 5 * 86400000);
+  const startISO = startDate.toISOString();
+  const endISO = endDate.toISOString();
+  // Format for HTML date inputs: YYYY-MM-DD
+  const startStr = startDate.toISOString().split('T')[0];
+  const endStr = endDate.toISOString().split('T')[0];
+
+  // Click "Rent This Item" to show the rental modal (for the video)
   const hasRentBtn = await clickWithRing(page, 'Rent This Item', 'button, a');
   if (hasRentBtn) {
-    await sleep(1000);
-    // Fill rental form if modal opens
+    await sleep(1500);
+
+    // Fill pickup date
+    const pickupInput = await page.$('input[type="date"]:first-of-type, input[name*="pickup"], input[name*="start"]');
+    if (pickupInput) {
+      await page.evaluate((el, val) => {
+        el.value = val;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      }, pickupInput, startStr);
+      console.log(`  Pickup date set: ${startStr}`);
+    }
+    await sleep(500);
+
+    // Fill return date (second date input)
+    const dateInputs = await page.$$('input[type="date"]');
+    if (dateInputs.length >= 2) {
+      await page.evaluate((el, val) => {
+        el.value = val;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      }, dateInputs[1], endStr);
+      console.log(`  Return date set: ${endStr}`);
+    }
+    await sleep(500);
+
+    // Fill message textarea
     const textarea = await page.$('textarea');
     if (textarea) {
       await typeSlowly(page, 'textarea',
         'Vacation in Scopello next week. Want aerial shots of the coastline.', 30);
       await sleep(1000);
-      await clickWithRing(page, 'Submit', 'button');
-      await sleep(2000);
     }
-  } else if (miniRentListingId) {
-    // API fallback
-    const startDate = new Date(Date.now() + 3 * 86400000).toISOString();
-    const endDate = new Date(Date.now() + 5 * 86400000).toISOString();
-    const rentalResp = await apiCall(page, 'POST', '/api/v1/rentals', {
-      listing_id: miniRentListingId,
-      requested_start: startDate,
-      requested_end: endDate,
-      renter_message: 'Vacation in Scopello next week. Want aerial shots of the coastline.',
-    });
-    console.log(`  Rental created: ${JSON.stringify(rentalResp.data?.id || rentalResp.data)}`);
-    await showToast(page, 'Rental request sent to Pietro!');
-  }
-  await sleep(3000);
 
-  // Get the rental ID we just created
+    // Click "Send Request" (the actual button text, not "Submit")
+    const sent = await clickWithRing(page, 'Send Request', 'button');
+    if (!sent) {
+      // Try other possible button texts
+      await clickWithRing(page, 'Submit', 'button') ||
+      await clickWithRing(page, 'Request', 'button');
+    }
+    await sleep(3000);
+  }
+
+  // Check if the rental was created via UI form
   const myRentals = await apiCall(page, 'GET', '/api/v1/rentals?role=renter&status=pending');
   let rentalId = null;
   if (myRentals.data && myRentals.data.length > 0) {
-    // Find the one for Mini 4 Pro
     rentalId = myRentals.data[0].id;
+    console.log(`  Rental created via UI: ${rentalId}`);
   }
-  console.log(`  Rental ID: ${rentalId}`);
+
+  // API fallback: if the form submission failed, create via API
+  if (!rentalId && miniRentListingId) {
+    console.log('  UI form failed -- creating rental via API fallback');
+    const rentalResp = await apiCall(page, 'POST', '/api/v1/rentals', {
+      listing_id: miniRentListingId,
+      requested_start: startISO,
+      requested_end: endISO,
+      renter_message: 'Vacation in Scopello next week. Want aerial shots of the coastline.',
+    });
+    console.log(`  API rental response: ${rentalResp.status} ${JSON.stringify(rentalResp.data)}`);
+    if (rentalResp.data && rentalResp.data.id) {
+      rentalId = rentalResp.data.id;
+    }
+    // Re-check if it was created
+    if (!rentalId) {
+      const recheck = await apiCall(page, 'GET', '/api/v1/rentals?role=renter&status=pending');
+      if (recheck.data && recheck.data.length > 0) {
+        rentalId = recheck.data[0].id;
+      }
+    }
+    if (rentalId) {
+      await showToast(page, 'Rental request sent to Pietro!');
+    }
+  }
+  await sleep(2000);
+
+  // HARD FAIL if rental creation failed -- don't continue with fake overlays
+  if (!rentalId) {
+    console.error('\n  FATAL: Rental creation failed. rentalId is null.');
+    console.error('  The entire drone storyline requires a real rental.');
+    console.error('  Check: listing exists, user is authenticated, dates are valid.\n');
+    await page.goto(card('#DC2626', 'SCRIPT ERROR', 'Rental creation failed',
+      '<div class="extra">rentalId is null. The drone rental was never created.<br>Check the console for API error details.</div>'));
+    await waitForEnter('Fix the issue and restart. Press ENTER to close');
+    await browser.close();
+    process.exit(1);
+  }
+
+  console.log(`  Rental ID confirmed: ${rentalId}`);
   await demoLogout(page);
 
 
@@ -724,24 +791,15 @@ async function showErrorBanner(page, message) {
 
   // Try to delete -- should be blocked by active service quote from EP14
   console.log('  Scene 17b: Try to delete (expect blocked)');
-  await clickWithRing(page, 'Delete Account', 'button');
-  await sleep(1000);
 
-  // Handle confirm dialog
+  // Set up dialog handler BEFORE clicking
   page.once('dialog', async dialog => {
     console.log(`  Dialog: ${dialog.message()}`);
     await dialog.accept();
   });
   await clickWithRing(page, 'Delete Account', 'button');
-  await sleep(2000);
-
-  // The API should return 409 -- show the error
-  const deleteAttempt = await apiCall(page, 'DELETE', '/api/v1/users/me');
-  console.log(`  Delete attempt: ${deleteAttempt.status} ${JSON.stringify(deleteAttempt.data)}`);
-  if (deleteAttempt.status === 409) {
-    await showErrorBanner(page, deleteAttempt.data?.detail || 'Cannot delete account: active obligations remain.');
-  }
-  await sleep(4000);
+  await sleep(4000);  // Wait for the 409 toast to appear from doDelete()
+  console.log('  Expect 409 toast: active service quote blocks deletion');
 
 
   // ============================================================
@@ -796,34 +854,31 @@ async function showErrorBanner(page, message) {
   await smoothScroll(page, 300);
   await sleep(2000);
 
-  // Click Delete Account
-  await clickWithRing(page, 'Delete Account', 'button');
-  await sleep(1500);
-
-  // Handle confirm dialog
+  // Set up dialog handler BEFORE clicking
   page.once('dialog', async dialog => {
     console.log(`  Dialog: ${dialog.message()}`);
     await dialog.accept();
   });
 
-  // Wait for the actual deletion -- the front-end JS should handle it
-  // But if the button triggers the JS flow directly, we just wait
-  await sleep(3000);
+  // Click Delete Account -- the front-end doDelete() will:
+  // 1. Call DELETE /api/v1/users/me
+  // 2. Server clears bh_session cookie in response
+  // 3. Redirect to / (nav will show "Log In" instead of "sally")
+  await clickWithRing(page, 'Delete Account', 'button');
+  await sleep(5000);  // Wait for redirect to complete
 
-  // If the front-end didn't trigger, do it via API
-  const deleteResp = await apiCall(page, 'DELETE', '/api/v1/users/me');
-  console.log(`  Delete response: ${deleteResp.status} ${JSON.stringify(deleteResp.data)}`);
-  if (deleteResp.status === 200) {
-    await showToast(page, 'Account deleted. Goodbye, Sally.');
-  }
-  await sleep(4000);
+  // Verify we landed on the home page (redirected after deletion)
+  const currentUrl = page.url();
+  console.log(`  After deletion, URL: ${currentUrl}`);
+  // The nav should now show "Log In" instead of "sally" -- our bug fix!
+  await sleep(3000);
 
 
   // ============================================================
   // SCENE 21: GONE (card -- 10s)
   // ============================================================
   console.log('  Scene 21: Gone card');
-  await demoLogout(page);
+  // Sally is already logged out -- server cleared cookie during deletion
 
   await showOverlay(page,
     'GONE',
