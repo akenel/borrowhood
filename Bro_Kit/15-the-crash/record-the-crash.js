@@ -409,20 +409,18 @@ async function showErrorBanner(page, message) {
   // ============================================================
   console.log('  Scene 7: Sally requests rental');
 
-  // Find the rental listing for Mini 4 Pro
-  const miniListings = await apiCall(page, 'GET', '/api/v1/listings?item_slug=dji-mini-4-pro-beginner-friendly');
-  let miniRentListingId = null;
-  if (miniListings.data && miniListings.data.items) {
-    const rentListing = miniListings.data.items.find(l => l.listing_type === 'rent');
-    if (rentListing) miniRentListingId = rentListing.id;
-  }
-  // Fallback: search all Pietro's listings
-  if (!miniRentListingId) {
-    const allListings = await apiCall(page, 'GET', '/api/v1/listings?q=Mini+4+Pro&listing_type=rent');
-    if (allListings.data && allListings.data.items && allListings.data.items.length > 0) {
-      miniRentListingId = allListings.data.items[0].id;
+  // Get the listing ID from the page's Alpine component (already rendered)
+  const miniRentListingId = await page.evaluate(() => {
+    const rentalDiv = document.querySelector('[x-data*="listingId"]');
+    if (!rentalDiv) return null;
+    // Alpine v3: data lives on _x_dataStack
+    if (rentalDiv._x_dataStack && rentalDiv._x_dataStack.length > 0) {
+      return rentalDiv._x_dataStack[0].listingId;
     }
-  }
+    // Fallback: parse from x-data attribute text
+    const match = rentalDiv.getAttribute('x-data').match(/listingId:\s*'([^']+)'/);
+    return match ? match[1] : null;
+  });
   console.log(`  Mini 4 Pro rent listing ID: ${miniRentListingId}`);
 
   // Calculate dates for the rental (3 days from now, return 5 days from now)
@@ -430,7 +428,6 @@ async function showErrorBanner(page, message) {
   const endDate = new Date(Date.now() + 5 * 86400000);
   const startISO = startDate.toISOString();
   const endISO = endDate.toISOString();
-  // Format for HTML date inputs: YYYY-MM-DD
   const startStr = startDate.toISOString().split('T')[0];
   const endStr = endDate.toISOString().split('T')[0];
 
@@ -439,44 +436,59 @@ async function showErrorBanner(page, message) {
   if (hasRentBtn) {
     await sleep(1500);
 
-    // Fill pickup date
-    const pickupInput = await page.$('input[type="date"]:first-of-type, input[name*="pickup"], input[name*="start"]');
-    if (pickupInput) {
-      await page.evaluate((el, val) => {
-        el.value = val;
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        el.dispatchEvent(new Event('change', { bubbles: true }));
-      }, pickupInput, startStr);
-      console.log(`  Pickup date set: ${startStr}`);
-    }
+    // Fill dates via Alpine v3 reactive model (x-model binds to rentalForm)
+    await page.evaluate((s, e) => {
+      const rentalDiv = document.querySelector('[x-data*="listingId"]');
+      if (rentalDiv && rentalDiv._x_dataStack && rentalDiv._x_dataStack.length > 0) {
+        rentalDiv._x_dataStack[0].rentalForm.start = s;
+        rentalDiv._x_dataStack[0].rentalForm.end = e;
+      }
+      // Also set input values directly so they show visually
+      const dateInputs = document.querySelectorAll('input[type="date"]');
+      if (dateInputs[0]) dateInputs[0].value = s;
+      if (dateInputs[1]) dateInputs[1].value = e;
+    }, startStr, endStr);
+    console.log(`  Dates set via Alpine: ${startStr} to ${endStr}`);
     await sleep(500);
 
-    // Fill return date (second date input)
-    const dateInputs = await page.$$('input[type="date"]');
-    if (dateInputs.length >= 2) {
-      await page.evaluate((el, val) => {
-        el.value = val;
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        el.dispatchEvent(new Event('change', { bubbles: true }));
-      }, dateInputs[1], endStr);
-      console.log(`  Return date set: ${endStr}`);
-    }
-    await sleep(500);
-
-    // Fill message textarea
+    // Type the message visually (so viewers see it being typed)
     const textarea = await page.$('textarea');
     if (textarea) {
       await typeSlowly(page, 'textarea',
         'Vacation in Scopello next week. Want aerial shots of the coastline.', 30);
+      // Sync to Alpine v3 model
+      await page.evaluate(() => {
+        const ta = document.querySelector('textarea');
+        const rentalDiv = document.querySelector('[x-data*="listingId"]');
+        if (ta && rentalDiv && rentalDiv._x_dataStack && rentalDiv._x_dataStack.length > 0) {
+          rentalDiv._x_dataStack[0].rentalForm.message = ta.value;
+        }
+      });
       await sleep(1000);
     }
 
-    // Click "Send Request" (the actual button text, not "Submit")
-    const sent = await clickWithRing(page, 'Send Request', 'button');
-    if (!sent) {
-      // Try other possible button texts
-      await clickWithRing(page, 'Submit', 'button') ||
-      await clickWithRing(page, 'Request', 'button');
+    // Click the submit button (indigo/green button in the modal, not Cancel)
+    // Use direct selector since x-text renders "Send Request" asynchronously
+    const submitted = await page.evaluate(() => {
+      const btns = document.querySelectorAll('button');
+      for (const btn of btns) {
+        if (btn.textContent.trim().includes('Send Request') ||
+            btn.classList.contains('bg-indigo-600') ||
+            btn.getAttribute('@click') === 'submitRental()') {
+          const box = btn.getBoundingClientRect();
+          if (box.width > 0 && box.height > 0) {
+            btn.click();
+            return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+          }
+        }
+      }
+      return null;
+    });
+    if (submitted) {
+      await showRing(page, submitted.x, submitted.y);
+      console.log('  Clicked Send Request');
+    } else {
+      console.log('  WARN: Could not find Send Request button');
     }
     await sleep(3000);
   }
@@ -501,13 +513,6 @@ async function showErrorBanner(page, message) {
     console.log(`  API rental response: ${rentalResp.status} ${JSON.stringify(rentalResp.data)}`);
     if (rentalResp.data && rentalResp.data.id) {
       rentalId = rentalResp.data.id;
-    }
-    // Re-check if it was created
-    if (!rentalId) {
-      const recheck = await apiCall(page, 'GET', '/api/v1/rentals?role=renter&status=pending');
-      if (recheck.data && recheck.data.length > 0) {
-        rentalId = recheck.data[0].id;
-      }
     }
     if (rentalId) {
       await showToast(page, 'Rental request sent to Pietro!');
