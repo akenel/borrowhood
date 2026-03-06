@@ -119,6 +119,11 @@ All users: password `helix_pass`. Seed users: sally, mike, angel, maria, nino.
 | 2 | Edge Cases | `08-edge-cases-when-things-go-wrong/` | DONE |
 | 3 | Community & Reputation | `09-community-and-reputation/` | DONE |
 | 4 | The Auction | `10-the-auction/` | FINAL (2:49) |
+| 5 | The Legends | `11-the-legends/` | FINAL (4:07) |
+| 6 | The Italian Job | `12-the-italian-job/` | PRE-PACKAGED |
+| 7 | The Giveaway | `13-the-giveaway/` | FINAL (2:36) |
+| 8 | The Workshop | `14-the-workshop/` | FINAL (2:19) |
+| 9 | The Crash | `15-the-crash/` | PRE-PACKAGED |
 
 ---
 

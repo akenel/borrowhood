@@ -62,7 +62,15 @@ UPDATE bh_listing
        )
    AND status = 'PAUSED';
 
--- ── 4. Clean stale deposits from previous takes ──
+-- ── 4. Clean stale reviews from previous takes ──
+
+DELETE FROM bh_review
+ WHERE rental_id IN (
+         SELECT id FROM bh_rental
+          WHERE status NOT IN ('COMPLETED', 'DECLINED', 'CANCELLED')
+       );
+
+-- ── 4b. Clean stale deposits from previous takes ──
 
 DELETE FROM bh_deposit
  WHERE rental_id IN (
@@ -90,6 +98,37 @@ DELETE FROM bh_lockbox_access
 
 DELETE FROM bh_rental
  WHERE status NOT IN ('COMPLETED', 'DECLINED', 'CANCELLED');
+
+-- ── 7b. Clean ALL completed rentals between Sally & Pietro from previous takes ──
+--    These ghosts pile up across takes and show as duplicates on the dashboard.
+--    Cascade: reviews -> deposits -> disputes -> lockbox -> rentals
+
+DELETE FROM bh_review
+ WHERE rental_id IN (
+         SELECT id FROM bh_rental
+          WHERE renter_id IN (SELECT id FROM bh_user WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local'))
+       );
+
+DELETE FROM bh_deposit
+ WHERE rental_id IN (
+         SELECT id FROM bh_rental
+          WHERE renter_id IN (SELECT id FROM bh_user WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local'))
+       );
+
+DELETE FROM bh_dispute
+ WHERE rental_id IN (
+         SELECT id FROM bh_rental
+          WHERE renter_id IN (SELECT id FROM bh_user WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local'))
+       );
+
+DELETE FROM bh_lockbox_access
+ WHERE rental_id IN (
+         SELECT id FROM bh_rental
+          WHERE renter_id IN (SELECT id FROM bh_user WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local'))
+       );
+
+DELETE FROM bh_rental
+ WHERE renter_id IN (SELECT id FROM bh_user WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local'));
 
 -- ── 8. Clean stale service quotes from EP14 takes ──
 --    (Sally's active quote that blocks account deletion)
@@ -181,3 +220,8 @@ SELECT COUNT(*) AS stale_deposits
          SELECT id FROM bh_rental
           WHERE status NOT IN ('COMPLETED', 'DECLINED', 'CANCELLED')
        );
+
+SELECT '--- GHOST RENTALS sally+pietro (should be 0) ---' AS section;
+SELECT COUNT(*) AS ghost_rentals
+  FROM bh_rental
+ WHERE renter_id IN (SELECT id FROM bh_user WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local'));

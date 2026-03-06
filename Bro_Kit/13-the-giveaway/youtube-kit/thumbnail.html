@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 1280px; height: 720px; overflow: hidden;
+  background: linear-gradient(135deg, #064E3B 0%, #065F46 30%, #047857 60%, #064E3B 100%);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: white;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  position: relative;
+}
+
+/* Green gradient accent bar at top */
+.accent-bar {
+  position: absolute; top: 0; left: 0; right: 0; height: 8px;
+  background: linear-gradient(90deg, #10B981, #34D399, #6EE7B7);
+}
+
+/* Main title */
+h1 {
+  font-size: 96px; font-weight: 900;
+  letter-spacing: -3px; line-height: 1.0;
+  text-shadow: 4px 4px 16px rgba(0,0,0,0.5);
+  margin-bottom: 12px;
+}
+
+/* Subtitle */
+h2 {
+  font-size: 42px; font-weight: 400;
+  opacity: 0.85; margin-bottom: 32px;
+}
+
+/* Stats row */
+.stats {
+  display: flex; gap: 60px;
+  margin-bottom: 36px;
+}
+.stat-block { text-align: center; }
+.stat-num {
+  font-size: 72px; font-weight: 900;
+  color: #6EE7B7;
+  line-height: 1.0;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+}
+.stat-label {
+  font-size: 24px; opacity: 0.6;
+  margin-top: 4px;
+}
+
+/* Feature pills */
+.features {
+  display: flex; gap: 16px;
+}
+.feature-pill {
+  padding: 10px 24px;
+  border-radius: 999px;
+  font-size: 22px; font-weight: 700;
+  letter-spacing: 1px;
+  background: rgba(255,255,255,0.15);
+}
+.pill-free { background: rgba(16, 185, 129, 0.6); }
+.pill-claim { background: rgba(52, 211, 153, 0.5); }
+.pill-auto { background: rgba(110, 231, 183, 0.4); }
+
+/* FREE badge */
+.free-badge {
+  font-size: 120px; font-weight: 900;
+  color: #6EE7B7;
+  text-shadow: 4px 4px 20px rgba(0,0,0,0.4);
+  margin-bottom: 8px;
+  letter-spacing: 10px;
+}
+
+/* BorrowHood brand */
+.brand {
+  position: absolute; bottom: 24px; right: 32px;
+  font-size: 28px; font-weight: 700;
+  color: #6EE7B7; opacity: 0.8;
+}
+
+/* Episode badge */
+.episode {
+  position: absolute; top: 24px; right: 32px;
+  font-size: 20px; font-weight: 600;
+  background: rgba(255,255,255,0.1);
+  padding: 8px 20px; border-radius: 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="accent-bar"></div>
+
+<div class="episode">EPISODE 7</div>
+
+<div class="free-badge">FREE</div>
+<h1>THE GIVEAWAY</h1>
+<h2>Claim It. Pick It Up. Done.</h2>
+
+<div class="stats">
+  <div class="stat-block">
+    <div class="stat-num">4</div>
+    <div class="stat-label">FREE ITEMS</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-num">0</div>
+    <div class="stat-label">PRICE</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-num">1</div>
+    <div class="stat-label">CLICK</div>
+  </div>
+</div>
+
+<div class="features">
+  <span class="feature-pill pill-free">FREE BADGE</span>
+  <span class="feature-pill pill-claim">CLAIM BUTTON</span>
+  <span class="feature-pill pill-auto">AUTO-COMPLETE</span>
+</div>
+
+<div class="brand">BorrowHood</div>
+
+</body>
+</html>

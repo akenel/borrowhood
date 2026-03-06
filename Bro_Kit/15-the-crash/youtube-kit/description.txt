@@ -1,52 +1,59 @@
-What happens when a rented drone crashes? Deposits, disputes, and rebuttals -- the financial safety net that protects both sides.
+What happens when a rented drone crashes? Five acts. Two neighbors. One deposit that changes everything.
 
-Act 1: Sally rents Pietro's DJI Mini 4 Pro. EUR 100 deposit held. She picks it up, flies it, returns it with a cracked gimbal. Pietro files a dispute. Sally responds: wind gust, not negligence. Resolution: partial deposit -- EUR 70 to Pietro for repairs, EUR 30 back to Sally.
+Sally rents Pietro's DJI Mini 4 Pro for aerial shots in Scopello. EUR 50 rental + EUR 100 deposit = EUR 150 total. She picks it up, flies it over the cliffs, and returns it with a cracked gimbal and a snapped propeller.
 
-Act 2: Sally still can't delete her account -- she has an active service quote from Episode 14. She cancels the quote, tries again, and this time the account deletes. Profile gone. Listings paused. Clean exit.
+Pietro files a dispute. Sally responds: wind gust, not negligence. The platform tracks both sides. Resolution: EUR 70 to Pietro for repairs, EUR 30 back to Sally. Fair. Done.
 
-Two stories. One video. The full lifecycle of money and membership.
+But then something unexpected happens.
 
-No voiceover. Just the feature, live on Hetzner.
+Pietro browses Sally's workshop and finds her 200-piece cookie cutter collection. His niece Sofia's birthday is next week. He rents the cookie cutters as a peace offering. Sally approves -- and throws in extra shapes for Sofia.
 
-0:00 The Crash
-0:12 Pietro's Drone Fleet
-0:30 Sally Rents the Mini 4 Pro
-0:50 Deposit Held -- EUR 100
-1:05 Pickup Day
-1:20 The Return -- Damage Report
-1:40 Pietro Files a Dispute
-2:05 Sally's Rebuttal
-2:25 Resolution -- Partial Deposit
-2:45 The Clean Exit
-3:05 Sally Resolves Her Quote
-3:20 Account Deleted
-3:40 Feature Complete
+A crashed drone brought them together. Now the question is: Sally bakes the best cookies in Trapani but can't deliver. Pietro has a licensed drone. Johnny Abela's bike is always broken.
 
-How deposits work:
-- Deposit collected when rental starts (HELD status)
-- Released back to renter on successful return
-- Forfeited to owner if item is damaged or lost
-- Partial release splits the deposit -- damage cost deducted, remainder returned
-- Every deposit links to a rental, a payer, and a recipient
+What if the drone guy... delivered the cookies?
+
+0:00 The Crash -- Season 1 Pilot
+0:10 Meet Pietro Ferretti -- SkyView Sicilia
+0:35 Pietro's Drone Fleet
+1:05 Meet Sally Thompson -- Sally's Kitchen
+1:20 Sally Rents the DJI Mini 4 Pro
+2:00 ACT I -- The Invoice (EUR 150)
+2:30 Pietro Approves the Rental
+3:00 ACT II -- The Flight (Pickup Day)
+3:40 Sally Picks Up the Drone
+4:10 ACT III -- The Crash (Damage Report)
+4:50 Pietro Files a Dispute
+5:30 ACT IV -- Sally's Rebuttal
+6:10 The Resolution (EUR 70/30 Split)
+7:00 Money Settlement
+7:30 ACT V -- The Seed
+8:00 Pietro Browses Sally's Cookie Cutters
+8:40 The Cookie Cutter Order (EUR 55)
+9:20 Sally Approves -- Full Circle
+9:50 EPILOGUE -- The Lightbulb
+10:20 The Partnership
+10:50 What if the drone guy... delivered the cookies?
+
+How deposits work in BorrowHood:
+- Deposit collected at rental start (HELD)
+- Released on successful return
+- Forfeited on damage or loss
+- Partial split when both sides have a case
 
 How disputes work:
-- Either party files a dispute (reason + description + evidence)
-- Other party responds with their side (the rebuttal)
-- Status moves to UNDER_REVIEW
-- Resolution options: full refund, partial refund, deposit forfeited, deposit returned, no action, account warning, account suspended
-- Resolution updates the deposit status automatically
+- Either party files (reason + description)
+- Other party submits rebuttal
+- Resolution options: full refund, partial, forfeited, returned
+- Deposit updated automatically
 
-Account deletion safety gates:
-- Active rentals (as renter or owner) block deletion
-- Held deposits block deletion
-- Open disputes block deletion
-- Active service quotes block deletion
-- Resolve everything first, then delete cleanly
+The Cast (Season 1 -- Trapani):
+Angel, Nino Cassisa, Leonardo da Vinci, Sally Thompson, Mike Kenel, Marco Moretti, Pietro Ferretti, Jake Chen, George Clooney, John Abela, Maria Ferretti, Sofia Ferretti, Rosa Ferretti, Anne Muthoni
 
-Stack: FastAPI, SQLAlchemy, PostgreSQL, Jinja2, Alpine.js, Tailwind CSS.
+Stack: FastAPI, SQLAlchemy, PostgreSQL, Jinja2, Alpine.js, Tailwind CSS, Keycloak OIDC.
+Built with Claude Code (Opus 4.6). Deployed on Hetzner (EUR 7.59/mo).
 
-Built with Claude Code (Opus). Deployed on Hetzner (EUR 7.59/mo).
+Notion Motion Pictures -- Built with Claude Code
 
-BorrowHood -- The neighborhood marketplace where your deposit protects both sides.
+BorrowHood -- The neighborhood marketplace where every crash is a door.
 
-#BorrowHood #Drones #Deposits #Disputes #AccountDeletion #FastAPI #Python #Marketplace #ClaudeCode #Anthropic
+#BorrowHood #Season1 #TheCrash #Drones #Deposits #Disputes #CookieCutters #FastAPI #Python #ClaudeCode #Anthropic #NotionMotionPictures
