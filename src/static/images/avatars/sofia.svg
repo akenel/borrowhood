@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Sofia Ferretti - 17yo baker, flour on cheek, cookie -->
+  <circle cx="64" cy="64" r="64" fill="#fef3c7"/>
+  <!-- Face -->
+  <circle cx="64" cy="52" r="28" fill="#f0d4a8"/>
+  <!-- Dark hair (long, Italian) -->
+  <path d="M36 48 Q34 22 64 16 Q94 22 92 48 Q88 32 64 28 Q40 32 36 48Z" fill="#3d2914"/>
+  <path d="M36 48 Q32 68 36 85" stroke="#3d2914" stroke-width="8" fill="none"/>
+  <path d="M92 48 Q96 68 92 85" stroke="#3d2914" stroke-width="8" fill="none"/>
+  <!-- Eyes (bright, young) -->
+  <ellipse cx="52" cy="48" rx="4" ry="4" fill="#2d3436"/>
+  <circle cx="53" cy="47" r="1.5" fill="white"/>
+  <ellipse cx="76" cy="48" rx="4" ry="4" fill="#2d3436"/>
+  <circle cx="77" cy="47" r="1.5" fill="white"/>
+  <!-- Big smile -->
+  <path d="M50 60 Q64 70 78 60" stroke="#c0392b" stroke-width="2.5" fill="none"/>
+  <!-- Flour spot on cheek -->
+  <circle cx="82" cy="56" r="5" fill="white" opacity="0.6"/>
+  <!-- Apron -->
+  <path d="M38 88 Q38 80 64 82 Q90 80 90 88 L90 128 L38 128Z" fill="#F9A8D4"/>
+  <path d="M54 82 L54 110 L74 110 L74 82" fill="#EC4899" opacity="0.3"/>
+  <!-- Cookie in hand -->
+  <circle cx="100" cy="90" r="10" fill="#D2691E"/>
+  <circle cx="96" cy="87" r="1.5" fill="#5D3A1A"/>
+  <circle cx="102" cy="85" r="1.5" fill="#5D3A1A"/>
+  <circle cx="104" cy="92" r="1.5" fill="#5D3A1A"/>
+  <circle cx="97" cy="93" r="1.5" fill="#5D3A1A"/>
+</svg>

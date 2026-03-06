@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Johnny Abela - Banana seat bike wheelie, mop in hand, Peanuts style -->
+  <circle cx="64" cy="64" r="64" fill="#87CEEB"/>
+  <!-- Back wheel (on ground) -->
+  <circle cx="85" cy="108" r="14" fill="none" stroke="#333" stroke-width="3"/>
+  <circle cx="85" cy="108" r="2" fill="#333"/>
+  <!-- Front wheel (in air - wheelie!) -->
+  <circle cx="30" cy="88" r="14" fill="none" stroke="#333" stroke-width="3"/>
+  <circle cx="30" cy="88" r="2" fill="#333"/>
+  <!-- Bike frame -->
+  <line x1="85" y1="108" x2="65" y2="88" stroke="#e74c3c" stroke-width="3"/>
+  <line x1="65" y1="88" x2="30" y2="88" stroke="#e74c3c" stroke-width="3"/>
+  <line x1="65" y1="88" x2="75" y2="78" stroke="#e74c3c" stroke-width="3"/>
+  <line x1="85" y1="108" x2="75" y2="78" stroke="#e74c3c" stroke-width="3"/>
+  <!-- Banana seat (yellow!) -->
+  <path d="M68 84 Q78 80 85 84" stroke="#FCD34D" stroke-width="5" fill="#FCD34D" stroke-linecap="round"/>
+  <!-- Handlebars -->
+  <line x1="30" y1="88" x2="28" y2="76" stroke="#333" stroke-width="2.5"/>
+  <line x1="22" y1="76" x2="34" y2="76" stroke="#333" stroke-width="2.5"/>
+  <!-- Johnny - big round head, sitting on banana seat -->
+  <circle cx="72" cy="58" r="20" fill="#FFE4B5"/>
+  <!-- Single curl (Charlie Brown) -->
+  <path d="M66 40 Q72 34 78 40 Q76 36 72 38 Q68 36 66 40Z" fill="#2d1810"/>
+  <!-- Dot eyes -->
+  <circle cx="66" cy="55" r="2.5" fill="#2d3436"/>
+  <circle cx="78" cy="55" r="2.5" fill="#2d3436"/>
+  <!-- Big grin -->
+  <path d="M64 64 Q72 72 80 64" stroke="#2d3436" stroke-width="2" fill="none"/>
+  <!-- Body on bike -->
+  <path d="M62 76 Q72 74 78 80" fill="#FCD34D" stroke="#FCD34D" stroke-width="4"/>
+  <!-- Zigzag shirt -->
+  <path d="M58 78 L63 74 L68 78 L73 74 L78 78" stroke="#2d3436" stroke-width="1.5" fill="none"/>
+  <!-- Left arm holding handlebar -->
+  <line x1="60" y1="74" x2="30" y2="76" stroke="#FFE4B5" stroke-width="4"/>
+  <!-- Right arm holding mop UP in the air -->
+  <line x1="80" y1="70" x2="100" y2="30" stroke="#FFE4B5" stroke-width="4"/>
+  <!-- Mop -->
+  <line x1="100" y1="30" x2="100" y2="8" stroke="#8B7355" stroke-width="3"/>
+  <rect x="93" y="4" width="14" height="8" rx="2" fill="#DDD"/>
+  <path d="M93 12 L95 20 M97 12 L97 20 M100 12 L100 20 M103 12 L103 20 M105 12 L105 20" stroke="#BBB" stroke-width="1.5"/>
+</svg>

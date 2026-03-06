@@ -32,6 +32,7 @@ from src.models.user import (
 )
 from src.models.helpboard import BHHelpPost, BHHelpReply, HelpType, HelpStatus, HelpUrgency
 from src.models.workshop import BHWorkshopMember, TeamRole
+from src.models.mentorship import BHMentorship, MentorshipType, MentorshipStatus
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +86,7 @@ async def seed_database(db: AsyncSession) -> dict:
     with open(SEED_FILE) as f:
         data = json.load(f)
 
-    counts = {"users": 0, "items": 0, "listings": 0, "teams": 0, "rentals": 0, "reviews": 0}
+    counts = {"users": 0, "items": 0, "listings": 0, "teams": 0, "mentorships": 0, "rentals": 0, "reviews": 0}
     user_map = {}  # slug -> user object
     listing_map = {}  # item_slug -> first listing object
 
@@ -236,6 +237,25 @@ async def seed_database(db: AsyncSession) -> dict:
                 accepted=team.get("accepted", False),
             ))
             counts["teams"] += 1
+
+    # Create mentorships
+    for m in data.get("mentorships", []):
+        mentor = user_map.get(m["mentor_slug"])
+        apprentice = user_map.get(m["apprentice_slug"])
+        if mentor and apprentice:
+            db.add(BHMentorship(
+                mentor_id=mentor.id,
+                apprentice_id=apprentice.id,
+                mentorship_type=_enum_val(MentorshipType, m["mentorship_type"]),
+                status=_enum_val(MentorshipStatus, m["status"]),
+                skill_name=m["skill_name"],
+                skill_category=m["skill_category"],
+                hours_logged=m.get("hours_logged", 0),
+                milestones_completed=m.get("milestones_completed", 0),
+                goal=m.get("goal"),
+                notes=m.get("notes"),
+            ))
+            counts["mentorships"] += 1
 
     # Create seed rentals and reviews (makes the app look alive)
     seed_reviews = [

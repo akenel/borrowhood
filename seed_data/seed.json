@@ -14,6 +14,9 @@
       "latitude": 38.018,
       "longitude": 12.537,
       "badge_tier": "trusted",
+      "date_of_birth": "1964-03-14",
+      "mother_name": "Dorothy Thompson",
+      "father_name": "Robert Thompson",
       "languages": [
         {
           "language_code": "en",
@@ -82,6 +85,9 @@
       "latitude": 38.022,
       "longitude": 12.545,
       "badge_tier": "pillar",
+      "date_of_birth": "1968-02-11",
+      "mother_name": "Maria Kenel",
+      "father_name": "Albert Kenel",
       "languages": [
         {
           "language_code": "en",
@@ -142,6 +148,9 @@
       "latitude": 38.077,
       "longitude": 12.644,
       "badge_tier": "legend",
+      "date_of_birth": "1984-01-15",
+      "mother_name": "Maria Kenel",
+      "father_name": "Albert Kenel",
       "languages": [
         {
           "language_code": "en",
@@ -210,6 +219,9 @@
       "latitude": 38.003,
       "longitude": 12.54,
       "badge_tier": "trusted",
+      "date_of_birth": "1991-03-25",
+      "mother_name": "Giuseppina Cassisa",
+      "father_name": "Sebastino Cassisa",
       "languages": [
         {
           "language_code": "it",
@@ -266,6 +278,9 @@
       "latitude": 38.025,
       "longitude": 12.53,
       "badge_tier": "pillar",
+      "date_of_birth": "1954-07-20",
+      "mother_name": "Lucia Ferrara",
+      "father_name": "Salvatore Cataldo",
       "languages": [
         {
           "language_code": "it",
@@ -322,6 +337,9 @@
       "latitude": 38.015,
       "longitude": 12.55,
       "badge_tier": "legend",
+      "date_of_birth": "1978-04-30",
+      "mother_name": "Elena Vitale",
+      "father_name": "Antonio Vitale",
       "languages": [
         {
           "language_code": "it",
@@ -394,6 +412,9 @@
       "latitude": 38.02,
       "longitude": 12.535,
       "badge_tier": "active",
+      "date_of_birth": "1995-09-12",
+      "mother_name": "Siobhan Morrison",
+      "father_name": "Patrick Morrison",
       "languages": [
         {
           "language_code": "en",
@@ -443,72 +464,6 @@
       "offers_pickup": true
     },
     {
-      "slug": "lunas-studio",
-      "display_name": "Luna Chen",
-      "email": "luna@borrowhood.local",
-      "workshop_name": "Luna's Art Studio",
-      "workshop_type": "studio",
-      "tagline": "Create something beautiful today",
-      "bio": "Painter, potter, and part-time dreamer. My studio has a kiln, a wheel, and more brushes than I can count. I teach watercolor on Saturdays and pottery on Wednesdays. All levels welcome.",
-      "telegram_username": "luna_art",
-      "city": "Trapani",
-      "country_code": "IT",
-      "latitude": 38.028,
-      "longitude": 12.542,
-      "badge_tier": "trusted",
-      "languages": [
-        {
-          "language_code": "en",
-          "proficiency": "C2"
-        },
-        {
-          "language_code": "zh",
-          "proficiency": "native"
-        },
-        {
-          "language_code": "it",
-          "proficiency": "B2"
-        }
-      ],
-      "skills": [
-        {
-          "skill_name": "Watercolor Painting",
-          "category": "art",
-          "self_rating": 5,
-          "years_experience": 15
-        },
-        {
-          "skill_name": "Pottery",
-          "category": "crafts",
-          "self_rating": 4,
-          "years_experience": 8
-        },
-        {
-          "skill_name": "Art Teaching",
-          "category": "teaching",
-          "self_rating": 4,
-          "years_experience": 10
-        }
-      ],
-      "social_links": [
-        {
-          "platform": "instagram",
-          "url": "https://instagram.com/lunasart",
-          "label": "Art Portfolio"
-        }
-      ],
-      "points": {
-        "total_points": 250,
-        "rentals_completed": 10,
-        "reviews_given": 12,
-        "reviews_received": 14,
-        "items_listed": 8,
-        "helpful_flags": 8
-      },
-      "offers_training": true,
-      "offers_custom_orders": true
-    },
-    {
       "slug": "rosas-home",
       "display_name": "Rosa Ferrara",
       "email": "rosa@borrowhood.local",
@@ -522,6 +477,9 @@
       "latitude": 38.016,
       "longitude": 12.549,
       "badge_tier": "pillar",
+      "date_of_birth": "1942-11-08",
+      "mother_name": "Concetta Ferrara",
+      "father_name": "Vincenzo Ferrara",
       "languages": [
         {
           "language_code": "it",
@@ -553,19 +511,22 @@
       }
     },
     {
-      "slug": "daves-sports",
-      "display_name": "Dave Wilson",
-      "email": "dave@borrowhood.local",
-      "workshop_name": "Dave's Sports Shed",
-      "workshop_type": "garage",
-      "tagline": "Life's too short for bad gear",
-      "bio": "Retired PE teacher. My garage has surfboards, bikes, camping gear, and more. Everything is maintained and ready to go. Hourly, daily, or weekly rentals. I deliver within 5km.",
-      "telegram_username": "dave_sports",
+      "slug": "georges-villa",
+      "display_name": "George Clooney",
+      "email": "george@borrowhood.local",
+      "workshop_name": "Villa Oleandra",
+      "workshop_type": "villa",
+      "tagline": "What else?",
+      "bio": "Actor, director, espresso enthusiast. I have a villa on Lake Como but I spend my winters in Sicily. My garage has vintage Vespas, espresso machines, and a collection of props from my films. I also make a mean Negroni. Everything is available for rent -- except the Oscar.",
+      "telegram_username": "george_villa",
       "city": "Trapani",
       "country_code": "IT",
       "latitude": 38.03,
       "longitude": 12.525,
-      "badge_tier": "active",
+      "badge_tier": "pillar",
+      "date_of_birth": "1961-05-06",
+      "mother_name": "Nina Bruce Warren",
+      "father_name": "Nick Clooney",
       "languages": [
         {
           "language_code": "en",
@@ -573,31 +534,31 @@
         },
         {
           "language_code": "it",
-          "proficiency": "A2"
+          "proficiency": "B2"
         }
       ],
       "skills": [
         {
-          "skill_name": "Bike Repair",
-          "category": "sports",
-          "self_rating": 4,
-          "years_experience": 20
+          "skill_name": "Espresso Making",
+          "category": "food",
+          "self_rating": 5,
+          "years_experience": 25
         },
         {
-          "skill_name": "Surfing Instruction",
-          "category": "sports",
-          "self_rating": 3,
-          "years_experience": 10
+          "skill_name": "Film Direction",
+          "category": "creative",
+          "self_rating": 5,
+          "years_experience": 30
         }
       ],
       "social_links": [],
       "points": {
-        "total_points": 95,
-        "rentals_completed": 8,
-        "reviews_given": 3,
-        "reviews_received": 6,
-        "items_listed": 15,
-        "helpful_flags": 1
+        "total_points": 420,
+        "rentals_completed": 18,
+        "reviews_given": 15,
+        "reviews_received": 25,
+        "items_listed": 8,
+        "helpful_flags": 10
       },
       "offers_delivery": true
     },
@@ -605,16 +566,19 @@
       "slug": "johns-cleaning",
       "display_name": "John Abela",
       "email": "john@borrowhood.local",
-      "workshop_name": "John's Cleaning Corner",
+      "workshop_name": "Johnny's Runs",
       "workshop_type": "other",
-      "tagline": "Professional clean, neighbor prices",
-      "bio": "Professional cleaner for 15 years. I have industrial carpet cleaners, pressure washers, and steam cleaners that I rent out when I'm not using them. Save yourself EUR 200 -- rent mine for EUR 20.",
-      "telegram_username": "john_clean",
+      "tagline": "Cleaning by day, deliveries by bike (when it works)",
+      "bio": "Everyone calls me Johnny. Maltese-Sicilian, born in Trapani. I clean houses and businesses -- industrial carpet cleaners, pressure washers, the real stuff. But my real dream is local delivery. I know every street, every shortcut, every doorbell that doesn't work. Problem is, my bike keeps breaking. Chain snapped twice this month. The frame is bent from that pothole on Via Fardella. One day I'll get an electric scooter and run a proper delivery service. Until then, I walk. And I clean. And I dream about that scooter.",
+      "telegram_username": "johnny_runs",
       "city": "Trapani",
       "country_code": "IT",
       "latitude": 38.012,
       "longitude": 12.538,
       "badge_tier": "newcomer",
+      "date_of_birth": "2000-08-03",
+      "mother_name": "Carmen Abela",
+      "father_name": "Joseph Abela",
       "languages": [
         {
           "language_code": "en",
@@ -641,6 +605,18 @@
           "category": "cleaning",
           "self_rating": 5,
           "years_experience": 10
+        },
+        {
+          "skill_name": "Local Delivery",
+          "category": "logistics",
+          "self_rating": 4,
+          "years_experience": 3
+        },
+        {
+          "skill_name": "Bike Repair",
+          "category": "repair",
+          "self_rating": 2,
+          "years_experience": 1
         }
       ],
       "social_links": [],
@@ -651,7 +627,9 @@
         "reviews_received": 2,
         "items_listed": 6,
         "helpful_flags": 0
-      }
+      },
+      "offers_delivery": true,
+      "offers_pickup": true
     },
     {
       "slug": "sofias-studio",
@@ -1878,6 +1856,9 @@
       "latitude": 38.068,
       "longitude": 12.82,
       "badge_tier": "trusted",
+      "date_of_birth": "1982-01-22",
+      "mother_name": "Antonella Ferretti",
+      "father_name": "Giovanni Ferretti",
       "languages": [
         {
           "language_code": "it",
@@ -1924,6 +1905,141 @@
         "helpful_flags": 2
       },
       "offers_training": true
+    },
+    {
+      "slug": "sofias-bakes",
+      "display_name": "Sofia Ferretti",
+      "email": "sofiaferretti@borrowhood.local",
+      "workshop_name": null,
+      "workshop_type": null,
+      "tagline": "Learning to bake, one cookie at a time",
+      "bio": "17 years old. Pietro's niece. I love baking -- especially cookies. Uncle Pietro got me Sally's 200-piece cookie cutter set for my birthday. Now I want to learn everything. Looking for a mentor.",
+      "telegram_username": "sofia_bakes",
+      "city": "Scopello",
+      "country_code": "IT",
+      "latitude": 38.069,
+      "longitude": 12.821,
+      "badge_tier": "newcomer",
+      "date_of_birth": "2009-06-15",
+      "mother_name": "Sara Ferretti",
+      "father_name": "Davide Ferretti",
+      "languages": [
+        {
+          "language_code": "it",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "en",
+          "proficiency": "B1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Baking",
+          "category": "cooking",
+          "self_rating": 2,
+          "years_experience": 2
+        }
+      ],
+      "social_links": [],
+      "points": {
+        "total_points": 5,
+        "rentals_completed": 0,
+        "reviews_given": 0,
+        "reviews_received": 0,
+        "items_listed": 0,
+        "helpful_flags": 0
+      }
+    },
+    {
+      "slug": "annes-qa-lab",
+      "display_name": "Anne Muthoni",
+      "email": "anne@borrowhood.local",
+      "workshop_name": null,
+      "workshop_type": null,
+      "tagline": "Quality is not an act, it is a habit",
+      "bio": "QA tester and quality advocate. I break things so users don't have to. If there's a bug, I'll find it. If the flow is broken, I'll map it. Every test case tells a story.",
+      "telegram_username": "anne_muthoni",
+      "city": "Nairobi",
+      "country_code": "KE",
+      "latitude": -1.286,
+      "longitude": 36.817,
+      "badge_tier": "active",
+      "date_of_birth": "1997-06-22",
+      "mother_name": "Grace Wanjiku Muthoni",
+      "father_name": "James Muthoni",
+      "languages": [
+        {
+          "language_code": "en",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "sw",
+          "proficiency": "native"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Quality Assurance",
+          "category": "technology",
+          "self_rating": 5,
+          "years_experience": 8
+        }
+      ],
+      "social_links": [],
+      "points": {
+        "total_points": 50,
+        "rentals_completed": 3,
+        "reviews_given": 5,
+        "reviews_received": 2,
+        "items_listed": 0,
+        "helpful_flags": 8
+      }
+    },
+    {
+      "slug": "tommys-deals",
+      "display_name": "Tommaso Ferrara",
+      "email": "tommy@borrowhood.local",
+      "workshop_name": "Tommy's Deals",
+      "workshop_type": "other",
+      "tagline": "Best deals in Trapani, guaranteed",
+      "bio": "I find stuff and I sell stuff. Electronics, clothes, whatever. Fast delivery. No questions asked. My grandmother Maria says I should get a real job but this IS a real job. Why work for someone else when you can work for yourself?",
+      "telegram_username": "tommy_deals",
+      "city": "Trapani",
+      "country_code": "IT",
+      "latitude": 38.018,
+      "longitude": 12.514,
+      "badge_tier": "newcomer",
+      "date_of_birth": "2000-02-14",
+      "mother_name": "Angela Ferrara",
+      "father_name": "Giuseppe Ferrara",
+      "languages": [
+        {
+          "language_code": "it",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "en",
+          "proficiency": "B1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Sales",
+          "category": "business",
+          "self_rating": 5,
+          "years_experience": 3
+        }
+      ],
+      "social_links": [],
+      "points": {
+        "total_points": 5,
+        "rentals_completed": 0,
+        "reviews_given": 0,
+        "reviews_received": 0,
+        "items_listed": 2,
+        "helpful_flags": 0
+      }
     },
     {
       "slug": "saras-cycles",
@@ -14039,8 +14155,23 @@
       "media": [
         {
           "media_type": "photo",
-          "url": "https://images.unsplash.com/photo-1594385208974-2f8bb07b7c24?w=800&h=600&fit=crop&q=80",
-          "alt_text": "KitchenAid Stand Mixer (Artisan 5qt) - product photo"
+          "url": "/static/images/seed/kitchenaid-mixer.png",
+          "alt_text": "KitchenAid Stand Mixer (Artisan 5qt) - front view"
+        },
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/kitchenaid-mixer-2.png",
+          "alt_text": "KitchenAid Stand Mixer - bowl and splash guard detail"
+        },
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/kitchenaid-mixer-3.png",
+          "alt_text": "KitchenAid Stand Mixer - bowl close-up from above"
+        },
+        {
+          "media_type": "photo",
+          "url": "/static/images/seed/kitchenaid-mixer-4.png",
+          "alt_text": "KitchenAid Stand Mixer - alternate angle"
         }
       ],
       "listings": [
@@ -14425,7 +14556,7 @@
       "longitude": 12.541
     },
     {
-      "owner_slug": "lunas-studio",
+      "owner_slug": "leonardos-bottega",
       "name": "Pottery Wheel Session (2 hours)",
       "slug": "pottery-wheel-session-2-hours",
       "description": "Use my pottery wheel and kiln. I'll teach beginners or leave you alone if you know what you're doing. Clay included. Your pieces fired and ready in 1 week.",
@@ -14460,7 +14591,7 @@
       "longitude": 12.535
     },
     {
-      "owner_slug": "lunas-studio",
+      "owner_slug": "leonardos-bottega",
       "name": "Watercolor Painting Kit (Rental)",
       "slug": "watercolor-painting-kit-rental",
       "description": "Professional Winsor & Newton watercolor set with brushes, paper pad, palette, and water cup. Everything you need for a day of painting. Great for plein air at the beach.",
@@ -14523,7 +14654,7 @@
       "longitude": 12.543
     },
     {
-      "owner_slug": "daves-sports",
+      "owner_slug": "georges-villa",
       "name": "Mountain Bike (Specialized Rockhopper)",
       "slug": "mountain-bike-specialized-rockhopper",
       "description": "Size L frame. 29\" wheels. Well maintained, new brake pads. Perfect for the trails around Erice or a day exploring Trapani. Helmet included.",
@@ -14558,7 +14689,7 @@
       "longitude": 12.54
     },
     {
-      "owner_slug": "daves-sports",
+      "owner_slug": "georges-villa",
       "name": "Surfboard (7'6\" Funboard)",
       "slug": "surfboard-76-funboard",
       "description": "Great intermediate board. Stable enough for beginners, responsive enough for experienced riders. Includes leash and wax. Perfect for the beaches near San Vito Lo Capo.",
@@ -14739,7 +14870,7 @@
       "longitude": 12.54
     },
     {
-      "owner_slug": "lunas-studio",
+      "owner_slug": "leonardos-bottega",
       "name": "Oil Painting Supplies (Complete Starter Kit)",
       "slug": "oil-painting-supplies-complete-starter-kit",
       "description": "Winsor & Newton oil paints (24 colours), brushes (15 assorted), palette, easel, canvas boards (5), turpentine, linseed oil, palette knife set. Everything a beginner or intermediate painter needs.",
@@ -14773,7 +14904,7 @@
       "longitude": 12.52
     },
     {
-      "owner_slug": "lunas-studio",
+      "owner_slug": "leonardos-bottega",
       "name": "Pottery Wheel (Electric, Shimpo VL-Whisper)",
       "slug": "pottery-wheel-electric-shimpo-vl-whisper",
       "description": "Professional-grade Shimpo VL-Whisper pottery wheel. Whisper-quiet motor, variable speed, reversible. Includes bat pins and splash pan. Heavy (30kg) but I can help load.",
@@ -14880,7 +15011,7 @@
       "longitude": 12.53
     },
     {
-      "owner_slug": "daves-sports",
+      "owner_slug": "georges-villa",
       "name": "Stand-Up Paddleboard (Inflatable 10'6\")",
       "slug": "stand-up-paddleboard-inflatable-10-6",
       "description": "Red Paddle Co Ride 10'6\" inflatable SUP. Includes pump, adjustable paddle, ankle leash, backpack. Inflates in 5 minutes, fits in car boot. Perfect for the Trapani coast.",
@@ -15309,7 +15440,7 @@
       ]
     },
     {
-      "owner_slug": "daves-sports",
+      "owner_slug": "georges-villa",
       "name": "Electric Cargo Bike -- Babboe City Mountain",
       "slug": "electric-cargo-bike-babboe",
       "description": "Front-loading electric cargo bike with rain cover. Carries up to 100kg or 2 kids + groceries. Shimano mid-drive motor, 80km range. Perfect for market runs, beach gear, or kid transport in the centro storico where cars can't go. Includes lock, helmet, and rain cover.",
@@ -15395,7 +15526,7 @@
       ]
     },
     {
-      "owner_slug": "daves-sports",
+      "owner_slug": "georges-villa",
       "name": "Bike Tune-Up & Repair Service",
       "slug": "bike-tune-up-repair-service",
       "description": "Full bike tune-up: brakes, gears, chain, tires, cables, bearings. I work on road bikes, mountain bikes, city bikes, and e-bikes (non-motor parts). 10 years as a weekend mechanic. Drop off at my shed or I come to you (within Trapani). Most tune-ups done in 1-2 hours while you wait.",
@@ -15499,7 +15630,7 @@
       ]
     },
     {
-      "owner_slug": "lunas-studio",
+      "owner_slug": "leonardos-bottega",
       "name": "Photography Walk & Lesson -- Trapani Old Town",
       "slug": "photography-walk-lesson-trapani",
       "description": "Learn photography while exploring Trapani's stunning old town. Composition, lighting, street photography, golden hour techniques. Bring your camera (phone is fine too). I'll teach you to see light the way artists do. We end at a cafe overlooking the sea. Small groups only -- 3 people max.",
@@ -15629,7 +15760,7 @@
       ]
     },
     {
-      "owner_slug": "lunas-studio",
+      "owner_slug": "leonardos-bottega",
       "name": "Commissioned Portrait Painting -- Oil on Canvas",
       "slug": "commissioned-portrait-oil-canvas",
       "description": "Custom oil portrait from your photo. Realistic or impressionist style. Canvas sizes from 30x40cm to 100x80cm. I work from high-resolution photos -- send 3-5 from different angles. Each portrait takes 2-4 weeks. Perfect gift for anniversaries, memorials, or just because your dog deserves it.",
@@ -15896,7 +16027,7 @@
       ]
     },
     {
-      "owner_slug": "daves-sports",
+      "owner_slug": "georges-villa",
       "name": "Kayak Tandem -- Explore the Coast",
       "slug": "kayak-tandem-explore-coast",
       "description": "Sit-on-top tandem kayak (2 person). Stable, easy to paddle, great for exploring the coast between Trapani and San Vito. Includes 2 paddles, 2 life vests, dry bag, and a basic map of good spots. I'll meet you at the beach and show you how to launch.",
@@ -15923,7 +16054,214 @@
       ]
     },
     {
-      "owner_slug": "lunas-studio",
+      "owner_slug": "georges-villa",
+      "name": "La Marzocco Linea Mini (Espresso Machine)",
+      "slug": "la-marzocco-linea-mini-espresso",
+      "description": "The La Marzocco Linea Mini. The same machine they use in the best cafes in Italy, scaled down for home use. Dual boiler, PID temperature control, pre-infusion. I have two -- one at the villa, one on the yacht. This one is from the villa. Comes with a Mazzer Mini grinder and 1kg of Ferretti single-origin beans.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "kitchen",
+      "subcategory": "appliances",
+      "condition": "excellent",
+      "brand": "La Marzocco",
+      "model": "Linea Mini",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop&q=80",
+          "alt_text": "La Marzocco Linea Mini espresso machine on marble counter"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 25.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 200.0,
+          "pickup_only": true,
+          "notes": "Pickup from Villa Oleandra, Trapani. I'll give you a 15-minute lesson on how to pull a proper shot. Grinder included. Beans NOT included after the first kilo."
+        }
+      ],
+      "latitude": 38.03,
+      "longitude": 12.525,
+      "story": "I bought this machine after a barista in Milan told me my espresso was 'acceptable.' Acceptable. I spent EUR 4,200 to never hear that word again."
+    },
+    {
+      "owner_slug": "georges-villa",
+      "name": "Nespresso Citiz (Backup Machine)",
+      "slug": "nespresso-citiz-backup-espresso",
+      "description": "My backup Nespresso Citiz. For when the Linea Mini is rented out or when I can't be bothered to grind beans. Makes a decent espresso in 25 seconds. Pod machine -- not for purists, but perfect for mortals. Comes with a starter pack of 50 capsules.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "kitchen",
+      "subcategory": "appliances",
+      "condition": "good",
+      "brand": "Nespresso",
+      "model": "Citiz C113",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Nespresso Citiz espresso machine"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 5.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 30.0,
+          "delivery_available": true,
+          "pickup_only": false,
+          "notes": "Free delivery within Trapani. 50 capsules included. After that, buy your own. I recommend the Roma blend."
+        }
+      ],
+      "latitude": 38.03,
+      "longitude": 12.525
+    },
+    {
+      "owner_slug": "georges-villa",
+      "name": "Vespa Primavera 125 (Vintage, 1978)",
+      "slug": "vespa-primavera-125-vintage-1978",
+      "description": "Original 1978 Vespa Primavera 125. Celeste blue. Fully restored. Rides like a dream through the narrow streets of Trapani. Helmet, lock, and a hand-drawn map of the best gelato stops included. You scratch it, you buy it. Insurance required.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "transport",
+      "subcategory": "scooters",
+      "condition": "excellent",
+      "brand": "Piaggio",
+      "model": "Vespa Primavera 125 (1978)",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Vintage celeste blue Vespa Primavera 125"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 35.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 300.0,
+          "pickup_only": true,
+          "notes": "Valid license required. Must be 18+. Weekly rate EUR 200. Insurance certificate needed before I hand over the key. This is not a toy."
+        },
+        {
+          "listing_type": "auction",
+          "starting_bid": 200.0,
+          "reserve_price": 800.0,
+          "bid_increment": 25.0,
+          "currency": "EUR",
+          "notes": "Thinking of selling. If the right offer comes along, she goes to a good home."
+        }
+      ],
+      "latitude": 38.03,
+      "longitude": 12.525,
+      "story": "I found this Vespa in a barn outside Marsala in 2019. The farmer wanted EUR 500 for it. I gave him EUR 800 because it was worth more than he knew. Took 6 months to restore. She sounds like a sewing machine and smells like history."
+    },
+    {
+      "owner_slug": "georges-villa",
+      "name": "Yacht Day Trip -- Trapani to Favignana",
+      "slug": "yacht-day-trip-trapani-favignana",
+      "description": "A full day on my 42-foot sailing yacht. Trapani marina to Favignana island and back. Swim stops, lunch on board, sunset return. I captain. You relax. Maximum 6 guests. Bring sunscreen and a good attitude.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "experiences",
+      "subcategory": "boating",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1540946485063-a40da27545f8?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Sailing yacht on turquoise Mediterranean water near Favignana"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 180.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 500.0,
+          "max_participants": 6,
+          "per_person_rate": 45.0,
+          "notes": "Full day trip 9AM-7PM. Lunch, drinks, and snorkeling gear included. No experience needed. Minimum 2 guests. Cancellation if wind exceeds 25 knots."
+        }
+      ],
+      "latitude": 38.03,
+      "longitude": 12.525,
+      "story": "I bought the boat because someone told me actors shouldn't know how to sail. I now have a captain's license and more sea miles than most fishermen in Trapani. The bilge pump works. Usually."
+    },
+    {
+      "owner_slug": "tommys-deals",
+      "name": "PlayStation 5 (Brand New, Sealed)",
+      "slug": "ps5-brand-new-tommy",
+      "description": "Brand new PS5, still in box. My cousin got two for Christmas and doesn't need this one. Rent it for a weekend or buy it outright. Best price in Trapani. No receipt but it's legit, trust me.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "electronics",
+      "subcategory": "gaming",
+      "condition": "new",
+      "brand": "Sony",
+      "model": "PlayStation 5",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=800&h=600&fit=crop&q=80",
+          "alt_text": "PlayStation 5 console box"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 30.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 100.0,
+          "delivery_available": true,
+          "notes": "Fast delivery anywhere in Trapani. Cash preferred. No questions asked."
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.514
+    },
+    {
+      "owner_slug": "tommys-deals",
+      "name": "iPhone 14 Pro Max (Like New)",
+      "slug": "iphone-14-pro-max-tommy",
+      "description": "iPhone 14 Pro Max, 256GB, space black. Like new. My friend upgraded to the 16 and gave me this. Screen perfect, battery 94%. Great for temporary use or if your phone broke. Weekly rental only.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "electronics",
+      "subcategory": "phones",
+      "condition": "like_new",
+      "brand": "Apple",
+      "model": "iPhone 14 Pro Max",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?w=800&h=600&fit=crop&q=80",
+          "alt_text": "iPhone 14 Pro Max space black"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 15.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 200.0,
+          "notes": "Weekly rental EUR 80. Must leave ID as deposit. Cash only."
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.514
+    },
+    {
+      "owner_slug": "leonardos-bottega",
       "name": "Pottery Wheel Session -- Make Your Own",
       "slug": "pottery-wheel-session-make-your-own",
       "description": "Hands-on pottery session on a professional electric wheel. I'll teach you centering, pulling, and shaping. You make 2-3 pieces (bowl, cup, vase) and I fire them in my kiln. Pick them up glazed and finished 2 weeks later. Great date activity, great rainy day activity, great any day activity.",
@@ -16911,7 +17249,7 @@
       "media": [
         {
           "media_type": "photo",
-          "url": "https://images.unsplash.com/photo-1594385208974-2f8bb07b7c24?w=800&h=600&fit=crop&q=80",
+          "url": "/static/images/seed/kitchenaid-mixer.png",
           "alt_text": "Hobart commercial stand mixer"
         },
         {
@@ -29199,6 +29537,618 @@
       "owner_slug": "listers-antiseptic-ward",
       "content_language": "en",
       "media": []
+    },
+    {
+      "owner_slug": "sofias-bakes",
+      "name": "Cookie Cutter Set (200 pieces) -- Sofia's Collection",
+      "slug": "cookie-cutter-set-sofias-collection",
+      "description": "Uncle Pietro got me Sally's legendary 200-piece cookie cutter set for my birthday. Every shape you can imagine. I'm still learning to use them all but I can rent them out when I'm not baking.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "kitchen",
+      "subcategory": "baking",
+      "condition": "good",
+      "brand": "Various",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Cookie Cutter Set (200 pieces) - product photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 3.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 15.0,
+          "pickup_only": true,
+          "notes": "Pick up from Scopello. I'll throw in some extra shapes for kids."
+        }
+      ],
+      "latitude": 38.069,
+      "longitude": 12.821,
+      "story": "These used to belong to Sally Thompson. She collected them for 40 years. Uncle Pietro rented them for my 17th birthday and Sally said I should keep them. Now Sally teaches me how to bake. Every cookie cutter has a story."
+    },
+    {
+      "owner_slug": "sofias-bakes",
+      "name": "Sofia's Birthday Cookie Box (Custom Order)",
+      "slug": "sofias-birthday-cookie-box",
+      "description": "I bake custom cookie boxes for birthdays, parties, or just because. Choose 12 shapes, I bake them fresh with Sicilian ingredients. Vanilla, chocolate chip, or lemon zest flavors. 48 hours notice.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "kitchen",
+      "subcategory": "baking",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Sofia's Birthday Cookie Box - fresh baked cookies"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 18.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "delivery_available": true,
+          "pickup_only": false,
+          "notes": "12 cookies per box. Custom shapes. Message me your theme and I'll bake it fresh."
+        }
+      ],
+      "latitude": 38.069,
+      "longitude": 12.821
+    },
+    {
+      "owner_slug": "sofias-bakes",
+      "name": "Baking with Sofia -- Learn to Make Sicilian Cookies",
+      "slug": "baking-with-sofia-sicilian-cookies",
+      "description": "I'm 17 and still learning, but I can already teach the basics. We'll make amaretti, biscotti, and my own chocolate chip recipe. My kitchen, my music, my apron. 2 hours. You bring the appetite.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "kitchen",
+      "subcategory": "baking",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1486427944344-ddd5bdbe52a4?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Baking with Sofia - hands-on cookie workshop"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "training",
+          "price": 10.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "2 hour minimum. Flour, sugar, eggs included. You take home what you bake."
+        }
+      ],
+      "latitude": 38.069,
+      "longitude": 12.821,
+      "story": "Sally Thompson is my mentor. She taught me that baking is chemistry AND love. I want to pass it on."
+    },
+    {
+      "owner_slug": "annes-qa-lab",
+      "name": "Bug Hunting Workshop -- Find Bugs Like a Pro",
+      "slug": "bug-hunting-workshop-anne",
+      "description": "I'll teach you how to find bugs in web apps. Manual testing, exploratory testing, writing test cases. 3-hour workshop. Bring your laptop and a sharp eye. We'll break things together.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "technology",
+      "subcategory": "testing",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Bug Hunting Workshop - QA testing session"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "training",
+          "price": 15.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "3-hour minimum. We test real apps. You leave knowing how to write a proper bug report."
+        }
+      ],
+      "latitude": -1.286,
+      "longitude": 36.817
+    },
+    {
+      "owner_slug": "annes-qa-lab",
+      "name": "QA Test Plan Template Kit",
+      "slug": "qa-test-plan-template-kit",
+      "description": "My collection of test plan templates, checklists, and bug report forms. ISTQB-aligned. Used in 20+ projects. Digital download -- you get the full kit as a ZIP file.",
+      "content_language": "en",
+      "item_type": "digital",
+      "category": "technology",
+      "subcategory": "testing",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=600&fit=crop&q=80",
+          "alt_text": "QA Test Plan Template Kit - organized testing documents"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 8.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "One-time purchase. Includes test plan, test case templates, bug report form, regression checklist."
+        }
+      ],
+      "latitude": -1.286,
+      "longitude": 36.817,
+      "story": "I built this kit over 8 years of testing. Every template was born from a project that needed better structure. Now you can skip the learning curve."
+    },
+    {
+      "owner_slug": "angel-hq",
+      "name": "SAP Migration Deep Dive -- 1-Hour Consultation",
+      "slug": "sap-migration-consultation-angel",
+      "description": "20 years of SAP PI/PO, CPI, and integration architecture in one hour. Bring your spaghetti diagrams, I'll untangle them. No PowerPoints -- whiteboard only. If I can't find the root cause in 60 minutes, the session is free. Spoiler: I always find it.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "services",
+      "subcategory": "consulting",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&h=600&fit=crop&q=80",
+          "alt_text": "SAP Migration Deep Dive -- 1-Hour Consultation - whiteboard session"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 150.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "1-hour session. Whiteboard only. If I can't find the root cause, it's free."
+        }
+      ],
+      "latitude": 38.077,
+      "longitude": 12.644
+    },
+    {
+      "owner_slug": "angel-hq",
+      "name": "MacBook Pro 16\" M3 Max -- Digital Nomad Ready",
+      "slug": "macbook-pro-16-m3-max-nomad",
+      "description": "The laptop that built BorrowHood. 36GB RAM, 1TB SSD, loaded with dev tools. Comes with charger, USB-C hub, and a stern warning not to install Windows on it. Daily rate includes a free judgmental look if you use it for spreadsheets.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "electronics",
+      "subcategory": "computers",
+      "condition": "excellent",
+      "brand": "Apple",
+      "model": "MacBook Pro 16\" M3 Max",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&h=600&fit=crop&q=80",
+          "alt_text": "MacBook Pro 16\" M3 Max -- Digital Nomad Ready - laptop on desk"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 35.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 500.0,
+          "notes": "Comes with charger and USB-C hub. No Windows installations please."
+        }
+      ],
+      "latitude": 38.077,
+      "longitude": 12.644
+    },
+    {
+      "owner_slug": "angel-hq",
+      "name": "Camping Gear Bundle -- MAX Essentials Kit",
+      "slug": "camping-gear-bundle-max-essentials",
+      "description": "Everything you need for off-grid Sicilian living: 2-burner stove, pots, sleeping bag (rated to 5C), headlamp, first aid kit, and a Swiss army knife that's seen more countries than most passports. The sleeping bag smells like freedom and slightly like diesel.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "outdoor",
+      "subcategory": "camping",
+      "condition": "good",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Camping Gear Bundle -- MAX Essentials Kit - camping equipment spread out"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 15.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 80.0,
+          "notes": "Full kit for off-grid Sicilian living. Sleeping bag rated to 5C."
+        }
+      ],
+      "latitude": 38.077,
+      "longitude": 12.644
+    },
+    {
+      "owner_slug": "angel-hq",
+      "name": "Whiskey & Code Night -- Pair Programming on the Rooftop",
+      "slug": "whiskey-code-night-rooftop",
+      "description": "Friday nights at Baglio Xiare. Bring your laptop and a bug you can't fix. I bring the Lagavulin and 20 years of debugging wisdom. We solve your problem or we drink until it doesn't matter anymore. Either way, you leave with a story. Max 4 developers per session.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "services",
+      "subcategory": "events",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Whiskey & Code Night -- Pair Programming on the Rooftop - evening coding session"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 40.0,
+          "price_unit": "per_session",
+          "currency": "EUR",
+          "notes": "Friday nights at Baglio Xiare. Max 4 developers. Lagavulin included."
+        }
+      ],
+      "latitude": 38.077,
+      "longitude": 12.644
+    },
+    {
+      "owner_slug": "pietros-drones",
+      "name": "Aerial Photography & Video -- Weddings, Real Estate, Events",
+      "slug": "aerial-photography-video-sicily",
+      "description": "Licensed EU drone pilot with 500+ flight hours over Western Sicily. 4K cinematic footage, edited same-day for real estate, next-week for weddings (because weddings are complicated, like the families involved). Includes raw files, color-graded edit, and a highlight reel. Insurance covered -- learned that lesson the hard way.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "services",
+      "subcategory": "photography",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Aerial Photography & Video -- drone flying over Sicilian coastline"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 250.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "notes": "Licensed EU pilot. 4K footage. Includes raw files and color-graded edit. Insurance covered."
+        }
+      ],
+      "latitude": 38.068,
+      "longitude": 12.82
+    },
+    {
+      "owner_slug": "pietros-drones",
+      "name": "Drone Pilot License Prep Course (EU A1/A3)",
+      "slug": "drone-pilot-license-prep-eu",
+      "description": "8-hour intensive course over 2 days. Theory + 4 hours stick time on a training drone. Pass rate: 94%. The other 6% tried to fly inverted on day one. Includes study materials, practice exam, and one 'oh God oh God' moment per student (mandatory).",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "training",
+      "subcategory": "drones",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Drone Pilot License Prep Course -- training session with drone"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 180.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "notes": "8-hour intensive over 2 days. Theory + 4 hours stick time. 94% pass rate."
+        }
+      ],
+      "latitude": 38.068,
+      "longitude": 12.82
+    },
+    {
+      "owner_slug": "pietros-drones",
+      "name": "Drone Repair & Tune-Up Service",
+      "slug": "drone-repair-tune-up-service",
+      "description": "Props chipped? Gimbal wobbling? Camera fogged? Bring it in. I fix DJI, Autel, and FPV builds. Diagnostics free, parts at cost, labor EUR 40/hour. If your drone hit a seagull, add EUR 20 for the therapy I'll need after seeing the footage.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "services",
+      "subcategory": "repair",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1579829366248-204fe8413f31?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Drone Repair & Tune-Up Service -- drone components on workbench"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 40.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "DJI, Autel, FPV builds. Diagnostics free, parts at cost."
+        }
+      ],
+      "latitude": 38.068,
+      "longitude": 12.82
+    },
+    {
+      "owner_slug": "ninos-campers",
+      "name": "Fiat Ducato Camper Van (Sleeps 4, Kitchen, Solar)",
+      "slug": "fiat-ducato-camper-van-rental",
+      "description": "2019 Ducato, professionally converted. Sleeps 4 (if two of you are short), full kitchen, 200W solar, outdoor shower. Unlimited km in Sicily. Comes with a Camper & Tour emergency number and my father Sebastino's blessing, which in Sicily is basically insurance.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "vehicles",
+      "subcategory": "campers",
+      "condition": "excellent",
+      "brand": "Fiat",
+      "model": "Ducato 2019",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Fiat Ducato Camper Van -- parked at Sicilian coastline"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 95.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 500.0,
+          "notes": "Sleeps 4, full kitchen, 200W solar, outdoor shower. Unlimited km in Sicily."
+        }
+      ],
+      "latitude": 38.003,
+      "longitude": 12.54
+    },
+    {
+      "owner_slug": "ninos-campers",
+      "name": "Camping Trip Planning -- Hidden Gems of Western Sicily",
+      "slug": "camping-trip-planning-western-sicily",
+      "description": "I grew up in these roads. Tell me how many days and what you like -- beaches, ruins, wine, or all three -- and I'll plan your route with campsites, wild spots (shh), best restaurants, and fuel stops. Includes offline maps and my personal phone number for when you inevitably get lost in Segesta at sunset.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "services",
+      "subcategory": "travel",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Camping Trip Planning -- scenic road through Western Sicily"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 30.0,
+          "price_unit": "per_session",
+          "currency": "EUR",
+          "notes": "Custom route planning for Western Sicily. Includes offline maps and my phone number."
+        }
+      ],
+      "latitude": 38.003,
+      "longitude": 12.54
+    },
+    {
+      "owner_slug": "rosas-home",
+      "name": "Hand-Knitted Sicilian Shawl (Custom Colors & Patterns)",
+      "slug": "hand-knitted-sicilian-shawl-custom",
+      "description": "Made by these hands for 65 years. Choose your colors and pattern -- traditional Sicilian, modern geometric, or 'surprise me Rosa.' Takes 2-3 weeks. Each shawl comes with a tag that says who made it and a lifetime guarantee, because I plan to outlive everyone in this neighborhood.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "crafts",
+      "subcategory": "textiles",
+      "condition": "new",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1585399058947-f68f7C340562?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Hand-Knitted Sicilian Shawl -- colorful knitted textile"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 85.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "Custom colors and pattern. 2-3 weeks production. Lifetime guarantee from Rosa."
+        }
+      ],
+      "latitude": 38.016,
+      "longitude": 12.549,
+      "story": "Made by these hands for 65 years. Every stitch carries a prayer and a story. My grandmother taught me, I taught my daughters, and now the shawls travel the world while I stay in Trapani."
+    },
+    {
+      "owner_slug": "rosas-home",
+      "name": "Nonna Rosa's Babysitting -- Ages 2-10, Snacks Included",
+      "slug": "nonna-rosas-babysitting-service",
+      "description": "I raised 6 children and 14 grandchildren. None of them went to prison. That's my resume. Your kids will eat homemade biscotti, learn three Sicilian words (one of them rude), and come home tired enough to sleep through the night. No tablets, no TV -- just stories, games, and a garden full of lizards to chase.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "services",
+      "subcategory": "childcare",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Nonna Rosa's Babysitting -- garden with toys and biscotti"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 25.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "notes": "Ages 2-10. Homemade biscotti included. No tablets, no TV. Just stories and lizards."
+        }
+      ],
+      "latitude": 38.016,
+      "longitude": 12.549
+    },
+    {
+      "owner_slug": "annes-qa-lab",
+      "name": "Website Accessibility Audit (WCAG 2.1 Compliance)",
+      "slug": "website-accessibility-audit-wcag",
+      "description": "I break websites for a living. Give me your URL, I'll give you a 40-page report on every accessibility violation, with screenshots, severity ratings, and fix suggestions. Screen reader tested, keyboard-only tested, color contrast tested. If your site passes on the first try, I'll refund you -- but nobody passes on the first try.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "services",
+      "subcategory": "testing",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Website Accessibility Audit -- screen showing WCAG compliance report"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 200.0,
+          "price_unit": "per_session",
+          "currency": "EUR",
+          "notes": "Full WCAG 2.1 audit. 40-page report with screenshots and fix suggestions."
+        }
+      ],
+      "latitude": -1.286,
+      "longitude": 36.817
+    },
+    {
+      "owner_slug": "annes-qa-lab",
+      "name": "User Testing Session -- Real Feedback, No Mercy",
+      "slug": "user-testing-session-real-feedback",
+      "description": "1-hour session where I use your app like a real human who hasn't read your documentation. Screen recorded, think-aloud protocol, timestamped notes. I'll find the UX pain points your team is too polite to mention. Includes a written report with 'Things That Made Me Want to Close the Tab' section. Constructive, but honest.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "services",
+      "subcategory": "testing",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&h=600&fit=crop&q=80",
+          "alt_text": "User Testing Session -- person testing app on laptop with notes"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 80.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "notes": "1-hour session. Screen recorded, think-aloud protocol, timestamped notes and written report."
+        }
+      ],
+      "latitude": -1.286,
+      "longitude": 36.817
+    },
+    {
+      "owner_slug": "tommys-deals",
+      "name": "Designer Sunglasses Collection -- Ray-Ban, Gucci, Prada",
+      "slug": "designer-sunglasses-collection-tommy",
+      "description": "Premium sunglasses for rent. Perfect for beach days, weddings, or looking important at cafes. All authentic (wink). Cash preferred, no receipts needed. Return policy: flexible. Questions about serial numbers: unnecessary.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "fashion",
+      "subcategory": "accessories",
+      "condition": "good",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Designer Sunglasses Collection -- assorted premium sunglasses display"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 10.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 50.0,
+          "notes": "Cash preferred. Return policy: flexible. Questions about serial numbers: unnecessary."
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.514
+    },
+    {
+      "owner_slug": "johns-cleaning",
+      "name": "Johnny's Delivery Bike (Broken -- Needs Repair)",
+      "slug": "johnnys-delivery-bike-broken",
+      "description": "My delivery bike. 26-inch mountain bike, panniers on both sides, can carry 15kg of goods. Problem: chain snaps every two weeks, frame is bent from a pothole on Via Fardella. I've fixed it 6 times already. If someone has a welder or knows bikes, I'd trade cleaning services for a proper repair. This bike is my business.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "cycling",
+      "subcategory": "bikes",
+      "condition": "poor",
+      "brand": "Bianchi",
+      "model": "Kuma 26",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Mountain bike with delivery panniers"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "offer",
+          "price": 0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "Not for rent -- listed because I need help fixing it. Will trade cleaning services for bike repair. The frame needs welding and the chain needs replacing. Again."
+        }
+      ],
+      "latitude": 38.012,
+      "longitude": 12.538
+    },
+    {
+      "owner_slug": "johns-cleaning",
+      "name": "Local Delivery Service -- Trapani Centro",
+      "slug": "johnny-local-delivery-trapani",
+      "description": "I deliver anything that fits in my bike panniers (when the bike works) or I carry it on foot. Groceries, packages, bakery orders, documents. I know every street in Trapani centro -- every shortcut, every one-way street, every doorbell code that doesn't work. Same-day delivery within the old town. For bigger loads or when the bike is broken (often), I walk. Still faster than the post office.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "services",
+      "subcategory": "delivery",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1526367790999-0150786686a2?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Local delivery service in old town streets"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "service",
+          "price": 5.0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "notes": "EUR 5 per delivery within Trapani centro. EUR 8 to Bonagia or Erice bassa. EUR 12 to the port area. Heavier than 10kg = EUR 3 extra. I'll confirm pickup time by Telegram. Usually within 2 hours."
+        }
+      ]
     }
   ],
   "teams": [
@@ -29211,10 +30161,48 @@
     },
     {
       "workshop_owner_slug": "sallys-kitchen",
-      "member_slug": "lunas-studio",
+      "member_slug": "leonardos-bottega",
       "role": "contributor",
       "invite_message": "Luna photographs my baked goods for the listings. She makes them look even better than they taste.",
       "accepted": true
+    }
+  ],
+  "mentorships": [
+    {
+      "mentor_slug": "sallys-kitchen",
+      "apprentice_slug": "sofias-bakes",
+      "mentorship_type": "apprentice",
+      "status": "active",
+      "skill_name": "Baking",
+      "skill_category": "cooking",
+      "hours_logged": 0,
+      "milestones_completed": 0,
+      "goal": "Master 10 cookie recipes from Sally's collection. Bake for the neighborhood market.",
+      "notes": "Sofia got Sally's cookie cutter set for her birthday. Natural talent. Eager learner. Sally's note: Just ping me on Telegram if you get stuck. I recommend butter for the cookbook recipes but you can always use virgin olive oil of course."
+    },
+    {
+      "mentor_slug": "pietros-drones",
+      "apprentice_slug": "sofias-bakes",
+      "mentorship_type": "apprentice",
+      "status": "proposed",
+      "skill_name": "Drone Piloting",
+      "skill_category": "drones",
+      "hours_logged": 0,
+      "milestones_completed": 0,
+      "goal": "Get licensed for basic drone delivery flights within Scopello.",
+      "notes": "Uncle Pietro wants to teach Sofia drone delivery. Waiting for her to turn 18."
+    },
+    {
+      "mentor_slug": "johns-cleaning",
+      "apprentice_slug": "sofias-bakes",
+      "mentorship_type": "intern",
+      "status": "proposed",
+      "skill_name": "Local Delivery",
+      "skill_category": "logistics",
+      "hours_logged": 0,
+      "milestones_completed": 0,
+      "goal": "Learn neighborhood delivery routes. Help Johnny with his rounds.",
+      "notes": "Johnny's bike is broken. Sofia could help with deliveries on foot until the scooter arrives."
     }
   ]
 }

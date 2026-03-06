@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Leonardo da Vinci - Renaissance master with paintbrush -->
+  <circle cx="64" cy="64" r="64" fill="#92400e"/>
+  <!-- Face -->
+  <circle cx="64" cy="52" r="28" fill="#e8c9a0"/>
+  <!-- Long hair -->
+  <path d="M36 52 Q32 25 64 18 Q96 25 92 52 Q90 40 64 36 Q38 40 36 52Z" fill="#8B7355"/>
+  <path d="M36 52 Q34 70 38 80" stroke="#8B7355" stroke-width="6" fill="none"/>
+  <path d="M92 52 Q94 70 90 80" stroke="#8B7355" stroke-width="6" fill="none"/>
+  <!-- Beard -->
+  <path d="M46 62 Q64 85 82 62 Q82 78 64 88 Q46 78 46 62Z" fill="#9B8B6B"/>
+  <!-- Eyes (wise) -->
+  <ellipse cx="52" cy="48" rx="3.5" ry="3" fill="#2d3436"/>
+  <ellipse cx="76" cy="48" rx="3.5" ry="3" fill="#2d3436"/>
+  <!-- Brows -->
+  <path d="M46 43 Q52 40 58 43" stroke="#7B6B4B" stroke-width="2" fill="none"/>
+  <path d="M70 43 Q76 40 82 43" stroke="#7B6B4B" stroke-width="2" fill="none"/>
+  <!-- Renaissance hat -->
+  <path d="M38 32 Q64 12 90 32 Q80 28 64 26 Q48 28 38 32Z" fill="#c0392b"/>
+  <!-- Robe -->
+  <path d="M32 92 Q32 82 64 84 Q96 82 96 92 L96 128 L32 128Z" fill="#8B0000"/>
+  <!-- Paintbrush in hand -->
+  <line x1="92" y1="85" x2="110" y2="65" stroke="#D2B48C" stroke-width="3"/>
+  <ellipse cx="112" cy="63" rx="4" ry="3" fill="#3498db" transform="rotate(-30 112 63)"/>
+</svg>

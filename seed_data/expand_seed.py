@@ -1138,15 +1138,28 @@ NEW_ITEMS = [
 ]
 
 # ── Giveaway Image Fixes ────────────────────────────────────────────
+# Each item gets 3 photos so the image gallery (prev/next + thumbnails) shows up.
+# Garden hose: REAL garden hose photos (old one was a plant, not a hose).
 GIVEAWAY_IMAGES = {
     "garden-hose-30m-free": [
-        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&h=600&fit=crop&q=80", "alt_text": "Garden hose coiled in garage - free pickup"},
+        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1499892298463-01d7f9832da5?w=800&h=600&fit=crop&q=80", "alt_text": "Woman watering plants with garden hose in yard"},
+        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1684867430779-e66e779a19b7?w=800&h=600&fit=crop&q=80", "alt_text": "Person spraying water with garden hose"},
+        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1515150144380-bca9f1650ed9?w=800&h=600&fit=crop&q=80", "alt_text": "Watering garden with hose - close up"},
     ],
     "bread-maker-panasonic-free": [
-        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&h=600&fit=crop&q=80", "alt_text": "Bread maker with fresh loaf - free to good home"},
+        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&h=600&fit=crop&q=80", "alt_text": "Fresh baked bread from bread maker"},
+        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1555932450-31a8aec2adf1?w=800&h=600&fit=crop&q=80", "alt_text": "Bread loaves fresh from oven"},
+        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1585190775860-a37ab092ac67?w=800&h=600&fit=crop&q=80", "alt_text": "Homemade bread on cutting board"},
     ],
     "kids-bicycle-16-inch-free": [
-        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=800&h=600&fit=crop&q=80", "alt_text": "Kids bicycle 16 inch with training wheels - free"},
+        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=800&h=600&fit=crop&q=80", "alt_text": "Kids bicycle with training wheels"},
+        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1583124688426-3128aec007f8?w=800&h=600&fit=crop&q=80", "alt_text": "Child's bicycle outdoors"},
+        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1595182747080-3b43712dd27d?w=800&h=600&fit=crop&q=80", "alt_text": "Kids bike parked on path"},
+    ],
+    "nanosecond-wire-teaching-aid": [
+        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=600&fit=crop&q=80", "alt_text": "Circuit board close-up - teaching electronics"},
+        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1613563696309-c2a4db7e1f36?w=800&h=600&fit=crop&q=80", "alt_text": "Science teaching materials and equipment"},
+        {"media_type": "photo", "url": "https://images.unsplash.com/photo-1613563696452-c7239f5ae99c?w=800&h=600&fit=crop&q=80", "alt_text": "STEM education hands-on learning"},
     ],
 }
 

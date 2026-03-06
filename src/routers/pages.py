@@ -665,18 +665,22 @@ async def demo_login_page(
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Not found")
 
+    _av = "/static/images/avatars"
     demo_users = [
-        {"username": "angel", "display_name": "Angelo Kenel", "workshop": "The Black Wolf Workshop", "roles": "admin, operator, moderator, lender", "badge": "legend", "color": "amber"},
-        {"username": "nino", "display_name": "Nino Cassisa", "workshop": "Camper & Tour Trapani", "roles": "operator, moderator, lender", "badge": "pillar", "color": "purple"},
-        {"username": "luna", "display_name": "Luna Greco", "workshop": "Luna's Art Studio", "roles": "moderator, lender", "badge": "trusted", "color": "emerald"},
-        {"username": "sally", "display_name": "Sally Baker", "workshop": "Sally's Kitchen", "roles": "lender", "badge": "trusted", "color": "emerald"},
-        {"username": "mike", "display_name": "Mike Kenel", "workshop": "Mike's Tool Shed", "roles": "lender", "badge": "pillar", "color": "purple"},
-        {"username": "marco", "display_name": "Marco Moretti", "workshop": "Bottega del Legno", "roles": "lender", "badge": "active", "color": "blue"},
-        {"username": "jake", "display_name": "Jake Chen", "workshop": "Jake's Maker Space", "roles": "lender", "badge": "active", "color": "blue"},
-        {"username": "dave", "display_name": "Dave Thompson", "workshop": "Dave's Sports Locker", "roles": "lender", "badge": "active", "color": "blue"},
-        {"username": "maria", "display_name": "Maria Ferretti", "workshop": None, "roles": "lender", "badge": "newcomer", "color": "gray"},
-        {"username": "rosa", "display_name": "Rosa Ferretti", "workshop": None, "roles": "member only", "badge": "newcomer", "color": "gray"},
-        {"username": "anne", "display_name": "Anne Muthoni", "workshop": None, "roles": "qa-tester", "badge": "active", "color": "blue"},
+        {"username": "angel", "display_name": "Angel", "workshop": "The Black Wolf Workshop", "roles": "admin, operator, moderator, lender", "badge": "legend", "color": "amber", "avatar": f"{_av}/angel.jpg"},
+        {"username": "nino", "display_name": "Nino Cassisa", "workshop": "Camper & Tour Trapani", "roles": "operator, moderator, lender", "badge": "pillar", "color": "purple", "avatar": f"{_av}/nino.svg"},
+        {"username": "leonardo", "display_name": "Leonardo da Vinci", "workshop": "Bottega di Leonardo", "roles": "moderator, lender", "badge": "legend", "color": "amber", "avatar": f"{_av}/leonardo.svg"},
+        {"username": "sally", "display_name": "Sally Baker", "workshop": "Sally's Kitchen", "roles": "lender", "badge": "trusted", "color": "emerald", "avatar": f"{_av}/sally.svg"},
+        {"username": "mike", "display_name": "Mike Kenel", "workshop": "Mike's Tool Shed", "roles": "lender", "badge": "pillar", "color": "purple", "avatar": f"{_av}/mike.svg"},
+        {"username": "marco", "display_name": "Marco Moretti", "workshop": "Bottega del Legno", "roles": "lender", "badge": "active", "color": "blue", "avatar": f"{_av}/marco.svg"},
+        {"username": "pietro", "display_name": "Pietro Ferretti", "workshop": "SkyView Sicilia", "roles": "lender", "badge": "active", "color": "blue", "avatar": f"{_av}/pietro.svg"},
+        {"username": "jake", "display_name": "Jake Chen", "workshop": "Jake's Maker Space", "roles": "lender", "badge": "active", "color": "blue", "avatar": f"{_av}/jake.svg"},
+        {"username": "george", "display_name": "George Clooney", "workshop": "Villa Oleandra", "roles": "lender", "badge": "pillar", "color": "purple", "avatar": f"{_av}/george.svg"},
+        {"username": "john", "display_name": "John Abela", "workshop": "John's Cleaning Corner", "roles": "lender", "badge": "newcomer", "color": "gray", "avatar": f"{_av}/john.svg"},
+        {"username": "maria", "display_name": "Maria Ferretti", "workshop": None, "roles": "lender", "badge": "newcomer", "color": "gray", "avatar": f"{_av}/maria.svg"},
+        {"username": "sofiaferretti", "display_name": "Sofia Ferretti", "workshop": None, "roles": "member", "badge": "newcomer", "color": "gray", "avatar": f"{_av}/sofia.svg"},
+        {"username": "rosa", "display_name": "Rosa Ferretti", "workshop": None, "roles": "member only", "badge": "newcomer", "color": "gray", "avatar": f"{_av}/rosa.svg"},
+        {"username": "anne", "display_name": "Anne Muthoni", "workshop": None, "roles": "qa-tester", "badge": "active", "color": "blue", "avatar": f"{_av}/anne.svg"},
     ]
 
     ctx = _ctx(request, token, demo_users=demo_users)

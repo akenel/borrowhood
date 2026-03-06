@@ -462,6 +462,47 @@
       ]
     },
     {
+      "username": "pietro",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "helix_pass",
+          "temporary": false
+        }
+      ],
+      "email": "pietro@borrowhood.test",
+      "firstName": "Pietro",
+      "lastName": "Ferretti",
+      "attributes": {
+        "display_name": [
+          "Pietro Ferretti"
+        ],
+        "workshop_name": [
+          "SkyView Sicilia"
+        ],
+        "city": [
+          "Scopello"
+        ],
+        "language": [
+          "it",
+          "en"
+        ],
+        "notes": [
+          "Licensed drone pilot. Aerial photography and drone rentals."
+        ]
+      },
+      "realmRoles": [
+        "bh-lender",
+        "bh-member",
+        "default-roles-borrowhood"
+      ],
+      "groups": [
+        "/Lenders"
+      ]
+    },
+    {
       "username": "jake",
       "enabled": true,
       "emailVerified": true,
@@ -539,7 +580,7 @@
       ]
     },
     {
-      "username": "dave",
+      "username": "george",
       "enabled": true,
       "emailVerified": true,
       "credentials": [
@@ -549,24 +590,25 @@
           "temporary": false
         }
       ],
-      "email": "dave@borrowhood.test",
-      "firstName": "Dave",
-      "lastName": "Thompson",
+      "email": "george@borrowhood.test",
+      "firstName": "George",
+      "lastName": "Clooney",
       "attributes": {
         "display_name": [
-          "Dave Thompson"
+          "George Clooney"
         ],
         "workshop_name": [
-          "Dave's Sports Locker"
+          "Villa Oleandra"
         ],
         "city": [
-          "Marsala"
+          "Laglio"
         ],
         "language": [
-          "en"
+          "en",
+          "it"
         ],
         "notes": [
-          "Sports gear lender. Bikes, surfboards, camping gear."
+          "Actor, filmmaker, humanitarian. Lake Como villa. Lends premium gear with style."
         ]
       },
       "realmRoles": [
@@ -579,7 +621,7 @@
       ]
     },
     {
-      "username": "luna",
+      "username": "leonardo",
       "enabled": true,
       "emailVerified": true,
       "credentials": [
@@ -589,26 +631,26 @@
           "temporary": false
         }
       ],
-      "email": "luna@borrowhood.test",
-      "firstName": "Luna",
-      "lastName": "Greco",
+      "email": "leonardo@borrowhood.test",
+      "firstName": "Leonardo",
+      "lastName": "da Vinci",
       "attributes": {
         "display_name": [
-          "Luna Greco"
+          "Leonardo da Vinci"
         ],
         "workshop_name": [
-          "Luna's Art Studio"
+          "Bottega di Leonardo"
         ],
         "city": [
-          "Trapani"
+          "Vinci"
         ],
         "language": [
           "it",
           "en",
-          "es"
+          "la"
         ],
         "notes": [
-          "Artist and pottery teacher. Offers both tools and training."
+          "Polymath. Painter, inventor, engineer. The original maker. Moderator by divine right."
         ]
       },
       "realmRoles": [
@@ -619,6 +661,85 @@
       ],
       "groups": [
         "/Moderators"
+      ]
+    },
+    {
+      "username": "john",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "helix_pass",
+          "temporary": false
+        }
+      ],
+      "email": "john@borrowhood.test",
+      "firstName": "John",
+      "lastName": "Abela",
+      "attributes": {
+        "display_name": [
+          "John Abela"
+        ],
+        "workshop_name": [
+          "John's Cleaning Corner"
+        ],
+        "city": [
+          "Trapani"
+        ],
+        "language": [
+          "en",
+          "it",
+          "mt"
+        ],
+        "notes": [
+          "Professional cleaner 15 years. Local delivery guy -- bike always broken. Maltese roots. Everyone calls him Johnny."
+        ]
+      },
+      "realmRoles": [
+        "bh-lender",
+        "bh-member",
+        "default-roles-borrowhood"
+      ],
+      "groups": [
+        "/Lenders"
+      ]
+    },
+    {
+      "username": "sofiaferretti",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "helix_pass",
+          "temporary": false
+        }
+      ],
+      "email": "sofiaferretti@borrowhood.test",
+      "firstName": "Sofia",
+      "lastName": "Ferretti",
+      "attributes": {
+        "display_name": [
+          "Sofia Ferretti"
+        ],
+        "city": [
+          "Trapani"
+        ],
+        "language": [
+          "it",
+          "en"
+        ],
+        "notes": [
+          "Pietro's niece. 17 years old. Loves baking. The cookie cutter birthday girl. Future apprentice."
+        ]
+      },
+      "realmRoles": [
+        "bh-member",
+        "default-roles-borrowhood"
+      ],
+      "groups": [
+        "/Members"
       ]
     },
     {
@@ -722,5 +843,69 @@
     "clientOfflineSessionMaxLifespan": "0",
     "clientSessionIdleTimeout": "0",
     "clientSessionMaxLifespan": "0"
-  }
+  },
+  "identityProviders": [
+    {
+      "alias": "github",
+      "displayName": "GitHub",
+      "providerId": "github",
+      "enabled": true,
+      "updateProfileFirstLoginMode": "on",
+      "trustEmail": true,
+      "storeToken": false,
+      "addReadTokenRoleOnCreate": false,
+      "authenticateByDefault": false,
+      "linkOnly": false,
+      "firstBrokerLoginFlowAlias": "first broker login",
+      "config": {
+        "clientId": "SET_ON_SERVER",
+        "clientSecret": "SET_ON_SERVER",
+        "defaultScope": "user:email",
+        "syncMode": "IMPORT",
+        "guiOrder": "1"
+      }
+    }
+  ],
+  "identityProviderMappers": [
+    {
+      "name": "github-username",
+      "identityProviderAlias": "github",
+      "identityProviderMapper": "github-user-attribute-mapper",
+      "config": {
+        "syncMode": "INHERIT",
+        "jsonField": "login",
+        "userAttribute": "username"
+      }
+    },
+    {
+      "name": "github-email",
+      "identityProviderAlias": "github",
+      "identityProviderMapper": "github-user-attribute-mapper",
+      "config": {
+        "syncMode": "INHERIT",
+        "jsonField": "email",
+        "userAttribute": "email"
+      }
+    },
+    {
+      "name": "github-name",
+      "identityProviderAlias": "github",
+      "identityProviderMapper": "github-user-attribute-mapper",
+      "config": {
+        "syncMode": "INHERIT",
+        "jsonField": "name",
+        "userAttribute": "firstName"
+      }
+    },
+    {
+      "name": "github-avatar",
+      "identityProviderAlias": "github",
+      "identityProviderMapper": "hardcoded-attribute-idp-mapper",
+      "config": {
+        "syncMode": "INHERIT",
+        "attribute": "avatar_source",
+        "attribute.value": "github"
+      }
+    }
+  ]
 }

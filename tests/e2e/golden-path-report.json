@@ -1,158 +1,158 @@
 {
   "base_url": "https://46.62.138.218",
-  "timestamp": "2026-03-03T14:43:27.844Z",
+  "timestamp": "2026-03-03T19:18:38.572Z",
   "summary": {
     "passed": 27,
     "failed": 0,
     "total": 27
   },
   "artifacts": {
-    "lunaCookie": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJURzR4djNqTXptbUFOeWUzcWlja0xnTDlpT2lzZl9oWFZqdnJKMGp1QUl3In0.eyJleHAiOjE3NzI1NTA3OTUsImlhdCI6MTc3MjU0ODk5NSwianRpIjoiZDk3ZjdhMzctZTRmZS00YzE5LTlhZmEtZTEzNDdkN2I5YzYyIiwiaXNzIjoiaHR0cHM6Ly80Ni42Mi4xMzguMjE4L3JlYWxtcy9ib3Jyb3dob29kIiwic3ViIjoiNGQyNjNiZGYtMjdjNi00OGY0LWEyMjAtZjkyYjg2MGM5ZWMwIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYm9ycm93aG9vZC13ZWIiLCJzZXNzaW9uX3N0YXRlIjoiMTg2NjdhMDEtN2Q1OS00NGRhLThmNDEtOWNjNWNkNTY0OTg4IiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHBzOi8vNDYuNjIuMTM4LjIxOCIsImh0dHBzOi8vaGVsaXgubG9jYWwiLCJodHRwczovLzQ2LjYyLjEzOC4yMTg6ODQ0MyIsImh0dHBzOi8vYm9ycm93aG9vZC5oZWxpeC5sb2NhbCIsImh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiYmgtbGVuZGVyIiwiYmgtbWVtYmVyIiwiYmgtbW9kZXJhdG9yIiwiZGVmYXVsdC1yb2xlcy1ib3Jyb3dob29kIl19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiIxODY2N2EwMS03ZDU5LTQ0ZGEtOGY0MS05Y2M1Y2Q1NjQ5ODgiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6Ikx1bmEgR3JlY28iLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJsdW5hIiwiZ2l2ZW5fbmFtZSI6Ikx1bmEiLCJmYW1pbHlfbmFtZSI6IkdyZWNvIiwiZW1haWwiOiJsdW5hQGJvcnJvd2hvb2QudGVzdCJ9.Sr-omuIWULioPU6YQvM3y1SZtL85RBQV10APgG9WpOf_nXKbYtfkFj9L4XMSdIeavDPasodORHleBO8PQqvGncqG7pre7W_yZmoL38UJgNwM6PuPMI8xgGGckGgPenkIS2Y0z_H14thyUG-HprsHQB8eilh828aFXcH90CB-XjDqs1Or0h8Qpzj4PDr8nsyQOsHCZ65vlKW-23bSwKpZT5fs7IuJPGeoZHPDbtAQstmU1gBOwZUs1qvSEQXJ84w_-Esd5JUk870CEm0mwXZ_mpLm1aBrBhJtr61GkCHa_LEAtC9WxZosQBM3ktfsuoJQv77t1li8Pl3OWtfZ_PTq_g",
-    "jakeCookie": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJURzR4djNqTXptbUFOeWUzcWlja0xnTDlpT2lzZl9oWFZqdnJKMGp1QUl3In0.eyJleHAiOjE3NzI1NTA3OTYsImlhdCI6MTc3MjU0ODk5NiwianRpIjoiNjZjY2E5MDEtY2IxYi00ZmYxLTljNTYtMDhjYmNkMDk2MzEzIiwiaXNzIjoiaHR0cHM6Ly80Ni42Mi4xMzguMjE4L3JlYWxtcy9ib3Jyb3dob29kIiwic3ViIjoiMGM2MjE2MDAtMmExYy00ZTgyLWJiNmItOGNkNjVlNTFhYjBlIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYm9ycm93aG9vZC13ZWIiLCJzZXNzaW9uX3N0YXRlIjoiZmYxM2JiMjAtMDYwZC00Njc2LWIzODEtZDE3NGYzMTFkMWU4IiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHBzOi8vNDYuNjIuMTM4LjIxOCIsImh0dHBzOi8vaGVsaXgubG9jYWwiLCJodHRwczovLzQ2LjYyLjEzOC4yMTg6ODQ0MyIsImh0dHBzOi8vYm9ycm93aG9vZC5oZWxpeC5sb2NhbCIsImh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiYmgtbGVuZGVyIiwiYmgtbWVtYmVyIiwiZGVmYXVsdC1yb2xlcy1ib3Jyb3dob29kIl19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiJmZjEzYmIyMC0wNjBkLTQ2NzYtYjM4MS1kMTc0ZjMxMWQxZTgiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6Ikpha2UgQ2hlbiIsInByZWZlcnJlZF91c2VybmFtZSI6Impha2UiLCJnaXZlbl9uYW1lIjoiSmFrZSIsImZhbWlseV9uYW1lIjoiQ2hlbiIsImVtYWlsIjoiamFrZUBib3Jyb3dob29kLnRlc3QifQ.KsG3_dnZIf_cjy7La51w5TvII3SQ-ks96nU4J1bMDVFOWghhWJY7UsCXN_HNq3JWxH1x8W6-3vfQjVsWZu68mHTf41L5kXWAJKgLmEZ1mKBO24fGQwQzQJhafnBKkkCPkGij-qQLUPedhtTmkW4J2ACDzGqcQJMUCLmp438wgzsUJW_vyCWkfO9cly_tiRHjJpgowfgef-LVOb5LfSHlJ5xfZm6Aisnaffv8V8yOcgx9K9mW7PtvwpvVzsZGIy7zLklpI-VAHqB6Z8PlxnMYBIolBVYZBVxAxWVgHCO8kCB584EqiDB5BZi_wcDFR5hV4w_Gt0PW4Z7OCvsR8iVG8g",
+    "lunaCookie": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJURzR4djNqTXptbUFOeWUzcWlja0xnTDlpT2lzZl9oWFZqdnJKMGp1QUl3In0.eyJleHAiOjE3NzI1NjcyOTQsImlhdCI6MTc3MjU2NTQ5NCwianRpIjoiM2U1ZWNjODktMWIwNi00NGNhLWI0MzItOTNmNzA1MWM5MTQyIiwiaXNzIjoiaHR0cHM6Ly80Ni42Mi4xMzguMjE4L3JlYWxtcy9ib3Jyb3dob29kIiwic3ViIjoiNGQyNjNiZGYtMjdjNi00OGY0LWEyMjAtZjkyYjg2MGM5ZWMwIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYm9ycm93aG9vZC13ZWIiLCJzZXNzaW9uX3N0YXRlIjoiNzcxNjU1ODAtZmY3Ny00MzBmLWI5YjYtYWI1ODFhMzNkODYyIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHBzOi8vNDYuNjIuMTM4LjIxOCIsImh0dHBzOi8vaGVsaXgubG9jYWwiLCJodHRwczovLzQ2LjYyLjEzOC4yMTg6ODQ0MyIsImh0dHBzOi8vYm9ycm93aG9vZC5oZWxpeC5sb2NhbCIsImh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiYmgtbGVuZGVyIiwiYmgtbWVtYmVyIiwiYmgtbW9kZXJhdG9yIiwiZGVmYXVsdC1yb2xlcy1ib3Jyb3dob29kIl19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiI3NzE2NTU4MC1mZjc3LTQzMGYtYjliNi1hYjU4MWEzM2Q4NjIiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6Ikx1bmEgR3JlY28iLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJsdW5hIiwiZ2l2ZW5fbmFtZSI6Ikx1bmEiLCJmYW1pbHlfbmFtZSI6IkdyZWNvIiwiZW1haWwiOiJsdW5hQGJvcnJvd2hvb2QudGVzdCJ9.XyFNFLaDYrcXhCIM24cg6xZNenvJipMaEc8OKLD8_bieVJxBdrl_zJPCijoPdRtoJujE2nxNLw-c1X3-R5DN6aPvpe9k9LkKk-RDn1OmhiQ-NGDuiFcW3RDRxTI4p3I3Liuvq6CYI_ZwhMjFpdiTyBUOMEEAHvbHQkyLF4rTAm8OQTq6EkyABPw5eE8A7dbPZmpfyOSYYaHOaNNFD3TQSQPUM2el9poG2P8TqPGrwjgNUl57opm9bNUxszO2U28FBoWBcr9ZKOtz1ExKHtBoCnm36kophvZKvBjdeFI2S0TugwRXdd4f-x6Depezqf56SYNYJRG5aDWql6xx37DBrw",
+    "jakeCookie": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJURzR4djNqTXptbUFOeWUzcWlja0xnTDlpT2lzZl9oWFZqdnJKMGp1QUl3In0.eyJleHAiOjE3NzI1NjcyOTUsImlhdCI6MTc3MjU2NTQ5NSwianRpIjoiNmU2N2FiYjgtMGVlNy00MGEzLWEwZTMtYzMwN2Y0N2NlODEyIiwiaXNzIjoiaHR0cHM6Ly80Ni42Mi4xMzguMjE4L3JlYWxtcy9ib3Jyb3dob29kIiwic3ViIjoiMGM2MjE2MDAtMmExYy00ZTgyLWJiNmItOGNkNjVlNTFhYjBlIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYm9ycm93aG9vZC13ZWIiLCJzZXNzaW9uX3N0YXRlIjoiOGQxMDQwYWMtYTNkNi00ZGI4LTg5NGQtYTI5ZmNmZDNmYmUwIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHBzOi8vNDYuNjIuMTM4LjIxOCIsImh0dHBzOi8vaGVsaXgubG9jYWwiLCJodHRwczovLzQ2LjYyLjEzOC4yMTg6ODQ0MyIsImh0dHBzOi8vYm9ycm93aG9vZC5oZWxpeC5sb2NhbCIsImh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiYmgtbGVuZGVyIiwiYmgtbWVtYmVyIiwiZGVmYXVsdC1yb2xlcy1ib3Jyb3dob29kIl19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiI4ZDEwNDBhYy1hM2Q2LTRkYjgtODk0ZC1hMjlmY2ZkM2ZiZTAiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6Ikpha2UgQ2hlbiIsInByZWZlcnJlZF91c2VybmFtZSI6Impha2UiLCJnaXZlbl9uYW1lIjoiSmFrZSIsImZhbWlseV9uYW1lIjoiQ2hlbiIsImVtYWlsIjoiamFrZUBib3Jyb3dob29kLnRlc3QifQ.rsMOs-Z5O5_t3xPslYhd5Bz1Ow-7RHgc9k7VrIkySwp2hyGMwkLdJiksuf2laMJCrvNpezCywyb1Nql0g2P_mHsKE7ByOeeG-wYQHbyVk-APbHyYvX8Ak0hfmhVh4AACt5WxHvqvKLTCty6w9JoqtU2rkZrySrCXAAsht-EsLiuxNUyFUcYScj_SKw4m6MuB4pHIKNq0vG6IVFL9Lia9RJbqI-kNMotPOmvs4ZQKh4FJuf9rnaP4f1BdXRZrTfXmyreVKLxvsOo1wmfx7Cah-SXS_PMwQ2mWMv4gxhrsvTBrRKiMfhsMBv9msjCJlE2EGToH6WKuvsZkN2NgNoAdjw",
     "lunaUserId": "17e23ba3-e56d-4bd6-a08c-30c09887f7f8",
     "jakeUserId": "7948b667-63dc-4c83-bbdb-963b17ecdc27",
-    "itemId": "ec846bfc-daa8-484a-ae44-c503ef699c9d",
-    "itemSlug": "golden-path-ceramic-kiln-1772548996104",
-    "listingId": "98bf906e-3e61-4c40-b993-c891e195bf2e",
-    "rentalId": "73918f65-b19f-4b19-ac3d-66f830fc4c5a",
-    "pickupCode": "DQ2Z8RQB",
-    "returnCode": "AFNGS97B"
+    "itemId": "1054cbd3-9b8c-48fe-b7ce-4a365b73a5fe",
+    "itemSlug": "golden-path-ceramic-kiln-1772565496976",
+    "listingId": "755dbe77-d945-4e99-8f84-53beb196dec3",
+    "rentalId": "7890cbf1-a06d-4627-8187-0fce574e09df",
+    "pickupCode": "VUCD5XBQ",
+    "returnCode": "ARWW2H5Y"
   },
   "steps": [
     {
       "name": "Step 1: Luna logs in",
       "status": "pass",
-      "ms": 1061
+      "ms": 2192
     },
     {
       "name": "Step 2: Jake logs in",
       "status": "pass",
-      "ms": 784
+      "ms": 1507
     },
     {
       "name": "Step 3: Luna fetches her profile",
       "status": "pass",
-      "ms": 277
+      "ms": 595
     },
     {
       "name": "Step 4: Jake fetches his profile",
       "status": "pass",
-      "ms": 186
+      "ms": 487
     },
     {
       "name": "Step 5: Luna creates an item (Ceramic Kiln)",
       "status": "pass",
-      "ms": 319
+      "ms": 599
     },
     {
       "name": "Step 6: Luna creates a RENT listing",
       "status": "pass",
-      "ms": 154
+      "ms": 709
     },
     {
       "name": "Step 7: Listing appears in public API",
       "status": "pass",
-      "ms": 268
+      "ms": 414
     },
     {
       "name": "Step 8: Item appears on browse page",
       "status": "pass",
-      "ms": 168
+      "ms": 209
     },
     {
       "name": "Step 9: Jake requests rental (3 days)",
       "status": "pass",
-      "ms": 208
+      "ms": 422
     },
     {
       "name": "Step 10: Jake cannot rent his own items (validation)",
       "status": "pass",
-      "ms": 207
+      "ms": 432
     },
     {
       "name": "Step 11: Luna approves the rental",
       "status": "pass",
-      "ms": 238
+      "ms": 489
     },
     {
       "name": "Step 12: Luna generates lockbox codes",
       "status": "pass",
-      "ms": 214
+      "ms": 414
     },
     {
       "name": "Step 13: Duplicate lockbox generation returns 409",
       "status": "pass",
-      "ms": 154
+      "ms": 575
     },
     {
       "name": "Step 14: Wrong code is rejected",
       "status": "pass",
-      "ms": 181
+      "ms": 353
     },
     {
       "name": "Step 15: Jake verifies pickup code",
       "status": "pass",
-      "ms": 171
+      "ms": 335
     },
     {
       "name": "Step 16: Rental status is now picked_up",
       "status": "pass",
-      "ms": 225
+      "ms": 589
     },
     {
       "name": "Step 17: Jake verifies return code",
       "status": "pass",
-      "ms": 175
+      "ms": 535
     },
     {
       "name": "Step 18: Luna marks rental complete",
       "status": "pass",
-      "ms": 249
+      "ms": 701
     },
     {
       "name": "Step 19: Jake reviews Luna (5 stars)",
       "status": "pass",
-      "ms": 243
+      "ms": 720
     },
     {
       "name": "Step 20: Luna reviews Jake (5 stars)",
       "status": "pass",
-      "ms": 245
+      "ms": 647
     },
     {
       "name": "Step 21: Duplicate review is rejected (409)",
       "status": "pass",
-      "ms": 209
+      "ms": 669
     },
     {
       "name": "Step 22: Luna review summary shows new review",
       "status": "pass",
-      "ms": 130
+      "ms": 391
     },
     {
       "name": "Step 23: Jake review summary shows new review",
       "status": "pass",
-      "ms": 178
+      "ms": 172
     },
     {
       "name": "Step 24: Notifications were created for Luna",
       "status": "pass",
-      "ms": 185
+      "ms": 281
     },
     {
       "name": "Step 25: Notifications were created for Jake",
       "status": "pass",
-      "ms": 205
+      "ms": 524
     },
     {
       "name": "Step 26: Item detail page loads in browser",
       "status": "pass",
-      "ms": 3808
+      "ms": 5776
     },
     {
       "name": "Step 27: Workshop page shows Luna reputation",
       "status": "pass",
-      "ms": 3603
+      "ms": 5639
     }
   ]
 }
