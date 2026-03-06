@@ -1,0 +1,41 @@
+BorrowHood introduces workshops. Every garage becomes a repair shop. Every kitchen becomes a bakery. Skills, services, quotes, and yes -- you can leave.
+
+This episode demonstrates the full workshop lifecycle: explore a maker's profile with verified skills, request a service quote, provider submits pricing (labor + materials), customer accepts. Then we test the new account deletion feature -- Danger Zone with safety gates that block deletion when you have active obligations.
+
+Featuring: Marco's Woodworking Workshop, Sally's Kitchen, and the new Delete Account flow.
+
+No voiceover. Just the feature, live on Hetzner.
+
+0:00 The Workshop
+0:10 Marco's Woodworking Workshop
+0:25 Sally Needs Furniture Repaired
+0:35 Service Listing -- Quote Request
+0:50 Marco Prices the Job
+1:05 Sally Accepts the Quote
+1:20 Danger Zone -- Account Deletion
+1:40 Safety Gate -- Blocked!
+2:10 Feature Complete
+
+How workshops work:
+- Every user has a workshop profile (name, type, tagline, bio)
+- Add skills with self-rating (1-5 stars)
+- Neighbors verify your skills (trusted expert at 5+ verifications)
+- List services: "I'll fix your furniture" with hourly/flat pricing
+- Customers request quotes describing what they need
+- Provider responds with labor hours, materials cost, total
+- Customer accepts or declines within 7 days
+- Service quotes track the full lifecycle: requested to completed
+
+Account deletion:
+- Dashboard Settings has a Danger Zone section
+- Safety gates block deletion if you have active rentals, held deposits, or open disputes
+- Soft-delete hides profile, pauses listings, clears notifications
+- GDPR-ready: your data, your choice
+
+Stack: FastAPI, SQLAlchemy, PostgreSQL, Jinja2, Alpine.js, Tailwind CSS.
+
+Built with Claude Code (Opus). Deployed on Hetzner (EUR 7.59/mo).
+
+BorrowHood -- The neighborhood marketplace where everyone is a workshop.
+
+#BorrowHood #Workshop #Services #Skills #AccountDeletion #FastAPI #Python #Marketplace #ClaudeCode #Anthropic

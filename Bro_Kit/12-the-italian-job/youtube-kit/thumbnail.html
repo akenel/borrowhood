@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 1280px; height: 720px; overflow: hidden;
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 40%, #1E293B 60%, #0F172A 100%);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: white;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  position: relative;
+}
+
+/* Italian flag accent bars at top */
+.accent-bars {
+  position: absolute; top: 0; left: 0; right: 0; height: 8px;
+  display: flex;
+}
+.accent-bars .bar { flex: 1; }
+.bar-green { background: #009246; }
+.bar-white { background: #FFFFFF; }
+.bar-red { background: #CE2B37; }
+
+/* Main title */
+h1 {
+  font-size: 96px; font-weight: 900;
+  letter-spacing: -3px; line-height: 1.0;
+  text-shadow: 4px 4px 16px rgba(0,0,0,0.5);
+  margin-bottom: 12px;
+}
+
+/* Subtitle */
+h2 {
+  font-size: 42px; font-weight: 400;
+  opacity: 0.85; margin-bottom: 32px;
+}
+
+/* Stats row */
+.stats {
+  display: flex; gap: 60px;
+  margin-bottom: 36px;
+}
+.stat-block { text-align: center; }
+.stat-num {
+  font-size: 72px; font-weight: 900;
+  color: #38BDF8;
+  line-height: 1.0;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+}
+.stat-label {
+  font-size: 24px; opacity: 0.6;
+  margin-top: 4px;
+}
+
+/* Language pills */
+.langs {
+  display: flex; gap: 16px;
+}
+.lang-pill {
+  padding: 10px 24px;
+  border-radius: 999px;
+  font-size: 22px; font-weight: 700;
+  letter-spacing: 1px;
+}
+.lang-en { background: rgba(59, 130, 246, 0.7); }
+.lang-it { background: rgba(0, 146, 70, 0.7); }
+
+/* Flags */
+.flag-row {
+  display: flex; gap: 24px; align-items: center;
+  margin-bottom: 20px;
+}
+.flag { font-size: 64px; }
+.arrow { font-size: 48px; opacity: 0.6; }
+
+/* BorrowHood brand */
+.brand {
+  position: absolute; bottom: 24px; right: 32px;
+  font-size: 28px; font-weight: 700;
+  color: #38BDF8; opacity: 0.8;
+}
+
+/* Episode badge */
+.episode {
+  position: absolute; top: 24px; right: 32px;
+  font-size: 20px; font-weight: 600;
+  background: rgba(255,255,255,0.1);
+  padding: 8px 20px; border-radius: 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="accent-bars">
+  <div class="bar bar-green"></div>
+  <div class="bar bar-white"></div>
+  <div class="bar bar-red"></div>
+</div>
+
+<div class="episode">EPISODE 6</div>
+
+<div class="flag-row">
+  <span class="flag">&#x1F1EC;&#x1F1E7;</span>
+  <span class="arrow">&#x2194;</span>
+  <span class="flag">&#x1F1EE;&#x1F1F9;</span>
+</div>
+
+<h1>THE ITALIAN JOB</h1>
+<h2>One Click. Tutto Cambia.</h2>
+
+<div class="stats">
+  <div class="stat-block">
+    <div class="stat-num">547</div>
+    <div class="stat-label">TRANSLATED STRINGS</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-num">2</div>
+    <div class="stat-label">LANGUAGES</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-num">1</div>
+    <div class="stat-label">CLICK</div>
+  </div>
+</div>
+
+<div class="langs">
+  <span class="lang-pill lang-en">ENGLISH</span>
+  <span class="lang-pill lang-it">ITALIANO</span>
+</div>
+
+<div class="brand">BorrowHood</div>
+
+</body>
+</html>
