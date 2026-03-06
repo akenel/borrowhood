@@ -298,7 +298,11 @@ class TestUserModelEnums:
 
     def test_workshop_type_values(self):
         from src.models.user import WorkshopType
-        expected = {"kitchen", "garage", "garden", "workshop", "studio", "office", "other"}
+        expected = {
+            "kitchen", "garage", "garden", "workshop", "studio", "office", "other",
+            "arena", "camp", "dock", "dojo", "forge", "fortress",
+            "laboratory", "lodge", "observatory", "palace", "pavilion", "study",
+        }
         assert {t.value for t in WorkshopType} == expected
 
     def test_account_status_values(self):

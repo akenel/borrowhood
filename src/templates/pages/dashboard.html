@@ -140,6 +140,7 @@
                                 {% if rental.status.value == 'completed' %}bg-emerald-50 text-emerald-700
                                 {% elif rental.status.value == 'pending' %}bg-amber-50 text-amber-700
                                 {% elif rental.status.value == 'approved' %}bg-blue-50 text-blue-700
+                                {% elif rental.status.value == 'disputed' %}bg-orange-50 text-orange-700
                                 {% elif rental.status.value in ['declined','cancelled'] %}bg-red-50 text-red-700
                                 {% else %}bg-gray-100 text-gray-700{% endif %}">
                                 {{ t('rental.status.' + rental.status.value) }}
@@ -147,6 +148,62 @@
                             <span class="text-xs text-gray-400">{{ rental.created_at.strftime('%b %d') }}</span>
                         </div>
                     </div>
+
+                    <!-- Dispute response section for renter (when rental is disputed) -->
+                    {% if rental.status.value == 'disputed' %}
+                    <div class="mt-3 border-t border-orange-200 pt-3" x-data="disputeRespond('{{ rental.id }}')">
+                        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                            <div class="flex items-center space-x-2 mb-3">
+                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                                </svg>
+                                <span class="text-sm font-semibold text-orange-900">Dispute Filed Against This Rental</span>
+                            </div>
+
+                            <!-- Loading state -->
+                            <div x-show="loading" class="text-sm text-gray-500">Loading dispute details...</div>
+
+                            <!-- Dispute details + response form -->
+                            <div x-show="!loading && dispute" x-cloak>
+                                <div class="mb-3 p-3 bg-white rounded border border-orange-100">
+                                    <p class="text-xs text-orange-600 font-medium mb-1">Owner's claim:</p>
+                                    <p class="text-sm font-medium text-gray-800" x-text="dispute?.reason?.replace(/_/g, ' ')"></p>
+                                    <p class="text-sm text-gray-600 mt-1" x-text="dispute?.description"></p>
+                                </div>
+
+                                <!-- Already responded -->
+                                <div x-show="dispute?.status === 'under_review'" class="p-3 bg-blue-50 rounded border border-blue-100">
+                                    <p class="text-xs text-blue-600 font-medium">Your response has been submitted. Awaiting resolution.</p>
+                                    <p class="text-sm text-gray-700 mt-1" x-text="dispute?.response"></p>
+                                </div>
+
+                                <!-- Response form (only when status is 'filed') -->
+                                <div x-show="dispute?.status === 'filed'">
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Your Response</label>
+                                    <textarea x-model="responseText" rows="3" placeholder="Explain your side of the situation (min 10 characters)..."
+                                              class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"></textarea>
+                                    <button @click="submitResponse()" :disabled="submitting || responseText.length < 10"
+                                            class="mt-2 text-xs px-4 py-2 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 disabled:opacity-50 min-h-[36px]">
+                                        <span x-show="!submitting">Submit Response</span>
+                                        <span x-show="submitting" x-cloak>Submitting...</span>
+                                    </button>
+                                </div>
+
+                                <!-- Resolved -->
+                                <div x-show="dispute?.status === 'resolved'" class="p-3 bg-emerald-50 rounded border border-emerald-100">
+                                    <p class="text-xs text-emerald-600 font-medium">Dispute Resolved</p>
+                                    <p class="text-sm text-gray-700 mt-1" x-text="'Resolution: ' + (dispute?.resolution?.replace(/_/g, ' ') || '')"></p>
+                                    <p x-show="dispute?.resolution_notes" class="text-sm text-gray-600 mt-1" x-text="dispute?.resolution_notes"></p>
+                                </div>
+                            </div>
+
+                            <!-- No dispute found -->
+                            <div x-show="!loading && !dispute" x-cloak>
+                                <p class="text-sm text-gray-500 italic">Dispute details could not be loaded.</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
 
                     <!-- Lock box section for approved/picked_up rentals -->
                     <template x-if="status === 'approved' || status === 'picked_up'">
@@ -289,6 +346,8 @@
                                 {% if rental.status.value == 'completed' %}bg-emerald-50 text-emerald-700
                                 {% elif rental.status.value == 'pending' %}bg-amber-50 text-amber-700
                                 {% elif rental.status.value == 'approved' %}bg-blue-50 text-blue-700
+                                {% elif rental.status.value == 'disputed' %}bg-orange-50 text-orange-700
+                                {% elif rental.status.value == 'returned' %}bg-purple-50 text-purple-700
                                 {% else %}bg-gray-100 text-gray-700{% endif %}">
                                 {{ t('rental.status.' + rental.status.value) }}
                             </span>
@@ -300,9 +359,125 @@
                             {% elif rental.status.value == 'returned' %}
                             <button @click="updateStatus('completed')" :disabled="processing"
                                     class="text-xs px-3 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 min-h-[32px]">Complete</button>
+                            <button @click="showDisputeForm = !showDisputeForm"
+                                    class="text-xs px-3 py-1 bg-orange-600 text-white rounded-lg hover:bg-orange-700 min-h-[32px]">File Dispute</button>
                             {% endif %}
                         </div>
                     </div>
+
+                    <!-- Dispute filing form (owner, when rental is returned) -->
+                    {% if rental.status.value == 'returned' %}
+                    <div x-show="showDisputeForm" x-cloak class="mt-3 border-t border-orange-200 pt-3">
+                        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                            <div class="flex items-center space-x-2 mb-3">
+                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                                </svg>
+                                <span class="text-sm font-semibold text-orange-900">File a Dispute</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Reason</label>
+                                    <select x-model="disputeReason" class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 min-h-[36px]">
+                                        <option value="">Select a reason...</option>
+                                        <option value="item_damaged">Item Damaged</option>
+                                        <option value="item_not_returned">Item Not Returned</option>
+                                        <option value="late_return">Late Return</option>
+                                        <option value="item_not_as_described">Item Not As Described</option>
+                                        <option value="no_show">No Show</option>
+                                        <option value="payment_issue">Payment Issue</option>
+                                        <option value="safety_concern">Safety Concern</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Description</label>
+                                    <textarea x-model="disputeDescription" rows="3" placeholder="Describe the issue in detail (min 10 characters)..."
+                                              class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"></textarea>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button @click="fileDispute()" :disabled="filingDispute || !disputeReason || disputeDescription.length < 10"
+                                            class="text-xs px-4 py-2 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 disabled:opacity-50 min-h-[36px]">
+                                        <span x-show="!filingDispute">Submit Dispute</span>
+                                        <span x-show="filingDispute" x-cloak>Filing...</span>
+                                    </button>
+                                    <button @click="showDisputeForm = false"
+                                            class="text-xs px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 min-h-[36px]">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Dispute resolution form (owner, when rental is disputed) -->
+                    {% if rental.status.value == 'disputed' %}
+                    <div class="mt-3 border-t border-orange-200 pt-3" x-data="disputeResolve('{{ rental.id }}')">
+                        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                            <div class="flex items-center space-x-2 mb-3">
+                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span class="text-sm font-semibold text-orange-900">Dispute In Progress</span>
+                            </div>
+
+                            <div x-show="loading" class="text-sm text-gray-500">Loading dispute details...</div>
+
+                            <div x-show="!loading && dispute" x-cloak>
+                                <!-- Owner's original claim -->
+                                <div class="mb-3 p-3 bg-white rounded border border-orange-100">
+                                    <p class="text-xs text-orange-600 font-medium mb-1">Your claim:</p>
+                                    <p class="text-sm font-medium text-gray-800" x-text="dispute?.reason?.replace(/_/g, ' ')"></p>
+                                    <p class="text-sm text-gray-600 mt-1" x-text="dispute?.description"></p>
+                                </div>
+
+                                <!-- Renter's response (if any) -->
+                                <div x-show="dispute?.response" class="mb-3 p-3 bg-blue-50 rounded border border-blue-100">
+                                    <p class="text-xs text-blue-600 font-medium mb-1">Renter's response:</p>
+                                    <p class="text-sm text-gray-700" x-text="dispute?.response"></p>
+                                </div>
+
+                                <div x-show="!dispute?.response" class="mb-3 p-3 bg-gray-50 rounded border border-gray-200">
+                                    <p class="text-xs text-gray-500 italic">Waiting for renter's response...</p>
+                                </div>
+
+                                <!-- Resolution form (available once dispute is under_review) -->
+                                <div x-show="dispute?.status === 'under_review' || dispute?.status === 'filed'">
+                                    <div class="space-y-3 mt-3">
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-700 mb-1">Resolution</label>
+                                            <select x-model="resolutionType" class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 min-h-[36px]">
+                                                <option value="">Select resolution...</option>
+                                                <option value="deposit_forfeited">Forfeit Deposit</option>
+                                                <option value="deposit_returned">Return Deposit</option>
+                                                <option value="partial_refund">Partial Refund</option>
+                                                <option value="full_refund">Full Refund</option>
+                                                <option value="no_action">No Action</option>
+                                                <option value="account_warning">Account Warning</option>
+                                                <option value="account_suspended">Account Suspended</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-700 mb-1">Resolution Notes</label>
+                                            <textarea x-model="resolutionNotes" rows="2" placeholder="Optional notes about the resolution..."
+                                                      class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"></textarea>
+                                        </div>
+                                        <button @click="resolveDispute()" :disabled="resolving || !resolutionType"
+                                                class="text-xs px-4 py-2 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 disabled:opacity-50 min-h-[36px]">
+                                            <span x-show="!resolving">Resolve Dispute</span>
+                                            <span x-show="resolving" x-cloak>Resolving...</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Already resolved -->
+                                <div x-show="dispute?.status === 'resolved'" class="p-3 bg-emerald-50 rounded border border-emerald-100">
+                                    <p class="text-xs text-emerald-600 font-medium">Dispute Resolved</p>
+                                    <p class="text-sm text-gray-700 mt-1" x-text="'Resolution: ' + (dispute?.resolution?.replace(/_/g, ' ') || '')"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
 
                     <!-- Lock box section for approved rentals (owner generates codes) -->
                     {% if rental.status.value == 'approved' %}
@@ -505,7 +680,7 @@
         };
     }
 
-    // Lock box component for owners (generate codes)
+    // Lock box component for owners (generate codes + dispute filing)
     function lockboxOwner(rentalId, status) {
         return {
             rentalId,
@@ -517,6 +692,10 @@
             hasExistingCodes: false,
             locationHint: '',
             instructions: '',
+            showDisputeForm: false,
+            disputeReason: '',
+            disputeDescription: '',
+            filingDispute: false,
 
             async init() {
                 if (this.status === 'approved') {
@@ -566,6 +745,26 @@
                 } catch (err) {
                     window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: err.message } }));
                 } finally { this.generating = false; }
+            },
+
+            async fileDispute() {
+                this.filingDispute = true;
+                try {
+                    const resp = await fetch('/api/v1/disputes', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            rental_id: this.rentalId,
+                            reason: this.disputeReason,
+                            description: this.disputeDescription
+                        })
+                    });
+                    if (!resp.ok) { const err = await resp.json(); throw new Error(err.detail); }
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Dispute filed successfully' } }));
+                    setTimeout(() => window.location.reload(), 1500);
+                } catch (err) {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: err.message } }));
+                } finally { this.filingDispute = false; }
             }
         };
     }
@@ -693,6 +892,98 @@
                     }));
                     this.deleting = false;
                 }
+            }
+        };
+    }
+
+    // Dispute response component for renters
+    function disputeRespond(rentalId) {
+        return {
+            rentalId,
+            dispute: null,
+            loading: false,
+            responseText: '',
+            submitting: false,
+
+            async init() {
+                await this.loadDispute();
+            },
+
+            async loadDispute() {
+                this.loading = true;
+                try {
+                    const resp = await fetch('/api/v1/disputes?limit=1');
+                    if (resp.ok) {
+                        const disputes = await resp.json();
+                        this.dispute = disputes.find(d => d.rental_id === this.rentalId);
+                    }
+                } catch (e) { /* network error */ }
+                finally { this.loading = false; }
+            },
+
+            async submitResponse() {
+                if (!this.dispute || this.responseText.length < 10) return;
+                this.submitting = true;
+                try {
+                    const resp = await fetch(`/api/v1/disputes/${this.dispute.id}/respond`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ response: this.responseText })
+                    });
+                    if (!resp.ok) { const err = await resp.json(); throw new Error(err.detail); }
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Response submitted successfully' } }));
+                    setTimeout(() => window.location.reload(), 1500);
+                } catch (err) {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: err.message } }));
+                } finally { this.submitting = false; }
+            }
+        };
+    }
+
+    // Dispute resolution component for owners
+    function disputeResolve(rentalId) {
+        return {
+            rentalId,
+            dispute: null,
+            loading: false,
+            resolutionType: '',
+            resolutionNotes: '',
+            resolving: false,
+
+            async init() {
+                await this.loadDispute();
+            },
+
+            async loadDispute() {
+                this.loading = true;
+                try {
+                    const resp = await fetch('/api/v1/disputes?limit=10');
+                    if (resp.ok) {
+                        const disputes = await resp.json();
+                        this.dispute = disputes.find(d => d.rental_id === this.rentalId);
+                    }
+                } catch (e) { /* network error */ }
+                finally { this.loading = false; }
+            },
+
+            async resolveDispute() {
+                if (!this.dispute || !this.resolutionType) return;
+                this.resolving = true;
+                try {
+                    const resp = await fetch(`/api/v1/disputes/${this.dispute.id}/resolve`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            resolution: this.resolutionType,
+                            resolution_notes: this.resolutionNotes || null
+                        })
+                    });
+                    if (!resp.ok) { const err = await resp.json(); throw new Error(err.detail); }
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Dispute resolved successfully' } }));
+                    setTimeout(() => window.location.reload(), 1500);
+                } catch (err) {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: err.message } }));
+                } finally { this.resolving = false; }
             }
         };
     }
