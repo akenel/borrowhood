@@ -14736,6 +14736,16 @@
           "media_type": "photo",
           "url": "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=800&h=600&fit=crop&q=80",
           "alt_text": "Industrial Carpet Cleaner - product photo"
+        },
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Deep carpet cleaning in progress - hot water extraction"
+        },
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1527515637462-cee1395c688c?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Clean carpet result after professional treatment"
         }
       ],
       "listings": [
@@ -14776,7 +14786,22 @@
         {
           "media_type": "photo",
           "url": "https://images.unsplash.com/photo-1621274403997-37aace184f49?w=800&h=600&fit=crop&q=80",
-          "alt_text": "Pressure Washer (Karcher K5) - product photo"
+          "alt_text": "Karcher K5 pressure washer - product photo"
+        },
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Pressure washing stone patio - before and after"
+        },
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Pressure washing car in driveway"
+        },
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Pressure washing concrete driveway"
         }
       ],
       "listings": [
@@ -15128,7 +15153,17 @@
         {
           "media_type": "photo",
           "url": "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=800&h=600&fit=crop&q=80",
-          "alt_text": "Carpet Cleaner (Bissell ProHeat 2X) - product photo"
+          "alt_text": "Bissell ProHeat 2X carpet cleaner"
+        },
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Carpet cleaning in living room"
+        },
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Professional cleaning results on upholstery"
         }
       ],
       "listings": [
@@ -15962,6 +15997,16 @@
           "media_type": "photo",
           "url": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&h=600&fit=crop&q=80",
           "alt_text": "Professional deep cleaning service in modern apartment"
+        },
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Kitchen deep cleaning -- sparkling countertops"
+        },
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1527515637462-cee1395c688c?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Bathroom deep cleaning -- tiles and grout"
         }
       ],
       "listings": [
@@ -15988,6 +16033,16 @@
           "media_type": "photo",
           "url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop&q=80",
           "alt_text": "Pressure washing stone patio clean"
+        },
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1621274403997-37aace184f49?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Power washing concrete driveway"
+        },
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Pressure washing exterior wall -- moss removal"
         }
       ],
       "listings": [
