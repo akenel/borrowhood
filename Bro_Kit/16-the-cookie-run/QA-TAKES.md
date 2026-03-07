@@ -99,6 +99,34 @@ Tracks bugs found per take, fixes applied, and deployment status.
 
 ---
 
+## Between Takes 5 and 6 (2026-03-07)
+
+**Image audit -- all EP2 cast items:**
+- Found 52 broken `/media/borrowhood/items/` image paths across 16 EP2 cast items
+- These local file paths don't exist on the Hetzner server
+- Root cause: old seeding wrote `/media/` paths, `seed_new_items()` doesn't update existing records
+
+**Fixes applied:**
+- Replaced all 52 broken images with valid Unsplash URLs via SQL
+- Added multiple images per item to show different use cases:
+  - Pressure Washer: 4 images (product, patio, car, concrete)
+  - Industrial Carpet Cleaner: 3 images
+  - Bissell Carpet Cleaner: 3 images
+  - Deep Cleaning Service: 3 images
+  - Pressure Washing Service: 3 images
+- Updated seed.json with matching multi-image arrays (permanent fix)
+- Created `ep2-fix-broken-images.sql` for repeatable deployment
+- Added `tests/test_seed_data.py` with 12 tests:
+  - EP2 cast items must have images (hard fail)
+  - No blank URLs, no broken `/media/` paths, valid URL format
+  - All media must have alt_text
+  - Users have slugs and display names
+  - Items have slugs, owners, listings
+  - Item owners exist as users
+- Test suite: 137 passed, 35 failed (ConnectionRefused = need DB, expected), 1 skipped (advisory)
+
+---
+
 ## Commits
 
 | Hash | Description |
@@ -107,9 +135,10 @@ Tracks bugs found per take, fixes applied, and deployment status.
 | `fa871c9` | feat: EP2 "The Cookie Run" pre-production -- script, youtube kit, thumbnail |
 | `a2fdc66` | fix: EP2 Take 1-4 QA fixes -- listing-type UX, flash prevention, trust cap |
 | `01482cc` | fix: trust score display -- scores are 0-100 integers, not 0.0-1.0 floats |
+| `644aaa9` | fix: EP2 Take 5 QA -- listing type badges on dashboard, trust score math |
 
 ---
 
 ## Take 6 (pending)
 
-Ready to record after deploying Take 5 fixes to Hetzner.
+Ready to record after deploying image fixes to Hetzner.
