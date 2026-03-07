@@ -94,11 +94,13 @@
   },
   "purchase": {
     "request_title": "Richiesta di Acquisto",
-    "submit": "Invia Richiesta di Acquisto"
+    "submit": "Invia Richiesta di Acquisto",
+    "message_placeholder": "Ciao! Vorrei acquistare questo..."
   },
   "booking": {
     "request_title": "Richiesta di Prenotazione",
-    "submit": "Invia Richiesta di Prenotazione"
+    "submit": "Invia Richiesta di Prenotazione",
+    "message_placeholder": "Ciao! Vorrei prenotare questo servizio..."
   },
   "rental": {
     "request_title": "Richiesta di Noleggio",
@@ -409,7 +411,7 @@
     "my_rentals": "I Miei Ordini",
     "incoming_requests": "Richieste in Arrivo",
     "no_items": "Non hai ancora pubblicato nessun oggetto.",
-    "no_rentals": "Nessuna attività di noleggio.",
+    "no_rentals": "Nessun ordine ancora.",
     "list_first_item": "Pubblica il Tuo Primo Oggetto",
     "as_renter": "Come Noleggiatore",
     "as_owner": "Come Proprietario",

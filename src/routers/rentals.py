@@ -144,7 +144,7 @@ async def create_rental(
     db.add(rental)
     await db.flush()
 
-    # Notify item owner about the rental request
+    # Notify item owner about the request
     await notify_rental_event(
         db=db,
         user_id=listing.item.owner_id,
@@ -152,6 +152,7 @@ async def create_rental(
         item_name=listing.item.name,
         other_party_name=user.display_name,
         rental_id=rental.id,
+        listing_type=listing.listing_type.value if listing.listing_type else None,
     )
 
     await db.commit()
@@ -276,6 +277,7 @@ async def update_rental_status(
             item_name=rental.listing.item.name,
             other_party_name=user.display_name,
             rental_id=rental.id,
+            listing_type=rental.listing.listing_type.value if rental.listing.listing_type else None,
         )
 
     await db.commit()
