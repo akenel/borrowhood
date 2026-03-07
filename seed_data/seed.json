@@ -69,7 +69,8 @@
       },
       "offers_delivery": true,
       "offers_training": true,
-      "offers_custom_orders": true
+      "offers_custom_orders": true,
+      "avatar_url": "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=200&h=200&fit=crop&crop=face"
     },
     {
       "slug": "mikes-garage",
@@ -132,7 +133,8 @@
         "helpful_flags": 12
       },
       "offers_repair": true,
-      "offers_pickup": true
+      "offers_pickup": true,
+      "avatar_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face"
     },
     {
       "slug": "angel-hq",
@@ -203,7 +205,8 @@
         "reviews_received": 18,
         "items_listed": 8,
         "helpful_flags": 30
-      }
+      },
+      "avatar_url": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face"
     },
     {
       "slug": "ninos-campers",
@@ -262,7 +265,8 @@
         "helpful_flags": 3
       },
       "offers_delivery": true,
-      "offers_repair": true
+      "offers_repair": true,
+      "avatar_url": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face"
     },
     {
       "slug": "marias-garden",
@@ -321,7 +325,8 @@
         "helpful_flags": 20
       },
       "offers_delivery": true,
-      "offers_training": true
+      "offers_training": true,
+      "avatar_url": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face"
     },
     {
       "slug": "marcos-workshop",
@@ -396,7 +401,8 @@
       },
       "offers_custom_orders": true,
       "offers_repair": true,
-      "offers_training": true
+      "offers_training": true,
+      "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face"
     },
     {
       "slug": "jakes-electronics",
@@ -461,7 +467,8 @@
         "helpful_flags": 2
       },
       "offers_repair": true,
-      "offers_pickup": true
+      "offers_pickup": true,
+      "avatar_url": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&crop=face"
     },
     {
       "slug": "rosas-home",
@@ -508,7 +515,8 @@
         "reviews_received": 35,
         "items_listed": 3,
         "helpful_flags": 45
-      }
+      },
+      "avatar_url": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face"
     },
     {
       "slug": "georges-villa",
@@ -560,7 +568,8 @@
         "items_listed": 8,
         "helpful_flags": 10
       },
-      "offers_delivery": true
+      "offers_delivery": true,
+      "avatar_url": "https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=200&h=200&fit=crop&crop=face"
     },
     {
       "slug": "johns-cleaning",
@@ -629,7 +638,8 @@
         "helpful_flags": 0
       },
       "offers_delivery": true,
-      "offers_pickup": true
+      "offers_pickup": true,
+      "avatar_url": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop&crop=face"
     },
     {
       "slug": "sofias-studio",
@@ -1904,7 +1914,8 @@
         "items_listed": 6,
         "helpful_flags": 2
       },
-      "offers_training": true
+      "offers_training": true,
+      "avatar_url": "https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?w=200&h=200&fit=crop&crop=face"
     },
     {
       "slug": "sofias-bakes",
@@ -1949,7 +1960,8 @@
         "reviews_received": 0,
         "items_listed": 0,
         "helpful_flags": 0
-      }
+      },
+      "avatar_url": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200&h=200&fit=crop&crop=face"
     },
     {
       "slug": "annes-qa-lab",
@@ -1994,7 +2006,8 @@
         "reviews_received": 2,
         "items_listed": 0,
         "helpful_flags": 8
-      }
+      },
+      "avatar_url": "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face"
     },
     {
       "slug": "tommys-deals",
@@ -2536,7 +2549,8 @@
       "offers_training": true,
       "offers_custom_orders": true,
       "offers_repair": true,
-      "father_name": "Ser Piero da Vinci"
+      "father_name": "Ser Piero da Vinci",
+      "avatar_url": "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=200&h=200&fit=crop&crop=face"
     },
     {
       "slug": "al-khwarizmis-library",
