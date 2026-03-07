@@ -168,6 +168,24 @@ Tracks bugs found per take, fixes applied, and deployment status.
 
 ---
 
-## Take 8 (pending)
+## Take 8 (2026-03-07)
 
-Ready to record. Pre-recording cleanup deployed. Container restarted.
+**Recording:** Clean run. All 39 scenes completed. No script errors.
+
+**Issues found:**
+1. Duplicate incoming request on Sofia's dashboard (7:58) -- two identical cookie box purchase requests from Pietro. Root cause: script clicked submit button (fires Alpine submitRental), then 500ms later called submitRental() again as "safety net". Race condition: first request completed before guard checked `submitting` flag.
+
+**Fixes applied:**
+- Removed duplicate submitRental() safety net call from recording script (lines 694-706)
+- Button click alone is sufficient -- Alpine handles the form submission
+
+**Backlog (from voice feedback):**
+- Tab notification badges: show count on "Incoming Requests (2)", "Favorites (1)" etc.
+- Favorites as notifications: when someone favorites a workshop, owner should see it
+- Card transitions: 0.5s fade-in/fade-out on story cards instead of instant cut
+
+---
+
+## Take 9 (pending)
+
+Ready to record after cleanup.
