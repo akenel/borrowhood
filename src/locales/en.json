@@ -74,7 +74,13 @@
     "languages": "Speaks",
     "location": "Location",
     "rent_this": "Rent This Item",
+    "buy_this": "Buy This Item",
+    "book_this": "Book This Service",
+    "claim_this": "Claim This Item",
     "login_to_rent": "Log In to Rent",
+    "login_to_buy": "Log In to Buy",
+    "login_to_book": "Log In to Book",
+    "login_to_claim": "Log In to Claim",
     "contact_owner": "Contact Owner",
     "contact_telegram": "Contact on Telegram",
     "available_as": "Available As",
@@ -85,6 +91,14 @@
     "written_in": "Written in",
     "map_note": "Exact location shared after booking confirmed.",
     "report": "Report this item"
+  },
+  "purchase": {
+    "request_title": "Purchase Request",
+    "submit": "Send Purchase Request"
+  },
+  "booking": {
+    "request_title": "Booking Request",
+    "submit": "Send Booking Request"
   },
   "rental": {
     "request_title": "Rental Request",

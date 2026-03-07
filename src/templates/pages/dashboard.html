@@ -6,7 +6,7 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-        <h1 class="text-2xl font-bold text-gray-900">{{ t('dashboard.title') }}</h1>
+        <h1 class="text-2xl font-bold text-gray-900">{{ t('dashboard.title') }}{% if user %} <span class="text-indigo-600">&rsaquo;</span> <span class="text-gray-500 font-normal">{{ user.get('name', user.get('preferred_username', '')) }}</span>{% endif %}</h1>
         <a href="/list"
            class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px]">
             + {{ t('home.cta_list') }}
