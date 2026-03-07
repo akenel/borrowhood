@@ -533,6 +533,80 @@ async function goToDashboardTab(page, tabName) {
 
 
   // ============================================================
+  // SCENE 9c: SOFIA BOOKS SALLY'S BAKING CLASS
+  // ============================================================
+  console.log('  Scene 9c: Sofia books Sally\'s baking class');
+  await page.goto(`${BASE}/item/baking-with-sally-sicilian-cookies`, { waitUntil: 'networkidle2', timeout: 15000 });
+  await setZoom(page);
+  await sleep(3000);
+
+  // Click "Book This" (TRAINING type)
+  const hasBookBtn = await clickWithRing(page, 'Book This', 'button, a');
+  if (hasBookBtn) {
+    await sleep(1500);
+
+    // Fill dates
+    const classStart = new Date(Date.now() + 2 * 86400000);
+    const classEnd = new Date(Date.now() + 2 * 86400000);
+    const classStartStr = classStart.toISOString().split('T')[0];
+    const classEndStr = classEnd.toISOString().split('T')[0];
+
+    await page.evaluate((s, e) => {
+      const dateInputs = document.querySelectorAll('input[type="date"]');
+      if (dateInputs[0]) { dateInputs[0].value = s; dateInputs[0].dispatchEvent(new Event('input', {bubbles:true})); }
+      if (dateInputs[1]) { dateInputs[1].value = e; dateInputs[1].dispatchEvent(new Event('input', {bubbles:true})); }
+      const listingEl = document.querySelector('[x-data*="listingId"]');
+      if (listingEl) {
+        const data = window.Alpine?.$data(listingEl) ||
+                     (listingEl._x_dataStack && listingEl._x_dataStack[0]);
+        if (data) { data.rentalForm.start = s; data.rentalForm.end = e; }
+      }
+    }, classStartStr, classEndStr);
+    await sleep(1000);
+
+    // Type message
+    const classTextarea = await page.$('textarea');
+    if (classTextarea) {
+      await typeSlowly(page, 'textarea',
+        'Hi Sally! I\'m Sofia, Pietro\'s niece. I got cookie cutters for my birthday and I want to learn to bake. Can I come Saturday?', 25);
+      await page.evaluate(() => {
+        const ta = document.querySelector('textarea');
+        const listingEl = document.querySelector('[x-data*="listingId"]');
+        if (ta && listingEl) {
+          const data = window.Alpine?.$data(listingEl) ||
+                       (listingEl._x_dataStack && listingEl._x_dataStack[0]);
+          if (data) data.rentalForm.message = ta.value;
+        }
+      });
+      await sleep(1000);
+    }
+
+    // Click Send Request inside modal
+    const classSubmitted = await page.evaluate(() => {
+      const modal = document.querySelector('.fixed.inset-0');
+      if (!modal) return null;
+      const btns = modal.querySelectorAll('button');
+      for (const btn of btns) {
+        const txt = btn.textContent.trim();
+        if (txt.includes('Send') || txt.includes('Request') || txt.includes('Book')) {
+          const box = btn.getBoundingClientRect();
+          if (box.width > 0 && box.height > 0) {
+            btn.click();
+            return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+          }
+        }
+      }
+      return null;
+    });
+    if (classSubmitted) {
+      await showRing(page, classSubmitted.x, classSubmitted.y);
+      console.log('  Sofia booked Sally\'s baking class');
+    }
+    await sleep(3000);
+  }
+
+
+  // ============================================================
   // SCENE 10: THE FIRST BAKE (overlay, 12s)
   // ============================================================
   console.log('  Scene 10: The First Bake card');
