@@ -634,15 +634,20 @@ async function goToDashboardTab(page, tabName) {
   if (hasRentBtn) {
     await sleep(1500);
 
-    // Fill dates
+    // Fill dates (only visible for rental/service types, hidden for sell/offer)
     await page.evaluate((s, e) => {
       const dateInputs = document.querySelectorAll('input[type="date"]');
       if (dateInputs[0]) { dateInputs[0].value = s; dateInputs[0].dispatchEvent(new Event('input', {bubbles:true})); }
       if (dateInputs[1]) { dateInputs[1].value = e; dateInputs[1].dispatchEvent(new Event('input', {bubbles:true})); }
+      // Alpine v3: use Alpine.$data() to set form values
       const rentalDiv = document.querySelector('[x-data*="listingId"]');
-      if (rentalDiv && rentalDiv._x_dataStack && rentalDiv._x_dataStack.length > 0) {
-        rentalDiv._x_dataStack[0].rentalForm.start = s;
-        rentalDiv._x_dataStack[0].rentalForm.end = e;
+      if (rentalDiv) {
+        const data = window.Alpine?.$data(rentalDiv) ||
+                     (rentalDiv._x_dataStack && rentalDiv._x_dataStack[0]);
+        if (data) {
+          data.rentalForm.start = s;
+          data.rentalForm.end = e;
+        }
       }
     }, startStr, endStr);
     await sleep(1000);
@@ -655,20 +660,26 @@ async function goToDashboardTab(page, tabName) {
       await page.evaluate(() => {
         const ta = document.querySelector('textarea');
         const rentalDiv = document.querySelector('[x-data*="listingId"]');
-        if (ta && rentalDiv && rentalDiv._x_dataStack && rentalDiv._x_dataStack.length > 0) {
-          rentalDiv._x_dataStack[0].rentalForm.message = ta.value;
+        if (ta && rentalDiv) {
+          const data = window.Alpine?.$data(rentalDiv) ||
+                       (rentalDiv._x_dataStack && rentalDiv._x_dataStack[0]);
+          if (data) {
+            data.rentalForm.message = ta.value;
+          }
         }
       });
       await sleep(1000);
     }
 
-    // Click Send Request
+    // Click Send Request -- find the submit button INSIDE the modal overlay
     const submitted = await page.evaluate(() => {
-      const btns = document.querySelectorAll('button');
+      // The modal is in a div with class "fixed inset-0"
+      const modal = document.querySelector('.fixed.inset-0');
+      if (!modal) return null;
+      const btns = modal.querySelectorAll('button');
       for (const btn of btns) {
-        if (btn.textContent.trim().includes('Send Request') ||
-            btn.classList.contains('bg-indigo-600') ||
-            btn.getAttribute('@click') === 'submitRental()') {
+        const txt = btn.textContent.trim();
+        if (txt.includes('Send') || txt.includes('Request') || txt.includes('Purchase')) {
           const box = btn.getBoundingClientRect();
           if (box.width > 0 && box.height > 0) {
             btn.click();
@@ -678,6 +689,21 @@ async function goToDashboardTab(page, tabName) {
       }
       return null;
     });
+
+    // If button click didn't trigger Alpine, call submitRental() directly
+    if (submitted) {
+      await sleep(500);
+      await page.evaluate(() => {
+        const rentalDiv = document.querySelector('[x-data*="listingId"]');
+        if (rentalDiv) {
+          const data = window.Alpine?.$data(rentalDiv) ||
+                       (rentalDiv._x_dataStack && rentalDiv._x_dataStack[0]);
+          if (data && !data.submitting) {
+            data.submitRental();
+          }
+        }
+      });
+    }
     if (submitted) {
       await showRing(page, submitted.x, submitted.y);
       console.log('  Clicked Send Request');
@@ -943,7 +969,7 @@ async function goToDashboardTab(page, tabName) {
   // ============================================================
   console.log('  Scene 28: Pietro\'s dashboard');
   // Pietro is still logged in
-  await goToDashboardTab(page, 'My Rentals');
+  await goToDashboardTab(page, 'My Orders');
   await sleep(4000);
 
   // Show incoming requests too
