@@ -209,6 +209,30 @@ Tracks bugs found per take, fixes applied, and deployment status.
 
 ---
 
-## Take 10 (pending)
+## Take 10 (2026-03-07)
 
-Script changes needed before recording.
+**Recording:** Scene 9c (Sofia books Sally's class) failed -- WARN: "Book This" not found.
+Root cause: route was `/item/slug` but correct route is `/items/slug`. Rest of episode ran clean.
+
+**Issues found:**
+1. Scene 9c route wrong: `/item/` should be `/items/` (404, button never rendered)
+2. Workshop avatars show letter initials instead of faces -- viewers can't follow who's who
+3. Workshop banners are generic purple gradients -- no visual identity per character
+4. Cast members have no real street addresses or precise GPS (all generic 38.018, 12.537)
+5. Story: the 5 friends / 5 addresses need to map to real cast members
+6. Story: Sally's scooter purchase should be prepped for EP3
+
+**Fixes applied:**
+- Route fix: `/item/` -> `/items/` for baking training page
+- Avatars: Unsplash portrait photos for all 14 demo cast (seed.json + SQL deployed)
+- Banners: Unsplash landscape photos matching each workshop type
+- Real Trapani addresses + precise GPS coords for all 14 cast
+- Sally's Electric Scooter added as PAUSED RENT listing (EP3 ready)
+- Card overlay transitions: 0.5s fade-in and fade-out on all story cards
+- 5 delivery addresses mapped to cast: Pietro (Via Roma), Sally (Via Garibaldi), Leonardo (Via Torrearsa), Nino (Piazza Mercato), Maria (Via Fardella)
+
+---
+
+## Take 11 (pending)
+
+Ready after deployment of banners, addresses, and scooter to Hetzner.
