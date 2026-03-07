@@ -1,0 +1,73 @@
+What happens when a 17-year-old bakes her first cookies and needs to deliver them across town?
+
+Previously: Sally rented Pietro's drone. It crashed. Dispute filed. Deposit split EUR 70/30. Then Pietro rented Sally's cookie cutters -- for his niece Sofia's birthday. The question was: "What if the drone guy... delivered the cookies?"
+
+This is that episode.
+
+Sofia Ferretti is 17. She just got 200 cookie cutters from her uncle Pietro. Sally Thompson -- cookie queen, trusted member -- is her baking mentor. Their first session: almond biscuits from scratch. Six burned. Four perfect. "You learn from the ones that burn."
+
+Sofia creates her first commission listing: birthday cookie boxes. EUR 15 each. Five orders come in. Pietro orders first. Then neighbors. Then friends.
+
+Problem: 5 boxes, 5 addresses, no delivery. Enter Johnny Abela -- the delivery kid with the broken bike. Chain held together with zip ties. Frame bent from a pothole on Via Fardella. He loads one box, rides 200 meters, chain snaps. Cookies on the ground.
+
+Pietro walks in. "I have a drone." The DJI Mini 4 Pro. Cookie box strapped underneath. First delivery: success. Customer films it. Posts it on Instagram. By the fifth delivery, people on the street are pointing at the sky.
+
+All 5 delivered. Sofia made EUR 50 profit. But Johnny is standing there with his broken bike. He did nothing. He was supposed to be the delivery kid.
+
+The drone can fly but can't knock on doors. Johnny knocks on doors but can't fly. Sally bakes but can't deliver.
+
+Sally's cookie sales this week: EUR 235. A used electric scooter: EUR 200.
+
+She sees his face.
+
+What if the cookie queen... bought the delivery kid his wheels?
+
+0:00 The Cookie Run -- Season 1 Episode 2
+0:10 Previously on BorrowHood
+0:30 Meet Sofia Ferretti -- Pietro's Niece
+0:50 Meet Sally Thompson -- Cookie Queen & Mentor
+1:10 Sally Visits Sofia's Workshop
+1:40 ACT I -- The First Bake
+2:10 Sofia's First Listing
+2:50 ACT II -- The Order (Sofia's Birthday Boxes)
+3:20 Pietro Orders a Cookie Box
+3:50 Sofia's First Sale
+4:20 5 Boxes, 5 Addresses
+4:50 ACT III -- The Problem (Enter Johnny Abela)
+5:20 Johnny's Workshop -- The Broken Bike
+5:50 Johnny's Delivery Service
+6:20 The Chain Snaps
+6:50 ACT IV -- The Flight ("I have a drone")
+7:20 Pietro's Drone Fleet
+7:50 The Deal -- Aerial Delivery Service
+8:20 First Cookie Delivery by Drone
+8:50 It Works -- 5 for 5
+9:30 ACT V -- The Gap (Johnny Watches)
+10:00 Sally's Cookie Sales -- EUR 235
+10:30 Sally Sees Johnny's Broken Bike
+11:00 The Math -- Scooter = EUR 200
+11:20 EPILOGUE -- The Door
+11:40 What if the cookie queen... bought the delivery kid his wheels?
+
+How mentorships work in BorrowHood:
+- Mentor teaches, apprentice learns
+- Three types: mentor, apprentice, intern
+- Platform tracks the relationship
+- Mentors earn reputation, apprentices earn skills
+
+How commissions work:
+- List a custom item or service
+- Customers place orders with messages
+- Creator fulfills and ships (or in this case, flies)
+
+The Cast (Season 1 -- Trapani):
+Angel, Nino Cassisa, Leonardo da Vinci, Sally Thompson, Mike Kenel, Marco Moretti, Pietro Ferretti, Jake Chen, George Clooney, John Abela, Maria Ferretti, Sofia Ferretti, Rosa Ferretti, Anne Muthoni
+
+Stack: FastAPI, SQLAlchemy, PostgreSQL, Jinja2, Alpine.js, Tailwind CSS, Keycloak OIDC.
+Built with Claude Code (Opus 4.6). Deployed on Hetzner (EUR 7.59/mo).
+
+Notion Motion Pictures -- Built with Claude Code
+
+BorrowHood -- The neighborhood marketplace where every crash is a door.
+
+#BorrowHood #Season1 #TheCookieRun #Cookies #Drones #Delivery #Mentorship #Sofia #Johnny #FastAPI #Python #ClaudeCode #Anthropic #NotionMotionPictures
