@@ -94,11 +94,13 @@
   },
   "purchase": {
     "request_title": "Purchase Request",
-    "submit": "Send Purchase Request"
+    "submit": "Send Purchase Request",
+    "message_placeholder": "Hi! I would like to buy this..."
   },
   "booking": {
     "request_title": "Booking Request",
-    "submit": "Send Booking Request"
+    "submit": "Send Booking Request",
+    "message_placeholder": "Hi! I would like to book this service..."
   },
   "rental": {
     "request_title": "Rental Request",
@@ -409,7 +411,7 @@
     "my_rentals": "My Orders",
     "incoming_requests": "Incoming Requests",
     "no_items": "You haven't listed any items yet.",
-    "no_rentals": "No rental activity yet.",
+    "no_rentals": "No orders yet.",
     "list_first_item": "List Your First Item",
     "as_renter": "As Renter",
     "as_owner": "As Owner",

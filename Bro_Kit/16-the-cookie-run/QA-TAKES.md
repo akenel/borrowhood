@@ -139,6 +139,35 @@ Tracks bugs found per take, fixes applied, and deployment status.
 
 ---
 
-## Take 6 (pending)
+## Take 6 (2026-03-07)
 
-Ready to record after deploying image fixes to Hetzner.
+**Note:** Skipped -- was actually a buggy run using the old script before Take 7 fixes were deployed.
+
+---
+
+## Take 7 (2026-03-07)
+
+**Recording:** Two runs. First run had stale data from Take 6. Second run clean after pre-recording cleanup.
+
+**Issues found:**
+1. Notification bell says "wants to rent your Birthday Cookie Box" -- should say "wants to buy" (SELL item)
+2. Notification titles use generic "Rental" language for all listing types (purchases, bookings, claims)
+3. Message placeholder in modal still says "rental" for SELL items
+4. Residual rentals from previous takes visible in dashboard (stale data, not a code bug)
+
+**Fixes applied:**
+- `notify_rental_event()` now accepts `listing_type` parameter and generates type-aware titles:
+  - SELL: "wants to buy", "Purchase of..."
+  - SERVICE/TRAINING: "wants to book", "Booking of..."
+  - GIVEAWAY/OFFER: "wants to claim", "Claim of..."
+  - RENT (default): "wants to rent", "Rental of..."
+- Both call sites in `rentals.py` (create_rental, update_rental_status) pass `listing_type`
+- Modal textarea placeholder adapts per listing type (sell/service/training/rent)
+- Added i18n keys: `purchase.message_placeholder`, `booking.message_placeholder` (en + it)
+- Updated `dashboard.no_rentals` to "No orders yet." / "Nessun ordine ancora."
+
+---
+
+## Take 8 (pending)
+
+Ready to record. Pre-recording cleanup deployed. Container restarted.

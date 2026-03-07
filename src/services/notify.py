@@ -83,20 +83,39 @@ async def notify_rental_event(
     item_name: str,
     other_party_name: str,
     rental_id: UUID,
+    listing_type: Optional[str] = None,
     telegram_chat_id: Optional[str] = None,
 ):
-    """Convenience wrapper for rental-related notifications."""
+    """Convenience wrapper for rental/purchase/booking notifications."""
+    # Determine action verb based on listing type
+    lt = listing_type.lower() if listing_type else "rent"
+    if lt == "sell":
+        verb_request = "buy"
+        verb_past = "Purchase"
+    elif lt in ("service", "training"):
+        verb_request = "book"
+        verb_past = "Booking"
+    elif lt == "giveaway":
+        verb_request = "claim"
+        verb_past = "Claim"
+    elif lt == "offer":
+        verb_request = "claim"
+        verb_past = "Claim"
+    else:
+        verb_request = "rent"
+        verb_past = "Rental"
+
     titles = {
-        NotificationType.RENTAL_REQUEST: f"{other_party_name} wants to rent your {item_name}",
-        NotificationType.RENTAL_APPROVED: f"Your rental request for {item_name} was approved",
-        NotificationType.RENTAL_DECLINED: f"Your rental request for {item_name} was declined",
+        NotificationType.RENTAL_REQUEST: f"{other_party_name} wants to {verb_request} your {item_name}",
+        NotificationType.RENTAL_APPROVED: f"Your {verb_past.lower()} request for {item_name} was approved",
+        NotificationType.RENTAL_DECLINED: f"Your {verb_past.lower()} request for {item_name} was declined",
         NotificationType.RENTAL_PICKED_UP: f"{item_name} has been picked up",
         NotificationType.RENTAL_RETURNED: f"{item_name} has been returned",
-        NotificationType.RENTAL_COMPLETED: f"Rental of {item_name} is complete",
-        NotificationType.RENTAL_CANCELLED: f"Rental of {item_name} was cancelled",
+        NotificationType.RENTAL_COMPLETED: f"{verb_past} of {item_name} is complete",
+        NotificationType.RENTAL_CANCELLED: f"{verb_past} of {item_name} was cancelled",
     }
 
-    title = titles.get(notification_type, f"Rental update for {item_name}")
+    title = titles.get(notification_type, f"{verb_past} update for {item_name}")
 
     return await create_notification(
         db=db,
