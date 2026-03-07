@@ -216,6 +216,7 @@ async function showOverlay(page, name, subtitle, extra = '', duration = 9000) {
       font-family: 'Segoe UI', Arial, sans-serif; text-align: center;
       padding: 60px 80px 80px; overflow-y: auto;
       scroll-behavior: smooth;
+      opacity: 0; transition: opacity 0.5s ease;
     `;
     overlay.innerHTML = `
       <h1 style="font-size:128px; font-weight:900; margin-bottom:16px;
@@ -225,10 +226,15 @@ async function showOverlay(page, name, subtitle, extra = '', duration = 9000) {
       ${e ? `<div id="overlay-extra" style="font-size:40px; opacity:0.75; margin-top:8px; line-height:1.6; max-width:1500px; flex-shrink:0">${e}</div>` : ''}
     `;
     document.body.appendChild(overlay);
+    // Force reflow then trigger fade-in
+    void overlay.offsetWidth;
+    overlay.style.opacity = '1';
   }, name, subtitle, extra);
 
-  const halfDuration = Math.floor(duration / 2);
-  await sleep(halfDuration);
+  // Fade-in takes 500ms, fade-out takes 500ms -- both inside the total duration
+  const visibleTime = duration - 1000; // subtract fade-in + fade-out
+  const halfVisible = Math.floor(Math.max(visibleTime, 0) / 2);
+  await sleep(500 + halfVisible); // wait for fade-in + first half of visible time
 
   await page.evaluate(() => {
     const o = document.getElementById('name-card-overlay');
@@ -236,13 +242,13 @@ async function showOverlay(page, name, subtitle, extra = '', duration = 9000) {
       o.scrollTo({ top: o.scrollHeight, behavior: 'smooth' });
     }
   });
-  await sleep(halfDuration);
+  await sleep(halfVisible); // second half of visible time
 
   await page.evaluate(() => {
     const o = document.getElementById('name-card-overlay');
-    if (o) { o.style.transition = 'opacity 0.5s'; o.style.opacity = '0'; }
+    if (o) { o.style.opacity = '0'; }
   });
-  await sleep(600);
+  await sleep(500); // wait for fade-out to finish
   await page.evaluate(() => {
     const o = document.getElementById('name-card-overlay');
     if (o) o.remove();

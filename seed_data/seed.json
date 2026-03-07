@@ -10,9 +10,10 @@
       "bio": "Retired pastry chef. 40 years in commercial kitchens. Now I bake from home and teach anyone who wants to learn. My cookie cutters alone could fill a museum.",
       "telegram_username": "sally_kitchen",
       "city": "Trapani",
+      "address": "Via Torrearsa 12, Trapani",
       "country_code": "IT",
-      "latitude": 38.018,
-      "longitude": 12.537,
+      "latitude": 38.0185,
+      "longitude": 12.5145,
       "badge_tier": "trusted",
       "date_of_birth": "1964-03-14",
       "mother_name": "Dorothy Thompson",
@@ -70,7 +71,8 @@
       "offers_delivery": true,
       "offers_training": true,
       "offers_custom_orders": true,
-      "avatar_url": "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=200&h=200&fit=crop&crop=face"
+      "avatar_url": "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&h=400&fit=crop"
     },
     {
       "slug": "mikes-garage",
@@ -82,9 +84,10 @@
       "bio": "Mechanic by trade, tinkerer by nature. Inherited my father's tool collection -- 500 tools, every one with a story. Now they're earning their keep instead of collecting dust.",
       "telegram_username": "mike_garage",
       "city": "Trapani",
+      "address": "Via Ammiraglio Staiti 8, Trapani",
       "country_code": "IT",
-      "latitude": 38.022,
-      "longitude": 12.545,
+      "latitude": 38.0155,
+      "longitude": 12.5095,
       "badge_tier": "pillar",
       "date_of_birth": "1968-02-11",
       "mother_name": "Maria Kenel",
@@ -134,7 +137,8 @@
       },
       "offers_repair": true,
       "offers_pickup": true,
-      "avatar_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face"
+      "avatar_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1580894894513-541e068a3e2b?w=1200&h=400&fit=crop"
     },
     {
       "slug": "angel-hq",
@@ -145,10 +149,11 @@
       "tagline": "The Black Wolf builds from the road",
       "bio": "Swiss-Canadian software developer building BorrowHood from a camper van in Sicily. If I can build a platform from a campsite with a Fairphone and a laptop, you can list your shovel.",
       "telegram_username": "BigKingFisher",
-      "city": "Trapani",
+      "city": "Bonagia",
+      "address": "Baglio Xiare, Bonagia",
       "country_code": "IT",
-      "latitude": 38.077,
-      "longitude": 12.644,
+      "latitude": 38.0773,
+      "longitude": 12.6443,
       "badge_tier": "legend",
       "date_of_birth": "1984-01-15",
       "mother_name": "Maria Kenel",
@@ -206,7 +211,8 @@
         "items_listed": 8,
         "helpful_flags": 30
       },
-      "avatar_url": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face"
+      "avatar_url": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?w=1200&h=400&fit=crop"
     },
     {
       "slug": "ninos-campers",
@@ -218,9 +224,10 @@
       "bio": "Family camper business since the 90s. We rent, repair, and sell camper vans. Camping accessories for every adventure. Based at Palazzo Asia, Trapani.",
       "telegram_username": "nino_camper",
       "city": "Trapani",
+      "address": "Via Culcasi 4, Trapani",
       "country_code": "IT",
-      "latitude": 38.003,
-      "longitude": 12.54,
+      "latitude": 38.014,
+      "longitude": 12.523,
       "badge_tier": "trusted",
       "date_of_birth": "1991-03-25",
       "mother_name": "Giuseppina Cassisa",
@@ -266,7 +273,8 @@
       },
       "offers_delivery": true,
       "offers_repair": true,
-      "avatar_url": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face"
+      "avatar_url": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?w=1200&h=400&fit=crop"
     },
     {
       "slug": "marias-garden",
@@ -278,9 +286,10 @@
       "bio": "Ho 72 anni e il mio giardino è la mia vita. Coltivo pomodori, basilico, e limoni. Posso insegnarti tutto quello che so -- ma devi portare i tuoi guanti!",
       "telegram_username": "maria_garden",
       "city": "Trapani",
+      "address": "Via Giovan Battista Fardella 45, Trapani",
       "country_code": "IT",
-      "latitude": 38.025,
-      "longitude": 12.53,
+      "latitude": 38.016,
+      "longitude": 12.52,
       "badge_tier": "pillar",
       "date_of_birth": "1954-07-20",
       "mother_name": "Lucia Ferrara",
@@ -326,7 +335,8 @@
       },
       "offers_delivery": true,
       "offers_training": true,
-      "avatar_url": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face"
+      "avatar_url": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&h=400&fit=crop"
     },
     {
       "slug": "marcos-workshop",
@@ -338,9 +348,10 @@
       "bio": "Master woodworker. 30 years shaping timber. My workshop is open to anyone who wants to learn -- or just needs a lathe for an afternoon. Bring wood, I bring the knowledge.",
       "telegram_username": "marco_legno",
       "city": "Trapani",
+      "address": "Via San Francesco d'Assisi 20, Trapani",
       "country_code": "IT",
-      "latitude": 38.015,
-      "longitude": 12.55,
+      "latitude": 38.0178,
+      "longitude": 12.5125,
       "badge_tier": "legend",
       "date_of_birth": "1978-04-30",
       "mother_name": "Elena Vitale",
@@ -402,7 +413,8 @@
       "offers_custom_orders": true,
       "offers_repair": true,
       "offers_training": true,
-      "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face"
+      "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=1200&h=400&fit=crop"
     },
     {
       "slug": "jakes-electronics",
@@ -414,9 +426,10 @@
       "bio": "Electronics repair nerd. I fix phones, laptops, and anything with a circuit board. Also have a 3D printer and laser cutter available for hourly rental. Right to repair is a human right.",
       "telegram_username": "jake_tech",
       "city": "Trapani",
+      "address": "Via Garibaldi 18, Trapani",
       "country_code": "IT",
-      "latitude": 38.02,
-      "longitude": 12.535,
+      "latitude": 38.018,
+      "longitude": 12.512,
       "badge_tier": "active",
       "date_of_birth": "1995-09-12",
       "mother_name": "Siobhan Morrison",
@@ -468,7 +481,8 @@
       },
       "offers_repair": true,
       "offers_pickup": true,
-      "avatar_url": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&crop=face"
+      "avatar_url": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&h=400&fit=crop"
     },
     {
       "slug": "rosas-home",
@@ -480,9 +494,10 @@
       "bio": "Ho 84 anni. Non uso il computer. Mio nipote Marco ha fatto questo profilo per me. Ma so fare la pasta migliore di Trapani e ho una macchina per la pasta che chiunque può usare.",
       "telegram_username": null,
       "city": "Trapani",
+      "address": "Piazza Mercato 5, Trapani",
       "country_code": "IT",
-      "latitude": 38.016,
-      "longitude": 12.549,
+      "latitude": 38.017,
+      "longitude": 12.511,
       "badge_tier": "pillar",
       "date_of_birth": "1942-11-08",
       "mother_name": "Concetta Ferrara",
@@ -516,7 +531,8 @@
         "items_listed": 3,
         "helpful_flags": 45
       },
-      "avatar_url": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face"
+      "avatar_url": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=1200&h=400&fit=crop"
     },
     {
       "slug": "georges-villa",
@@ -528,9 +544,10 @@
       "bio": "Actor, director, espresso enthusiast. I have a villa on Lake Como but I spend my winters in Sicily. My garage has vintage Vespas, espresso machines, and a collection of props from my films. I also make a mean Negroni. Everything is available for rent -- except the Oscar.",
       "telegram_username": "george_villa",
       "city": "Trapani",
+      "address": "Via Regina Elena 1, Trapani",
       "country_code": "IT",
-      "latitude": 38.03,
-      "longitude": 12.525,
+      "latitude": 38.0195,
+      "longitude": 12.516,
       "badge_tier": "pillar",
       "date_of_birth": "1961-05-06",
       "mother_name": "Nina Bruce Warren",
@@ -569,7 +586,8 @@
         "helpful_flags": 10
       },
       "offers_delivery": true,
-      "avatar_url": "https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=200&h=200&fit=crop&crop=face"
+      "avatar_url": "https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&h=400&fit=crop"
     },
     {
       "slug": "johns-cleaning",
@@ -581,9 +599,10 @@
       "bio": "Everyone calls me Johnny. Maltese-Sicilian, born in Trapani. I clean houses and businesses -- industrial carpet cleaners, pressure washers, the real stuff. But my real dream is local delivery. I know every street, every shortcut, every doorbell that doesn't work. Problem is, my bike keeps breaking. Chain snapped twice this month. The frame is bent from that pothole on Via Fardella. One day I'll get an electric scooter and run a proper delivery service. Until then, I walk. And I clean. And I dream about that scooter.",
       "telegram_username": "johnny_runs",
       "city": "Trapani",
+      "address": "Via Fardella 88, Trapani",
       "country_code": "IT",
-      "latitude": 38.012,
-      "longitude": 12.538,
+      "latitude": 38.0158,
+      "longitude": 12.522,
       "badge_tier": "newcomer",
       "date_of_birth": "2000-08-03",
       "mother_name": "Carmen Abela",
@@ -639,7 +658,8 @@
       },
       "offers_delivery": true,
       "offers_pickup": true,
-      "avatar_url": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop&crop=face"
+      "avatar_url": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&h=400&fit=crop"
     },
     {
       "slug": "sofias-studio",
@@ -1862,6 +1882,7 @@
       "bio": "Licensed drone pilot and aerial photographer. Real estate, events, agriculture, inspections. I have 3 drones from mini to pro. Rent a drone for your project or hire me to fly it.",
       "telegram_username": "pietro_skyview",
       "city": "Scopello",
+      "address": "Via Marco Ferro 3, Scopello",
       "country_code": "IT",
       "latitude": 38.068,
       "longitude": 12.82,
@@ -1915,7 +1936,8 @@
         "helpful_flags": 2
       },
       "offers_training": true,
-      "avatar_url": "https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?w=200&h=200&fit=crop&crop=face"
+      "avatar_url": "https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=1200&h=400&fit=crop"
     },
     {
       "slug": "sofias-bakes",
@@ -1927,9 +1949,10 @@
       "bio": "17 years old. Pietro's niece. I love baking -- especially cookies. Uncle Pietro got me Sally's 200-piece cookie cutter set for my birthday. Now I want to learn everything. Looking for a mentor.",
       "telegram_username": "sofia_bakes",
       "city": "Scopello",
+      "address": "Via Marco Ferro 3, Scopello",
       "country_code": "IT",
-      "latitude": 38.069,
-      "longitude": 12.821,
+      "latitude": 38.068,
+      "longitude": 12.82,
       "badge_tier": "newcomer",
       "date_of_birth": "2009-06-15",
       "mother_name": "Sara Ferretti",
@@ -1961,7 +1984,8 @@
         "items_listed": 0,
         "helpful_flags": 0
       },
-      "avatar_url": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200&h=200&fit=crop&crop=face"
+      "avatar_url": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=1200&h=400&fit=crop"
     },
     {
       "slug": "annes-qa-lab",
@@ -1973,9 +1997,10 @@
       "bio": "QA tester and quality advocate. I break things so users don't have to. If there's a bug, I'll find it. If the flow is broken, I'll map it. Every test case tells a story.",
       "telegram_username": "anne_muthoni",
       "city": "Nairobi",
+      "address": "Nairobi, Kenya",
       "country_code": "KE",
-      "latitude": -1.286,
-      "longitude": 36.817,
+      "latitude": -1.2921,
+      "longitude": 36.8219,
       "badge_tier": "active",
       "date_of_birth": "1997-06-22",
       "mother_name": "Grace Wanjiku Muthoni",
@@ -2007,7 +2032,8 @@
         "items_listed": 0,
         "helpful_flags": 8
       },
-      "avatar_url": "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face"
+      "avatar_url": "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200&h=400&fit=crop"
     },
     {
       "slug": "tommys-deals",
@@ -2480,10 +2506,11 @@
       "tagline": "Simplicity is the ultimate sophistication",
       "bio": "Painter. Engineer. Anatomist. Inventor. Vegetarian. Left-handed mirror-writer. Born in Vinci, Republic of Florence. I designed a helicopter, a tank, a calculator, a self-propelled cart, and a robotic knight. Built none of them. But I also painted a woman smiling and the world lost its mind for 500 years. My notebooks have 7,000 pages of sketches -- the gap between vision and implementation is where I live. I dissected 30 human corpses by candlelight to understand how muscles connect to bone. My landlord was not pleased. I am slow. I am thorough. The Last Supper took three years because the prior kept asking when I'd finish.",
       "telegram_username": "leo_bottega",
-      "city": "Vinci",
+      "city": "Trapani",
+      "address": "Via Roma 30, Trapani",
       "country_code": "IT",
-      "latitude": 43.787,
-      "longitude": 10.924,
+      "latitude": 38.0175,
+      "longitude": 12.5135,
       "badge_tier": "legend",
       "languages": [
         {
@@ -2550,7 +2577,8 @@
       "offers_custom_orders": true,
       "offers_repair": true,
       "father_name": "Ser Piero da Vinci",
-      "avatar_url": "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=200&h=200&fit=crop&crop=face"
+      "avatar_url": "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1200&h=400&fit=crop"
     },
     {
       "slug": "al-khwarizmis-library",
@@ -30183,6 +30211,39 @@
           "price_unit": "flat",
           "currency": "EUR",
           "notes": "EUR 5 per delivery within Trapani centro. EUR 8 to Bonagia or Erice bassa. EUR 12 to the port area. Heavier than 10kg = EUR 3 extra. I'll confirm pickup time by Telegram. Usually within 2 hours."
+        }
+      ]
+    },
+    {
+      "owner_slug": "sallys-kitchen",
+      "name": "Electric Scooter (Used -- Perfect for Deliveries)",
+      "slug": "sallys-electric-scooter-for-delivery",
+      "description": "Used Xiaomi electric scooter, 30km range, perfect for local deliveries. Bought it for Johnny but listing it as a rental so he builds credit on the platform. EUR 5/day or EUR 25/week.",
+      "category": "Transport",
+      "tags": [
+        "scooter",
+        "electric",
+        "delivery",
+        "transport"
+      ],
+      "condition": "good",
+      "listings": [
+        {
+          "listing_type": "RENT",
+          "price": 5.0,
+          "currency": "EUR",
+          "status": "PAUSED",
+          "description": "Electric scooter for local deliveries. 30km range, lightweight, easy to ride. Perfect for Trapani centro."
+        }
+      ],
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800",
+          "alt_text": "Electric scooter for urban delivery"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1604868189955-89cf4e3dbff2?w=800",
+          "alt_text": "Electric scooter parked on Mediterranean street"
         }
       ]
     }
