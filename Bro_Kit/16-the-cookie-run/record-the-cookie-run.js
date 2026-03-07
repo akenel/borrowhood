@@ -536,7 +536,7 @@ async function goToDashboardTab(page, tabName) {
   // SCENE 9c: SOFIA BOOKS SALLY'S BAKING CLASS
   // ============================================================
   console.log('  Scene 9c: Sofia books Sally\'s baking class');
-  await page.goto(`${BASE}/item/baking-with-sally-sicilian-cookies`, { waitUntil: 'networkidle2', timeout: 15000 });
+  await page.goto(`${BASE}/items/baking-with-sally-sicilian-cookies`, { waitUntil: 'networkidle2', timeout: 15000 });
   await setZoom(page);
   await sleep(3000);
 
