@@ -67,8 +67,18 @@
                             <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">{{ t('categories.' + item.category) }}</span>
                         </div>
                         {% if item.listings %}
-                        <div class="mt-2">
+                        <div class="mt-2 flex flex-wrap gap-1">
                             {% for listing in item.listings %}
+                            <span class="text-xs px-2 py-0.5 rounded-full
+                                {% if listing.listing_type.value == 'sell' %}bg-purple-50 text-purple-700
+                                {% elif listing.listing_type.value == 'service' %}bg-cyan-50 text-cyan-700
+                                {% elif listing.listing_type.value == 'training' %}bg-teal-50 text-teal-700
+                                {% elif listing.listing_type.value == 'giveaway' %}bg-green-50 text-green-700
+                                {% elif listing.listing_type.value == 'auction' %}bg-amber-50 text-amber-700
+                                {% elif listing.listing_type.value == 'offer' %}bg-lime-50 text-lime-700
+                                {% else %}bg-indigo-50 text-indigo-700{% endif %}">
+                                {{ listing.listing_type.value | title }}
+                            </span>
                             <span class="text-xs px-2 py-0.5 rounded-full
                                 {% if listing.status.value == 'active' %}bg-emerald-50 text-emerald-700
                                 {% elif listing.status.value == 'draft' %}bg-gray-100 text-gray-500
@@ -133,7 +143,21 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between">
                         <div>
                             <p class="font-medium text-gray-900">{{ rental.listing.item.name if rental.listing and rental.listing.item else 'Item' }}</p>
-                            <p class="text-sm text-gray-500">{{ t('dashboard.as_renter') }}</p>
+                            <p class="text-sm text-gray-500">
+                                {% if rental.listing and rental.listing.listing_type %}
+                                {% set lt = rental.listing.listing_type.value %}
+                                <span class="inline-block text-xs px-2 py-0.5 rounded-full mr-1
+                                    {% if lt == 'sell' %}bg-purple-50 text-purple-700
+                                    {% elif lt == 'service' %}bg-cyan-50 text-cyan-700
+                                    {% elif lt == 'training' %}bg-teal-50 text-teal-700
+                                    {% elif lt == 'giveaway' %}bg-green-50 text-green-700
+                                    {% elif lt == 'auction' %}bg-amber-50 text-amber-700
+                                    {% elif lt == 'offer' %}bg-lime-50 text-lime-700
+                                    {% else %}bg-indigo-50 text-indigo-700{% endif %}">
+                                    {% if lt == 'sell' %}Purchase{% elif lt == 'service' %}Service{% elif lt == 'training' %}Training{% elif lt == 'giveaway' %}Giveaway{% elif lt == 'auction' %}Auction{% elif lt == 'offer' %}Offer{% else %}Rental{% endif %}
+                                </span>
+                                {% endif %}
+                            </p>
                         </div>
                         <div class="mt-2 sm:mt-0 flex items-center space-x-3">
                             <span class="text-xs px-3 py-1 rounded-full font-medium
@@ -336,7 +360,21 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between">
                         <div>
                             <p class="font-medium text-gray-900">{{ rental.listing.item.name if rental.listing and rental.listing.item else 'Item' }}</p>
-                            <p class="text-sm text-gray-500">{{ t('dashboard.as_owner') }}</p>
+                            <p class="text-sm text-gray-500">
+                                {% if rental.listing and rental.listing.listing_type %}
+                                {% set lt = rental.listing.listing_type.value %}
+                                <span class="inline-block text-xs px-2 py-0.5 rounded-full mr-1
+                                    {% if lt == 'sell' %}bg-purple-50 text-purple-700
+                                    {% elif lt == 'service' %}bg-cyan-50 text-cyan-700
+                                    {% elif lt == 'training' %}bg-teal-50 text-teal-700
+                                    {% elif lt == 'giveaway' %}bg-green-50 text-green-700
+                                    {% elif lt == 'auction' %}bg-amber-50 text-amber-700
+                                    {% elif lt == 'offer' %}bg-lime-50 text-lime-700
+                                    {% else %}bg-indigo-50 text-indigo-700{% endif %}">
+                                    {% if lt == 'sell' %}Purchase{% elif lt == 'service' %}Service{% elif lt == 'training' %}Training{% elif lt == 'giveaway' %}Giveaway{% elif lt == 'auction' %}Auction{% elif lt == 'offer' %}Offer{% else %}Rental{% endif %}
+                                </span>
+                                {% endif %}
+                            </p>
                             {% if rental.renter_message %}
                             <p class="text-sm text-gray-600 mt-1 italic">"{{ rental.renter_message }}"</p>
                             {% endif %}

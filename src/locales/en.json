@@ -406,7 +406,7 @@
   "dashboard": {
     "title": "My Dashboard",
     "my_items": "My Items",
-    "my_rentals": "My Rentals",
+    "my_rentals": "My Orders",
     "incoming_requests": "Incoming Requests",
     "no_items": "You haven't listed any items yet.",
     "no_rentals": "No rental activity yet.",
