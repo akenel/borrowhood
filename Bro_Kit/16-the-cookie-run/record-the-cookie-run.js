@@ -640,10 +640,10 @@ async function goToDashboardTab(page, tabName) {
       if (dateInputs[0]) { dateInputs[0].value = s; dateInputs[0].dispatchEvent(new Event('input', {bubbles:true})); }
       if (dateInputs[1]) { dateInputs[1].value = e; dateInputs[1].dispatchEvent(new Event('input', {bubbles:true})); }
       // Alpine v3: use Alpine.$data() to set form values
-      const rentalDiv = document.querySelector('[x-data*="listingId"]');
-      if (rentalDiv) {
-        const data = window.Alpine?.$data(rentalDiv) ||
-                     (rentalDiv._x_dataStack && rentalDiv._x_dataStack[0]);
+      const listingEl = document.querySelector('[x-data*="listingId"]');
+      if (listingEl) {
+        const data = window.Alpine?.$data(listingEl) ||
+                     (listingEl._x_dataStack && listingEl._x_dataStack[0]);
         if (data) {
           data.rentalForm.start = s;
           data.rentalForm.end = e;
@@ -659,10 +659,10 @@ async function goToDashboardTab(page, tabName) {
         'For Sofia\'s birthday! Her uncle Pietro here. She\'ll love these.', 30);
       await page.evaluate(() => {
         const ta = document.querySelector('textarea');
-        const rentalDiv = document.querySelector('[x-data*="listingId"]');
-        if (ta && rentalDiv) {
-          const data = window.Alpine?.$data(rentalDiv) ||
-                       (rentalDiv._x_dataStack && rentalDiv._x_dataStack[0]);
+        const listingEl = document.querySelector('[x-data*="listingId"]');
+        if (ta && listingEl) {
+          const data = window.Alpine?.$data(listingEl) ||
+                       (listingEl._x_dataStack && listingEl._x_dataStack[0]);
           if (data) {
             data.rentalForm.message = ta.value;
           }
@@ -694,10 +694,10 @@ async function goToDashboardTab(page, tabName) {
     if (submitted) {
       await sleep(500);
       await page.evaluate(() => {
-        const rentalDiv = document.querySelector('[x-data*="listingId"]');
-        if (rentalDiv) {
-          const data = window.Alpine?.$data(rentalDiv) ||
-                       (rentalDiv._x_dataStack && rentalDiv._x_dataStack[0]);
+        const listingEl = document.querySelector('[x-data*="listingId"]');
+        if (listingEl) {
+          const data = window.Alpine?.$data(listingEl) ||
+                       (listingEl._x_dataStack && listingEl._x_dataStack[0]);
           if (data && !data.submitting) {
             data.submitRental();
           }

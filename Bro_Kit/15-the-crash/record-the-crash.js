@@ -505,12 +505,12 @@ async function goToDashboardTab(page, tabName) {
 
   // Get listing ID for API fallback
   const miniRentListingId = await page.evaluate(() => {
-    const rentalDiv = document.querySelector('[x-data*="listingId"]');
-    if (!rentalDiv) return null;
-    if (rentalDiv._x_dataStack && rentalDiv._x_dataStack.length > 0) {
-      return rentalDiv._x_dataStack[0].listingId;
-    }
-    const match = rentalDiv.getAttribute('x-data').match(/listingId:\s*'([^']+)'/);
+    const listingEl = document.querySelector('[x-data*="listingId"]');
+    if (!listingEl) return null;
+    const data = window.Alpine?.$data(listingEl) ||
+                 (listingEl._x_dataStack && listingEl._x_dataStack[0]);
+    if (data) return data.listingId;
+    const match = listingEl.getAttribute('x-data').match(/listingId:\s*'([^']+)'/);
     return match ? match[1] : null;
   });
   console.log(`  Mini 4 Pro rent listing ID: ${miniRentListingId}`);
@@ -572,10 +572,11 @@ async function goToDashboardTab(page, tabName) {
       if (dateInputs[0]) { dateInputs[0].value = s; dateInputs[0].dispatchEvent(new Event('input', {bubbles:true})); }
       if (dateInputs[1]) { dateInputs[1].value = e; dateInputs[1].dispatchEvent(new Event('input', {bubbles:true})); }
       // Also sync Alpine
-      const rentalDiv = document.querySelector('[x-data*="listingId"]');
-      if (rentalDiv && rentalDiv._x_dataStack && rentalDiv._x_dataStack.length > 0) {
-        rentalDiv._x_dataStack[0].rentalForm.start = s;
-        rentalDiv._x_dataStack[0].rentalForm.end = e;
+      const listingEl = document.querySelector('[x-data*="listingId"]');
+      if (listingEl) {
+        const data = window.Alpine?.$data(listingEl) ||
+                     (listingEl._x_dataStack && listingEl._x_dataStack[0]);
+        if (data) { data.rentalForm.start = s; data.rentalForm.end = e; }
       }
     }, startStr, endStr);
     console.log(`  Pickup: ${startStr}, Return: ${endStr}`);
@@ -588,9 +589,11 @@ async function goToDashboardTab(page, tabName) {
         'Vacation in Scopello next week. Want aerial shots of the coastline.', 30);
       await page.evaluate(() => {
         const ta = document.querySelector('textarea');
-        const rentalDiv = document.querySelector('[x-data*="listingId"]');
-        if (ta && rentalDiv && rentalDiv._x_dataStack && rentalDiv._x_dataStack.length > 0) {
-          rentalDiv._x_dataStack[0].rentalForm.message = ta.value;
+        const listingEl = document.querySelector('[x-data*="listingId"]');
+        if (ta && listingEl) {
+          const data = window.Alpine?.$data(listingEl) ||
+                       (listingEl._x_dataStack && listingEl._x_dataStack[0]);
+          if (data) data.rentalForm.message = ta.value;
         }
       });
       await sleep(1000);
