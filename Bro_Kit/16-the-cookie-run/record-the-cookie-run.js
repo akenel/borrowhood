@@ -690,20 +690,6 @@ async function goToDashboardTab(page, tabName) {
       return null;
     });
 
-    // If button click didn't trigger Alpine, call submitRental() directly
-    if (submitted) {
-      await sleep(500);
-      await page.evaluate(() => {
-        const listingEl = document.querySelector('[x-data*="listingId"]');
-        if (listingEl) {
-          const data = window.Alpine?.$data(listingEl) ||
-                       (listingEl._x_dataStack && listingEl._x_dataStack[0]);
-          if (data && !data.submitting) {
-            data.submitRental();
-          }
-        }
-      });
-    }
     if (submitted) {
       await showRing(page, submitted.x, submitted.y);
       console.log('  Clicked Send Request');
