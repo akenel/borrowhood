@@ -186,6 +186,29 @@ Tracks bugs found per take, fixes applied, and deployment status.
 
 ---
 
-## Take 9 (pending)
+## Take 9 (2026-03-07)
 
-Ready to record after cleanup.
+**Recording:** Cleanest take yet. All 39 scenes, no script errors, no duplicate requests. Starts 1:04, ends 11:18 raw.
+
+**Issues found (voice feedback):**
+1. Minor login flash at ~1:46-1:49 (known, about:blank helps but doesn't eliminate 100%)
+2. Storyline gap: Sofia shows up at Sally's kitchen but we never see her book the class -- needs a scene
+3. "friend" should be "friends" (plural) on the 5 Boxes card
+
+**Script changes needed for Take 10:**
+- Add scene: Sofia books Sally's baking training (fills the gap, no flashbacks)
+- Leonardo da Vinci cameo setup: Leo claims Johnny's free bike, pays EUR 5-10 for delivery, Johnny delivers using lockbox code. Seeds EP3 intro + drop-off lockbox use case.
+- Fix "friend" -> "friends" on 5 Boxes card
+- The 5 cookie buyers need to be real cast members (Johnny, Leo, etc.) or acknowledged off-screen
+
+**Backlog (from PbP feedback):**
+- Dashboard "My Items" activity summary (recent activity, score changes, favorites, recommendations)
+- Tab notification badges (from Take 8 backlog)
+- Favorites as notifications (from Take 8 backlog)
+- Card fade transitions 0.5s (from Take 8 backlog)
+
+---
+
+## Take 10 (pending)
+
+Script changes needed before recording.
