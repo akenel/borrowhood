@@ -29540,39 +29540,6 @@
     },
     {
       "owner_slug": "sofias-bakes",
-      "name": "Cookie Cutter Set (200 pieces) -- Sofia's Collection",
-      "slug": "cookie-cutter-set-sofias-collection",
-      "description": "Uncle Pietro got me Sally's legendary 200-piece cookie cutter set for my birthday. Every shape you can imagine. I'm still learning to use them all but I can rent them out when I'm not baking.",
-      "content_language": "en",
-      "item_type": "physical",
-      "category": "kitchen",
-      "subcategory": "baking",
-      "condition": "good",
-      "brand": "Various",
-      "media": [
-        {
-          "media_type": "photo",
-          "url": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&h=600&fit=crop&q=80",
-          "alt_text": "Cookie Cutter Set (200 pieces) - product photo"
-        }
-      ],
-      "listings": [
-        {
-          "listing_type": "rent",
-          "price": 3.0,
-          "price_unit": "per_day",
-          "currency": "EUR",
-          "deposit": 15.0,
-          "pickup_only": true,
-          "notes": "Pick up from Scopello. I'll throw in some extra shapes for kids."
-        }
-      ],
-      "latitude": 38.069,
-      "longitude": 12.821,
-      "story": "These used to belong to Sally Thompson. She collected them for 40 years. Uncle Pietro rented them for my 17th birthday and Sally said I should keep them. Now Sally teaches me how to bake. Every cookie cutter has a story."
-    },
-    {
-      "owner_slug": "sofias-bakes",
       "name": "Sofia's Birthday Cookie Box (Custom Order)",
       "slug": "sofias-birthday-cookie-box",
       "description": "I bake custom cookie boxes for birthdays, parties, or just because. Choose 12 shapes, I bake them fresh with Sicilian ingredients. Vanilla, chocolate chip, or lemon zest flavors. 48 hours notice.",
@@ -29602,10 +29569,10 @@
       "longitude": 12.821
     },
     {
-      "owner_slug": "sofias-bakes",
-      "name": "Baking with Sofia -- Learn to Make Sicilian Cookies",
-      "slug": "baking-with-sofia-sicilian-cookies",
-      "description": "I'm 17 and still learning, but I can already teach the basics. We'll make amaretti, biscotti, and my own chocolate chip recipe. My kitchen, my music, my apron. 2 hours. You bring the appetite.",
+      "owner_slug": "sallys-kitchen",
+      "name": "Baking with Sally -- Learn to Make Sicilian Cookies",
+      "slug": "baking-with-sally-sicilian-cookies",
+      "description": "I've been baking Sicilian cookies for 20 years. Amaretti, biscotti, chocolate chip -- the real recipes, not the shortcut ones. My kitchen, my rules, my playlist. 2 hours. You bring the appetite, I bring the flour. Currently mentoring Sofia Ferretti -- she's 17 and already better than me at biscotti.",
       "content_language": "en",
       "item_type": "service",
       "category": "kitchen",
@@ -29613,8 +29580,8 @@
       "media": [
         {
           "media_type": "photo",
-          "url": "https://images.unsplash.com/photo-1486427944344-ddd5bdbe52a4?w=800&h=600&fit=crop&q=80",
-          "alt_text": "Baking with Sofia - hands-on cookie workshop"
+          "url": "https://images.unsplash.com/photo-1556217477-d325251ece38?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Baking with Sally - hands-on cookie workshop"
         }
       ],
       "listings": [
@@ -29626,9 +29593,9 @@
           "notes": "2 hour minimum. Flour, sugar, eggs included. You take home what you bake."
         }
       ],
-      "latitude": 38.069,
-      "longitude": 12.821,
-      "story": "Sally Thompson is my mentor. She taught me that baking is chemistry AND love. I want to pass it on."
+      "latitude": 38.018,
+      "longitude": 12.514,
+      "story": "Baking is chemistry AND love. I teach because someone taught me. Sofia is my first apprentice -- she burned 6 cookies on day one. That's how you learn."
     },
     {
       "owner_slug": "annes-qa-lab",

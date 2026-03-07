@@ -123,6 +123,8 @@ async function apiCall(page, method, path, body) {
 
 // -- VISIBLE demo login: navigate to /demo-login, click username --
 async function visibleLogin(page, username) {
+  await page.goto('about:blank');
+  await sleep(300);
   await page.goto(`${BASE}/demo-login`, { waitUntil: 'networkidle2', timeout: 15000 });
   await page.evaluate(() => { document.body.style.zoom = '1'; });
   await sleep(3000);
@@ -210,7 +212,7 @@ async function showOverlay(page, name, subtitle, extra = '', duration = 9000) {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       z-index: 99999; display: flex; flex-direction: column;
       align-items: center; justify-content: flex-start;
-      background: rgba(30,41,59,0.95); color: white;
+      background: rgba(30,41,59,1.0); color: white;
       font-family: 'Segoe UI', Arial, sans-serif; text-align: center;
       padding: 60px 80px 80px; overflow-y: auto;
       scroll-behavior: smooth;
@@ -511,7 +513,7 @@ async function goToDashboardTab(page, tabName) {
   await setZoom(page);
   await sleep(4000);
 
-  // Show My Items tab -- she has 3 items
+  // Show My Items tab -- she has 1 item (Birthday Cookie Box)
   await clickWithRing(page, 'My Items', '[role="tab"], button, a');
   await sleep(4000);
 
@@ -568,7 +570,7 @@ async function goToDashboardTab(page, tabName) {
   console.log('  Scene 12: Sofia creates commission listing');
   // Sofia is already logged in from Scene 8
   // Navigate to her items -- the Birthday Cookie Box already exists in seed data
-  await page.goto(`${BASE}/items/sofias-birthday-cookie-box-custom-order`, { waitUntil: 'networkidle2', timeout: 15000 });
+  await page.goto(`${BASE}/items/sofias-birthday-cookie-box`, { waitUntil: 'networkidle2', timeout: 15000 });
   await setZoom(page);
   await sleep(5000);
 
@@ -587,7 +589,7 @@ async function goToDashboardTab(page, tabName) {
   await showOverlay(page,
     'HER FIRST LISTING',
     'Sofia Ferretti. Newcomer. Age 17.',
-    '<span class="hl">3 items listed.</span> Cookie cutters, birthday box, baking training.<br>' +
+    '<span class="hl">1 item listed.</span> Sofia\'s Birthday Cookie Box (Custom Order).<br>' +
     'Badge: Newcomer. Points: 10.<br><br>' +
     '<span class="dim">Everyone starts somewhere.</span>',
     10000
@@ -611,7 +613,7 @@ async function goToDashboardTab(page, tabName) {
 
   // Click on Birthday Cookie Box
   console.log('  Scene 14c: Pietro views cookie box listing');
-  await page.goto(`${BASE}/items/sofias-birthday-cookie-box-custom-order`, { waitUntil: 'networkidle2', timeout: 15000 });
+  await page.goto(`${BASE}/items/sofias-birthday-cookie-box`, { waitUntil: 'networkidle2', timeout: 15000 });
   await setZoom(page);
   await sleep(5000);
 
@@ -628,7 +630,7 @@ async function goToDashboardTab(page, tabName) {
   const endStr = endDate.toISOString().split('T')[0];
 
   // Try to rent via UI
-  const hasRentBtn = await clickWithRing(page, 'Rent This', 'button, a');
+  const hasRentBtn = await clickWithRing(page, 'Buy This', 'button, a') || await clickWithRing(page, 'Rent This', 'button, a');
   if (hasRentBtn) {
     await sleep(1500);
 

@@ -1,0 +1,77 @@
+# EP2 "The Cookie Run" -- QA Take Log
+
+Tracks bugs found per take, fixes applied, and deployment status.
+
+---
+
+## Take 1 (2026-03-07)
+
+**Issues found:**
+1. Broken Unsplash URL for "Baking with Sofia" (`photo-1486427944344` returned 404)
+2. Wrong item slug in script: `sofias-birthday-cookie-box-custom-order` (actual: `sofias-birthday-cookie-box`)
+3. Sofia owned cookie cutters -- story says she RENTS them from Sally
+4. Broken local image paths on server (`/media/borrowhood/items/...` files missing)
+
+**Fixes applied:**
+- Replaced broken Unsplash URL with `photo-1556217477-d325251ece38`
+- Fixed cookie box slug in recording script (lines 571, 614)
+- Removed Sofia's cookie cutter item from seed.json (she rents Sally's)
+- SQL UPDATE server items to valid Unsplash URLs
+
+---
+
+## Take 2 (2026-03-07)
+
+**Issues found:**
+1. Wrong item slug `sofias-birthday-cookie-box-custom-order` still in script (missed second reference)
+2. Dashboard shows "My Dashboard" with no user identity
+3. "Baking with Sofia" item owned by Sofia -- should be Sally's training (she teaches)
+
+**Fixes applied:**
+- Fixed all slug references in script
+- Added username display to dashboard: `My Dashboard > Sally Thompson`
+- Moved "Baking with Sofia" to Sally's ownership, renamed "Baking with Sally", new slug `baking-with-sally-sicilian-cookies`
+
+---
+
+## Take 3 (2026-03-07)
+
+**Issues found:**
+1. Button says "Rent This Item" for SELL-type items (Birthday Cookie Box is for sale)
+2. Button says "Rent This Item" for SERVICE/TRAINING types
+3. Overlay background semi-transparent (previous page bleeds through)
+4. Sofia shows "3 items" in script narration (she has 1 after cutter removal)
+5. Script tries `Buy This` button click but template says `Rent This Item`
+6. No logged-in indicator when visiting other people's workshops
+
+**Fixes applied:**
+- Listing-type-aware button text: Buy/Book/Claim/Rent based on `listing_type_val`
+- Added i18n keys: `buy_this`, `book_this`, `claim_this`, `login_to_buy`, `login_to_book`, `login_to_claim` (en + it)
+- Overlay background fully opaque: `rgba(30,41,59,1.0)`
+- Updated Sofia item count narration to "1 item"
+- Script button click updated to try "Buy This" then "Rent This"
+
+---
+
+## Take 4 (2026-03-07)
+
+**Issues found:**
+1. Screen flashes at ~0:44, ~0:54, ~1:37, ~2:26 -- browser shows previous page content during login transitions
+2. Trust score shows 6000%/9500% on workshop pages -- not capped
+3. Rental modal says "Rental Request" for SELL items, shows date pickers for purchases
+4. No logged-in user indicator on workshop pages
+
+**Fixes applied:**
+- `visibleLogin()` now navigates to `about:blank` + 300ms pause before demo-login (fixes all 9 transitions)
+- Trust score capped: `{{ [workshop.trust_score * 100, 100] | min | int }}%` in `workshop.html`
+- Modal title/button/date-pickers now listing-type-aware via Alpine `listingType` variable
+  - "Purchase Request" for sell, "Booking Request" for service/training, "Rental Request" for rent
+  - Date pickers hidden for sell and offer types
+  - New i18n keys: `purchase.request_title`, `purchase.submit`, `booking.request_title`, `booking.submit` (en + it)
+- Added "Viewing as: [username]" badge in workshop breadcrumb for logged-in users
+
+---
+
+## Take 5 (pending)
+
+Ready to record after deploying Take 4 fixes to Hetzner.

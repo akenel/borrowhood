@@ -74,7 +74,13 @@
     "languages": "Parla",
     "location": "Posizione",
     "rent_this": "Noleggia Questo Oggetto",
+    "buy_this": "Acquista Questo Oggetto",
+    "book_this": "Prenota Questo Servizio",
+    "claim_this": "Richiedi Questo Oggetto",
     "login_to_rent": "Accedi per Noleggiare",
+    "login_to_buy": "Accedi per Acquistare",
+    "login_to_book": "Accedi per Prenotare",
+    "login_to_claim": "Accedi per Richiedere",
     "contact_owner": "Contatta il Proprietario",
     "contact_telegram": "Contatta su Telegram",
     "available_as": "Disponibile Come",
@@ -85,6 +91,14 @@
     "written_in": "Scritto in",
     "map_note": "Posizione esatta condivisa dopo la conferma della prenotazione.",
     "report": "Segnala questo oggetto"
+  },
+  "purchase": {
+    "request_title": "Richiesta di Acquisto",
+    "submit": "Invia Richiesta di Acquisto"
+  },
+  "booking": {
+    "request_title": "Richiesta di Prenotazione",
+    "submit": "Invia Richiesta di Prenotazione"
   },
   "rental": {
     "request_title": "Richiesta di Noleggio",

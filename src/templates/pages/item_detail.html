@@ -405,9 +405,11 @@
             <!-- Rent / Claim / Contact CTA -->
             {% set active_listing_id = namespace(val='') %}
             {% set is_giveaway = namespace(val=false) %}
+            {% set listing_type_val = namespace(val='rent') %}
             {% for listing in item.listings %}
             {% if listing.status.value == 'active' and listing.listing_type.value != 'auction' and not active_listing_id.val %}
             {% set active_listing_id.val = listing.id | string %}
+            {% set listing_type_val.val = listing.listing_type.value %}
             {% if listing.listing_type.value == 'giveaway' %}{% set is_giveaway.val = true %}{% endif %}
             {% endif %}
             {% endfor %}
@@ -415,6 +417,7 @@
             <div class="bg-white rounded-lg border border-gray-200 p-6"
                  x-data="{ showRentalModal: false, submitting: false,
                            listingId: '{{ active_listing_id.val }}',
+                           listingType: '{{ listing_type_val.val }}',
                            isGiveaway: {{ 'true' if is_giveaway.val else 'false' }},
                            rentalForm: { start: '', end: '', message: '' },
                            async submitRental() {
@@ -449,12 +452,12 @@
                 {% if user %}
                 <button @click="showRentalModal = true"
                    class="w-full flex items-center justify-center px-6 py-3 {{ 'bg-green-600 hover:bg-green-700 focus:ring-green-500' if is_giveaway.val else 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500' }} text-white font-semibold rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors min-h-[44px]">
-                    {{ t('giveaway.claim') if is_giveaway.val else t('item.rent_this') }}
+                    {% if is_giveaway.val %}{{ t('giveaway.claim') }}{% elif listing_type_val.val == 'sell' %}{{ t('item.buy_this') }}{% elif listing_type_val.val in ('service', 'training') %}{{ t('item.book_this') }}{% elif listing_type_val.val == 'offer' %}{{ t('item.claim_this') }}{% else %}{{ t('item.rent_this') }}{% endif %}
                 </button>
                 {% else %}
                 <a href="/login"
                    class="w-full flex items-center justify-center px-6 py-3 {{ 'bg-green-600 hover:bg-green-700 focus:ring-green-500' if is_giveaway.val else 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500' }} text-white font-semibold rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors min-h-[44px]">
-                    {{ t('giveaway.login_to_claim') if is_giveaway.val else t('item.login_to_rent') }}
+                    {% if is_giveaway.val %}{{ t('giveaway.login_to_claim') }}{% elif listing_type_val.val == 'sell' %}{{ t('item.login_to_buy') }}{% elif listing_type_val.val in ('service', 'training') %}{{ t('item.login_to_book') }}{% elif listing_type_val.val == 'offer' %}{{ t('item.login_to_claim') }}{% else %}{{ t('item.login_to_rent') }}{% endif %}
                 </a>
                 {% endif %}
                 {% if item.owner and item.owner.telegram_username %}
@@ -469,11 +472,11 @@
                      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
                      @keydown.escape.window="showRentalModal = false">
                     <div class="bg-white rounded-lg max-w-md w-full p-6 space-y-4" @click.outside="showRentalModal = false">
-                        <h2 class="text-lg font-bold text-gray-900" x-text="isGiveaway ? '{{ t('giveaway.claim') }}' : '{{ t('rental.request_title') }}'"></h2>
+                        <h2 class="text-lg font-bold text-gray-900" x-text="isGiveaway ? '{{ t('giveaway.claim') }}' : listingType === 'sell' ? '{{ t('purchase.request_title') }}' : listingType === 'service' || listingType === 'training' ? '{{ t('booking.request_title') }}' : '{{ t('rental.request_title') }}'"></h2>
                         <p class="text-sm text-gray-500">{{ item.name }}</p>
 
                         <!-- Date pickers: hidden for giveaways -->
-                        <template x-if="!isGiveaway">
+                        <template x-if="!isGiveaway && listingType !== 'sell' && listingType !== 'offer'">
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('rental.start_date') }}</label>
@@ -503,7 +506,7 @@
                             <button @click="submitRental()" :disabled="submitting"
                                     :class="isGiveaway ? 'bg-green-600 hover:bg-green-700' : 'bg-indigo-600 hover:bg-indigo-700'"
                                     class="px-4 py-2 text-white font-semibold rounded-lg disabled:opacity-50 min-h-[44px]">
-                                <span x-show="!submitting" x-text="isGiveaway ? '{{ t('giveaway.claim') }}' : '{{ t('rental.submit') }}'"></span>
+                                <span x-show="!submitting" x-text="isGiveaway ? '{{ t('giveaway.claim') }}' : listingType === 'sell' ? '{{ t('purchase.submit') }}' : listingType === 'service' || listingType === 'training' ? '{{ t('booking.submit') }}' : '{{ t('rental.submit') }}'"></span>
                                 <span x-show="submitting" x-cloak>{{ t('common.loading') }}</span>
                             </button>
                         </div>
