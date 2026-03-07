@@ -406,7 +406,7 @@
   "dashboard": {
     "title": "La Mia Dashboard",
     "my_items": "I Miei Oggetti",
-    "my_rentals": "I Miei Noleggi",
+    "my_rentals": "I Miei Ordini",
     "incoming_requests": "Richieste in Arrivo",
     "no_items": "Non hai ancora pubblicato nessun oggetto.",
     "no_rentals": "Nessuna attività di noleggio.",

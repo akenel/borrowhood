@@ -72,6 +72,44 @@ Tracks bugs found per take, fixes applied, and deployment status.
 
 ---
 
-## Take 5 (pending)
+## Take 5 (2026-03-07)
 
-Ready to record after deploying Take 4 fixes to Hetzner.
+**Recording:** Clean run, no script errors. All 39 scenes completed.
+
+**Issues found (voice feedback):**
+1. Dashboard lumps everything under "My Rentals" -- purchases, services, skills, sales all look the same
+2. No listing type distinction on dashboard cards -- can't tell a rental from a purchase from a service
+3. Need to distinguish service provider vs client/customer roles
+4. Request modal should adapt more per type (auction=bid, sale=fixed price, service=hourly/flat, rental=dates)
+
+**Fixes applied:**
+- Added listing type badges (Purchase/Service/Training/Giveaway/Auction/Offer/Rental) to:
+  - My Items tab cards (color-coded pill next to status)
+  - My Orders tab cards (replaces generic "As Renter" label)
+  - Incoming Requests tab cards (replaces generic "As Owner" label)
+- Renamed "My Rentals" tab to "My Orders" (en: "My Orders", it: "I Miei Ordini")
+- Trust score template: removed erroneous `* 100` multiplication (scores already 0-100 integers)
+- Color thresholds fixed: 0.7 -> 70, 0.4 -> 40
+
+**Backlog (larger items for future episodes):**
+- Full tab split: separate tabs for Rentals, Purchases, Services, Auctions
+- Type-specific request forms: auction=bid+dates, sale=fixed price, service=hourly/flat/negotiable
+- Provider vs customer role distinction in UI
+- Skills section in dashboard
+
+---
+
+## Commits
+
+| Hash | Description |
+|------|-------------|
+| `6fe2c0b` | feat: EP2 pre-recording cleanup SQL |
+| `fa871c9` | feat: EP2 "The Cookie Run" pre-production -- script, youtube kit, thumbnail |
+| `a2fdc66` | fix: EP2 Take 1-4 QA fixes -- listing-type UX, flash prevention, trust cap |
+| `01482cc` | fix: trust score display -- scores are 0-100 integers, not 0.0-1.0 floats |
+
+---
+
+## Take 6 (pending)
+
+Ready to record after deploying Take 5 fixes to Hetzner.
