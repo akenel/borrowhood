@@ -520,9 +520,13 @@
             <div class="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">{{ t('item.listed_by') }}</h3>
                 <a href="/workshop/{{ item.owner.slug }}" class="flex items-center space-x-3 group">
+                    {% if item.owner.avatar_url %}
+                    <img src="{{ item.owner.avatar_url }}" alt="{{ item.owner.display_name }}" class="w-12 h-12 rounded-full object-cover">
+                    {% else %}
                     <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
                         <span class="text-lg font-bold text-indigo-600">{{ item.owner.display_name[0] }}</span>
                     </div>
+                    {% endif %}
                     <div>
                         <p class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
                             {{ item.owner.workshop_name or item.owner.display_name }}
