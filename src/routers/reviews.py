@@ -161,6 +161,10 @@ async def create_review(
     await check_and_award_badges(db, user.id)
     await check_and_award_badges(db, data.reviewee_id)
 
+    # Recalculate trust score for the reviewee (bad reviews lower it)
+    from src.services.reputation import calculate_trust_score
+    await calculate_trust_score(db, data.reviewee_id)
+
     await db.commit()
     await db.refresh(review)
     return review

@@ -279,12 +279,12 @@
                                 <!-- Trust score -->
                                 {% if member.trust_score is not none %}
                                 <span class="inline-flex items-center text-xs font-medium
-                                    {% if member.trust_score >= 0.7 %}text-emerald-600{% elif member.trust_score >= 0.4 %}text-blue-600{% else %}text-gray-500{% endif %}"
+                                    {% if member.trust_score >= 70 %}text-emerald-600{% elif member.trust_score >= 40 %}text-blue-600{% else %}text-gray-500{% endif %}"
                                     title="{% if lang == 'it' %}Punteggio fiducia{% else %}Trust score{% endif %}">
                                     <svg class="w-3.5 h-3.5 mr-0.5" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5C17.944 5.33 18 5.68 18 6.036 18 12.66 14.627 18.188 10 19.998 5.373 18.188 2 12.66 2 6.036c0-.357.056-.706.166-1.037z" clip-rule="evenodd"/>
                                     </svg>
-                                    {{ (member.trust_score * 100) | int }}%
+                                    {{ [member.trust_score | int, 100] | min }}%
                                 </span>
                                 {% endif %}
                                 <!-- City -->

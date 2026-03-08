@@ -19,7 +19,7 @@ from src.dependencies import get_current_user_token, get_user
 from src.i18n import detect_language, get_translator, SUPPORTED_LANGUAGES
 from src.models.item import BHItem, CATEGORY_GROUPS
 from src.models.listing import BHListing, ListingStatus
-from src.models.rental import BHRental
+from src.models.rental import BHRental, RentalStatus
 from src.models.review import BHReview
 from src.models.badge import BADGE_INFO
 from src.models.user import BadgeTier, BHUser, WorkshopType
@@ -358,6 +358,8 @@ async def dashboard(request: Request,
     item_count = 0
     renter_rentals = []
     owner_rentals = []
+    earnings_total = 0.0
+    completed_count = 0
 
     if token:
         try:
@@ -409,11 +411,29 @@ async def dashboard(request: Request,
             )
             owner_rentals = owner_result.scalars().unique().all()
 
+            # Earnings from completed orders (sum of listing prices)
+            earnings_row = await db.execute(
+                select(
+                    func.coalesce(func.sum(BHListing.price), 0),
+                    func.count(BHRental.id),
+                )
+                .select_from(BHRental)
+                .join(BHListing, BHRental.listing_id == BHListing.id)
+                .join(BHItem, BHListing.item_id == BHItem.id)
+                .where(BHItem.owner_id == db_user.id)
+                .where(BHRental.status == RentalStatus.COMPLETED)
+            )
+            row = earnings_row.one()
+            earnings_total = float(row[0])
+            completed_count = row[1]
+
     ctx = _ctx(request, token,
         items=items,
         item_total=item_count,
         renter_rentals=renter_rentals,
         owner_rentals=owner_rentals,
+        earnings_total=earnings_total,
+        completed_count=completed_count,
     )
     return _render("pages/dashboard.html", ctx)
 
@@ -510,9 +530,9 @@ async def members_directory(
     service: Optional[str] = None,
     skill: Optional[str] = None,
     language: Optional[str] = None,
-    lat: Optional[float] = None,
-    lng: Optional[float] = None,
-    radius: float = 25.0,
+    lat: Optional[str] = None,
+    lng: Optional[str] = None,
+    radius: Optional[str] = None,
     sort: str = "newest",
     limit: int = 12,
     offset: int = 0,
@@ -521,6 +541,29 @@ async def members_directory(
 ):
     """Members directory with search and filters."""
     from sqlalchemy import case
+
+    # Parse lat/lng/radius from strings (HTML forms send empty strings)
+    _lat: Optional[float] = None
+    _lng: Optional[float] = None
+    _radius: float = 25.0
+    try:
+        if lat:
+            _lat = float(lat)
+    except (ValueError, TypeError):
+        pass
+    try:
+        if lng:
+            _lng = float(lng)
+    except (ValueError, TypeError):
+        pass
+    try:
+        if radius:
+            _radius = float(radius)
+    except (ValueError, TypeError):
+        pass
+    lat = _lat  # type: ignore[assignment]
+    lng = _lng  # type: ignore[assignment]
+    radius = _radius  # type: ignore[assignment]
 
     limit = max(12, min(limit, 48))
 

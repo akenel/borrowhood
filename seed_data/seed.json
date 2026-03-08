@@ -29637,9 +29637,9 @@
     },
     {
       "owner_slug": "sofias-bakes",
-      "name": "Sofia's Birthday Cookie Box (750g, ~75 cookies, various sizes and shapes)",
-      "slug": "sofias-birthday-cookie-box",
-      "description": "I bake custom cookie boxes for birthdays, parties, or just because. Choose 12 shapes, I bake them fresh with Sicilian ingredients. Vanilla, chocolate chip, or lemon zest flavors. 48 hours notice.",
+      "name": "Cookie JAR Refill (OOAK Cookies -- 750g)",
+      "slug": "cookie-jar-refill-ooak-cookies-750g",
+      "description": "Various one-of-a-kind cookies, approximately 25 delicious cookies made with love. Packaged in one large paper bag -- makes a great gift! Delivered anywhere in Trapani (provide GPS coordinates) or pickup available. Always fresh: order today, have it tomorrow at your door.",
       "content_language": "en",
       "item_type": "service",
       "category": "kitchen",
@@ -29648,13 +29648,13 @@
         {
           "media_type": "photo",
           "url": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=800&h=600&fit=crop&q=80",
-          "alt_text": "Sofia's Birthday Cookie Box - fresh baked cookies"
+          "alt_text": "Cookie JAR Refill - fresh baked OOAK cookies by Sofia"
         }
       ],
       "listings": [
         {
           "listing_type": "sell",
-          "price": 18.0,
+          "price": 15.0,
           "price_unit": "flat",
           "currency": "EUR",
           "delivery_available": true,
