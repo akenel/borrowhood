@@ -435,8 +435,7 @@ async function goToDashboardTab(page, tabName) {
     '<div class="extra" style="text-align:left; font-size:36px; line-height:2">' +
     '<span class="hl">Sally</span> rented <span class="hl">Pietro\'s</span> drone. It crashed.<br>' +
     'Dispute filed. Deposit split. <span class="green">EUR 70/30.</span><br>' +
-    'Then Pietro rented Sally\'s cookie cutters AND booked her baking class.<br>' +
-    'A birthday gift for his niece <span class="hl">Sofia</span>.<br><br>' +
+    'But they kept doing business. That\'s how BorrowHood works.<br><br>' +
     'The question was:<br>' +
     '<span style="color:#FCD34D; font-size:44px; font-weight:700">' +
     '"What if the drone guy... delivered the cookies?"</span></div>'
@@ -935,9 +934,9 @@ async function goToDashboardTab(page, tabName) {
     'linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%)',
     '5 BOXES',
     '5 addresses across Trapani',
-    '<div class="extra">Pietro. Sally. Leonardo. Nino. Maria.<br>' +
-    '5 friends across Trapani want Sofia\'s birthday cookies.<br><br>' +
-    'One problem: <span class="red">how do you deliver them?</span></div>'
+    '<div class="extra">5 friends across Trapani want Sofia\'s birthday cookies.<br>' +
+    '5 addresses. 5 deliveries. 1 problem.<br><br>' +
+    '<span class="red">How do you deliver them?</span></div>'
   ));
   await sleep(12000);
 
@@ -1287,7 +1286,7 @@ async function goToDashboardTab(page, tabName) {
     'Johnny knocks on doors but has no wheels.<br>' +
     'Sally bakes but can\'t deliver.<br>' +
     'Sofia bakes AND sells but needs all of them.<br><br>' +
-    '<span style="opacity:0.5; font-size:28px">And Leonardo is watching from Via Torrearsa...</span></div>'
+    '<span class="dim">Four people. Four skills. One neighborhood.</span></div>'
   ));
   await sleep(8000);
 
@@ -1321,7 +1320,7 @@ async function goToDashboardTab(page, tabName) {
   <div class="setup">
     <span class="name">Sally's</span> cookies earned EUR 235 this week.<br>
     A used electric scooter costs EUR 200.<br>
-    <span class="name">Johnny</span> needs wheels. <span class="name">Nino</span> wants odd jobs.<br>
+    <span class="name">Johnny</span> needs wheels.<br>
     <span class="name">Sally</span> sees a business, not a charity.
   </div>
   <div class="question">What if the cookie queen... rented the wheels?</div>
