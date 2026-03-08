@@ -123,9 +123,14 @@ async def create_rental(
     if listing.status != "active":
         raise HTTPException(status_code=400, detail="Listing is not active")
 
-    # Can't rent your own items
+    # Can't rent/buy/book your own items
     if listing.item.owner_id == user.id:
-        raise HTTPException(status_code=400, detail="Cannot rent your own item")
+        verb = {
+            ListingType.SELL: "buy", ListingType.GIVEAWAY: "claim",
+            ListingType.OFFER: "claim", ListingType.SERVICE: "book",
+            ListingType.TRAINING: "book", ListingType.COMMISSION: "order",
+        }.get(listing.listing_type, "rent")
+        raise HTTPException(status_code=400, detail=f"Cannot {verb} your own item")
 
     # Giveaway shortcut: auto-set dates to now (no date picking needed)
     from datetime import datetime, timezone

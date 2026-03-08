@@ -172,7 +172,7 @@
                                 {% else %}bg-gray-100 text-gray-700{% endif %}">
                                 {{ t('rental.status.' + rental.status.value) }}
                             </span>
-                            <span class="text-xs text-gray-400">{{ rental.created_at.strftime('%b %d') }}</span>
+                            <span class="text-xs text-gray-400">{{ rental.created_at.strftime('%A, %B %d, %Y at %H:%M') }}</span>
                         </div>
                     </div>
 

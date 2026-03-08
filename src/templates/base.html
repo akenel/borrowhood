@@ -157,9 +157,9 @@
                             </div>
                             <div class="max-h-64 overflow-y-auto">
                                 <template x-for="n in notifications" :key="n.id">
-                                    <a :href="n.link || '#'" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-50" :class="!n.read ? 'bg-indigo-50/50' : ''">
+                                    <a :href="n.link || '#'" @click="if(!n.read) { fetch('/api/v1/notifications/' + n.id + '/read', { method: 'PATCH' }); n.read = true; unread = Math.max(0, unread - 1); }" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-50" :class="!n.read ? 'bg-indigo-50/50' : ''">
                                         <p class="text-sm text-gray-900" :class="!n.read ? 'font-semibold' : ''" x-text="n.title"></p>
-                                        <p class="text-xs text-gray-400 mt-0.5" x-text="new Date(n.created_at).toLocaleDateString()"></p>
+                                        <p class="text-xs text-gray-400 mt-0.5" x-text="new Date(n.created_at).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' at ' + new Date(n.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })"></p>
                                     </a>
                                 </template>
                                 <p x-show="notifications.length === 0" class="px-4 py-6 text-sm text-gray-400 text-center">No notifications yet</p>
