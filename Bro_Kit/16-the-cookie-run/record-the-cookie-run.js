@@ -497,13 +497,13 @@ async function goToDashboardTab(page, tabName) {
   await setZoom(page);
   await sleep(3000);
 
-  const hasRentCutters = await clickWithRing(page, 'Rent This', 'button, a');
+  const hasRentCutters = await clickWithRing(page, 'Rent This', 'button, a')
+    || await clickWithRing(page, 'Book This', 'button, a');
   if (hasRentCutters) {
     await sleep(1500);
-    const giftStart = new Date(Date.now() + 1 * 86400000);
-    const giftEnd = new Date(Date.now() + 3 * 86400000);
-    const giftStartStr = giftStart.toISOString().split('T')[0];
-    const giftEndStr = giftEnd.toISOString().split('T')[0];
+    // Real dates: Sofia picks up Friday March 6, returns Saturday March 7
+    const giftStartStr = '2026-03-06';
+    const giftEndStr = '2026-03-07';
 
     await page.evaluate((s, e) => {
       const dateInputs = document.querySelectorAll('input[type="date"]');
@@ -521,7 +521,7 @@ async function goToDashboardTab(page, tabName) {
     const cutterTextarea = await page.$('textarea');
     if (cutterTextarea) {
       await typeSlowly(page, 'textarea',
-        'Birthday gift for my niece Sofia! She wants to learn baking. Can she pick them up Friday?', 25);
+        'Birthday gift for my niece Sofia! She wants to learn baking. Pickup Friday March 6 at 6pm please.', 25);
       await page.evaluate(() => {
         const ta = document.querySelector('textarea');
         const listingEl = document.querySelector('[x-data*="listingId"]');
@@ -540,7 +540,7 @@ async function goToDashboardTab(page, tabName) {
       const btns = modal.querySelectorAll('button');
       for (const btn of btns) {
         const txt = btn.textContent.trim();
-        if (txt.includes('Send') || txt.includes('Request') || txt.includes('Rent')) {
+        if (txt.includes('Send') || txt.includes('Request') || txt.includes('Rent') || txt.includes('Book')) {
           const box = btn.getBoundingClientRect();
           if (box.width > 0 && box.height > 0) { btn.click(); return { x: box.x + box.width/2, y: box.y + box.height/2 }; }
         }
@@ -734,7 +734,7 @@ async function goToDashboardTab(page, tabName) {
   await showOverlay(page,
     'HER FIRST LISTING',
     'Sofia Ferretti. Newcomer. Age 17.',
-    '<span class="hl">1 item listed.</span> Sofia\'s Birthday Cookie Box (Custom Order).<br>' +
+    '<span class="hl">1 item listed.</span> Sofia\'s Birthday Cookie Box.<br>' +
     'Badge: Newcomer. Points: 10.<br><br>' +
     '<span class="dim">Uncle Pietro gave her the tools. Now she gives the world cookies.</span>',
     10000

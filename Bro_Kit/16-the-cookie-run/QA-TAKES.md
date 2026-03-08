@@ -278,6 +278,29 @@ Root cause: route was `/item/slug` but correct route is `/items/slug`. Rest of e
 
 ---
 
-## Take 12 (pending)
+## Take 12 (2026-03-08)
 
-Ready after deployment of story revision + template fixes to Hetzner.
+**Raw:** `raw-takes/Take 12 - s1 ep2 - THE COOKIE RUN OBS_2026-03-08 02-09-50.mp4`
+**Duration:** 1:00 to 11:26 (10m26s)
+
+**Issues found:**
+1. Scene 6d: "Rent This" button not found -- cookie cutter has TRAINING listing first, shows "Book This Service"
+2. Scooter images dead (both Unsplash URLs return 404) -- no image on scooter page at 9:59
+3. Cookie box says "Custom Order" -- should say weight/count
+4. Baking training says "2 hours" -- should be full day course (8am-6pm)
+5. Scooter pricing unclear -- needs half-day/full-day model (EUR 5/4hrs, EUR 10/day)
+6. Pietro's rental message doesn't specify pickup date/time
+
+**Fixes applied:**
+1. Script: added `|| clickWithRing('Book This')` fallback + `'Book'` in submit button search
+2. Scooter: replaced 2 dead Unsplash URLs with 4 working ones in seed.json + Hetzner DB
+3. Cookie box: renamed to "750g, ~75 cookies, various sizes and shapes" in seed.json + DB
+4. Baking training: updated to "Full day course: 8am to 6pm. Next class: Saturday March 7, 2026" in seed.json + DB
+5. Scooter: updated description with "EUR 5 per half-day (4 hours), EUR 10 full day" in seed.json + DB
+6. Script: Pietro's message now says "Pickup Friday March 6 at 6pm please"
+7. Cookie cutter listing order: RENT before TRAINING (swapped created_at in DB)
+8. Script: hardcoded dates to 2026-03-06 / 2026-03-07 (real dates)
+
+**Status:** All fixes deployed. Ready for Take 13.
+
+---

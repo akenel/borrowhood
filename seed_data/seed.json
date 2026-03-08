@@ -29637,7 +29637,7 @@
     },
     {
       "owner_slug": "sofias-bakes",
-      "name": "Sofia's Birthday Cookie Box (Custom Order)",
+      "name": "Sofia's Birthday Cookie Box (750g, ~75 cookies, various sizes and shapes)",
       "slug": "sofias-birthday-cookie-box",
       "description": "I bake custom cookie boxes for birthdays, parties, or just because. Choose 12 shapes, I bake them fresh with Sicilian ingredients. Vanilla, chocolate chip, or lemon zest flavors. 48 hours notice.",
       "content_language": "en",
@@ -29669,7 +29669,7 @@
       "owner_slug": "sallys-kitchen",
       "name": "Baking with Sally -- Learn to Make Sicilian Cookies",
       "slug": "baking-with-sally-sicilian-cookies",
-      "description": "I've been baking Sicilian cookies for 20 years. Amaretti, biscotti, chocolate chip -- the real recipes, not the shortcut ones. My kitchen, my rules, my playlist. 2 hours. You bring the appetite, I bring the flour. Currently mentoring Sofia Ferretti -- she's 17 and already better than me at biscotti.",
+      "description": "I've been baking Sicilian cookies for 20 years. Amaretti, biscotti, chocolate chip -- the real recipes, not the shortcut ones. My kitchen, my rules, my playlist. Full day course: 8am to 6pm. You bring the appetite, I bring the flour. Currently mentoring Sofia Ferretti -- she's 17 and already better than me at biscotti. Next class: Saturday March 7, 2026.",
       "content_language": "en",
       "item_type": "service",
       "category": "kitchen",
@@ -29687,7 +29687,7 @@
           "price": 10.0,
           "price_unit": "per_hour",
           "currency": "EUR",
-          "notes": "2 hour minimum. Flour, sugar, eggs included. You take home what you bake."
+          "notes": "Full day class (8am-6pm). Flour, sugar, eggs included. You take home what you bake. Next available: Saturday March 7, 2026."
         }
       ],
       "latitude": 38.018,
@@ -30218,7 +30218,7 @@
       "owner_slug": "sallys-kitchen",
       "name": "Electric Scooter (Used -- Perfect for Deliveries)",
       "slug": "sallys-electric-scooter-for-delivery",
-      "description": "Used Xiaomi electric scooter, 30km range, perfect for local deliveries. Bought it for Johnny but listing it as a rental so he builds credit on the platform. EUR 5/day or EUR 25/week.",
+      "description": "Used Xiaomi electric scooter, 30km range, perfect for local deliveries. EUR 5 per half-day (4 hours), EUR 10 full day. Pickup 8am or 2pm, return by 12pm or 6pm. No bulk discounts.",
       "category": "Transport",
       "tags": [
         "scooter",
@@ -30233,17 +30233,25 @@
           "price": 5.0,
           "currency": "EUR",
           "status": "PAUSED",
-          "description": "Electric scooter for local deliveries. 30km range, lightweight, easy to ride. Perfect for Trapani centro."
+          "description": "Electric scooter for local deliveries. 30km range, lightweight, easy to ride. EUR 5 per half-day (4hrs), EUR 10 full day. Pickup at 8am or 2pm."
         }
       ],
       "media": [
         {
-          "url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800",
+          "url": "https://images.unsplash.com/photo-1593764592116-bfb2a97c642a?w=800",
           "alt_text": "Electric scooter for urban delivery"
         },
         {
-          "url": "https://images.unsplash.com/photo-1604868189955-89cf4e3dbff2?w=800",
-          "alt_text": "Electric scooter parked on Mediterranean street"
+          "url": "https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=800",
+          "alt_text": "Electric scooter side view"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1622185135505-2d795003994a?w=800",
+          "alt_text": "Electric scooter on Mediterranean street"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1601758003122-53c40e686a19?w=800",
+          "alt_text": "Electric scooter close-up details"
         }
       ]
     }

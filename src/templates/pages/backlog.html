@@ -20,7 +20,7 @@
     </div>
 
     <!-- Summary Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
         <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
             <p class="text-2xl font-bold text-gray-900" x-text="summary.total">0</p>
             <p class="text-xs text-gray-500 mt-1">Total</p>
@@ -33,6 +33,10 @@
             <p class="text-2xl font-bold text-blue-600" x-text="summary.in_progress">0</p>
             <p class="text-xs text-gray-500 mt-1">In Progress</p>
         </div>
+        <div class="bg-white rounded-lg border border-purple-200 p-4 text-center">
+            <p class="text-2xl font-bold text-purple-600" x-text="summary.on_hold">0</p>
+            <p class="text-xs text-gray-500 mt-1">On Hold</p>
+        </div>
         <div class="bg-white rounded-lg border border-red-200 p-4 text-center">
             <p class="text-2xl font-bold text-red-600" x-text="summary.blocked">0</p>
             <p class="text-xs text-gray-500 mt-1">Blocked</p>
@@ -43,30 +47,68 @@
         </div>
     </div>
 
-    <!-- View Toggle -->
-    <div class="flex border-b border-gray-200 mb-6">
-        <button @click="view = 'board'"
-                :class="view === 'board' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
-                class="px-4 py-3 text-sm font-medium border-b-2 transition-colors min-h-[44px]">Board</button>
-        <button @click="view = 'list'"
-                :class="view === 'list' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
-                class="px-4 py-3 text-sm font-medium border-b-2 transition-colors min-h-[44px]">List</button>
+    <!-- View Toggle + Filters -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-gray-200 mb-6 gap-3 pb-3">
+        <div class="flex">
+            <button @click="view = 'board'"
+                    :class="view === 'board' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                    class="px-4 py-3 text-sm font-medium border-b-2 transition-colors min-h-[44px]">Board</button>
+            <button @click="view = 'list'"
+                    :class="view === 'list' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                    class="px-4 py-3 text-sm font-medium border-b-2 transition-colors min-h-[44px]">List</button>
+        </div>
+        <div class="flex flex-wrap gap-2 items-center">
+            <select x-model="filterStatus" class="px-2 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="on_hold">On Hold</option>
+                <option value="blocked">Blocked</option>
+                <option value="done">Done</option>
+                <option value="archived">Archived</option>
+            </select>
+            <select x-model="filterPriority" class="px-2 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500">
+                <option value="">All Priorities</option>
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select>
+            <select x-model="filterType" class="px-2 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500">
+                <option value="">All Types</option>
+                <option value="feature">Feature</option>
+                <option value="bug_fix">Bug Fix</option>
+                <option value="dev_task">Dev Task</option>
+                <option value="improvement">Improvement</option>
+            </select>
+            <select x-model="filterAssigned" class="px-2 py-1.5 text-xs border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500">
+                <option value="">All Assigned</option>
+                <template x-for="name in assignees" :key="name">
+                    <option :value="name" x-text="name"></option>
+                </template>
+                <option value="_unassigned">Unassigned</option>
+            </select>
+            <button x-show="filterStatus || filterPriority || filterType || filterAssigned"
+                    @click="filterStatus = ''; filterPriority = ''; filterType = ''; filterAssigned = ''"
+                    class="px-2 py-1.5 text-xs text-gray-500 hover:text-red-600 transition-colors">Clear</button>
+        </div>
     </div>
 
     <!-- Kanban Board View -->
-    <div x-show="view === 'board'" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <template x-for="col in ['pending', 'in_progress', 'blocked', 'done']" :key="col">
+    <div x-show="view === 'board'" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <template x-for="col in ['pending', 'in_progress', 'on_hold', 'blocked', 'done']" :key="col">
             <div class="bg-gray-50 rounded-lg p-3 min-h-[200px]">
                 <h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide"
                     :class="{
                         'text-amber-700': col === 'pending',
                         'text-blue-700': col === 'in_progress',
+                        'text-purple-700': col === 'on_hold',
                         'text-red-700': col === 'blocked',
                         'text-emerald-700': col === 'done'
                     }"
                     x-text="col.replace('_', ' ')"></h3>
                 <div class="space-y-2">
-                    <template x-for="item in items.filter(i => i.status === col)" :key="item.id">
+                    <template x-for="item in filteredItems.filter(i => i.status === col)" :key="item.id">
                         <div @click="openDetail(item)"
                              class="bg-white rounded-lg border border-gray-200 p-3 cursor-pointer hover:shadow-md transition-shadow">
                             <div class="flex items-center justify-between mb-1">
@@ -88,7 +130,7 @@
                             </div>
                         </div>
                     </template>
-                    <p x-show="items.filter(i => i.status === col).length === 0"
+                    <p x-show="filteredItems.filter(i => i.status === col).length === 0"
                        class="text-xs text-gray-400 text-center py-4">Empty</p>
                 </div>
             </div>
@@ -110,7 +152,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
-                    <template x-for="item in items" :key="item.id">
+                    <template x-for="item in filteredItems" :key="item.id">
                         <tr @click="openDetail(item)" class="hover:bg-gray-50 cursor-pointer">
                             <td class="px-4 py-3 text-xs font-mono text-gray-400" x-text="'BL-' + String(item.item_number).padStart(3, '0')"></td>
                             <td class="px-4 py-3 text-sm font-medium text-gray-900" x-text="item.title"></td>
@@ -120,6 +162,7 @@
                                       :class="{
                                           'bg-amber-100 text-amber-700': item.status === 'pending',
                                           'bg-blue-100 text-blue-700': item.status === 'in_progress',
+                                          'bg-purple-100 text-purple-700': item.status === 'on_hold',
                                           'bg-red-100 text-red-700': item.status === 'blocked',
                                           'bg-emerald-100 text-emerald-700': item.status === 'done',
                                           'bg-gray-100 text-gray-500': item.status === 'archived'
@@ -168,6 +211,9 @@
                     <button @click="quickStatus('in_progress')"
                             :class="selectedItem?.status === 'in_progress' ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100'"
                             class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors">In Progress</button>
+                    <button @click="quickStatus('on_hold')"
+                            :class="selectedItem?.status === 'on_hold' ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-700 hover:bg-purple-100'"
+                            class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors">On Hold</button>
                     <button @click="quickStatus('blocked')"
                             :class="selectedItem?.status === 'blocked' ? 'bg-red-600 text-white' : 'bg-red-50 text-red-700 hover:bg-red-100'"
                             class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors">Blocked</button>
@@ -293,12 +339,32 @@
 function backlogBoard() {
     return {
         view: 'board',
-        summary: { total: 0, pending: 0, in_progress: 0, blocked: 0, done: 0, archived: 0 },
+        summary: { total: 0, pending: 0, in_progress: 0, on_hold: 0, blocked: 0, done: 0, archived: 0 },
         items: [],
         selectedItem: null,
         activities: [],
         showCreateModal: false,
+        filterStatus: '',
+        filterPriority: '',
+        filterType: '',
+        filterAssigned: '',
         newItem: { title: '', description: '', item_type: 'dev_task', priority: 'medium', assigned_to: '', tags: '', created_by: '{{ user.get("preferred_username", "Angel") if user else "Angel" }}' },
+
+        get assignees() {
+            const names = [...new Set(this.items.map(i => i.assigned_to).filter(Boolean))];
+            return names.sort();
+        },
+
+        get filteredItems() {
+            return this.items.filter(i => {
+                if (this.filterStatus && i.status !== this.filterStatus) return false;
+                if (this.filterPriority && i.priority !== this.filterPriority) return false;
+                if (this.filterType && i.item_type !== this.filterType) return false;
+                if (this.filterAssigned === '_unassigned' && i.assigned_to) return false;
+                if (this.filterAssigned && this.filterAssigned !== '_unassigned' && i.assigned_to !== this.filterAssigned) return false;
+                return true;
+            });
+        },
 
         async api(url, options = {}) {
             const r = await fetch(url, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers } });

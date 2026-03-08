@@ -82,6 +82,7 @@ class BacklogSummary(BaseModel):
     total: int
     pending: int
     in_progress: int
+    on_hold: int
     blocked: int
     done: int
     archived: int
