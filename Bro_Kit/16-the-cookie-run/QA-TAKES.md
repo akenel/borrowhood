@@ -233,6 +233,51 @@ Root cause: route was `/item/slug` but correct route is `/items/slug`. Rest of e
 
 ---
 
-## Take 11 (pending)
+## Take 11 (2026-03-07)
 
-Ready after deployment of banners, addresses, and scooter to Hetzner.
+**Recording:** All scenes completed. Banners, avatars, GPS deployed. Card fades working.
+
+**Issues found (voice feedback #1):**
+1. My Items tab has no activity summary per item (no "5 sold", "3 completed" counts)
+2. Sally's avatar shows young woman -- should be older lady (cookie queen, 20 years baking)
+3. "Listed by" section on item detail shows initial letter, not avatar photo
+4. Tab notification badges still missing on dashboard tabs
+5. Cookie buyers need to be nailed down to cast members (already mapped in Take 10)
+
+**Issues found (voice feedback #2 -- STORY REVISION):**
+6. Sofia doesn't buy anything herself -- Pietro buys both gifts as birthday present:
+   - Gift 1: Rents Sally's cookie cutters for Sofia (weekend)
+   - Gift 2: Books Sally's baking class for Sofia (Saturday)
+   - Sofia goes to Sally's with the cutters, takes the lesson
+7. Script needs to show Pietro buying two things from Sally, not Sofia booking
+
+**Issues found (card review):**
+8. Sofia character card says "She got 200 cookie cutters for her birthday" -- WRONG, Pietro rented them
+9. "5 BOXES" card says "Two neighbors. A teacher. Her best friend." -- doesn't match mapped cast
+10. "THE DEAL" card says "Aerial Photography & Video" but Sofia is using it for delivery
+11. "EPILOGUE" card says "Sally has the money to fix it" -- ambiguous (scooter, not bike repair)
+
+**Fixes applied:**
+- Story revision: Scene 6 now has Pietro (not Sally) renting cookie cutters + booking baking class
+- Scene 9c removed (Sofia booking class) -- Pietro already did it in Scene 6e
+- Scene 7 overlay: "THE BIRTHDAY GIFT" replaces "THE MENTORSHIP" (shows both gifts)
+- Scene 7b added: Sally sees Pietro's incoming requests
+- Sofia character card: "Uncle Pietro rented Sally's cookie cutters for her birthday"
+- "5 BOXES" card: names match cast (Pietro, Sally, Leonardo, Nino, Maria)
+- "THE DEAL" card: "Aerial Photography & Delivery" + "Sofia books Pietro's drone for cookie delivery"
+- "EPILOGUE" card: "Sally has the money for a scooter" (not "fix it")
+- "HER FIRST LISTING" card: "Uncle Pietro gave her the tools"
+- "THE FIRST BAKE" card: "Uncle Pietro rented them. He also booked the class."
+- Sally avatar: changed to older woman (photo-1544005313) in seed.json + SQL
+- "Listed by" on item detail: shows avatar_url image if available, falls back to initial
+- Dashboard tab badges: count pills on My Items, My Orders, Incoming Requests tabs
+
+**Backlog:**
+- My Items activity summary per item (sold count, rental count, etc.)
+- Favorites as notifications
+
+---
+
+## Take 12 (pending)
+
+Ready after deployment of story revision + template fixes to Hetzner.

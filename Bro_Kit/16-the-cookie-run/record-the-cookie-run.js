@@ -9,8 +9,8 @@
  * Syd Field 5-act structure + epilogue. Know the ending before you write.
  *
  * THE ENDING: Johnny watches the drone deliver cookies. He's left behind.
- *   Sally sees his face. She has the money. He needs wheels.
- *   THE QUESTION: What if the cookie queen... bought the delivery kid his wheels?
+ *   Sally sees a business opportunity. Scooter rental for delivery people.
+ *   THE QUESTION: What if the cookie queen... rented the wheels?
  *
  * ACT 1 -- THE APPRENTICE (Scenes 1-10):
  *   1.  RED "OBS CHECK" card
@@ -18,9 +18,9 @@
  *   3.  "Previously on BorrowHood" recap card
  *   4.  Sofia character overlay on homepage
  *   5.  Sally character overlay
- *   6.  Demo login as Sally -- visit Sofia's workshop (Sofia's Bakes)
+ *   6.  Demo login as Pietro -- rents cookie cutters + books baking class for Sofia
  *   7.  Sally views mentorship -- she's Sofia's baking mentor
- *   8.  Demo login as Sofia -- Sofia's dashboard (newcomer, first time)
+ *   8.  Demo login as Sofia -- Sofia's dashboard (sees Pietro's gifts)
  *   9.  Sofia visits Sally's workshop -- sees cookie cutters + KitchenAid
  *  10.  Card: THE FIRST BAKE (Sally teaches, Sofia learns)
  *
@@ -435,7 +435,8 @@ async function goToDashboardTab(page, tabName) {
     '<div class="extra" style="text-align:left; font-size:36px; line-height:2">' +
     '<span class="hl">Sally</span> rented <span class="hl">Pietro\'s</span> drone. It crashed.<br>' +
     'Dispute filed. Deposit split. <span class="green">EUR 70/30.</span><br>' +
-    'Then Pietro rented Sally\'s cookie cutters. For his niece <span class="hl">Sofia</span>.<br><br>' +
+    'Then Pietro rented Sally\'s cookie cutters AND booked her baking class.<br>' +
+    'A birthday gift for his niece <span class="hl">Sofia</span>.<br><br>' +
     'The question was:<br>' +
     '<span style="color:#FCD34D; font-size:44px; font-weight:700">' +
     '"What if the drone guy... delivered the cookies?"</span></div>'
@@ -452,9 +453,9 @@ async function goToDashboardTab(page, tabName) {
   await showOverlay(page,
     'SOFIA FERRETTI',
     'Pietro\'s niece. 17 years old. Newcomer.',
-    'She got 200 cookie cutters for her birthday.<br>' +
-    'She wants to learn to bake.<br>' +
-    'Sally is her mentor.',
+    'Uncle Pietro rented Sally\'s cookie cutters for her birthday.<br>' +
+    'He also booked Sally\'s baking class. The full package.<br>' +
+    'Now Sofia learns from the best.',
     10000
   );
 
@@ -474,38 +475,172 @@ async function goToDashboardTab(page, tabName) {
 
 
   // ============================================================
-  // SCENE 6: LOGIN AS SALLY -- VISIT SOFIA'S WORKSHOP
+  // SCENE 6: LOGIN AS PIETRO -- BIRTHDAY GIFT FOR SOFIA
+  // Pietro rents cookie cutters + books baking class from Sally
   // ============================================================
-  console.log('  Scene 6: Login as Sally');
-  await visibleLogin(page, 'sally');
+  console.log('  Scene 6: Login as Pietro (birthday gift for Sofia)');
+  await visibleLogin(page, 'pietro');
 
-  console.log('  Scene 6b: Sally visits Sofia\'s workshop');
-  await page.goto(`${BASE}/workshop/sofias-bakes`, { waitUntil: 'networkidle2', timeout: 15000 });
+  console.log('  Scene 6b: Pietro visits Sally\'s workshop');
+  await page.goto(`${BASE}/workshop/sallys-kitchen`, { waitUntil: 'networkidle2', timeout: 15000 });
   await setZoom(page);
   await sleep(5000);
 
-  // Scroll through Sofia's profile
-  console.log('  Scene 6c: Scroll Sofia\'s profile');
-  await smoothScroll(page, 400);
+  // Scroll through Sally's items -- cookie cutters + baking class
+  console.log('  Scene 6c: Scroll Sally\'s items');
+  await smoothScroll(page, 500);
   await sleep(4000);
 
+  // --- Gift 1: Rent cookie cutters for Sofia ---
+  console.log('  Scene 6d: Pietro rents cookie cutters for Sofia');
+  await page.goto(`${BASE}/items/professional-cookie-cutter-set-200-pieces`, { waitUntil: 'networkidle2', timeout: 15000 });
+  await setZoom(page);
+  await sleep(3000);
+
+  const hasRentCutters = await clickWithRing(page, 'Rent This', 'button, a');
+  if (hasRentCutters) {
+    await sleep(1500);
+    const giftStart = new Date(Date.now() + 1 * 86400000);
+    const giftEnd = new Date(Date.now() + 3 * 86400000);
+    const giftStartStr = giftStart.toISOString().split('T')[0];
+    const giftEndStr = giftEnd.toISOString().split('T')[0];
+
+    await page.evaluate((s, e) => {
+      const dateInputs = document.querySelectorAll('input[type="date"]');
+      if (dateInputs[0]) { dateInputs[0].value = s; dateInputs[0].dispatchEvent(new Event('input', {bubbles:true})); }
+      if (dateInputs[1]) { dateInputs[1].value = e; dateInputs[1].dispatchEvent(new Event('input', {bubbles:true})); }
+      const listingEl = document.querySelector('[x-data*="listingId"]');
+      if (listingEl) {
+        const data = window.Alpine?.$data(listingEl) ||
+                     (listingEl._x_dataStack && listingEl._x_dataStack[0]);
+        if (data) { data.rentalForm.start = s; data.rentalForm.end = e; }
+      }
+    }, giftStartStr, giftEndStr);
+    await sleep(1000);
+
+    const cutterTextarea = await page.$('textarea');
+    if (cutterTextarea) {
+      await typeSlowly(page, 'textarea',
+        'Birthday gift for my niece Sofia! She wants to learn baking. Can she pick them up Friday?', 25);
+      await page.evaluate(() => {
+        const ta = document.querySelector('textarea');
+        const listingEl = document.querySelector('[x-data*="listingId"]');
+        if (ta && listingEl) {
+          const data = window.Alpine?.$data(listingEl) ||
+                       (listingEl._x_dataStack && listingEl._x_dataStack[0]);
+          if (data) data.rentalForm.message = ta.value;
+        }
+      });
+      await sleep(1000);
+    }
+
+    const cutterSubmitted = await page.evaluate(() => {
+      const modal = document.querySelector('.fixed.inset-0');
+      if (!modal) return null;
+      const btns = modal.querySelectorAll('button');
+      for (const btn of btns) {
+        const txt = btn.textContent.trim();
+        if (txt.includes('Send') || txt.includes('Request') || txt.includes('Rent')) {
+          const box = btn.getBoundingClientRect();
+          if (box.width > 0 && box.height > 0) { btn.click(); return { x: box.x + box.width/2, y: box.y + box.height/2 }; }
+        }
+      }
+      return null;
+    });
+    if (cutterSubmitted) {
+      await showRing(page, cutterSubmitted.x, cutterSubmitted.y);
+      console.log('  Pietro rented cookie cutters for Sofia');
+    }
+    await sleep(3000);
+  }
+
+  // --- Gift 2: Book baking class for Sofia ---
+  console.log('  Scene 6e: Pietro books Sally\'s baking class for Sofia');
+  await page.goto(`${BASE}/items/baking-with-sally-sicilian-cookies`, { waitUntil: 'networkidle2', timeout: 15000 });
+  await setZoom(page);
+  await sleep(3000);
+
+  const hasBookClass = await clickWithRing(page, 'Book This', 'button, a');
+  if (hasBookClass) {
+    await sleep(1500);
+    const classDate = new Date(Date.now() + 2 * 86400000);
+    const classDateStr = classDate.toISOString().split('T')[0];
+
+    await page.evaluate((s) => {
+      const dateInputs = document.querySelectorAll('input[type="date"]');
+      if (dateInputs[0]) { dateInputs[0].value = s; dateInputs[0].dispatchEvent(new Event('input', {bubbles:true})); }
+      if (dateInputs[1]) { dateInputs[1].value = s; dateInputs[1].dispatchEvent(new Event('input', {bubbles:true})); }
+      const listingEl = document.querySelector('[x-data*="listingId"]');
+      if (listingEl) {
+        const data = window.Alpine?.$data(listingEl) ||
+                     (listingEl._x_dataStack && listingEl._x_dataStack[0]);
+        if (data) { data.rentalForm.start = s; data.rentalForm.end = s; }
+      }
+    }, classDateStr);
+    await sleep(1000);
+
+    const classTextarea2 = await page.$('textarea');
+    if (classTextarea2) {
+      await typeSlowly(page, 'textarea',
+        'Also for Sofia\'s birthday! She loves baking. Saturday morning work for you?', 25);
+      await page.evaluate(() => {
+        const ta = document.querySelector('textarea');
+        const listingEl = document.querySelector('[x-data*="listingId"]');
+        if (ta && listingEl) {
+          const data = window.Alpine?.$data(listingEl) ||
+                       (listingEl._x_dataStack && listingEl._x_dataStack[0]);
+          if (data) data.rentalForm.message = ta.value;
+        }
+      });
+      await sleep(1000);
+    }
+
+    const classSubmitted2 = await page.evaluate(() => {
+      const modal = document.querySelector('.fixed.inset-0');
+      if (!modal) return null;
+      const btns = modal.querySelectorAll('button');
+      for (const btn of btns) {
+        const txt = btn.textContent.trim();
+        if (txt.includes('Send') || txt.includes('Request') || txt.includes('Book')) {
+          const box = btn.getBoundingClientRect();
+          if (box.width > 0 && box.height > 0) { btn.click(); return { x: box.x + box.width/2, y: box.y + box.height/2 }; }
+        }
+      }
+      return null;
+    });
+    if (classSubmitted2) {
+      await showRing(page, classSubmitted2.x, classSubmitted2.y);
+      console.log('  Pietro booked Sally\'s baking class for Sofia');
+    }
+    await sleep(3000);
+  }
+
 
   // ============================================================
-  // SCENE 7: MENTORSHIP OVERLAY (10s)
+  // SCENE 7: BIRTHDAY GIFT OVERLAY (10s)
   // ============================================================
-  console.log('  Scene 7: Mentorship explainer');
+  console.log('  Scene 7: Birthday gift explainer');
   await showOverlay(page,
-    'THE MENTORSHIP',
-    'Sally teaches. Sofia learns.',
+    'THE BIRTHDAY GIFT',
+    'Pietro bought Sofia two things from Sally.',
     '<div style="text-align:left; font-size:32px; line-height:2">' +
-    '<span class="hl">Mentor:</span> Sally Thompson (Baking)<br>' +
+    '<span class="hl">Gift 1:</span> Cookie cutter rental (200 pieces, weekend)<br>' +
+    '<span class="hl">Gift 2:</span> Baking class with Sally (Saturday morning)<br><br>' +
+    '<span class="hl">Mentor:</span> Sally Thompson<br>' +
     '<span class="hl">Apprentice:</span> Sofia Ferretti<br>' +
-    '<span class="hl">Status:</span> <span class="green">Active</span><br>' +
-    '<span class="hl">Type:</span> Apprenticeship (long-term skill building)<br><br>' +
-    '<span class="dim">The platform tracks who teaches whom.</span><br>' +
-    '<span class="dim">Mentors earn reputation. Apprentices earn skills.</span></div>',
+    '<span class="hl">Status:</span> <span class="green">Active</span><br><br>' +
+    '<span class="dim">One uncle. Two gifts. A new career begins.</span></div>',
     12000
   );
+
+
+  // ============================================================
+  // SCENE 7b: SALLY SEES PIETRO'S REQUESTS (incoming)
+  // ============================================================
+  console.log('  Scene 7b: Login as Sally -- incoming requests');
+  await visibleLogin(page, 'sally');
+  await goToDashboardTab(page, 'Incoming');
+  await sleep(5000);
 
 
   // ============================================================
@@ -538,78 +673,7 @@ async function goToDashboardTab(page, tabName) {
   await sleep(5000);
 
 
-  // ============================================================
-  // SCENE 9c: SOFIA BOOKS SALLY'S BAKING CLASS
-  // ============================================================
-  console.log('  Scene 9c: Sofia books Sally\'s baking class');
-  await page.goto(`${BASE}/items/baking-with-sally-sicilian-cookies`, { waitUntil: 'networkidle2', timeout: 15000 });
-  await setZoom(page);
-  await sleep(3000);
-
-  // Click "Book This" (TRAINING type)
-  const hasBookBtn = await clickWithRing(page, 'Book This', 'button, a');
-  if (hasBookBtn) {
-    await sleep(1500);
-
-    // Fill dates
-    const classStart = new Date(Date.now() + 2 * 86400000);
-    const classEnd = new Date(Date.now() + 2 * 86400000);
-    const classStartStr = classStart.toISOString().split('T')[0];
-    const classEndStr = classEnd.toISOString().split('T')[0];
-
-    await page.evaluate((s, e) => {
-      const dateInputs = document.querySelectorAll('input[type="date"]');
-      if (dateInputs[0]) { dateInputs[0].value = s; dateInputs[0].dispatchEvent(new Event('input', {bubbles:true})); }
-      if (dateInputs[1]) { dateInputs[1].value = e; dateInputs[1].dispatchEvent(new Event('input', {bubbles:true})); }
-      const listingEl = document.querySelector('[x-data*="listingId"]');
-      if (listingEl) {
-        const data = window.Alpine?.$data(listingEl) ||
-                     (listingEl._x_dataStack && listingEl._x_dataStack[0]);
-        if (data) { data.rentalForm.start = s; data.rentalForm.end = e; }
-      }
-    }, classStartStr, classEndStr);
-    await sleep(1000);
-
-    // Type message
-    const classTextarea = await page.$('textarea');
-    if (classTextarea) {
-      await typeSlowly(page, 'textarea',
-        'Hi Sally! I\'m Sofia, Pietro\'s niece. I got cookie cutters for my birthday and I want to learn to bake. Can I come Saturday?', 25);
-      await page.evaluate(() => {
-        const ta = document.querySelector('textarea');
-        const listingEl = document.querySelector('[x-data*="listingId"]');
-        if (ta && listingEl) {
-          const data = window.Alpine?.$data(listingEl) ||
-                       (listingEl._x_dataStack && listingEl._x_dataStack[0]);
-          if (data) data.rentalForm.message = ta.value;
-        }
-      });
-      await sleep(1000);
-    }
-
-    // Click Send Request inside modal
-    const classSubmitted = await page.evaluate(() => {
-      const modal = document.querySelector('.fixed.inset-0');
-      if (!modal) return null;
-      const btns = modal.querySelectorAll('button');
-      for (const btn of btns) {
-        const txt = btn.textContent.trim();
-        if (txt.includes('Send') || txt.includes('Request') || txt.includes('Book')) {
-          const box = btn.getBoundingClientRect();
-          if (box.width > 0 && box.height > 0) {
-            btn.click();
-            return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-          }
-        }
-      }
-      return null;
-    });
-    if (classSubmitted) {
-      await showRing(page, classSubmitted.x, classSubmitted.y);
-      console.log('  Sofia booked Sally\'s baking class');
-    }
-    await sleep(3000);
-  }
+  // (Scene 9c removed -- Pietro already booked the class in Scene 6e)
 
 
   // ============================================================
@@ -620,7 +684,8 @@ async function goToDashboardTab(page, tabName) {
     'ACT I \u00BB THE FIRST BAKE',
     'Sally\'s Kitchen. Saturday morning.',
     '<div style="text-align:left; font-size:32px; line-height:1.8">' +
-    'Sofia arrives at 8am with her cookie cutters.<br>' +
+    'Sofia arrives at 8am with Sally\'s cookie cutters.<br>' +
+    'Uncle Pietro rented them. He also booked the class.<br>' +
     'Sally has the KitchenAid running. Almond flour, vanilla, powdered sugar.<br><br>' +
     'First batch: 6 burned. 4 perfect.<br>' +
     '<span class="hl">"That\'s how it works,"</span> Sally says.<br>' +
@@ -671,7 +736,7 @@ async function goToDashboardTab(page, tabName) {
     'Sofia Ferretti. Newcomer. Age 17.',
     '<span class="hl">1 item listed.</span> Sofia\'s Birthday Cookie Box (Custom Order).<br>' +
     'Badge: Newcomer. Points: 10.<br><br>' +
-    '<span class="dim">Everyone starts somewhere.</span>',
+    '<span class="dim">Uncle Pietro gave her the tools. Now she gives the world cookies.</span>',
     10000
   );
 
@@ -870,8 +935,8 @@ async function goToDashboardTab(page, tabName) {
     'linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%)',
     '5 BOXES',
     '5 addresses across Trapani',
-    '<div class="extra">Pietro. Two neighbors. A teacher. Her best friend.<br>' +
-    'All want Sofia\'s birthday cookies.<br><br>' +
+    '<div class="extra">Pietro. Sally. Leonardo. Nino. Maria.<br>' +
+    '5 friends across Trapani want Sofia\'s birthday cookies.<br><br>' +
     'One problem: <span class="red">how do you deliver them?</span></div>'
   ));
   await sleep(12000);
@@ -1003,9 +1068,9 @@ async function goToDashboardTab(page, tabName) {
   console.log('  Scene 26: Drone service rental overlay');
   await showOverlay(page,
     'THE DEAL',
-    'Sofia rents Pietro\'s aerial delivery service.',
+    'Sofia books Pietro\'s drone for cookie delivery.',
     '<div style="text-align:left; font-size:32px; line-height:2">' +
-    '<span class="green">SERVICE:</span> Aerial Photography & Video<br>' +
+    '<span class="green">SERVICE:</span> Aerial Photography & Delivery<br>' +
     '<span class="green">PILOT:</span> Pietro Ferretti (licensed, EU A1/A3)<br>' +
     '<span class="green">DRONE:</span> DJI Mini 4 Pro<br>' +
     '<span class="green">MISSION:</span> 5 cookie box deliveries across Trapani centro<br>' +
@@ -1168,10 +1233,10 @@ async function goToDashboardTab(page, tabName) {
     'Sally\'s cookie earnings: <span class="green">EUR 235</span><br>' +
     'Used electric scooter: <span class="hl">EUR 200</span><br>' +
     'Left over: <span class="green">EUR 35</span><br><br>' +
-    'Johnny\'s bike repair: too expensive, frame is bent<br>' +
-    'Johnny\'s delivery fee: <span class="hl">EUR 5 per run</span><br><br>' +
-    '<span class="dim">A scooter pays for itself in 40 deliveries.</span><br>' +
-    '<span class="dim">Johnny does 40 deliveries in two weeks.</span></div>',
+    'Scooter rental: <span class="hl">EUR 5/day</span> + EUR 50 deposit<br>' +
+    'Johnny\'s bike: dead. Frame bent. Not worth fixing.<br><br>' +
+    '<span class="dim">Buy the scooter. Rent it to delivery people.</span><br>' +
+    '<span class="dim">40 rentals and it pays for itself.</span></div>',
     14000
   );
 
@@ -1202,7 +1267,9 @@ async function goToDashboardTab(page, tabName) {
     'Cookie cutters led to Sofia\'s baking.<br>' +
     'Sofia\'s baking needed delivery.<br>' +
     'Delivery exposed Johnny\'s broken bike.<br><br>' +
-    '<span class="hl">And Sally has the money to fix it.</span></div>'
+    '<span class="hl">Sally sees a business.</span><br>' +
+    'Buy a scooter. Rent it to delivery people.<br>' +
+    'No excuses. No broken bikes. Just wheels.</div>'
   ));
   await sleep(14000);
 
@@ -1217,9 +1284,10 @@ async function goToDashboardTab(page, tabName) {
     '',
     '<div class="extra" style="text-align:left; font-size:36px; line-height:1.8; margin-bottom:30px">' +
     'The drone flies but can\'t knock on doors.<br>' +
-    'Johnny knocks on doors but can\'t fly.<br>' +
+    'Johnny knocks on doors but has no wheels.<br>' +
     'Sally bakes but can\'t deliver.<br>' +
-    'Sofia bakes AND sells but needs both.</div>'
+    'Sofia bakes AND sells but needs all of them.<br><br>' +
+    '<span style="opacity:0.5; font-size:28px">And Leonardo is watching from Via Torrearsa...</span></div>'
   ));
   await sleep(8000);
 
@@ -1251,12 +1319,12 @@ async function goToDashboardTab(page, tabName) {
   .credit { font-size: 18px; opacity: 0.25; margin-top: 20px; }
 </style></head><body>
   <div class="setup">
-    <span class="name">Sally's</span> cookies are selling. EUR 235 this week.<br>
-    <span class="name">Johnny's</span> bike is dead. His dream is delivery.<br>
+    <span class="name">Sally's</span> cookies earned EUR 235 this week.<br>
     A used electric scooter costs EUR 200.<br>
-    <span class="name">Sally</span> sees his face.
+    <span class="name">Johnny</span> needs wheels. <span class="name">Nino</span> wants odd jobs.<br>
+    <span class="name">Sally</span> sees a business, not a charity.
   </div>
-  <div class="question">What if the cookie queen... bought the delivery kid his wheels?</div>
+  <div class="question">What if the cookie queen... rented the wheels?</div>
   <div class="continued">to be continued</div>
   <div class="credit">Notion Motion Pictures &raquo; Built with Claude Code (Opus 4.6)</div>
 </body></html>`)}`);
