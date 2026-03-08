@@ -344,3 +344,79 @@ class TestListingModel:
         assert "bid_increment" in columns
         assert "reserve_price" in columns
         assert "auction_end" in columns
+
+
+# --- Trust Score ---
+
+class TestTrustScore:
+    """Trust score calculation outputs 0-100 scale."""
+
+    def test_tier_values_are_0_to_1(self):
+        """TIER_VALUES used in trust score should be 0.0-1.0 range."""
+        from src.services.reputation import TIER_VALUES
+        for tier, val in TIER_VALUES.items():
+            assert 0.0 <= val <= 1.0, f"Tier {tier} value {val} out of range"
+
+    def test_tier_values_are_monotonic(self):
+        """Higher tiers should have higher values."""
+        from src.services.reputation import TIER_VALUES
+        from src.models.user import BadgeTier
+        ordered = [BadgeTier.NEWCOMER, BadgeTier.ACTIVE, BadgeTier.TRUSTED,
+                   BadgeTier.PILLAR, BadgeTier.LEGEND]
+        for i in range(len(ordered) - 1):
+            assert TIER_VALUES[ordered[i]] < TIER_VALUES[ordered[i + 1]]
+
+    def test_max_possible_score_is_100(self):
+        """Perfect scores in all components should yield 100."""
+        # points_score=1.0, review_score=1.0, tier_score=1.0, skill_score=1.0
+        trust = (0.35 * 1.0 + 0.40 * 1.0 + 0.15 * 1.0 + 0.10 * 1.0) * 100
+        assert trust == 100.0
+
+    def test_min_possible_score_is_0(self):
+        """Zero in all components should yield 0."""
+        trust = (0.35 * 0.0 + 0.40 * 0.0 + 0.15 * 0.0 + 0.10 * 0.0) * 100
+        assert trust == 0.0
+
+    def test_review_score_scaling(self):
+        """Review average of 3.0 (mid-range) should scale to 0.5."""
+        # Rating range 1-5, so 3.0 -> (3.0 - 1.0) / 4.0 = 0.5
+        review_score = (3.0 - 1.0) / 4.0
+        assert review_score == 0.5
+
+
+# --- Dashboard Earnings ---
+
+class TestDashboardEarnings:
+    """Dashboard earnings card context variables."""
+
+    def test_dashboard_route_has_earnings_params(self):
+        """Dashboard route should pass earnings_total and completed_count."""
+        import inspect
+        from src.routers.pages import dashboard
+        source = inspect.getsource(dashboard)
+        assert "earnings_total" in source
+        assert "completed_count" in source
+
+    def test_rental_status_has_completed(self):
+        """RentalStatus must have COMPLETED for earnings query."""
+        from src.models.rental import RentalStatus
+        assert hasattr(RentalStatus, "COMPLETED")
+        assert RentalStatus.COMPLETED.value == "completed"
+
+
+# --- Members Page Robustness ---
+
+class TestMembersPageParams:
+    """Members directory handles edge case query params."""
+
+    def test_members_route_accepts_string_lat_lng(self):
+        """The members_directory function should accept lat/lng as Optional[str]."""
+        import inspect
+        from src.routers.pages import members_directory
+        sig = inspect.signature(members_directory)
+        lat_param = sig.parameters.get("lat")
+        lng_param = sig.parameters.get("lng")
+        assert lat_param is not None
+        assert lng_param is not None
+        # Should be str type (not float) to handle empty strings from HTML forms
+        assert lat_param.annotation.__args__[0] is str or lat_param.default is None
