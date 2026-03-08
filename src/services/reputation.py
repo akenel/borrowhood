@@ -104,9 +104,9 @@ TIER_VALUES = {
 
 
 async def calculate_trust_score(db: AsyncSession, user_id: UUID) -> float:
-    """Calculate composite trust score (0.0 to 1.0).
+    """Calculate composite trust score (0 to 100).
 
-    Formula:
+    Formula (each component is 0.0-1.0, then scaled to 0-100):
     - 35% from points (capped at 1000)
     - 40% from weighted review average (1-5 scaled to 0-1)
     - 15% from badge tier (0.0 newcomer to 1.0 legend)
@@ -158,7 +158,7 @@ async def calculate_trust_score(db: AsyncSession, user_id: UUID) -> float:
         + 0.15 * tier_score
         + 0.10 * skill_score
     )
-    trust = round(trust, 3)
+    trust = round(trust * 100, 1)  # Scale to 0-100
 
     # Update user record
     user.trust_score = trust
