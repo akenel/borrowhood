@@ -406,11 +406,18 @@
             {% set active_listing_id = namespace(val='') %}
             {% set is_giveaway = namespace(val=false) %}
             {% set listing_type_val = namespace(val='rent') %}
+            {# Prefer rent/sell/giveaway/offer over service/training #}
             {% for listing in item.listings %}
-            {% if listing.status.value == 'active' and listing.listing_type.value != 'auction' and not active_listing_id.val %}
+            {% if listing.status.value == 'active' and listing.listing_type.value in ('rent', 'sell', 'giveaway', 'offer', 'commission') and not active_listing_id.val %}
             {% set active_listing_id.val = listing.id | string %}
             {% set listing_type_val.val = listing.listing_type.value %}
             {% if listing.listing_type.value == 'giveaway' %}{% set is_giveaway.val = true %}{% endif %}
+            {% endif %}
+            {% endfor %}
+            {% for listing in item.listings %}
+            {% if listing.status.value == 'active' and listing.listing_type.value in ('service', 'training') and not active_listing_id.val %}
+            {% set active_listing_id.val = listing.id | string %}
+            {% set listing_type_val.val = listing.listing_type.value %}
             {% endif %}
             {% endfor %}
             {% if active_listing_id.val %}
