@@ -30,6 +30,7 @@ class BacklogItemType(str, enum.Enum):
 class BacklogStatus(str, enum.Enum):
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
+    ON_HOLD = "on_hold"
     BLOCKED = "blocked"
     DONE = "done"
     ARCHIVED = "archived"

@@ -118,6 +118,7 @@ async def get_summary(
         total=total,
         pending=status_counts.get("pending", 0),
         in_progress=status_counts.get("in_progress", 0),
+        on_hold=status_counts.get("on_hold", 0),
         blocked=status_counts.get("blocked", 0),
         done=status_counts.get("done", 0),
         archived=status_counts.get("archived", 0),
