@@ -7,6 +7,7 @@
   "registrationEmailAsUsername": false,
   "verifyEmail": true,
   "rememberMe": true,
+  "resetPasswordAllowed": true,
   "sslRequired": "external",
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,

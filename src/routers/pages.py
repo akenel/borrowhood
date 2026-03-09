@@ -274,8 +274,12 @@ async def item_detail(slug: str, request: Request,
         except Exception:
             pass
 
+    # Compute ownership server-side so keycloak_id never reaches the template
+    is_owner = bool(token and item.owner and item.owner.keycloak_id == token.get("sub", ""))
+
     ctx = _ctx(request, token,
         item=item,
+        is_owner=is_owner,
         viewer_tier=viewer_tier,
         og_title=f"{item.name} - BorrowHood",
         og_description=item.description[:160] if item.description else "Available on BorrowHood",
@@ -554,6 +558,7 @@ async def orders_page(
         orders=orders,
         total_count=total_count,
         earnings_total=earnings_total,
+        viewer_user_id=db_user.id if token and db_user else None,
         selected_status=status,
         selected_role=role,
         selected_sort=sort,

@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
 from src.database import async_session, create_tables, get_db
+from src.middleware.rate_limit import RateLimitMiddleware
 from src.routers import ai, auth, badges, bids, communities, deposits, disputes, health, helpboard, insurance, items, listing_qa, listings, lockbox, messages, notifications, onboarding, pages, payments, rentals, reports, reviews, service_quotes, skills, telegram, translation, users
 from src.routers import qa as qa_router_mod
 from src.routers import backlog as backlog_router_mod
@@ -39,6 +40,9 @@ def create_app() -> FastAPI:
         docs_url="/api/docs" if settings.debug else None,
         redoc_url="/api/redoc" if settings.debug else None,
     )
+
+    # Rate limiting (BL-089) -- 120 reads/min, 20 writes/min per IP
+    app.add_middleware(RateLimitMiddleware, read_limit=120, write_limit=20, window_seconds=60)
 
     # Static files
     app.mount("/static", StaticFiles(directory="src/static"), name="static")

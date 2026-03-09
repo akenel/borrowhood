@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import get_user, require_auth, require_badge_tier
+from src.dependencies import get_user, require_auth, require_badge_tier, user_throttle
 from src.models.item import BHItem, BHItemFavorite, BHItemMedia, MediaType
 from src.models.listing import BHListing, ListingStatus
 from src.models.user import BHUser
@@ -104,6 +104,7 @@ async def get_item(item_id: UUID, db: AsyncSession = Depends(get_db)):
 async def create_item(
     data: ItemCreate,
     token: dict = Depends(require_badge_tier("active")),
+    _throttle: dict = Depends(user_throttle("create_item", 10, 3600)),
     db: AsyncSession = Depends(get_db),
 ):
     """Create a new item. Requires ACTIVE badge tier or higher."""

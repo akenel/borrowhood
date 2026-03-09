@@ -111,7 +111,7 @@
                         <span>EUR {{ "%.2f"|format(order.listing.price) }}</span>
                         {% endif %}
                         {% if item and item.owner %}
-                        <span>{% if user and item.owner.keycloak_id == user.get('sub') %}You sold{% else %}From <a href="/workshop/{{ item.owner.slug }}" class="text-indigo-600 hover:underline">{{ item.owner.display_name }}</a>{% endif %}</span>
+                        <span>{% if viewer_user_id and item.owner.id == viewer_user_id %}{% if lang == 'it' %}Venduto da te{% else %}You sold{% endif %}{% else %}From <a href="/workshop/{{ item.owner.slug }}" class="text-indigo-600 hover:underline">{{ item.owner.display_name }}</a>{% endif %}</span>
                         {% endif %}
                     </div>
                     {% if order.renter_message %}

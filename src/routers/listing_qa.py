@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import get_user, require_auth
+from src.dependencies import get_user, require_auth, user_throttle
 from src.models.listing import BHListing
 from src.models.listing_qa import BHListingQA
 from src.models.item import BHItem
@@ -69,9 +69,10 @@ async def list_qa(
 async def ask_question(
     data: QACreate,
     token: dict = Depends(require_auth),
+    _throttle: dict = Depends(user_throttle("ask_question", 20, 3600)),
     db: AsyncSession = Depends(get_db),
 ):
-    """Ask a question on a listing. Requires authentication."""
+    """Ask a question on a listing. Max 20/hour per user."""
     user = await get_user(db, token)
 
     # Verify listing exists

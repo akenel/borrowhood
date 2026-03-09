@@ -12,7 +12,7 @@ from sqlalchemy import and_, case, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_db
-from src.dependencies import get_user, require_auth
+from src.dependencies import get_user, require_auth, user_throttle
 from src.models.message import BHMessage
 from src.models.user import BHUser
 from src.schemas.message import MessageCreate, MessageOut, MessageSummary, ThreadSummary
@@ -200,9 +200,10 @@ async def get_thread(
 async def send_message(
     data: MessageCreate,
     token: dict = Depends(require_auth),
+    _throttle: dict = Depends(user_throttle("send_message", 50, 3600)),
     db: AsyncSession = Depends(get_db),
 ):
-    """Send a message to another user."""
+    """Send a message to another user. Max 50/hour per user."""
     user = await get_user(db, token)
 
     if data.recipient_id == user.id:
