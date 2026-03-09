@@ -238,3 +238,53 @@ def require_badge_tier(min_tier: str):
         return token
 
     return check_tier
+
+
+# ── Per-user action throttle (BL-024/025/026) ─────────────────────────
+# In-memory sliding window per (user_id, action).
+# Zero dependencies -- no Redis, no DB writes.
+
+import time as _time
+from collections import defaultdict as _defaultdict
+
+_user_actions: dict[str, list[float]] = _defaultdict(list)
+_user_actions_cleanup = 0.0
+
+
+def _cleanup_user_actions(now: float, window: int = 3600):
+    global _user_actions_cleanup
+    if now - _user_actions_cleanup < 300:
+        return
+    _user_actions_cleanup = now
+    cutoff = now - window
+    stale = [k for k, v in _user_actions.items() if not v or v[-1] < cutoff]
+    for k in stale:
+        del _user_actions[k]
+
+
+def user_throttle(action: str, limit: int, window_seconds: int = 3600):
+    """Dependency factory: limit how many times a user can do `action` per window.
+
+    Usage: Depends(user_throttle("send_message", 50, 3600))
+    Means: max 50 messages per hour per user.
+    """
+    async def check_throttle(token: dict = Depends(require_auth)) -> dict:
+        user_id = token.get("sub", "anon")
+        key = f"{user_id}:{action}"
+        now = _time.monotonic()
+        _cleanup_user_actions(now)
+
+        cutoff = now - window_seconds
+        timestamps = [t for t in _user_actions[key] if t > cutoff]
+
+        if len(timestamps) >= limit:
+            raise HTTPException(
+                status_code=429,
+                detail=f"Too many actions. Limit: {limit} per {window_seconds // 60} minutes.",
+            )
+
+        timestamps.append(now)
+        _user_actions[key] = timestamps
+        return token
+
+    return check_throttle

@@ -65,3 +65,4 @@ VoiceRecordings/*.mp3
 *.mp4
 *.avi
 *.mkv
+client_secret_*.json

@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import get_user, require_auth, require_badge_tier
+from src.dependencies import get_user, require_auth, require_badge_tier, user_throttle
 from src.models.item import BHItem
 from src.models.listing import BHListing, ListingStatus, ListingType
 from src.models.user import BHUser
@@ -70,6 +70,7 @@ async def get_listing(listing_id: UUID, db: AsyncSession = Depends(get_db)):
 async def create_listing(
     data: ListingCreate,
     token: dict = Depends(require_auth),
+    _throttle: dict = Depends(user_throttle("create_listing", 20, 3600)),
     db: AsyncSession = Depends(get_db),
 ):
     """Create a listing on an item you own. Requires authentication."""

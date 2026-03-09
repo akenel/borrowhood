@@ -868,7 +868,7 @@
             loaded: false,
             newQuestion: '',
             asking: false,
-            isOwner: {% if user and item.owner.keycloak_id == user.get('sub', '') %}true{% else %}false{% endif %},
+            isOwner: {% if is_owner %}true{% else %}false{% endif %},
             async init() {
                 for (var lid of listingIds) {
                     try {
@@ -938,19 +938,35 @@
             if (others.length > 0) {
                 var container = document.getElementById('recently-viewed-strip');
                 if (container) {
-                    var html = '';
+                    container.textContent = '';
                     others.forEach(function(item) {
-                        html += '<a href="/items/' + item.slug + '" class="flex-shrink-0 w-32 group">';
+                        var link = document.createElement('a');
+                        link.href = '/items/' + encodeURIComponent(item.slug);
+                        link.className = 'flex-shrink-0 w-32 group';
                         if (item.image) {
-                            html += '<img src="' + item.image + '" alt="' + item.name + '" class="w-32 h-24 rounded-lg object-cover group-hover:ring-2 group-hover:ring-indigo-400 transition-all">';
+                            var img = document.createElement('img');
+                            img.src = item.image;
+                            img.alt = item.name;
+                            img.className = 'w-32 h-24 rounded-lg object-cover group-hover:ring-2 group-hover:ring-indigo-400 transition-all';
+                            link.appendChild(img);
                         } else {
-                            html += '<div class="w-32 h-24 rounded-lg bg-gray-100 flex items-center justify-center"><svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>';
+                            var placeholder = document.createElement('div');
+                            placeholder.className = 'w-32 h-24 rounded-lg bg-gray-100 flex items-center justify-center';
+                            placeholder.innerHTML = '<svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>';
+                            link.appendChild(placeholder);
                         }
-                        html += '<p class="text-xs text-gray-600 mt-1 truncate group-hover:text-indigo-600">' + item.name + '</p>';
-                        if (item.price) html += '<p class="text-xs font-medium text-gray-900">EUR ' + item.price + '</p>';
-                        html += '</a>';
+                        var nameP = document.createElement('p');
+                        nameP.className = 'text-xs text-gray-600 mt-1 truncate group-hover:text-indigo-600';
+                        nameP.textContent = item.name;
+                        link.appendChild(nameP);
+                        if (item.price) {
+                            var priceP = document.createElement('p');
+                            priceP.className = 'text-xs font-medium text-gray-900';
+                            priceP.textContent = 'EUR ' + item.price;
+                            link.appendChild(priceP);
+                        }
+                        container.appendChild(link);
                     });
-                    container.innerHTML = html;
                     container.parentElement.style.display = 'block';
                 }
             }

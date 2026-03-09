@@ -11,7 +11,7 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_db
-from src.dependencies import require_auth
+from src.dependencies import require_auth, user_throttle
 from src.models.report import BHReport, ReportStatus
 from src.schemas.report import ReportCreate, ReportRead
 
@@ -24,9 +24,10 @@ router = APIRouter(prefix="/api/v1/reports", tags=["Reports"])
 async def create_report(
     report: ReportCreate,
     token: dict = Depends(require_auth),
+    _throttle: dict = Depends(user_throttle("file_report", 10, 3600)),
     db: AsyncSession = Depends(get_db),
 ):
-    """File a content moderation report."""
+    """File a content moderation report. Max 10/hour per user."""
     reporter_id = token.get("sub")
     if not reporter_id:
         raise HTTPException(status_code=401, detail="Missing user identity")

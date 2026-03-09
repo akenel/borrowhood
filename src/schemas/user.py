@@ -39,6 +39,14 @@ class UserSocialLinkOut(BaseModel):
     url: str
     label: Optional[str] = None
 
+    @field_validator("url")
+    @classmethod
+    def url_must_be_http(cls, v: str) -> str:
+        """Reject javascript:, data:, and other dangerous URL schemes."""
+        if not v.startswith(("http://", "https://")):
+            raise ValueError("Only http and https URLs are allowed")
+        return v
+
     class Config:
         from_attributes = True
 
