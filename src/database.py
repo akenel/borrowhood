@@ -89,9 +89,14 @@ async def run_migrations():
         # 2026-03-03: Multi-community federation
         "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS default_community_id UUID REFERENCES bh_community(id)",
         "ALTER TABLE bh_item ADD COLUMN IF NOT EXISTS community_id UUID REFERENCES bh_community(id)",
+        # 2026-03-08: Review photos (up to 3 URLs per review)
+        "ALTER TABLE bh_review ADD COLUMN IF NOT EXISTS photo_urls TEXT[]",
+        # 2026-03-08: Activity tracking
+        "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMPTZ",
     ]
     # ALTER TYPE ... ADD VALUE -- SQLAlchemy uses enum .name (UPPERCASE) for PG enums
     enum_migrations = [
+        "ALTER TYPE notificationtype ADD VALUE IF NOT EXISTS 'MESSAGE_RECEIVED'",
         "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'ARENA'",
         "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'CAMP'",
         "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'DOCK'",

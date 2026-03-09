@@ -9,7 +9,7 @@ import uuid
 from typing import Optional
 
 from sqlalchemy import CheckConstraint, Enum, Float, ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base, BHBase
@@ -56,6 +56,9 @@ class BHReview(BHBase, Base):
     # Weight snapshot (captured at review time for audit)
     reviewer_tier: Mapped[str] = mapped_column(String(20), nullable=False)
     weight: Mapped[float] = mapped_column(Float, nullable=False, default=1.0)
+
+    # Photos (up to 3 URLs)
+    photo_urls: Mapped[Optional[list]] = mapped_column(ARRAY(String(500)), default=None)
 
     # Moderation
     visible: Mapped[bool] = mapped_column(default=True)

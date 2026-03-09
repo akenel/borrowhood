@@ -126,6 +126,9 @@ class BHUser(BHBase, Base):
         UUID(as_uuid=True), ForeignKey("bh_community.id"), nullable=True
     )
 
+    # Activity tracking
+    last_active_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), default=None)
+
     # Terms of Service acceptance
     tos_accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), default=None)
 

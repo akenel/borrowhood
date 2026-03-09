@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}{% if lang == 'it' %}Messaggi{% else %}Messages{% endif %} - {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="messagesApp()" x-init="init()">
+
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">{% if lang == 'it' %}Messaggi{% else %}Messages{% endif %}</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Thread list (inbox) -->
+        <div class="md:col-span-1 bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div class="p-3 border-b border-gray-100 bg-gray-50">
+                <p class="text-sm font-semibold text-gray-700">{% if lang == 'it' %}Conversazioni{% else %}Conversations{% endif %}</p>
+            </div>
+            <div class="max-h-[500px] overflow-y-auto divide-y divide-gray-100">
+                <template x-for="thread in threads" :key="thread.other_user_id">
+                    <button @click="selectThread(thread)"
+                            class="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors"
+                            :class="activeThread === thread.other_user_id ? 'bg-indigo-50 border-l-2 border-indigo-600' : ''">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                                <template x-if="thread.other_user_avatar">
+                                    <img :src="thread.other_user_avatar" class="w-10 h-10 rounded-full object-cover">
+                                </template>
+                                <template x-if="!thread.other_user_avatar">
+                                    <span class="text-sm font-bold text-gray-500" x-text="thread.other_user_name[0]"></span>
+                                </template>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-sm font-medium text-gray-900 truncate" x-text="thread.other_user_name"></p>
+                                    <span x-show="thread.unread_count > 0" class="w-5 h-5 bg-blue-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center" x-text="thread.unread_count"></span>
+                                </div>
+                                <p class="text-xs text-gray-400 truncate" x-text="thread.last_message"></p>
+                            </div>
+                        </div>
+                    </button>
+                </template>
+                <p x-show="threads.length === 0 && loaded" class="px-4 py-8 text-sm text-gray-400 text-center">{% if lang == 'it' %}Nessuna conversazione{% else %}No conversations yet{% endif %}</p>
+            </div>
+        </div>
+
+        <!-- Message thread -->
+        <div class="md:col-span-2 bg-white rounded-lg border border-gray-200 flex flex-col" style="min-height: 500px;">
+            <template x-if="activeThread">
+                <div class="flex flex-col h-full">
+                    <!-- Thread header -->
+                    <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                        <p class="text-sm font-semibold text-gray-900" x-text="activeThreadName"></p>
+                    </div>
+
+                    <!-- Messages -->
+                    <div class="flex-1 overflow-y-auto p-4 space-y-3 max-h-[400px]" id="msg-scroll">
+                        <template x-for="msg in messages" :key="msg.id">
+                            <div :class="msg.sender_id === myUserId ? 'flex justify-end' : 'flex justify-start'">
+                                <div :class="msg.sender_id === myUserId ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-900'"
+                                     class="max-w-[75%] px-4 py-2 rounded-2xl">
+                                    <p class="text-sm" x-text="msg.body"></p>
+                                    <p class="text-[10px] mt-1 opacity-60" x-text="new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})"></p>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Compose -->
+                    <div class="p-3 border-t border-gray-100">
+                        <form @submit.prevent="sendMessage()" class="flex gap-2">
+                            <input type="text" x-model="newMessage" placeholder="{% if lang == 'it' %}Scrivi un messaggio...{% else %}Type a message...{% endif %}"
+                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-full text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]"
+                                   maxlength="5000">
+                            <button type="submit" :disabled="!newMessage.trim() || sending"
+                                    class="px-4 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:opacity-50 transition-colors min-h-[40px]">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </template>
+            <template x-if="!activeThread">
+                <div class="flex-1 flex items-center justify-center text-gray-400 text-sm">
+                    {% if lang == 'it' %}Seleziona una conversazione{% else %}Select a conversation{% endif %}
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function messagesApp() {
+    return {
+        threads: [],
+        messages: [],
+        loaded: false,
+        activeThread: null,
+        activeThreadName: '',
+        newMessage: '',
+        sending: false,
+        myUserId: '',
+        pollTimer: null,
+
+        async init() {
+            // Get my user ID
+            try {
+                var resp = await fetch('/api/v1/users/me');
+                if (resp.ok) { var d = await resp.json(); this.myUserId = d.id; }
+            } catch(e) {}
+
+            await this.loadThreads();
+            this.loaded = true;
+
+            // Check URL for ?to=userId
+            var params = new URLSearchParams(window.location.search);
+            var toUser = params.get('to');
+            if (toUser) {
+                await this.openThread(toUser);
+            }
+
+            // Poll for new messages every 10s
+            this.pollTimer = setInterval(() => {
+                this.loadThreads();
+                if (this.activeThread) this.loadMessages(this.activeThread);
+            }, 10000);
+        },
+
+        async loadThreads() {
+            try {
+                var resp = await fetch('/api/v1/messages/threads');
+                if (resp.ok) this.threads = await resp.json();
+            } catch(e) {}
+        },
+
+        async selectThread(thread) {
+            this.activeThread = thread.other_user_id;
+            this.activeThreadName = thread.other_user_name;
+            await this.loadMessages(thread.other_user_id);
+            thread.unread_count = 0;
+        },
+
+        async openThread(userId) {
+            this.activeThread = userId;
+            await this.loadMessages(userId);
+            // Find thread name
+            var t = this.threads.find(function(t) { return t.other_user_id === userId; });
+            if (t) this.activeThreadName = t.other_user_name;
+        },
+
+        async loadMessages(userId) {
+            try {
+                var resp = await fetch('/api/v1/messages/thread/' + userId);
+                if (resp.ok) {
+                    this.messages = await resp.json();
+                    this.$nextTick(() => {
+                        var el = document.getElementById('msg-scroll');
+                        if (el) el.scrollTop = el.scrollHeight;
+                    });
+                }
+            } catch(e) {}
+        },
+
+        async sendMessage() {
+            if (!this.newMessage.trim() || !this.activeThread) return;
+            this.sending = true;
+            try {
+                var resp = await fetch('/api/v1/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        recipient_id: this.activeThread,
+                        body: this.newMessage.trim()
+                    })
+                });
+                if (resp.ok) {
+                    var msg = await resp.json();
+                    this.messages.push(msg);
+                    this.newMessage = '';
+                    this.$nextTick(() => {
+                        var el = document.getElementById('msg-scroll');
+                        if (el) el.scrollTop = el.scrollHeight;
+                    });
+                }
+            } catch(e) {}
+            this.sending = false;
+        },
+
+        destroy() {
+            if (this.pollTimer) clearInterval(this.pollTimer);
+        }
+    };
+}
+</script>
+{% endblock %}

@@ -6,7 +6,7 @@ This file loads when working in the Bro_Kit directory. Follow these rules for ev
 
 ## The Rules (Non-Negotiable)
 
-1. **Brotherhood Run at 40% volume** -- every video, no exceptions. Source: `Archive/archive/Brotherhood Run.mp3` (209.9s / 3:30). Loop if video is longer. Fade in 3s, fade out 5s.
+1. **Brotherhood Run at 30% volume** -- every video, no exceptions. Source: `Archive/archive/Brotherhood Run.mp3` (209.9s / 3:30). Loop if video is longer. Fade in 3s, fade out 5s.
 
 2. **Every video gets a thumbnail** -- 1280x720 HTML, rendered to PNG + JPG via Puppeteer. High contrast, readable at small sizes.
 
@@ -123,7 +123,8 @@ All users: password `helix_pass`. Seed users: sally, mike, angel, maria, nino.
 | 6 | The Italian Job | `12-the-italian-job/` | PRE-PACKAGED |
 | 7 | The Giveaway | `13-the-giveaway/` | FINAL (2:36) |
 | 8 | The Workshop | `14-the-workshop/` | FINAL (2:19) |
-| 9 | The Crash | `15-the-crash/` | PRE-PACKAGED |
+| 9 | The Crash | `15-the-crash/` | FINAL (EP1 PUBLISHED) |
+| 10 | The Cookie Run | `16-the-cookie-run/` | FINAL (11:08, EP2 PUBLISHED) |
 
 ---
 

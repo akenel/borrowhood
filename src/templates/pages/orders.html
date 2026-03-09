@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}{% if lang == 'it' %}Cronologia Ordini{% else %}Order History{% endif %} - {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">{% if lang == 'it' %}Cronologia Ordini{% else %}Order History{% endif %}</h1>
+            <p class="text-sm text-gray-500 mt-1">
+                {% if lang == 'it' %}Tutti i tuoi acquisti, noleggi e vendite{% else %}All your purchases, rentals, and sales{% endif %}
+            </p>
+        </div>
+        {% if earnings_total > 0 %}
+        <div class="mt-3 sm:mt-0 text-right">
+            <p class="text-sm text-gray-500">{% if lang == 'it' %}Guadagni totali{% else %}Lifetime Earnings{% endif %}</p>
+            <p class="text-2xl font-bold text-emerald-600">EUR {{ "%.2f"|format(earnings_total) }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Filters -->
+    <form method="GET" action="/orders" class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <!-- Role -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Ruolo{% else %}Role{% endif %}</label>
+                <select name="role" class="w-full border border-gray-300 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]">
+                    <option value="">{% if lang == 'it' %}Tutti{% else %}All{% endif %}</option>
+                    <option value="buyer" {% if selected_role == 'buyer' %}selected{% endif %}>{% if lang == 'it' %}Acquisti{% else %}As Buyer{% endif %}</option>
+                    <option value="seller" {% if selected_role == 'seller' %}selected{% endif %}>{% if lang == 'it' %}Vendite{% else %}As Seller{% endif %}</option>
+                </select>
+            </div>
+
+            <!-- Status -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Stato{% else %}Status{% endif %}</label>
+                <select name="status" class="w-full border border-gray-300 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]">
+                    <option value="">{% if lang == 'it' %}Tutti{% else %}All{% endif %}</option>
+                    <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="approved" {% if selected_status == 'approved' %}selected{% endif %}>Approved</option>
+                    <option value="picked_up" {% if selected_status == 'picked_up' %}selected{% endif %}>Picked Up</option>
+                    <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="declined" {% if selected_status == 'declined' %}selected{% endif %}>Declined</option>
+                    <option value="cancelled" {% if selected_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+
+            <!-- Sort -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Ordina{% else %}Sort{% endif %}</label>
+                <select name="sort" class="w-full border border-gray-300 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]">
+                    <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>{% if lang == 'it' %}Piu recenti{% else %}Newest first{% endif %}</option>
+                    <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>{% if lang == 'it' %}Meno recenti{% else %}Oldest first{% endif %}</option>
+                </select>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-end gap-2">
+                <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[40px]">
+                    {{ t('browse.apply') }}
+                </button>
+                <a href="/orders" class="flex-1 px-4 py-2 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 text-center min-h-[40px] flex items-center justify-center">
+                    {{ t('browse.clear') }}
+                </a>
+            </div>
+        </div>
+    </form>
+
+    <!-- Orders list -->
+    {% if orders %}
+    <div class="space-y-4">
+        {% for order in orders %}
+        {% set item = order.listing.item if order.listing else None %}
+        <div class="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-sm transition-shadow">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <!-- Item image -->
+                {% if item and item.media %}
+                <a href="/items/{{ item.slug }}" class="flex-shrink-0">
+                    <img src="{{ item.media[0].url }}" alt="{{ item.name }}" class="w-16 h-16 rounded-lg object-cover">
+                </a>
+                {% else %}
+                <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    </svg>
+                </div>
+                {% endif %}
+
+                <!-- Details -->
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                        <h3 class="font-semibold text-gray-900 truncate">
+                            {% if item %}<a href="/items/{{ item.slug }}" class="hover:text-indigo-600">{{ item.name }}</a>{% else %}Unknown item{% endif %}
+                        </h3>
+                        <!-- Status badge -->
+                        <span class="flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium
+                            {% if order.status.value == 'completed' %}bg-emerald-100 text-emerald-700
+                            {% elif order.status.value == 'approved' or order.status.value == 'picked_up' %}bg-blue-100 text-blue-700
+                            {% elif order.status.value == 'pending' %}bg-amber-100 text-amber-700
+                            {% elif order.status.value == 'declined' or order.status.value == 'cancelled' %}bg-red-100 text-red-700
+                            {% else %}bg-gray-100 text-gray-600{% endif %}">
+                            {{ order.status.value | replace('_', ' ') | title }}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-3 mt-1 text-sm text-gray-500">
+                        {% if order.listing %}
+                        <span>{{ order.listing.listing_type.value | title }}</span>
+                        <span>EUR {{ "%.2f"|format(order.listing.price) }}</span>
+                        {% endif %}
+                        {% if item and item.owner %}
+                        <span>{% if user and item.owner.keycloak_id == user.get('sub') %}You sold{% else %}From <a href="/workshop/{{ item.owner.slug }}" class="text-indigo-600 hover:underline">{{ item.owner.display_name }}</a>{% endif %}</span>
+                        {% endif %}
+                    </div>
+                    {% if order.renter_message %}
+                    <p class="text-xs text-gray-400 mt-1 truncate">{{ order.renter_message }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Date + actions -->
+                <div class="flex-shrink-0 text-right">
+                    <p class="text-sm text-gray-500">{{ order.created_at.strftime('%b %d, %Y') }}</p>
+                    {% if order.requested_start %}
+                    <p class="text-xs text-gray-400">{{ order.requested_start.strftime('%b %d') }} - {{ order.requested_end.strftime('%b %d') if order.requested_end else '...' }}</p>
+                    {% endif %}
+                    {% if order.status.value == 'completed' and item %}
+                    <a href="/items/{{ item.slug }}#reviews" class="inline-flex items-center text-xs text-indigo-600 hover:underline mt-1">
+                        {% if lang == 'it' %}Lascia recensione{% else %}Leave review{% endif %}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% set current_page = (selected_offset // selected_limit) + 1 %}
+    {% set total_pages = ((total_count - 1) // selected_limit) + 1 if total_count > 0 else 1 %}
+    {% if total_pages > 1 %}
+    <div class="mt-6 flex items-center justify-between">
+        <p class="text-sm text-gray-500">{{ total_count }} {% if lang == 'it' %}ordini{% else %}orders{% endif %} ({% if lang == 'it' %}pagina{% else %}page{% endif %} {{ current_page }}/{{ total_pages }})</p>
+        <nav class="flex items-center gap-1">
+            {% if current_page > 1 %}
+            <a href="/orders?{% if selected_role %}role={{ selected_role }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}sort={{ selected_sort }}&limit={{ selected_limit }}&offset={{ (current_page - 2) * selected_limit }}"
+               class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">{% if lang == 'it' %}Prec{% else %}Prev{% endif %}</a>
+            {% endif %}
+            {% if current_page < total_pages %}
+            <a href="/orders?{% if selected_role %}role={{ selected_role }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}sort={{ selected_sort }}&limit={{ selected_limit }}&offset={{ current_page * selected_limit }}"
+               class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">{% if lang == 'it' %}Succ{% else %}Next{% endif %}</a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty state -->
+    <div class="text-center py-16">
+        <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">{% if lang == 'it' %}Nessun ordine{% else %}No orders yet{% endif %}</h3>
+        <p class="mt-2 text-sm text-gray-500">{% if lang == 'it' %}Inizia a esplorare il marketplace{% else %}Start browsing the marketplace{% endif %}</p>
+        <a href="/browse" class="mt-6 inline-flex px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
+            {{ t('nav.browse') }}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

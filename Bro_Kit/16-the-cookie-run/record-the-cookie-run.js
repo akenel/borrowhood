@@ -460,7 +460,7 @@ async function goToDashboardTab(page, tabName) {
 
 
   // ============================================================
-  // SCENE 5: SALLY THOMPSON (character overlay, 8s)
+  // SCENE 5: SALLY BAKER (character overlay, 8s)
   // ============================================================
   console.log('  Scene 5: Sally character card');
   await showOverlay(page,
@@ -500,9 +500,11 @@ async function goToDashboardTab(page, tabName) {
     || await clickWithRing(page, 'Book This', 'button, a');
   if (hasRentCutters) {
     await sleep(1500);
-    // Real dates: Sofia picks up Friday March 6, returns Saturday March 7
-    const giftStartStr = '2026-03-06';
-    const giftEndStr = '2026-03-07';
+    // Sofia picks up tomorrow, returns 4 days later (dynamic dates)
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+    const fourDaysLater = new Date(); fourDaysLater.setDate(fourDaysLater.getDate() + 5);
+    const giftStartStr = tomorrow.toISOString().split('T')[0];
+    const giftEndStr = fourDaysLater.toISOString().split('T')[0];
 
     await page.evaluate((s, e) => {
       const dateInputs = document.querySelectorAll('input[type="date"]');
@@ -520,7 +522,7 @@ async function goToDashboardTab(page, tabName) {
     const cutterTextarea = await page.$('textarea');
     if (cutterTextarea) {
       await typeSlowly(page, 'textarea',
-        'Birthday gift for my niece Sofia! She wants to learn baking. Pickup Friday March 6 at 6pm please.', 25);
+        'Birthday gift for my niece Sofia! She will pick up Wednesday at 6pm and return Sunday by 6pm. Could you do a personal handoff and walk her through the set? She needs to be ready for Saturday morning class.', 25);
       await page.evaluate(() => {
         const ta = document.querySelector('textarea');
         const listingEl = document.querySelector('[x-data*="listingId"]');
@@ -562,8 +564,9 @@ async function goToDashboardTab(page, tabName) {
   const hasBookClass = await clickWithRing(page, 'Book This', 'button, a');
   if (hasBookClass) {
     await sleep(1500);
-    const classDate = new Date(Date.now() + 2 * 86400000);
-    const classDateStr = classDate.toISOString().split('T')[0];
+    // Full day baking class -- 3 days from now (dynamic)
+    const classDay = new Date(); classDay.setDate(classDay.getDate() + 3);
+    const classDateStr = classDay.toISOString().split('T')[0];
 
     await page.evaluate((s) => {
       const dateInputs = document.querySelectorAll('input[type="date"]');
@@ -581,7 +584,7 @@ async function goToDashboardTab(page, tabName) {
     const classTextarea2 = await page.$('textarea');
     if (classTextarea2) {
       await typeSlowly(page, 'textarea',
-        'Also for Sofia\'s birthday! She loves baking. Saturday morning work for you?', 25);
+        'Also for Sofia -- Saturday March 8 full day class please. She will have the cookie cutters by then. Thank you Sally!', 25);
       await page.evaluate(() => {
         const ta = document.querySelector('textarea');
         const listingEl = document.querySelector('[x-data*="listingId"]');
@@ -623,11 +626,10 @@ async function goToDashboardTab(page, tabName) {
     'THE BIRTHDAY GIFT',
     'Pietro bought Sofia two things from Sally.',
     '<div style="text-align:left; font-size:32px; line-height:2">' +
-    '<span class="hl">Gift 1:</span> Cookie cutter rental (200 pieces, weekend)<br>' +
-    '<span class="hl">Gift 2:</span> Baking class with Sally (Saturday morning)<br><br>' +
-    '<span class="hl">Mentor:</span> Sally Thompson<br>' +
-    '<span class="hl">Apprentice:</span> Sofia Ferretti<br>' +
-    '<span class="hl">Status:</span> <span class="green">Active</span><br><br>' +
+    '<span class="hl">Gift 1:</span> Cookie cutter rental (200 pieces, 4 days)<br>' +
+    '<span class="hl">Gift 2:</span> Baking class with Sally (Saturday full day)<br><br>' +
+    '<span class="hl">Handoff:</span> Sally meets Sofia Wednesday 6pm<br>' +
+    '<span class="hl">Class:</span> Saturday March 8, 8am to 6pm<br><br>' +
     '<span class="dim">One uncle. Two gifts. A new career begins.</span></div>',
     12000
   );

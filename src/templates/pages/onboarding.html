@@ -73,7 +73,10 @@
                     this.locating = false;
                 },
                 (err) => {
-                    this.locationStatus = '{% if lang == 'it' %}Impossibile rilevare la posizione{% else %}Could not detect location{% endif %}';
+                    // Fallback to Trapani centro when browser denies geolocation
+                    this.profile.latitude = 38.017;
+                    this.profile.longitude = 12.514;
+                    this.locationStatus = '{% if lang == 'it' %}Posizione predefinita: Trapani{% else %}Default location: Trapani{% endif %}';
                     this.locating = false;
                 },
                 { enableHighAccuracy: true, timeout: 10000 }

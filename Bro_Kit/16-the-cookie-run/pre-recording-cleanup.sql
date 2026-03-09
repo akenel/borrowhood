@@ -14,13 +14,20 @@ UPDATE bh_user
    SET deleted_at      = NULL,
        account_status   = 'ACTIVE',
        telegram_chat_id = NULL,
-       notify_telegram  = false
+       notify_telegram  = false,
+       last_active_at   = NOW() - (random() * interval '2 hours')
  WHERE email IN (
    'sally@borrowhood.local',
    'pietro@borrowhood.local',
    'sofiaferretti@borrowhood.local',
    'john@borrowhood.local'
  );
+
+-- Set realistic last_active_at for all other seeded users (varied recency)
+UPDATE bh_user
+   SET last_active_at = NOW() - (random() * interval '30 days')
+ WHERE last_active_at IS NULL
+   AND email LIKE '%@borrowhood.local';
 
 -- Reactivate all their listings
 UPDATE bh_listing
@@ -42,7 +49,53 @@ UPDATE bh_listing
 -- ── 2. Clean ALL rentals involving EP2 cast (cascade order matters) ──
 --    Ghosts from previous takes pile up as duplicates on dashboards.
 
--- Reviews first
+-- Payments first (FK to bh_rental)
+DELETE FROM bh_payment
+ WHERE rental_id IN (
+   SELECT id FROM bh_rental
+    WHERE renter_id IN (
+      SELECT id FROM bh_user
+       WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local',
+                       'sofiaferretti@borrowhood.local', 'john@borrowhood.local')
+    )
+    OR id IN (
+      SELECT r.id FROM bh_rental r
+      JOIN bh_listing l ON r.listing_id = l.id
+      JOIN bh_item i ON l.item_id = i.id
+      WHERE i.owner_id IN (
+        SELECT id FROM bh_user
+         WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local',
+                         'sofiaferretti@borrowhood.local', 'john@borrowhood.local')
+      )
+    )
+ );
+
+-- Insurance (FK to bh_rental) -- skip if table doesn't exist yet
+DO $$ BEGIN
+  IF EXISTS (SELECT FROM pg_tables WHERE tablename = 'bh_insurance') THEN
+    DELETE FROM bh_insurance
+     WHERE rental_id IN (
+       SELECT id FROM bh_rental
+        WHERE renter_id IN (
+          SELECT id FROM bh_user
+           WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local',
+                           'sofiaferretti@borrowhood.local', 'john@borrowhood.local')
+        )
+        OR id IN (
+          SELECT r.id FROM bh_rental r
+          JOIN bh_listing l ON r.listing_id = l.id
+          JOIN bh_item i ON l.item_id = i.id
+          WHERE i.owner_id IN (
+            SELECT id FROM bh_user
+             WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local',
+                             'sofiaferretti@borrowhood.local', 'john@borrowhood.local')
+          )
+        )
+     );
+  END IF;
+END $$;
+
+-- Reviews
 DELETE FROM bh_review
  WHERE rental_id IN (
    SELECT id FROM bh_rental
@@ -171,7 +224,39 @@ DELETE FROM bh_notification
                     'sofiaferretti@borrowhood.local', 'john@borrowhood.local')
  );
 
--- ── 6. Seed Sally's completed order history (EUR 235+ in prior sales) ──
+-- ── 6. Clean messages between EP2 cast members ──
+
+DELETE FROM bh_message
+ WHERE sender_id IN (
+   SELECT id FROM bh_user
+    WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local',
+                    'sofiaferretti@borrowhood.local', 'john@borrowhood.local')
+ )
+ OR recipient_id IN (
+   SELECT id FROM bh_user
+    WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local',
+                    'sofiaferretti@borrowhood.local', 'john@borrowhood.local')
+ );
+
+-- ── 7. Clean Q&A on EP2 cast listings ──
+
+DELETE FROM bh_listing_qa
+ WHERE listing_id IN (
+   SELECT l.id FROM bh_listing l
+   JOIN bh_item i ON l.item_id = i.id
+   WHERE i.owner_id IN (
+     SELECT id FROM bh_user
+      WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local',
+                      'sofiaferretti@borrowhood.local', 'john@borrowhood.local')
+   )
+ )
+ OR asker_id IN (
+   SELECT id FROM bh_user
+    WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local',
+                    'sofiaferretti@borrowhood.local', 'john@borrowhood.local')
+ );
+
+-- ── 8. Seed Sally's completed order history (EUR 235+ in prior sales) ──
 --    These are "past" orders from community members, showing Sally
 --    has an established business before EP2 begins.
 
@@ -308,6 +393,29 @@ SELECT '--- NOTIFICATIONS (should be 0) ---' AS section;
 SELECT COUNT(*) AS notifications
   FROM bh_notification
  WHERE user_id IN (
+   SELECT id FROM bh_user
+    WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local',
+                    'sofiaferretti@borrowhood.local', 'john@borrowhood.local')
+ );
+
+SELECT '--- MESSAGES (should be 0) ---' AS section;
+SELECT COUNT(*) AS messages
+  FROM bh_message
+ WHERE sender_id IN (
+   SELECT id FROM bh_user
+    WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local',
+                    'sofiaferretti@borrowhood.local', 'john@borrowhood.local')
+ )
+ OR recipient_id IN (
+   SELECT id FROM bh_user
+    WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local',
+                    'sofiaferretti@borrowhood.local', 'john@borrowhood.local')
+ );
+
+SELECT '--- LISTING Q&A (should be 0) ---' AS section;
+SELECT COUNT(*) AS listing_qa
+  FROM bh_listing_qa
+ WHERE asker_id IN (
    SELECT id FROM bh_user
     WHERE email IN ('sally@borrowhood.local', 'pietro@borrowhood.local',
                     'sofiaferretti@borrowhood.local', 'john@borrowhood.local')
