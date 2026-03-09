@@ -27,6 +27,8 @@ from src.models.lockbox import BHLockBoxAccess
 from src.models.skill_verification import BHSkillVerification
 from src.models.telegram import BHTelegramLink
 from src.models.mentorship import BHMentorship
+from src.models.message import BHMessage
+from src.models.listing_qa import BHListingQA
 
 __all__ = [
     "BHUser",
@@ -62,4 +64,6 @@ __all__ = [
     "BHSkillVerification",
     "BHTelegramLink",
     "BHMentorship",
+    "BHMessage",
+    "BHListingQA",
 ]

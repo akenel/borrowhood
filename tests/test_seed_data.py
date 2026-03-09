@@ -276,13 +276,13 @@ class TestEP2CastConsistency:
             "Pietro rents Sally's cutters as a birthday gift for Sofia."
         )
 
-    def test_sofia_owns_birthday_cookie_box(self, seed_data):
-        """Sofia MUST own the Birthday Cookie Box -- her first listing."""
+    def test_sofia_owns_cookie_jar_refill(self, seed_data):
+        """Sofia MUST own the Cookie JAR Refill -- her first listing."""
         items = self._items(seed_data)
-        box = [i for i in items if "birthday-cookie-box" in i.get("slug", "")]
-        assert box, "Birthday Cookie Box not found in seed"
+        box = [i for i in items if "cookie-jar-refill" in i.get("slug", "")]
+        assert box, "Cookie JAR Refill not found in seed"
         assert box[0]["owner_slug"] == "sofias-bakes", (
-            f"Birthday Cookie Box owned by {box[0]['owner_slug']} -- must be sofias-bakes"
+            f"Cookie JAR Refill owned by {box[0]['owner_slug']} -- must be sofias-bakes"
         )
 
     def test_johnny_owns_broken_bike(self, seed_data):

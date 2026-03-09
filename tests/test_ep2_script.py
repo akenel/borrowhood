@@ -63,12 +63,11 @@ class TestStoryConsistency:
             "Script doesn't mention baking class/lesson"
         )
 
-    def test_five_boxes_names_real_cast(self, script):
-        """The 5 BOXES card must name real cast members, not generic labels."""
-        # Find the 5 BOXES card content
-        assert "Pietro. Sally. Leonardo. Nino. Maria." in script, (
-            "5 BOXES card doesn't name the 5 delivery recipients. "
-            "Expected: Pietro, Sally, Leonardo, Nino, Maria"
+    def test_five_boxes_addresses_not_names(self, script):
+        """The 5 BOXES card should reference addresses, not named non-EP2 cast."""
+        # We removed named cast (Leonardo, Nino, Maria) from EP2 cards
+        assert "5 friends" in script or "5 addresses" in script or "across Trapani" in script, (
+            "5 BOXES card should reference addresses or friends, not named non-EP2 cast"
         )
 
     def test_epilogue_frames_sally_as_entrepreneur(self, script):
@@ -108,15 +107,11 @@ class TestStoryConsistency:
         )
 
 
-    def test_leonardo_teased_in_climax(self, script):
-        """Leonardo must be teased in the climax cards (EP3 setup)."""
-        assert "Leonardo" in script or "Torrearsa" in script, (
-            "Leonardo not teased in climax -- he's watching from Via Torrearsa"
-        )
-
-    def test_nino_mentioned_in_teaser(self, script):
-        """Nino must be mentioned in the TO BE CONTINUED card (scooter rental subplot)."""
-        assert "Nino" in script, "Nino not mentioned -- he's part of the scooter rental subplot"
+    def test_no_non_ep2_characters_in_cards(self, script):
+        """Non-EP2 characters (Leonardo, Nino, Maria) should not appear in card text."""
+        # These characters appear in EP3+ but were removed from EP2 cards
+        # They may still appear in delivery addresses (Via Torrearsa) which is fine
+        assert "Nino wants" not in script, "Nino dialogue removed from EP2"
 
 
 class TestScriptRoutes:

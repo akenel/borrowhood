@@ -7,7 +7,7 @@ Every response includes t() translator and current lang in context.
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Request, Response
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,8 +28,39 @@ router = APIRouter(tags=["pages"])
 templates = Jinja2Templates(directory="src/templates")
 
 # Make datetime.now() available in templates for seasonal tag logic
-from datetime import datetime
+from datetime import datetime, timezone
 templates.env.globals["now"] = datetime.now
+
+
+def _last_seen(dt):
+    """Human-readable 'last seen' from a datetime."""
+    if not dt:
+        return None
+    now = datetime.now(timezone.utc)
+    if dt.tzinfo is None:
+        from datetime import timezone as tz
+        dt = dt.replace(tzinfo=tz.utc)
+    delta = now - dt
+    minutes = int(delta.total_seconds() / 60)
+    if minutes < 5:
+        return "online now"
+    if minutes < 60:
+        return f"seen {minutes}m ago"
+    hours = minutes // 60
+    if hours < 24:
+        return f"seen {hours}h ago"
+    days = delta.days
+    if days == 1:
+        return "seen yesterday"
+    if days < 30:
+        return f"seen {days}d ago"
+    months = days // 30
+    if months < 12:
+        return f"seen {months}mo ago"
+    return f"seen {days // 365}y ago"
+
+
+templates.env.filters["last_seen"] = _last_seen
 
 # Location privacy: 500m blur for public display
 from src.services.location_privacy import blur_coordinates
@@ -438,6 +469,110 @@ async def dashboard(request: Request,
     return _render("pages/dashboard.html", ctx)
 
 
+@router.get("/orders", response_class=HTMLResponse)
+async def orders_page(
+    request: Request,
+    status: Optional[str] = None,
+    role: Optional[str] = None,
+    sort: str = "newest",
+    limit: int = 24,
+    offset: int = 0,
+    db: AsyncSession = Depends(get_db),
+    token: Optional[dict] = Depends(get_current_user_token),
+):
+    """Full order history -- all rentals as buyer and seller."""
+    orders = []
+    total_count = 0
+    earnings_total = 0.0
+
+    if token:
+        try:
+            db_user = await get_user(db, token)
+        except Exception:
+            db_user = None
+
+        if db_user:
+            # Build base query
+            base = (
+                select(BHRental)
+                .options(
+                    selectinload(BHRental.listing).selectinload(BHListing.item).selectinload(BHItem.media),
+                    selectinload(BHRental.listing).selectinload(BHListing.item).selectinload(BHItem.owner),
+                )
+            )
+
+            # Role filter
+            if role == "buyer":
+                base = base.where(BHRental.renter_id == db_user.id)
+            elif role == "seller":
+                base = base.join(BHListing, BHRental.listing_id == BHListing.id).join(
+                    BHItem, BHListing.item_id == BHItem.id
+                ).where(BHItem.owner_id == db_user.id)
+            else:
+                # Both: renter OR item owner
+                base = base.outerjoin(BHListing, BHRental.listing_id == BHListing.id).outerjoin(
+                    BHItem, BHListing.item_id == BHItem.id
+                ).where(
+                    (BHRental.renter_id == db_user.id) | (BHItem.owner_id == db_user.id)
+                )
+
+            # Status filter
+            if status:
+                try:
+                    status_enum = RentalStatus(status.upper())
+                    base = base.where(BHRental.status == status_enum)
+                except ValueError:
+                    pass
+
+            # Count
+            from sqlalchemy import func as sqla_func
+            count_q = select(sqla_func.count()).select_from(base.subquery())
+            total_count = await db.scalar(count_q) or 0
+
+            # Sort
+            if sort == "oldest":
+                base = base.order_by(BHRental.created_at.asc())
+            else:
+                base = base.order_by(BHRental.created_at.desc())
+
+            base = base.offset(offset).limit(limit)
+            result = await db.execute(base)
+            orders = result.scalars().unique().all()
+
+            # Lifetime earnings
+            earnings_row = await db.execute(
+                select(func.coalesce(func.sum(BHListing.price), 0))
+                .select_from(BHRental)
+                .join(BHListing, BHRental.listing_id == BHListing.id)
+                .join(BHItem, BHListing.item_id == BHItem.id)
+                .where(BHItem.owner_id == db_user.id)
+                .where(BHRental.status == RentalStatus.COMPLETED)
+            )
+            earnings_total = float(earnings_row.scalar() or 0)
+
+    ctx = _ctx(request, token,
+        orders=orders,
+        total_count=total_count,
+        earnings_total=earnings_total,
+        selected_status=status,
+        selected_role=role,
+        selected_sort=sort,
+        selected_limit=limit,
+        selected_offset=offset,
+    )
+    return _render("pages/orders.html", ctx)
+
+
+@router.get("/messages", response_class=HTMLResponse)
+async def messages_page(request: Request,
+                        token: Optional[dict] = Depends(get_current_user_token)):
+    """In-app messaging between users."""
+    if not token:
+        return RedirectResponse(url="/login", status_code=302)
+    ctx = _ctx(request, token)
+    return _render("pages/messages.html", ctx)
+
+
 @router.get("/onboarding", response_class=HTMLResponse)
 async def onboarding_page(request: Request,
                           token: Optional[dict] = Depends(get_current_user_token)):
@@ -713,7 +848,7 @@ async def demo_login_page(
         {"username": "angel", "display_name": "Angel", "workshop": "The Black Wolf Workshop", "roles": "admin, operator, moderator, lender", "badge": "legend", "color": "amber", "avatar": f"{_av}/angel.jpg"},
         {"username": "nino", "display_name": "Nino Cassisa", "workshop": "Camper & Tour Trapani", "roles": "operator, moderator, lender", "badge": "pillar", "color": "purple", "avatar": f"{_av}/nino.svg"},
         {"username": "leonardo", "display_name": "Leonardo da Vinci", "workshop": "Bottega di Leonardo", "roles": "moderator, lender", "badge": "legend", "color": "amber", "avatar": f"{_av}/leonardo.svg"},
-        {"username": "sally", "display_name": "Sally Baker", "workshop": "Sally's Kitchen", "roles": "lender", "badge": "trusted", "color": "emerald", "avatar": f"{_av}/sally.svg"},
+        {"username": "sally", "display_name": "Sally Thompson", "workshop": "Sally's Kitchen", "roles": "lender", "badge": "trusted", "color": "emerald", "avatar": f"{_av}/sally.svg"},
         {"username": "mike", "display_name": "Mike Kenel", "workshop": "Mike's Tool Shed", "roles": "lender", "badge": "pillar", "color": "purple", "avatar": f"{_av}/mike.svg"},
         {"username": "marco", "display_name": "Marco Moretti", "workshop": "Bottega del Legno", "roles": "lender", "badge": "active", "color": "blue", "avatar": f"{_av}/marco.svg"},
         {"username": "pietro", "display_name": "Pietro Ferretti", "workshop": "SkyView Sicilia", "roles": "lender", "badge": "active", "color": "blue", "avatar": f"{_av}/pietro.svg"},

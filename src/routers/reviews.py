@@ -4,10 +4,12 @@ Reviews can only be left after a completed rental.
 Weight is calculated from the reviewer's badge tier at review time.
 """
 
+from pathlib import Path
 from typing import List, Optional
 from uuid import UUID
+import uuid as uuid_mod
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -168,3 +170,51 @@ async def create_review(
     await db.commit()
     await db.refresh(review)
     return review
+
+
+REVIEW_UPLOAD_DIR = Path(__file__).resolve().parent.parent / "static" / "uploads" / "reviews"
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
+MAX_REVIEW_PHOTOS = 3
+MAX_PHOTO_SIZE = 5 * 1024 * 1024  # 5 MB
+
+
+@router.post("/{review_id}/photos", status_code=201)
+async def upload_review_photo(
+    review_id: UUID,
+    file: UploadFile = File(...),
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Upload a photo to an existing review. Max 3 photos, 5MB each."""
+    user = await get_user(db, token)
+
+    result = await db.execute(
+        select(BHReview).where(BHReview.id == review_id)
+    )
+    review = result.scalars().first()
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+    if review.reviewer_id != user.id:
+        raise HTTPException(status_code=403, detail="Only the reviewer can add photos")
+
+    current_photos = review.photo_urls or []
+    if len(current_photos) >= MAX_REVIEW_PHOTOS:
+        raise HTTPException(status_code=400, detail=f"Maximum {MAX_REVIEW_PHOTOS} photos per review")
+
+    if file.content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(status_code=400, detail="Only JPEG, PNG, and WebP images allowed")
+
+    contents = await file.read()
+    if len(contents) > MAX_PHOTO_SIZE:
+        raise HTTPException(status_code=413, detail="Photo must be under 5MB")
+
+    REVIEW_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    filename = f"{uuid_mod.uuid4()}_{file.filename}"
+    filepath = REVIEW_UPLOAD_DIR / filename
+    filepath.write_bytes(contents)
+
+    url = f"/static/uploads/reviews/{filename}"
+    review.photo_urls = current_photos + [url]
+
+    await db.commit()
+    return {"url": url, "count": len(review.photo_urls)}

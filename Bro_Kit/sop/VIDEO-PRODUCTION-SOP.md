@@ -238,22 +238,32 @@ ffmpeg -i "raw-obs-recording.mp4" -ss START -to END \
 ### 6.2 Background Music
 
 **Track: Brotherhood Run** -- always. No exceptions.
-**Volume: 40%** -- always. No exceptions.
+**Volume: 30%** -- always. No exceptions.
 **Location:** `BorrowHood/Bro_Kit/Archive/archive/Brotherhood Run.mp3` (209.9s / 3:30)
 
 Loop if video is longer than 3:30. Fade in 3s at start, fade out 5s before end.
 
-```bash
-# Get video duration
-DURATION=$(ffprobe -v error -show_entries format=duration -of csv=p=0 XXXXX-silent.mp4)
+**CRITICAL: Brotherhood Run has ~1.8s silence at start and ~1.8s at end.** Using `-stream_loop` creates 3-4 seconds of dead air at each seam. Instead, trim the silence and crossfade the loops:
 
-# Create looped music track at 40% volume with fades
+```bash
+DURATION=$(ffprobe -v error -show_entries format=duration -of csv=p=0 XXXXX-silent.mp4)
 FADE_OUT_START=$(echo "$DURATION - 5" | bc)
-ffmpeg -stream_loop -1 \
-  -i "BorrowHood/Bro_Kit/Archive/archive/Brotherhood Run.mp3" \
-  -vn -af "volume=0.4,afade=t=in:d=3,afade=t=out:st=${FADE_OUT_START}:d=5" \
-  -t $DURATION \
-  music-loop.m4a
+
+# Step 1: Trim silence from start/end of Brotherhood Run
+ffmpeg -y -i "Brotherhood Run.mp3" -vn -ss 1.8 -to 208.2 -c:a pcm_s16le /tmp/br-trimmed.wav
+
+# Step 2: Crossfade 2 copies (2s overlap, no gap)
+ffmpeg -y -i /tmp/br-trimmed.wav -i /tmp/br-trimmed.wav \
+  -filter_complex "[0][1]acrossfade=d=2:c1=tri:c2=tri[ab]" -map "[ab]" /tmp/br-2x.wav
+
+# Step 3: Crossfade again for ~4 loops seamless (819s)
+ffmpeg -y -i /tmp/br-2x.wav -i /tmp/br-2x.wav \
+  -filter_complex "[0][1]acrossfade=d=2:c1=tri:c2=tri[out]" -map "[out]" /tmp/br-4x.wav
+
+# Step 4: Apply volume, fades, trim to video length
+ffmpeg -y -i /tmp/br-4x.wav \
+  -af "volume=0.3,afade=t=in:d=3,afade=t=out:st=${FADE_OUT_START}:d=5" \
+  -t $DURATION -c:a aac -b:a 128k -ar 48000 music-loop.m4a
 ```
 
 **Important:** Brotherhood Run mp3 has embedded cover art. Add `-vn` to strip the video stream, otherwise ffmpeg throws "Could not find tag for codec h264 in stream #0".
@@ -379,6 +389,47 @@ Analyze the final video frame by frame (5-second intervals) to map accurate chap
 - [ ] Chapter timestamps updated in YOUTUBE-METADATA.md (from frame analysis)
 - [ ] Silent + FINAL mp4 files in the numbered folder
 - [ ] **Final folder check: everything present, nothing in random locations**
+
+**PHASE 4 -- Post-Take Review (before YouTube publish):**
+
+After the final video is rendered but BEFORE publishing to YouTube, the team does a structured review. This catches bugs, recognizes wins, and feeds the backlog for the next episode.
+
+- [ ] **Lessons Learned (LL) breakdown** -- What went right, what went wrong, what surprised us
+- [ ] **Bug review** -- Any visual glitches, wrong data, UI issues spotted during playback
+- [ ] **Script fixes logged** -- Hardcoded dates, wrong names, missing fallbacks found during recording
+- [ ] **Backlog items logged** -- New features, fixes, and improvements identified (with BL-numbers)
+- [ ] **Feature recognition** -- List what shipped this episode (new features built and visible on screen)
+- [ ] **Next episode prep notes** -- What the next episode needs (story arcs, data setup, new characters)
+- [ ] **Backlog priorities updated** -- Re-rank items based on what matters for the next episode
+
+**Format:**
+```
+## EP[XX] Post-Take Review
+
+### What shipped
+- BL-077: In-app messaging (model + router + UI)
+- BL-080: Listing Q&A (public questions on listings)
+- ...
+
+### What broke / got fixed
+- Sally Thompson vs Baker name mismatch (fixed)
+- Hardcoded dates expired (fixed, now dynamic)
+- ...
+
+### Lessons learned
+1. Five features in one session is possible with parallel agents
+2. Every new table needs a DELETE in the pre-recording cleanup SQL
+3. ...
+
+### Backlog for next episode
+- BL-089: Rate limiting (HIGH)
+- BL-095: Real domain + SSL (HIGH)
+- ...
+```
+
+Save the review to: `Bro_Kit/NN-episode-name/POST-TAKE-REVIEW.md`
+
+This is the team's sprint retrospective. No publishing without it.
 
 ---
 

@@ -420,3 +420,55 @@ class TestMembersPageParams:
         assert lng_param is not None
         # Should be str type (not float) to handle empty strings from HTML forms
         assert lat_param.annotation.__args__[0] is str or lat_param.default is None
+
+
+# --- Last Seen / Activity Tracking ---
+
+class TestLastSeen:
+    """Verify last_active_at field and display filter."""
+
+    def test_user_model_has_last_active_at(self):
+        from src.models.user import BHUser
+        columns = {c.name for c in BHUser.__table__.columns}
+        assert "last_active_at" in columns
+
+    def test_last_seen_filter_online(self):
+        from src.routers.pages import _last_seen
+        from datetime import datetime, timezone, timedelta
+        now = datetime.now(timezone.utc)
+        assert _last_seen(now) == "online now"
+        assert _last_seen(now - timedelta(minutes=2)) == "online now"
+
+    def test_last_seen_filter_minutes(self):
+        from src.routers.pages import _last_seen
+        from datetime import datetime, timezone, timedelta
+        now = datetime.now(timezone.utc)
+        result = _last_seen(now - timedelta(minutes=30))
+        assert "30m ago" in result
+
+    def test_last_seen_filter_hours(self):
+        from src.routers.pages import _last_seen
+        from datetime import datetime, timezone, timedelta
+        now = datetime.now(timezone.utc)
+        result = _last_seen(now - timedelta(hours=5))
+        assert "5h ago" in result
+
+    def test_last_seen_filter_days(self):
+        from src.routers.pages import _last_seen
+        from datetime import datetime, timezone, timedelta
+        now = datetime.now(timezone.utc)
+        assert _last_seen(now - timedelta(days=1)) == "seen yesterday"
+        result = _last_seen(now - timedelta(days=10))
+        assert "10d ago" in result
+
+    def test_last_seen_filter_none(self):
+        from src.routers.pages import _last_seen
+        assert _last_seen(None) is None
+
+    def test_last_seen_filter_naive_datetime(self):
+        """Should handle naive datetimes (no tzinfo) without crashing."""
+        from src.routers.pages import _last_seen
+        from datetime import datetime, timedelta
+        naive = datetime.utcnow() - timedelta(hours=3)
+        result = _last_seen(naive)
+        assert "3h ago" in result

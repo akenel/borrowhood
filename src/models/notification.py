@@ -36,6 +36,7 @@ class NotificationType(str, enum.Enum):
     LOCKBOX_PICKUP_CONFIRMED = "lockbox_pickup_confirmed"  # Renter confirmed pickup
     LOCKBOX_RETURN_CONFIRMED = "lockbox_return_confirmed"  # Return confirmed
     BADGE_EARNED = "badge_earned"               # You earned a badge
+    MESSAGE_RECEIVED = "message_received"     # Someone sent you a message
     SYSTEM = "system"                         # Platform announcement
 
 

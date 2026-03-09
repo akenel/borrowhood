@@ -21,6 +21,7 @@ class ReviewOut(BaseModel):
     reviewer_tier: str
     weight: float
     visible: bool
+    photo_urls: Optional[list] = None
     created_at: datetime
 
     class Config:

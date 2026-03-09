@@ -40,6 +40,8 @@ async def get_user(db: AsyncSession, token: dict) -> BHUser:
     )
     user = result.scalars().first()
     if user:
+        user.last_active_at = datetime.now(timezone.utc)
+        await db.commit()
         return user
 
     # Fallback: match by username/slug (links seed users on first KC login)
@@ -61,6 +63,7 @@ async def get_user(db: AsyncSession, token: dict) -> BHUser:
         if user:
             logger.info("Auto-linking user '%s' (slug=%s) to keycloak_id %s", username, user.slug, kc_id)
             user.keycloak_id = kc_id
+            user.last_active_at = datetime.now(timezone.utc)
             await db.commit()
             await db.refresh(user)
             return user
@@ -85,6 +88,7 @@ async def get_user(db: AsyncSession, token: dict) -> BHUser:
         email=email,
         display_name=display_name,
         slug=slug,
+        last_active_at=datetime.now(timezone.utc),
     )
     db.add(new_user)
     await db.flush()

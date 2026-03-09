@@ -152,8 +152,8 @@
                         <div x-show="open" x-cloak @click.outside="open = false"
                              class="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg border border-gray-200 shadow-lg z-50">
                             <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                                <span class="text-sm font-semibold text-gray-900">Notifications</span>
-                                <button @click="markAllRead()" x-show="unread > 0" class="text-xs text-indigo-600 hover:underline">Mark all read</button>
+                                <span class="text-sm font-semibold text-gray-900">{% if lang == 'it' %}Notifiche{% else %}Notifications{% endif %}</span>
+                                <button @click="markAllRead()" x-show="unread > 0" class="text-xs text-indigo-600 hover:underline">{% if lang == 'it' %}Segna tutto letto{% else %}Mark all read{% endif %}</button>
                             </div>
                             <div class="max-h-64 overflow-y-auto">
                                 <template x-for="n in notifications" :key="n.id">
@@ -166,6 +166,21 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Messages icon -->
+                    <div class="relative hidden md:block"
+                         x-data="{ msgUnread: 0, async loadMsgCount() { try { const r = await fetch('/api/v1/messages/summary'); if(r.ok) { const d = await r.json(); this.msgUnread = d.unread; } } catch(e) {} } }"
+                         x-init="loadMsgCount(); setInterval(() => loadMsgCount(), 30000)">
+                        <a href="/messages"
+                           class="relative min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 hover:text-indigo-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                            <span x-show="msgUnread > 0" x-cloak
+                                  class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-blue-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center"
+                                  x-text="msgUnread > 9 ? '9+' : msgUnread"></span>
+                        </a>
+                    </div>
+                    <a href="/orders" class="text-sm text-gray-700 hover:text-indigo-600 hidden md:block">{% if lang == 'it' %}Ordini{% else %}Orders{% endif %}</a>
                     <a href="/profile" class="text-sm text-gray-700 hover:text-indigo-600 hidden md:block">{{ user.get('preferred_username', t('nav.profile')) }}</a>
                     <a href="/logout" class="text-sm text-gray-500 hover:text-red-600 hidden md:block">{{ t('nav.logout') }}</a>
                     {% else %}

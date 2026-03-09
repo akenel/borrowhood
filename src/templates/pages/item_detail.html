@@ -619,6 +619,49 @@
             </div>
             {% endif %}
 
+            <!-- Q&A Section -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="listingQA()">
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">{% if lang == 'it' %}Domande e Risposte{% else %}Questions & Answers{% endif %}</h3>
+
+                <!-- Ask a question -->
+                {% if user %}
+                <form @submit.prevent="askQuestion()" class="mb-4">
+                    <div class="flex gap-2">
+                        <input type="text" x-model="newQuestion"
+                               placeholder="{% if lang == 'it' %}Fai una domanda...{% else %}Ask a question...{% endif %}"
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]"
+                               maxlength="2000" minlength="5">
+                        <button type="submit" :disabled="asking || newQuestion.length < 5"
+                                class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors min-h-[40px]">
+                            {% if lang == 'it' %}Chiedi{% else %}Ask{% endif %}
+                        </button>
+                    </div>
+                </form>
+                {% else %}
+                <p class="text-sm text-gray-400 mb-4"><a href="/login" class="text-indigo-600 hover:underline">{% if lang == 'it' %}Accedi{% else %}Log in{% endif %}</a> {% if lang == 'it' %}per fare una domanda{% else %}to ask a question{% endif %}</p>
+                {% endif %}
+
+                <!-- Q&A list -->
+                <div class="space-y-4">
+                    <template x-for="qa in questions" :key="qa.id">
+                        <div class="border-l-2 border-gray-200 pl-3">
+                            <p class="text-sm text-gray-800"><span class="font-medium" x-text="qa.asker_name || 'Member'"></span>: <span x-text="qa.question"></span></p>
+                            <template x-if="qa.answer">
+                                <p class="text-sm text-emerald-700 mt-1"><span class="font-medium" x-text="qa.answerer_name || 'Owner'"></span>: <span x-text="qa.answer"></span></p>
+                            </template>
+                            <template x-if="!qa.answer && isOwner">
+                                <div class="mt-1 flex gap-2">
+                                    <input type="text" x-model="qa._draft" placeholder="{% if lang == 'it' %}Rispondi...{% else %}Answer...{% endif %}" class="flex-1 px-2 py-1 border border-gray-200 rounded text-sm">
+                                    <button @click="answerQuestion(qa)" class="px-2 py-1 bg-emerald-600 text-white text-xs rounded hover:bg-emerald-700">{% if lang == 'it' %}Rispondi{% else %}Reply{% endif %}</button>
+                                </div>
+                            </template>
+                            <p class="text-xs text-gray-300 mt-0.5" x-text="new Date(qa.created_at).toLocaleDateString()"></p>
+                        </div>
+                    </template>
+                    <p x-show="questions.length === 0 && loaded" class="text-sm text-gray-400">{% if lang == 'it' %}Nessuna domanda ancora{% else %}No questions yet{% endif %}</p>
+                </div>
+            </div>
+
             <!-- Report button (Rule 31) -->
             <div class="text-center" x-data="reportWidget('item', '{{ item.id }}')">
                 <button @click="showModal = true" class="text-xs text-gray-400 hover:text-red-500 transition-colors min-h-[44px]">
@@ -629,24 +672,30 @@
                         <div class="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6">
                             <h3 class="text-lg font-bold text-gray-900 mb-4">{{ t('item.report') }}</h3>
                             <select x-model="reason" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-3">
-                                <option value="spam">Spam</option>
-                                <option value="inappropriate">Inappropriate</option>
-                                <option value="scam">Scam</option>
-                                <option value="harassment">Harassment</option>
-                                <option value="other">Other</option>
+                                <option value="spam">{% if lang == 'it' %}Spam{% else %}Spam{% endif %}</option>
+                                <option value="inappropriate">{% if lang == 'it' %}Inappropriato{% else %}Inappropriate{% endif %}</option>
+                                <option value="scam">{% if lang == 'it' %}Truffa{% else %}Scam{% endif %}</option>
+                                <option value="harassment">{% if lang == 'it' %}Molestia{% else %}Harassment{% endif %}</option>
+                                <option value="other">{% if lang == 'it' %}Altro{% else %}Other{% endif %}</option>
                             </select>
-                            <textarea x-model="detail" rows="2" placeholder="Details (optional)" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4"></textarea>
+                            <textarea x-model="detail" rows="2" placeholder="{% if lang == 'it' %}Dettagli (opzionale){% else %}Details (optional){% endif %}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4"></textarea>
                             <div class="flex justify-end space-x-2">
-                                <button @click="showModal = false" class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">Cancel</button>
-                                <button @click="submit()" :disabled="submitting" class="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 min-h-[44px]">Report</button>
+                                <button @click="showModal = false" class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">{% if lang == 'it' %}Annulla{% else %}Cancel{% endif %}</button>
+                                <button @click="submit()" :disabled="submitting" class="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 min-h-[44px]">{% if lang == 'it' %}Segnala{% else %}Report{% endif %}</button>
                             </div>
-                            <p x-show="success" class="text-xs text-emerald-600 mt-2">Report submitted. Thank you.</p>
+                            <p x-show="success" class="text-xs text-emerald-600 mt-2">{% if lang == 'it' %}Segnalazione inviata. Grazie.{% else %}Report submitted. Thank you.{% endif %}</p>
                             <p x-show="error" class="text-xs text-red-600 mt-2" x-text="error"></p>
                         </div>
                     </div>
                 </template>
             </div>
         </div>
+    </div>
+
+    <!-- Recently Viewed Strip -->
+    <div class="mt-8" style="display: none;">
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">{% if lang == 'it' %}Visti di recente{% else %}Recently Viewed{% endif %}</h3>
+        <div id="recently-viewed-strip" class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin"></div>
     </div>
 </div>
 {% endblock %}
@@ -810,6 +859,103 @@
             }
         };
     }
+
+    // Q&A component
+    function listingQA() {
+        var listingIds = [{% for listing in item.listings %}'{{ listing.id }}'{% if not loop.last %},{% endif %}{% endfor %}];
+        return {
+            questions: [],
+            loaded: false,
+            newQuestion: '',
+            asking: false,
+            isOwner: {% if user and item.owner.keycloak_id == user.get('sub', '') %}true{% else %}false{% endif %},
+            async init() {
+                for (var lid of listingIds) {
+                    try {
+                        var resp = await fetch('/api/v1/listing-qa?listing_id=' + lid);
+                        if (resp.ok) {
+                            var data = await resp.json();
+                            this.questions = this.questions.concat(data);
+                        }
+                    } catch(e) {}
+                }
+                this.loaded = true;
+            },
+            async askQuestion() {
+                if (this.newQuestion.length < 5 || !listingIds.length) return;
+                this.asking = true;
+                try {
+                    var resp = await fetch('/api/v1/listing-qa', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ listing_id: listingIds[0], question: this.newQuestion })
+                    });
+                    if (resp.ok) {
+                        var qa = await resp.json();
+                        this.questions.unshift(qa);
+                        this.newQuestion = '';
+                    }
+                } catch(e) {}
+                this.asking = false;
+            },
+            async answerQuestion(qa) {
+                if (!qa._draft) return;
+                try {
+                    var resp = await fetch('/api/v1/listing-qa/' + qa.id + '/answer', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ answer: qa._draft })
+                    });
+                    if (resp.ok) {
+                        var updated = await resp.json();
+                        qa.answer = updated.answer;
+                        qa.answerer_name = updated.answerer_name;
+                        qa.answered_at = updated.answered_at;
+                    }
+                } catch(e) {}
+            }
+        };
+    }
+
+    // Recently Viewed -- track this item and render strip
+    (function() {
+        var KEY = 'bh_recently_viewed';
+        var MAX = 12;
+        var current = {
+            slug: '{{ item.slug }}',
+            name: '{{ item.name | e }}',
+            image: '{{ item.media[0].url if item.media else "" }}',
+            price: '{{ item.listings[0].price if item.listings else "" }}',
+        };
+        try {
+            var items = JSON.parse(localStorage.getItem(KEY) || '[]');
+            items = items.filter(function(i) { return i.slug !== current.slug; });
+            items.unshift(current);
+            if (items.length > MAX) items = items.slice(0, MAX);
+            localStorage.setItem(KEY, JSON.stringify(items));
+            // Render strip (skip current item)
+            var others = items.filter(function(i) { return i.slug !== current.slug; });
+            if (others.length > 0) {
+                var container = document.getElementById('recently-viewed-strip');
+                if (container) {
+                    var html = '';
+                    others.forEach(function(item) {
+                        html += '<a href="/items/' + item.slug + '" class="flex-shrink-0 w-32 group">';
+                        if (item.image) {
+                            html += '<img src="' + item.image + '" alt="' + item.name + '" class="w-32 h-24 rounded-lg object-cover group-hover:ring-2 group-hover:ring-indigo-400 transition-all">';
+                        } else {
+                            html += '<div class="w-32 h-24 rounded-lg bg-gray-100 flex items-center justify-center"><svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>';
+                        }
+                        html += '<p class="text-xs text-gray-600 mt-1 truncate group-hover:text-indigo-600">' + item.name + '</p>';
+                        if (item.price) html += '<p class="text-xs font-medium text-gray-900">EUR ' + item.price + '</p>';
+                        html += '</a>';
+                    });
+                    container.innerHTML = html;
+                    container.parentElement.style.display = 'block';
+                }
+            }
+        } catch(e) {}
+    })();
 
     // Review section component
     function reviewSection(ownerId) {
