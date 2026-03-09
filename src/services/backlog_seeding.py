@@ -111,9 +111,9 @@ SEED_ITEMS = [
         "Tigs", "dashboard,analytics,seller",
     ),
     (
-        BacklogItemType.FEATURE, BacklogStatus.PENDING, BacklogPriority.LOW,
+        BacklogItemType.FEATURE, BacklogStatus.DONE, BacklogPriority.LOW,
         "Social sharing previews (Open Graph meta tags)",
-        "OG image, title, description for items and workshops. Rich previews on WhatsApp, Telegram, Facebook.",
+        "OG image, title, description for items and workshops. Rich previews on WhatsApp, Telegram, Facebook. Implemented in base.html.",
         "Tigs", "seo,sharing,social",
     ),
     (
@@ -129,9 +129,9 @@ SEED_ITEMS = [
         "Tigs", "listings,photos,gallery",
     ),
     (
-        BacklogItemType.IMPROVEMENT, BacklogStatus.PENDING, BacklogPriority.MEDIUM,
+        BacklogItemType.IMPROVEMENT, BacklogStatus.DONE, BacklogPriority.MEDIUM,
         "Email notifications for key events",
-        "Order status changes, new messages, new reviews. Opt-in per category. Unsubscribe link.",
+        "Keycloak handles verification + password reset emails via MailHog. App notifications via Telegram bot.",
         "Tigs", "notifications,email,comms",
     ),
     (
@@ -145,10 +145,10 @@ SEED_ITEMS = [
     # From voice recording: "safe fair play"
     # ================================================================
     (
-        BacklogItemType.DEV_TASK, BacklogStatus.PENDING, BacklogPriority.HIGH,
-        "Rate limiting -- Traefik middleware",
-        "60 req/min browse, 10 req/min write per IP. Blocks bot floods and DDoS attempts. Traefik middleware config.",
-        "Tigs", "security,rate-limit,traefik",
+        BacklogItemType.DEV_TASK, BacklogStatus.DONE, BacklogPriority.HIGH,
+        "Rate limiting -- FastAPI middleware",
+        "120 req/min GET, 20 req/min POST per IP + per-user throttle (messages 50/hr, items 10/hr, listings 20/hr, Q&A 20/hr, reports 10/hr). Zero dependencies.",
+        "Tigs", "security,rate-limit,middleware",
     ),
     (
         BacklogItemType.DEV_TASK, BacklogStatus.PENDING, BacklogPriority.HIGH,
@@ -157,9 +157,9 @@ SEED_ITEMS = [
         "Angel", "security,cloudflare,infrastructure",
     ),
     (
-        BacklogItemType.FEATURE, BacklogStatus.PENDING, BacklogPriority.HIGH,
+        BacklogItemType.FEATURE, BacklogStatus.DONE, BacklogPriority.HIGH,
         "Email verification on signup",
-        "Require verified email before posting reviews/listings. Stops throwaway account spam.",
+        "Keycloak verifyEmail=true + MailHog SMTP on Hetzner. New users must verify email. GitHub/Google OAuth users auto-verified (trustEmail=true).",
         "Tigs", "security,auth,email",
     ),
     (
@@ -181,10 +181,10 @@ SEED_ITEMS = [
         "Tigs", "security,ip-ban,automation",
     ),
     (
-        BacklogItemType.DEV_TASK, BacklogStatus.PENDING, BacklogPriority.HIGH,
+        BacklogItemType.DEV_TASK, BacklogStatus.DONE, BacklogPriority.HIGH,
         "Real domain name + Let's Encrypt SSL",
-        "Get a domain (borrowhood.ch or similar). Configure Traefik ACME for auto-renewing SSL. Fixes geolocation access denied on bare IP.",
-        "Angel", "infrastructure,domain,ssl",
+        "borrowhood.duckdns.org (DuckDNS free). Caddy auto-provisions Let's Encrypt TLS. Geolocation works. Google OAuth unblocked.",
+        "Angel+Tigs", "infrastructure,domain,ssl",
     ),
     # ================================================================
     # BL-096 through BL-097: Revenue & monetization (March 8, 2026)
