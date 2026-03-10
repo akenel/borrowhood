@@ -624,6 +624,30 @@ async def upload_reply_media(
     return media
 
 
+@router.delete("/media/{media_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_media(
+    media_id: UUID,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a media attachment. Author only."""
+    user = await get_user(db, token)
+    result = await db.execute(
+        select(BHHelpMedia).where(BHHelpMedia.id == media_id)
+    )
+    media = result.scalars().first()
+    if not media:
+        raise HTTPException(status_code=404, detail="Media not found")
+    if media.uploader_id != user.id:
+        raise HTTPException(status_code=403, detail="Only the uploader can delete media")
+    # Delete file from disk
+    filepath = Path(media.url.lstrip("/"))
+    if filepath.exists():
+        filepath.unlink()
+    await db.delete(media)
+    await db.commit()
+
+
 async def _save_media(
     file: UploadFile,
     uploader_id,
