@@ -1,1 +1,0 @@
-BorrowHood, multilingual, i18n, internationalization, Italian, English, language switch, FastAPI, Python, marketplace, community, sharing economy, Jinja2, translation, locale, Claude Code, Anthropic, Opus, Hetzner, self-hosted, open source, peer-to-peer, neighborhood, workshop, tools, rental, demo, no voiceover, live demo, Garage Sessions

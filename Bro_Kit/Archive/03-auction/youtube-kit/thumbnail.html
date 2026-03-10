@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #0f172a;
+    position: relative;
+  }
+
+  .bg-image {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: url('thumb-bike-detail.jpg') no-repeat;
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.3);
+  }
+
+  .gradient-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(
+      135deg,
+      rgba(180, 83, 9, 0.92) 0%,
+      rgba(180, 83, 9, 0.75) 35%,
+      rgba(15, 23, 42, 0.6) 65%,
+      rgba(15, 23, 42, 0.3) 100%
+    );
+  }
+
+  .content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    padding: 50px 60px;
+  }
+
+  .left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .right {
+    width: 440px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .title-line1 {
+    font-size: 120px;
+    font-weight: 900;
+    color: white;
+    line-height: 1;
+    text-shadow: 3px 3px 12px rgba(0,0,0,0.5);
+    letter-spacing: -2px;
+  }
+
+  .title-line2 {
+    font-size: 50px;
+    font-weight: 700;
+    color: #fbbf24;
+    line-height: 1.2;
+    text-shadow: 3px 3px 12px rgba(0,0,0,0.5);
+    letter-spacing: -1px;
+    margin-bottom: 20px;
+  }
+
+  .subtitle {
+    font-size: 30px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.9);
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    line-height: 1.4;
+  }
+
+  .brand {
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand-dot {
+    width: 18px;
+    height: 18px;
+    background: #fbbf24;
+    border-radius: 50%;
+  }
+
+  .brand-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Auction highlights on right */
+  .auction-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .stat-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .stat-icon.amber { background: #f59e0b; }
+  .stat-icon.green { background: #10b981; }
+  .stat-icon.red { background: #ef4444; }
+  .stat-icon.blue { background: #3b82f6; }
+
+  .stat-label {
+    font-size: 20px;
+    font-weight: 600;
+    color: white;
+  }
+
+  .stat-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 2px;
+  }
+
+  /* Countdown display */
+  .countdown {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .countdown-box {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    text-align: center;
+    min-width: 60px;
+  }
+
+  .countdown-num {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fbbf24;
+  }
+
+  .countdown-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+  <div class="bg-image"></div>
+  <div class="gradient-overlay"></div>
+
+  <div class="content">
+    <div class="left">
+      <div class="title-line1">AUCTION</div>
+      <div class="title-line2">Competitive Bidding</div>
+      <div class="subtitle">
+        Bid. Outbid. Win.<br>
+        Live countdown. Reserve price.
+      </div>
+      <div class="brand">
+        <div class="brand-dot"></div>
+        <div class="brand-name">BorrowHood</div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="auction-stats">
+        <div class="stat-card">
+          <div class="stat-icon amber">$</div>
+          <div>
+            <div class="stat-label">Starting Bid</div>
+            <div class="stat-sub">EUR 50 minimum to enter</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">+5</div>
+          <div>
+            <div class="stat-label">Bid Increment</div>
+            <div class="stat-sub">Each bid must be EUR 5 higher</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">R</div>
+          <div>
+            <div class="stat-label">Reserve Price</div>
+            <div class="stat-sub">Hidden minimum the seller accepts</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red">!</div>
+          <div>
+            <div class="stat-label">Anti-Snipe</div>
+            <div class="stat-sub">Last-second bids extend the clock</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="countdown">
+        <div class="countdown-box">
+          <div class="countdown-num">00</div>
+          <div class="countdown-label">Days</div>
+        </div>
+        <div class="countdown-box">
+          <div class="countdown-num">00</div>
+          <div class="countdown-label">Hours</div>
+        </div>
+        <div class="countdown-box">
+          <div class="countdown-num">14</div>
+          <div class="countdown-label">Min</div>
+        </div>
+        <div class="countdown-box">
+          <div class="countdown-num">32</div>
+          <div class="countdown-label">Sec</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

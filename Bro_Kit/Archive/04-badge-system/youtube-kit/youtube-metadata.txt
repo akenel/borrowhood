@@ -1,0 +1,41 @@
+YOUTUBE VIDEO METADATA
+=====================
+
+TITLE:
+BorrowHood Badge System -- 15 Badges, 5 Tiers, Reputation That Matters
+
+DESCRIPTION:
+(see youtube-description.txt)
+
+TAGS:
+borrowhood, badge system, reputation, gamification, achievement badges, user tiers, fastapi, python, web development, keycloak, fullstack, live demo, alpine.js, tailwind css, docker, hetzner, claude code, ai coding, sharing economy, community platform, profile pages, open source, dev.to, devto, weekend challenge, weekend project, side project
+
+CATEGORY:
+Science & Technology
+
+VISIBILITY:
+Public
+
+LANGUAGE:
+English
+
+MUSIC:
+Brotherhood Run (40% volume, 2s fade-in, 4s fade-out)
+
+VIDEO SPECS:
+Resolution: 1920x1080
+Duration: 1:40
+Codec: H.264 + AAC
+File size: 3.3 MB
+
+THUMBNAIL:
+badge-system-THUMB.png
+
+THUMBNAIL IDEAS:
+- Profile page showing badges grid with tier badge prominent
+- Split screen: Newcomer profile vs Legend profile
+- Badge catalog overlay (all 15 badges in grid)
+
+SERIES:
+Episode 4 of 5
+Playlist: BorrowHood Feature Series

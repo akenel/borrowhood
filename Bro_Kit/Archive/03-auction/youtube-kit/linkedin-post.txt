@@ -1,0 +1,27 @@
+Dave has a Mountain Bike. Sally wants it. So does Rosa.
+
+How do you handle competitive bidding in a community sharing platform?
+
+Build an auction system.
+
+We just shipped the full auction engine for BorrowHood -- a community sharing platform we're building in Sicily.
+
+Here is how it works:
+-- Dave lists his Specialized Rockhopper as an auction (EUR 50 starting bid, EUR 5 increment)
+-- He sets a hidden reserve price (EUR 120) -- the minimum he'll accept
+-- Sally sees the auction with a live countdown timer and places the first bid
+-- Rosa outbids her at EUR 75 -- Sally gets a notification instantly
+-- Sally comes back at EUR 130 -- reserve price met, checkmark appears
+-- Dave ends the auction -- Sally wins the bike
+
+Anti-snipe protection: bid in the last 60 seconds and the clock extends by 2 minutes. No sniping.
+
+Every bid updates the panel in real time. Outbid notifications. Reserve met indicator. Countdown with days, hours, minutes, seconds. Owner ends it when ready.
+
+Watch the 3-minute demo. Every click is real, running on a live Hetzner server.
+
+[YOUTUBE LINK HERE]
+
+Tech stack: FastAPI, SQLAlchemy, Jinja2, Tailwind CSS, Alpine.js, Keycloak OIDC, Docker, Hetzner Cloud.
+
+#borrowhood #auction #competitivebidding #antisnipe #webdev #fastapi #python #aicoding #claudecode #realtimebidding #fullstack #sharingeconomy

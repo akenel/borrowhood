@@ -1,3 +1,0 @@
-borrowhood,auction system,live bidding,competitive bidding,reserve price,countdown timer,anti-snipe,bid increment,real-time auction,neighborhood auction,peer to peer,sharing economy,community platform,dji mini 3 pro,drone auction,beginner drone,no licence drone,fastapi,python,jinja2,tailwind css,alpine js,keycloak,docker,hetzner,devops,live demo,walkthrough,production app,auction feature,online bidding,outbid notification,drone marketplace,helixnet,claude code,anthropic,ai coding
-
-

@@ -125,6 +125,7 @@ All users: password `helix_pass`. Seed users: sally, mike, angel, maria, nino.
 | 8 | The Workshop | `14-the-workshop/` | FINAL (2:19) |
 | 9 | The Crash | `15-the-crash/` | FINAL (EP1 PUBLISHED) |
 | 10 | The Cookie Run | `16-the-cookie-run/` | FINAL (11:08, EP2 PUBLISHED) |
+| 11 | The Scooter | `EP3-the-scooter/` | PRE-PACKAGED (EP3) |
 
 ---
 

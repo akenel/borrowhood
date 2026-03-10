@@ -1,0 +1,71 @@
+What happens when the wind grounds the drones and a 500-year-old inventor picks up a broken bike?
+
+Previously: Sofia baked 5 cookie boxes. Pietro delivered them by drone. Johnny's bike died mid-delivery. Sally did the math: scooter = EUR 200, she has EUR 235. The question was: "What if the cookie queen... rented the wheels?"
+
+This is that episode.
+
+Leonardo da Vinci -- legend, moderator, the original maker -- spots Johnny's broken Bianchi Kuma 26 listed as a free giveaway on BorrowHood. "FREE for parts. Deliver for EUR 20." Johnny listed it because the scrap yard is across town. Half a day carrying it on his shoulder for pennies. He still loves this bike. Doesn't want it melted down. Hopes someone on BorrowHood does something with it.
+
+Leo picks up the bike. Johnny tells his story. Leo listens. Feels the kid's pain. Says nothing.
+
+On the walk home, carrying the bike on his shoulder, Leo's maker brain kicks in: "This frame needs a weld. Maybe I should take a welding lesson."
+
+He pulls out his phone. Browses BorrowHood. Mike's Garage -- 3-hour hands-on MIG welding course, EUR 30. Bring your own broken stuff. The cracked Bianchi frame is the perfect training project.
+
+Meanwhile, Trapani's wind is howling -- 50 km/h gusts off the Mediterranean. Pietro's drone is grounded. Sally activates her scooter listing: EUR 5/day + EUR 50 deposit. Sofia has 12 new cookie orders. Johnny rents the scooter and delivers them all. EUR 60 in one day.
+
+At Mike's Garage, Mike does a 5-second stitch weld demo. Leo says "Got it." Takes the welder. Welds the cracked frame. First weld. Invisible. Perfect. Mike: "How long have you been welding?!" Leo: "How long did that take?" Mike refunds the full EUR 30 -- can't charge for 5 minutes.
+
+Mike looks up Leo on BorrowHood. Sees the profile: LEGEND badge. 1400 points. Moderator. "You really are the real McCoy." Mike favorites Leo. They talk shop about liability waivers for power tools. Leo just unlocked 20 new listings for Mike's Garage.
+
+Back at the Bottega, Leo replaces the sprocket -- that's why the chain kept snapping -- new chain, tunes gears. The Bianchi Kuma 26 is reborn.
+
+Johnny doesn't know yet.
+
+What happens when a legend... fixes what everyone said was scrap?
+
+0:00 The Scooter -- Season 1 Episode 3
+0:08 Previously on BorrowHood
+0:35 ACT I -- The Rescue (Leonardo Finds the Bike)
+1:05 Leonardo's Bottega
+1:30 Johnny's Broken Bianchi Kuma 26
+2:00 Leo Favorites the Bike and Claims the Giveaway
+2:30 Johnny's Story -- The Scrap Yard Is Across Town
+3:10 The Walk Home -- "Maybe I Should Take a Welding Lesson"
+3:40 Mike's Garage -- 3-Hour MIG Welding Course
+4:10 ACT II -- The Wind (Trapani Blows)
+4:40 Pietro's Drone -- Grounded
+5:10 Sally Activates the Scooter
+5:40 Sofia's 12 New Cookie Orders
+6:00 ACT III -- Johnny Rents the Scooter
+6:40 ACT IV -- The Delivery (12 Boxes, EUR 60)
+7:20 The Math Works
+7:50 ACT V -- The Weld (Mike's Garage)
+8:20 5-Second Demo. "Got It."
+8:50 The Invisible Weld
+9:10 Mike Refunds EUR 30
+9:40 Mike Favorites Leonardo -- The Real McCoy
+10:00 The Garage Talk
+10:20 The Bottega -- Sprocket, Chain, Reborn
+10:40 EPILOGUE -- Johnny Doesn't Know Yet
+
+Platform features shown in this episode:
+- Giveaway listings (free items with delivery fee)
+- Service bookings (welding course, not a machine rental)
+- Owner-initiated cancellation with full refund
+- Scooter rental activation (PAUSED to ACTIVE)
+- Rental request with personal messages
+- Favorites system and member profiles
+- Commission-based cookie delivery orders
+
+The Cast (Season 1 -- Trapani):
+Angel, Nino Cassisa, Leonardo da Vinci, Sally Thompson, Mike Kenel, Marco Moretti, Pietro Ferretti, Jake Chen, George Clooney, John Abela, Maria Ferretti, Sofia Ferretti, Rosa Ferretti, Anne Muthoni
+
+Stack: FastAPI, SQLAlchemy, PostgreSQL, Jinja2, Alpine.js, Tailwind CSS, Keycloak OIDC.
+Built with Claude Code (Opus 4.6). Deployed on Hetzner (EUR 7.59/mo).
+
+Notion Motion Pictures -- Built with Claude Code
+
+BorrowHood -- The neighborhood marketplace where every crash is a door.
+
+#BorrowHood #Season1 #TheScooter #Leonardo #MikeKenel #Johnny #Sally #Welding #Wind #Trapani #FastAPI #Python #ClaudeCode #Anthropic #NotionMotionPictures
