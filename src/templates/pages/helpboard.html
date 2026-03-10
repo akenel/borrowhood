@@ -492,7 +492,7 @@
     <!-- ── CREATE POST MODAL ── -->
     <template x-teleport="body">
         <div x-show="showCreate" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="showCreate = false">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6 max-h-[90vh] overflow-y-auto">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 p-6 max-h-[90vh] overflow-y-auto">
                 <h3 class="text-lg font-bold text-gray-900 mb-4">{{ t('helpboard.new_post') }}</h3>
 
                 <!-- Type toggle -->
@@ -521,6 +521,10 @@
                             <span x-show="!aiDrafting">Draft with AI</span>
                             <span x-show="aiDrafting" x-cloak>Thinking...</span>
                         </button>
+                    </div>
+                    <!-- AI draft error -->
+                    <div x-show="aiDraftError" class="mt-3 p-2 bg-red-50 border border-red-200 rounded-lg" x-cloak>
+                        <p class="text-sm text-red-700" x-text="aiDraftError"></p>
                     </div>
                     <!-- AI value insight -->
                     <div x-show="aiDraftResult" class="mt-3 space-y-2" x-cloak>
@@ -643,6 +647,7 @@ function helpBoard() {
         aiDraftInput: '',
         aiDrafting: false,
         aiDraftResult: null,
+        aiDraftError: '',
         newPost: {
             help_type: 'need',
             title: '',
@@ -710,6 +715,7 @@ function helpBoard() {
             if (!this.aiDraftInput.trim()) return;
             this.aiDrafting = true;
             this.aiDraftResult = null;
+            this.aiDraftError = '';
             try {
                 var resp = await fetch('/api/v1/helpboard/draft', {
                     method: 'POST',
@@ -729,8 +735,12 @@ function helpBoard() {
                     if (data.body) this.newPost.body = data.body;
                     if (data.category) this.newPost.category = data.category;
                     if (data.urgency) this.newPost.urgency = data.urgency;
+                } else {
+                    this.aiDraftError = 'AI draft failed -- try again or write manually';
                 }
-            } catch(e) {}
+            } catch(e) {
+                this.aiDraftError = 'AI draft timed out -- try again or write manually';
+            }
             this.aiDrafting = false;
         },
 
