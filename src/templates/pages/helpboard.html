@@ -306,18 +306,20 @@
                         </div>
                     </div>
 
-                    <!-- Edit button (author only, not resolved/closed) -->
-                    <button x-show="isPostAuthor && !editMode && activePost.status !== 'resolved' && activePost.status !== 'closed'"
-                            @click="startEdit()"
-                            class="mt-2 text-xs text-indigo-600 hover:text-indigo-800">
-                        Edit post
-                    </button>
+                    <!-- Author actions (edit, not resolved/closed) -->
+                    <div x-show="isPostAuthor && !editMode && activePost.status !== 'resolved' && activePost.status !== 'closed'"
+                         class="mt-4 flex gap-2">
+                        <button @click="startEdit()"
+                                class="px-4 py-2 bg-indigo-50 text-indigo-700 text-sm font-medium rounded-lg hover:bg-indigo-100 border border-indigo-200 min-h-[44px]">
+                            Edit Post
+                        </button>
+                    </div>
 
                     <!-- Media gallery -->
                     <div x-show="activePost.media && activePost.media.length > 0" class="mt-4">
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             <template x-for="m in (activePost.media || [])" :key="m.id">
-                                <div class="rounded-lg overflow-hidden bg-gray-100">
+                                <div class="rounded-lg overflow-hidden bg-gray-100 relative group">
                                     <template x-if="m.media_type === 'photo'">
                                         <img :src="m.url" class="w-full h-48 object-cover cursor-pointer hover:opacity-90"
                                              :alt="m.alt_text || ''" @click="window.open(m.url, '_blank')">
@@ -326,7 +328,15 @@
                                         <video :src="m.url" controls class="w-full h-48 object-cover bg-black"
                                                preload="metadata"></video>
                                     </template>
-                                    <p class="text-xs text-gray-400 px-2 py-1 truncate" x-text="m.filename"></p>
+                                    <div class="flex items-center justify-between px-2 py-1">
+                                        <p class="text-xs text-gray-400 truncate" x-text="m.filename"></p>
+                                        <button x-show="isPostAuthor" @click="deleteMedia(m.id)"
+                                                class="text-xs text-red-400 hover:text-red-600 ml-2 flex-shrink-0" title="Remove">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                             </template>
                         </div>
@@ -937,6 +947,16 @@ function helpBoard() {
 
         // ── Media upload ──
 
+        async deleteMedia(mediaId) {
+            if (!confirm('Remove this attachment?')) return;
+            var resp = await fetch('/api/v1/helpboard/media/' + mediaId, { method: 'DELETE' });
+            if (resp.ok || resp.status === 204) {
+                this.activePost.media = (this.activePost.media || []).filter(m => m.id !== mediaId);
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Attachment removed' } }));
+            } else {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Failed to delete' } }));
+            }
+        },
         async uploadPostMedia(event) {
             this.uploadError = '';
             var file = event.target.files[0];
