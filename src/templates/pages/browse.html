@@ -11,10 +11,16 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <!-- Breadcrumb -->
-    <nav class="text-sm text-gray-500 mb-4">
+    <nav class="text-sm text-gray-500 mb-4 flex flex-wrap items-center gap-y-1">
         <a href="/" class="hover:text-indigo-600">{{ t('nav.home') }}</a>
         <span class="mx-2">/</span>
+        {% if selected_category %}
+        <a href="/browse" class="hover:text-indigo-600">{{ t('browse.title') }}</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-900">{{ t('categories.' + selected_category) }}</span>
+        {% else %}
         <span class="text-gray-900">{{ t('browse.title') }}</span>
+        {% endif %}
     </nav>
 
     <!-- Page header -->
