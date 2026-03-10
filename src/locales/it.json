@@ -418,7 +418,11 @@
     "load_more": "Carica Altri",
     "showing_items": "Mostrando {shown} di {total} oggetti",
     "favorites": "Preferiti",
-    "no_favorites": "Nessun preferito ancora. Esplora i Membri per trovare persone da seguire."
+    "no_favorites": "Nessun preferito ancora. Esplora i Membri per trovare persone da seguire.",
+    "history": "Storico",
+    "no_history": "Nessun ordine completato o annullato.",
+    "items": "Oggetti",
+    "no_item_favorites": "Nessun oggetto preferito. Esplora gli annunci per trovare oggetti che ti piacciono."
   },
   "onboarding": {
     "title": "Benvenuto su BorrowHood",

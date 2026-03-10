@@ -6,8 +6,10 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <!-- Breadcrumb -->
-    <nav class="text-sm text-gray-500 mb-6">
+    <nav class="text-sm text-gray-500 mb-6 flex flex-wrap items-center gap-y-1">
         <a href="/" class="hover:text-indigo-600">{{ t('nav.home') }}</a>
+        <span class="mx-2">/</span>
+        <a href="/members" class="hover:text-indigo-600">{{ t('nav.members') }}</a>
         <span class="mx-2">/</span>
         <span class="text-gray-900">{{ workshop.workshop_name or workshop.display_name }}</span>
         {% if user %}
@@ -127,6 +129,13 @@
             <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="{
                 analyzing: false,
                 analysis: null,
+                summary: null,
+                async init() {
+                    try {
+                        const resp = await fetch('/api/v1/reviews/summary/{{ workshop.id }}');
+                        if (resp.ok) this.summary = await resp.json();
+                    } catch(e) {}
+                },
                 async analyze() {
                     this.analyzing = true;
                     try {
@@ -169,7 +178,35 @@
                 </div>
                 <p class="text-xs text-gray-500 mt-1">{% if lang == 'it' %}Gemini analizza le recensioni: sentiment, punteggio ponderato, e segnala recensioni sospette.{% else %}Gemini analyzes reviews: sentiment, weighted scoring, and flags suspicious reviews.{% endif %}</p>
 
-                <!-- Analysis results -->
+                <!-- Basic stats (loaded on page load from summary API) -->
+                <template x-if="summary && !analysis">
+                    <div class="mt-4 space-y-3">
+                        <template x-if="summary.count === 0">
+                            <p class="text-sm text-gray-500">{{ workshop.display_name }} {% if lang == 'it' %}non ha ancora recensioni. Completa qualche noleggio per iniziare a costruire la reputazione.{% else %}has no reviews yet. Complete some rentals to start building reputation.{% endif %}</p>
+                        </template>
+                        <template x-if="summary.count > 0">
+                            <div class="grid grid-cols-3 gap-2 text-center">
+                                <div class="bg-gray-50 rounded-lg p-2">
+                                    <p class="text-lg font-bold text-gray-900" x-text="summary.count"></p>
+                                    <p class="text-xs text-gray-500">{% if lang == 'it' %}Recensioni{% else %}Reviews{% endif %}</p>
+                                </div>
+                                <div class="bg-gray-50 rounded-lg p-2">
+                                    <p class="text-lg font-bold text-gray-900" x-text="(summary.average || 0).toFixed(1)"></p>
+                                    <p class="text-xs text-gray-500">{% if lang == 'it' %}Media{% else %}Average{% endif %}</p>
+                                </div>
+                                <div class="bg-gray-50 rounded-lg p-2">
+                                    <p class="text-lg font-bold text-gray-900" x-text="(summary.weighted_average || 0).toFixed(1)"></p>
+                                    <p class="text-xs text-gray-500">{% if lang == 'it' %}Ponderata{% else %}Weighted{% endif %}</p>
+                                </div>
+                            </div>
+                        </template>
+                        <template x-if="summary.count > 0">
+                            <p class="text-xs text-gray-400">{% if lang == 'it' %}Clicca Analizza per l'analisi AI dettagliata{% else %}Click Analyze for detailed AI analysis{% endif %}</p>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- Full AI analysis results (after clicking Analyze) -->
                 <template x-if="analysis">
                     <div class="mt-4 space-y-3">
                         <!-- Summary -->
@@ -195,15 +232,15 @@
                         <div class="grid grid-cols-3 gap-2 text-center">
                             <div class="bg-gray-50 rounded-lg p-2">
                                 <p class="text-lg font-bold text-gray-900" x-text="analysis.total_reviews || 0"></p>
-                                <p class="text-xs text-gray-500">Reviews</p>
+                                <p class="text-xs text-gray-500">{% if lang == 'it' %}Recensioni{% else %}Reviews{% endif %}</p>
                             </div>
                             <div class="bg-gray-50 rounded-lg p-2">
                                 <p class="text-lg font-bold text-gray-900" x-text="(analysis.average_rating || 0).toFixed(1)"></p>
-                                <p class="text-xs text-gray-500">Average</p>
+                                <p class="text-xs text-gray-500">{% if lang == 'it' %}Media{% else %}Average{% endif %}</p>
                             </div>
                             <div class="bg-gray-50 rounded-lg p-2">
                                 <p class="text-lg font-bold text-gray-900" x-text="(analysis.weighted_average || 0).toFixed(1)"></p>
-                                <p class="text-xs text-gray-500">Weighted</p>
+                                <p class="text-xs text-gray-500">{% if lang == 'it' %}Ponderata{% else %}Weighted{% endif %}</p>
                             </div>
                         </div>
 
