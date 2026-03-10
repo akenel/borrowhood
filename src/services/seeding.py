@@ -8,7 +8,7 @@ Run once on first startup or via CLI.
 import json
 import logging
 import uuid
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 from slugify import slugify
@@ -37,6 +37,7 @@ from src.models.mentorship import BHMentorship, MentorshipType, MentorshipStatus
 logger = logging.getLogger(__name__)
 
 SEED_FILE = Path(__file__).parent.parent.parent / "seed_data" / "seed.json"
+SEED_EP4_FILE = Path(__file__).parent.parent.parent / "seed_data" / "seed_ep4.json"
 
 
 def _enum_val(enum_class, value):
@@ -490,6 +491,11 @@ async def seed_database(db: AsyncSession) -> dict:
 
     await db.commit()
     logger.info("Seed data loaded: %s", counts)
+
+    # Seed EP4 data (help posts, reviews, delivery tracking)
+    ep4_result = await seed_ep4_data(db)
+    counts["ep4"] = ep4_result
+
     return counts
 
 
@@ -703,3 +709,204 @@ async def seed_default_community(db: AsyncSession) -> dict:
     await db.commit()
     logger.info("Default community seeded: %s", settings.community_name)
     return {"status": "created", "name": settings.community_name}
+
+
+def _parse_datetime(value):
+    """Parse ISO datetime string to timezone-aware datetime object."""
+    if not value:
+        return None
+    try:
+        # Handle "2026-02-18T14:30:00Z" format
+        if value.endswith("Z"):
+            value = value[:-1] + "+00:00"
+        return datetime.fromisoformat(value)
+    except (ValueError, TypeError):
+        return None
+
+
+async def seed_ep4_data(db: AsyncSession) -> dict:
+    """Load EP4 seed data: help posts with threaded replies and reviews.
+
+    Safe to call multiple times -- checks for existing data by title
+    to avoid duplicates.
+    """
+
+    if not SEED_EP4_FILE.exists():
+        logger.warning("EP4 seed file not found: %s", SEED_EP4_FILE)
+        return {"status": "file_not_found"}
+
+    with open(SEED_EP4_FILE) as f:
+        data = json.load(f)
+
+    # Build user_map (slug -> user) from DB
+    result = await db.execute(select(BHUser))
+    all_users = result.scalars().all()
+    user_map = {u.slug: u for u in all_users}
+
+    if not user_map:
+        logger.info("No users in DB -- run full seed first")
+        return {"status": "no_users"}
+
+    # Build item_map (slug -> item) from DB
+    result = await db.execute(select(BHItem))
+    all_items = result.scalars().all()
+    item_map = {i.slug: i for i in all_items}
+
+    # Build listing_map (item_slug -> first listing + owner)
+    result = await db.execute(
+        select(BHListing, BHItem).join(BHItem, BHListing.item_id == BHItem.id)
+    )
+    listing_map = {}  # item_slug -> (listing, owner)
+    for listing_obj, item_obj in result.all():
+        if item_obj.slug not in listing_map:
+            owner = user_map.get(next(
+                (u.slug for u in all_users if u.id == item_obj.owner_id), None
+            ))
+            if owner:
+                listing_map[item_obj.slug] = (listing_obj, owner)
+
+    counts = {"help_posts": 0, "help_replies": 0, "reviews": 0, "rentals": 0}
+
+    # ── Help Posts ──────────────────────────────────────────────
+    # Check existing help post titles to avoid duplicates
+    result = await db.execute(select(BHHelpPost.title))
+    existing_titles = {row[0] for row in result.all()}
+
+    for post_data in data.get("help_posts", []):
+        if post_data["title"] in existing_titles:
+            continue
+
+        author = user_map.get(post_data["author_slug"])
+        if not author:
+            logger.warning("EP4 help post author %s not found, skipping", post_data["author_slug"])
+            continue
+
+        # Resolve item_id if item_slug is set
+        item_id = None
+        if post_data.get("item_slug"):
+            item_obj = item_map.get(post_data["item_slug"])
+            if item_obj:
+                item_id = item_obj.id
+
+        # Resolve resolved_by_id if resolved_by_slug is set
+        resolved_by_id = None
+        if post_data.get("resolved_by_slug"):
+            resolved_by = user_map.get(post_data["resolved_by_slug"])
+            if resolved_by:
+                resolved_by_id = resolved_by.id
+
+        post = BHHelpPost(
+            author_id=author.id,
+            help_type=HelpType(post_data["help_type"]),
+            status=HelpStatus(post_data["status"]),
+            urgency=HelpUrgency(post_data["urgency"]),
+            title=post_data["title"],
+            body=post_data.get("body"),
+            category=post_data["category"],
+            content_language=post_data.get("content_language", "en"),
+            neighborhood=post_data.get("neighborhood"),
+            item_id=item_id,
+            resolved_by_id=resolved_by_id,
+            upvote_count=post_data.get("upvote_count", 0),
+            reply_count=post_data.get("reply_count", len(post_data.get("replies", []))),
+        )
+        db.add(post)
+        await db.flush()
+        counts["help_posts"] += 1
+
+        # Create replies with threading support
+        reply_objects = []  # index -> reply object (for parent_index resolution)
+        for reply_data in post_data.get("replies", []):
+            reply_author = user_map.get(reply_data["author_slug"])
+            if not reply_author:
+                reply_objects.append(None)
+                continue
+
+            # Resolve parent_reply_id from parent_index
+            parent_reply_id = None
+            parent_idx = reply_data.get("parent_index")
+            if parent_idx is not None and parent_idx < len(reply_objects) and reply_objects[parent_idx]:
+                parent_reply_id = reply_objects[parent_idx].id
+
+            reply = BHHelpReply(
+                post_id=post.id,
+                author_id=reply_author.id,
+                body=reply_data["body"],
+                parent_reply_id=parent_reply_id,
+            )
+            db.add(reply)
+            await db.flush()
+            reply_objects.append(reply)
+            counts["help_replies"] += 1
+
+    # ── Reviews (with completed rentals) ────────────────────────
+    # Check existing review titles to avoid duplicates
+    result = await db.execute(select(BHReview.title))
+    existing_review_titles = {row[0] for row in result.all()}
+
+    for rev_data in data.get("reviews", []):
+        if rev_data.get("title") and rev_data["title"] in existing_review_titles:
+            continue
+
+        reviewer = user_map.get(rev_data["reviewer_slug"])
+        if not reviewer:
+            logger.warning("EP4 reviewer %s not found, skipping", rev_data["reviewer_slug"])
+            continue
+
+        listing_info = listing_map.get(rev_data["item_slug"])
+        if not listing_info:
+            logger.warning("EP4 item %s listing not found, skipping review", rev_data["item_slug"])
+            continue
+
+        listing_obj, owner = listing_info
+
+        # Use explicit owner_slug if provided, otherwise use listing owner
+        if rev_data.get("owner_slug"):
+            owner = user_map.get(rev_data["owner_slug"])
+            if not owner:
+                logger.warning("EP4 review owner %s not found, skipping", rev_data["owner_slug"])
+                continue
+
+        # Skip if reviewer is the owner
+        if reviewer.id == owner.id:
+            continue
+
+        # Create a completed rental for this review
+        rental = BHRental(
+            listing_id=listing_obj.id,
+            renter_id=reviewer.id,
+            status=RentalStatus.COMPLETED,
+            renter_message="Would love to try this!",
+        )
+        db.add(rental)
+        await db.flush()
+        counts["rentals"] += 1
+
+        # Create the review with all fields
+        review = BHReview(
+            rental_id=rental.id,
+            reviewer_id=reviewer.id,
+            reviewee_id=owner.id,
+            rating=rev_data["rating"],
+            title=rev_data.get("title"),
+            body=rev_data.get("body"),
+            content_language=rev_data.get("content_language", "en"),
+            rating_accuracy=rev_data.get("rating_accuracy"),
+            rating_communication=rev_data.get("rating_communication"),
+            rating_value=rev_data.get("rating_value"),
+            rating_timeliness=rev_data.get("rating_timeliness"),
+            would_recommend=rev_data.get("would_recommend"),
+            reviewer_tier=rev_data.get("reviewer_tier", reviewer.badge_tier.value),
+            weight=rev_data.get("weight", 1.0),
+            helpful_count=rev_data.get("helpful_count", 0),
+            not_helpful_count=rev_data.get("not_helpful_count", 0),
+            owner_response=rev_data.get("owner_response"),
+            owner_response_at=_parse_datetime(rev_data.get("owner_response_at")),
+            visible=rev_data.get("visible", True),
+        )
+        db.add(review)
+        counts["reviews"] += 1
+
+    await db.commit()
+    logger.info("EP4 seed data loaded: %s", counts)
+    return counts
