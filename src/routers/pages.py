@@ -395,6 +395,7 @@ async def dashboard(request: Request,
     owner_rentals = []
     earnings_total = 0.0
     completed_count = 0
+    db_user = None
 
     if token:
         try:
@@ -469,6 +470,7 @@ async def dashboard(request: Request,
         owner_rentals=owner_rentals,
         earnings_total=earnings_total,
         completed_count=completed_count,
+        db_user_id=str(db_user.id) if token and db_user else "",
     )
     return _render("pages/dashboard.html", ctx)
 

@@ -1466,7 +1466,7 @@
             async loadMyReviews() {
                 if (this.reviewsLoaded) return;
                 try {
-                    var resp = await fetch('/api/v1/reviews?reviewer_id={{ user.id if user else "" }}&limit=100');
+                    var resp = await fetch('/api/v1/reviews?reviewer_id={{ db_user_id }}&limit=100');
                     if (resp.ok) {
                         var reviews = await resp.json();
                         reviews.forEach(r => { this.myReviews[r.rental_id] = r; });
