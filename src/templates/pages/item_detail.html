@@ -733,7 +733,7 @@
                         {% if lang == 'it' %}Scansiona per vedere questo oggetto{% else %}Scan to view this item{% endif %}
                     </p>
                     <button @click="
-                        var a = document.createElement('a');
+                        let a = document.createElement('a');
                         a.href = qrUrl.replace('format=svg', 'format=png').replace('size=200x200', 'size=400x400');
                         a.download = '{{ item.slug }}-qr.png';
                         a.click();
@@ -1303,12 +1303,12 @@
                                         </svg>
                                         <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden"
                                                @change="
-                                                   var file = $event.target.files[0];
+                                                   let file = $event.target.files[0];
                                                    if (!file) return;
                                                    if (file.size > 5242880) { alert('Max 5MB'); return; }
                                                    reviewPhotoFiles.push(file);
-                                                   var reader = new FileReader();
-                                                   reader.onload = function(e) { reviewPhotos.push(e.target.result); };
+                                                   let reader = new FileReader();
+                                                   reader.onload = (e) => { reviewPhotos.push(e.target.result); };
                                                    reader.readAsDataURL(file);
                                                    $event.target.value = '';
                                                ">
@@ -1643,7 +1643,7 @@
         return {
             ownerId,
             reviews: [],
-            summary: null,
+            summary: {count: 0, average: 0, weighted_average: 0, star_distribution: {1:0,2:0,3:0,4:0,5:0}, subcategory_averages: null, recommend_rate: null},
             loaded: false,
             sortBy: 'recent',
             starFilter: null,
