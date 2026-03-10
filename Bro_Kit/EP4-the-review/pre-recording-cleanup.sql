@@ -94,36 +94,36 @@ DELETE FROM bh_rental WHERE renter_message LIKE '%EP4-seed%';
 -- 6. CREATE SOFIA'S COMPLETED COOKIE ORDERS WITH JOHNNY AS DELIVERY
 -- 4 completed rentals of Sofia's cookies, Johnny delivered by bike
 -- ============================================================
--- Order 1: Community member, Johnny bike delivery, 3 days ago
+-- Order 1: Aiko, Johnny bike delivery, 3 days ago
 INSERT INTO bh_rental (id, listing_id, renter_id, status, renter_message, created_at, updated_at)
 VALUES (
   gen_random_uuid(),
   (SELECT l.id FROM bh_listing l JOIN bh_item i ON l.item_id = i.id WHERE i.slug = 'cookie-jar-refill-ooak-cookies-750g' LIMIT 1),
-  (SELECT id FROM bh_user WHERE slug = 'community-member-23'),
+  (SELECT id FROM bh_user WHERE slug = 'aiko-studio'),
   'COMPLETED',
   'EP4-seed: Cookie delivery by Johnny (bike)',
   NOW() - INTERVAL '3 days',
   NOW() - INTERVAL '3 days'
 );
 
--- Order 2: Community member, Johnny bike delivery, 5 days ago
+-- Order 2: Alessia, Johnny bike delivery, 5 days ago
 INSERT INTO bh_rental (id, listing_id, renter_id, status, renter_message, created_at, updated_at)
 VALUES (
   gen_random_uuid(),
   (SELECT l.id FROM bh_listing l JOIN bh_item i ON l.item_id = i.id WHERE i.slug = 'cookie-jar-refill-ooak-cookies-750g' LIMIT 1),
-  (SELECT id FROM bh_user WHERE slug = 'community-member-45'),
+  (SELECT id FROM bh_user WHERE slug = 'alessias-music'),
   'COMPLETED',
   'EP4-seed: Cookie delivery by Johnny (bike)',
   NOW() - INTERVAL '5 days',
   NOW() - INTERVAL '5 days'
 );
 
--- Order 3: Community member, Johnny bike delivery, 7 days ago
+-- Order 3: Andrea, Johnny bike delivery, 7 days ago
 INSERT INTO bh_rental (id, listing_id, renter_id, status, renter_message, created_at, updated_at)
 VALUES (
   gen_random_uuid(),
   (SELECT l.id FROM bh_listing l JOIN bh_item i ON l.item_id = i.id WHERE i.slug = 'cookie-jar-refill-ooak-cookies-750g' LIMIT 1),
-  (SELECT id FROM bh_user WHERE slug = 'community-member-34'),
+  (SELECT id FROM bh_user WHERE slug = 'andreas-water'),
   'COMPLETED',
   'EP4-seed: Cookie delivery by Johnny (bike)',
   NOW() - INTERVAL '7 days',
