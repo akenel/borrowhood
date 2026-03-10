@@ -1217,7 +1217,7 @@
                             <label class="block text-sm font-medium text-gray-700">
                                 {% if lang == 'it' %}Valutazioni dettagliate{% else %}Detailed Ratings{% endif %}
                             </label>
-                            <template x-for="cat in [{key: 'rating_accuracy', label: '{% if lang == \"it\" %}Accuratezza{% else %}Accuracy{% endif %}'}, {key: 'rating_communication', label: '{% if lang == \"it\" %}Comunicazione{% else %}Communication{% endif %}'}, {key: 'rating_value', label: '{% if lang == \"it\" %}Valore{% else %}Value{% endif %}'}, {key: 'rating_timeliness', label: '{% if lang == \"it\" %}Puntualità{% else %}Timeliness{% endif %}'}]" :key="cat.key">
+                            <template x-for="cat in [{key: 'rating_accuracy', label: '{{ "Accuratezza" if lang == "it" else "Accuracy" }}'}, {key: 'rating_communication', label: '{{ "Comunicazione" if lang == "it" else "Communication" }}'}, {key: 'rating_value', label: '{{ "Valore" if lang == "it" else "Value" }}'}, {key: 'rating_timeliness', label: '{{ "Puntualità" if lang == "it" else "Timeliness" }}'}]" :key="cat.key">
                                 <div class="flex items-center justify-between">
                                     <span class="text-sm text-gray-600" x-text="cat.label"></span>
                                     <div class="flex gap-0.5">
