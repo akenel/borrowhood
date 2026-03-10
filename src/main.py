@@ -8,6 +8,7 @@ import asyncio
 import logging
 
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from fastapi import Depends
@@ -43,6 +44,11 @@ def create_app() -> FastAPI:
 
     # Rate limiting (BL-089) -- 120 reads/min, 20 writes/min per IP
     app.add_middleware(RateLimitMiddleware, read_limit=120, write_limit=20, window_seconds=60)
+
+    # Favicon at root (browsers request /favicon.ico directly)
+    @app.get("/favicon.ico", include_in_schema=False)
+    async def favicon():
+        return FileResponse("src/static/favicon.ico", media_type="image/x-icon")
 
     # Static files
     app.mount("/static", StaticFiles(directory="src/static"), name="static")

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ t('app.name') }}{% endblock %}</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/static/images/icon-192.png">
 
     <!-- SEO & Open Graph (Rule 30) -->
     <meta name="description" content="{{ meta_description | default(t('app.description')) }}">
