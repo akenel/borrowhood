@@ -39,6 +39,16 @@ WHERE id IN (
   WHERE i.slug = 'pressure-washer-karcher-k5'
 );
 
+-- Fix broken static image URLs (replace with Unsplash)
+UPDATE bh_item_media SET url = 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=800&h=600&fit=crop&q=80'
+WHERE item_id = (SELECT id FROM bh_item WHERE slug = 'pressure-washer-karcher-k5') AND url LIKE '%karcher-k5-product%';
+UPDATE bh_item_media SET url = 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop&q=80'
+WHERE item_id = (SELECT id FROM bh_item WHERE slug = 'pressure-washer-karcher-k5') AND url LIKE '%karcher-patio%';
+UPDATE bh_item_media SET url = 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&h=600&fit=crop&q=80'
+WHERE item_id = (SELECT id FROM bh_item WHERE slug = 'pressure-washer-karcher-k5') AND url LIKE '%karcher-garden%';
+UPDATE bh_item_media SET url = 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=600&fit=crop&q=80'
+WHERE item_id = (SELECT id FROM bh_item WHERE slug = 'pressure-washer-karcher-k5') AND url LIKE '%karcher-boat%';
+
 -- Verify it exists (will print a row if found)
 SELECT 'Pressure washer' AS check, i.slug, i.name, u.display_name AS owner
 FROM bh_item i JOIN bh_user u ON i.owner_id = u.id
