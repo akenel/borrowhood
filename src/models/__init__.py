@@ -22,7 +22,7 @@ from src.models.badge import BHBadge
 from src.models.qa import BHTestResult, BHBugReport, BHBugActivity, BHBugCommit
 from src.models.backlog import BHBacklogItem, BHBacklogActivity
 from src.models.translation import BHContentTranslation
-from src.models.helpboard import BHHelpPost, BHHelpReply
+from src.models.helpboard import BHHelpPost, BHHelpReply, BHHelpMedia, BHHelpUpvote
 from src.models.lockbox import BHLockBoxAccess
 from src.models.skill_verification import BHSkillVerification
 from src.models.telegram import BHTelegramLink
@@ -60,6 +60,8 @@ __all__ = [
     "BHContentTranslation",
     "BHHelpPost",
     "BHHelpReply",
+    "BHHelpMedia",
+    "BHHelpUpvote",
     "BHLockBoxAccess",
     "BHSkillVerification",
     "BHTelegramLink",
