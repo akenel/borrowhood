@@ -52,6 +52,24 @@ _BADGE_SORT = case(
 )
 
 
+# ── Current user ──
+
+
+@router.get("/me")
+async def get_current_user(
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Return the current authenticated user's basic info."""
+    user = await get_user(db, token)
+    return {
+        "id": str(user.id),
+        "display_name": user.display_name,
+        "slug": user.slug,
+        "avatar_url": user.avatar_url,
+    }
+
+
 # ── Avatar upload ──
 
 
