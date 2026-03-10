@@ -37,6 +37,15 @@ class NotificationType(str, enum.Enum):
     LOCKBOX_RETURN_CONFIRMED = "lockbox_return_confirmed"  # Return confirmed
     BADGE_EARNED = "badge_earned"               # You earned a badge
     MESSAGE_RECEIVED = "message_received"     # Someone sent you a message
+    # Delivery tracking
+    DELIVERY_PREPARING = "delivery_preparing"      # Owner is preparing your order
+    DELIVERY_DISPATCHED = "delivery_dispatched"    # Your order is on its way
+    DELIVERY_IN_TRANSIT = "delivery_in_transit"    # In transit to you
+    DELIVERY_DELIVERED = "delivery_delivered"       # Delivered -- confirm receipt
+    DELIVERY_READY_PICKUP = "delivery_ready_pickup" # Ready for pickup + location/code
+    DELIVERY_CONFIRMED = "delivery_confirmed"      # Buyer confirmed receipt
+    DELIVERY_FAILED = "delivery_failed"            # Delivery attempt failed
+    DELIVERY_DAMAGED = "delivery_damaged"          # Buyer reports damage
     SYSTEM = "system"                         # Platform announcement
 
 

@@ -316,6 +316,91 @@
                             </div>
                         </div>
                     </template>
+
+                    <!-- Delivery Tracking Timeline -->
+                    <template x-if="['approved','picked_up'].includes(status)">
+                        <div class="mt-3 border-t border-gray-100 pt-3"
+                             x-data="deliveryTimeline('{{ rental.id }}')" x-init="load()">
+                            <div x-show="tracking" x-cloak>
+                                <div class="flex items-center space-x-2 mb-3">
+                                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                                    </svg>
+                                    <span class="text-sm font-semibold text-gray-900">Delivery Tracking</span>
+                                    <span class="text-xs px-2 py-0.5 rounded-full"
+                                          :class="{
+                                              'bg-yellow-100 text-yellow-700': tracking.status === 'preparing',
+                                              'bg-blue-100 text-blue-700': ['dispatched','in_transit'].includes(tracking.status),
+                                              'bg-emerald-100 text-emerald-700': ['delivered','ready_for_pickup','confirmed','picked_up'].includes(tracking.status),
+                                              'bg-red-100 text-red-700': ['failed','damaged','returned_to_sender'].includes(tracking.status)
+                                          }"
+                                          x-text="tracking.status.replace(/_/g, ' ')"></span>
+                                </div>
+
+                                <!-- Delivery method badge -->
+                                <div class="mb-3 flex items-center space-x-2">
+                                    <template x-if="tracking.delivery_method === 'human'">
+                                        <span class="text-xs px-2 py-1 bg-indigo-50 text-indigo-600 rounded-full">Personal Delivery</span>
+                                    </template>
+                                    <template x-if="tracking.delivery_method === 'drone'">
+                                        <span class="text-xs px-2 py-1 bg-cyan-50 text-cyan-600 rounded-full">Drone Delivery</span>
+                                    </template>
+                                    <template x-if="tracking.delivery_method === 'lockbox'">
+                                        <span class="text-xs px-2 py-1 bg-amber-50 text-amber-600 rounded-full">Lockbox Pickup</span>
+                                    </template>
+                                    <template x-if="tracking.delivery_method === 'mail'">
+                                        <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">Mail/Courier</span>
+                                    </template>
+                                    <template x-if="tracking.delivery_method === 'pickup'">
+                                        <span class="text-xs px-2 py-1 bg-orange-50 text-orange-600 rounded-full">Self Pickup</span>
+                                    </template>
+                                    <span x-show="tracking.delivery_person_name" class="text-xs text-gray-500">
+                                        by <span x-text="tracking.delivery_person_name" class="font-medium"></span>
+                                    </span>
+                                    <span x-show="tracking.tracking_number" class="text-xs text-gray-400">
+                                        # <span x-text="tracking.tracking_number"></span>
+                                    </span>
+                                </div>
+
+                                <!-- Timeline events -->
+                                <div class="relative pl-5 space-y-3">
+                                    <div class="absolute left-2 top-1 bottom-1 w-0.5 bg-gray-200"></div>
+                                    <template x-for="(event, idx) in tracking.events" :key="event.id">
+                                        <div class="relative">
+                                            <div class="absolute -left-3 top-1 w-2.5 h-2.5 rounded-full border-2 border-white"
+                                                 :class="idx === tracking.events.length - 1 ? 'bg-indigo-500' : 'bg-gray-300'"></div>
+                                            <div class="ml-2">
+                                                <div class="flex items-center justify-between">
+                                                    <p class="text-sm font-medium text-gray-900" x-text="event.title"></p>
+                                                    <span class="text-xs text-gray-400 flex-shrink-0 ml-2" x-text="new Date(event.created_at).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})"></span>
+                                                </div>
+                                                <p x-show="event.description" class="text-xs text-gray-500 mt-0.5" x-text="event.description"></p>
+                                                <p x-show="event.next_action" class="text-xs text-indigo-600 mt-0.5 font-medium" x-text="'Next: ' + event.next_action"></p>
+                                                <img x-show="event.photo_url" :src="event.photo_url" class="mt-1 w-20 h-20 rounded-lg object-cover border border-gray-200">
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <!-- Confirm delivery button (for renter, when status is delivered) -->
+                                <div x-show="tracking.status === 'delivered' || tracking.status === 'picked_up'" class="mt-3 flex space-x-2">
+                                    <button @click="updateStatus('confirmed', 'Looks good -- thank you!')"
+                                            class="text-xs px-3 py-1.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 min-h-[32px]">
+                                        Confirm Receipt
+                                    </button>
+                                    <button @click="updateStatus('damaged', 'Item appears damaged')"
+                                            class="text-xs px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 min-h-[32px]">
+                                        Report Damage
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- No tracking yet -->
+                            <div x-show="loaded && !tracking" x-cloak class="text-xs text-gray-400 italic">
+                                No delivery tracking yet
+                            </div>
+                        </div>
+                    </template>
                 </div>
                 {% endfor %}
             </div>
@@ -327,20 +412,84 @@
         </div>
 
         <!-- History tab (completed/cancelled/declined orders) -->
-        <div x-show="tab === 'history'" x-cloak>
+        <div x-show="tab === 'history'" x-cloak x-data="historyTab()" x-effect="if (tab === 'history') loadMyReviews()">
             {% set history_renter = renter_rentals|selectattr('status.value', 'in', ['completed','cancelled','declined'])|list %}
             {% set history_owner = owner_rentals|selectattr('status.value', 'in', ['completed','cancelled','declined'])|list %}
+            {# Count by listing type across both sections #}
+            {% set ns = namespace(r_rent=0, r_svc=0, r_train=0, r_sell=0, r_give=0, o_rent=0, o_svc=0, o_train=0, o_sell=0, o_give=0) %}
+            {% for r in history_renter %}
+                {% set lt = r.listing.listing_type.value if r.listing and r.listing.listing_type else 'rent' %}
+                {% if lt == 'rent' %}{% set ns.r_rent = ns.r_rent + 1 %}
+                {% elif lt == 'service' %}{% set ns.r_svc = ns.r_svc + 1 %}
+                {% elif lt == 'training' %}{% set ns.r_train = ns.r_train + 1 %}
+                {% elif lt == 'sell' %}{% set ns.r_sell = ns.r_sell + 1 %}
+                {% elif lt == 'giveaway' %}{% set ns.r_give = ns.r_give + 1 %}{% endif %}
+            {% endfor %}
+            {% for r in history_owner %}
+                {% set lt = r.listing.listing_type.value if r.listing and r.listing.listing_type else 'rent' %}
+                {% if lt == 'rent' %}{% set ns.o_rent = ns.o_rent + 1 %}
+                {% elif lt == 'service' %}{% set ns.o_svc = ns.o_svc + 1 %}
+                {% elif lt == 'training' %}{% set ns.o_train = ns.o_train + 1 %}
+                {% elif lt == 'sell' %}{% set ns.o_sell = ns.o_sell + 1 %}
+                {% elif lt == 'giveaway' %}{% set ns.o_give = ns.o_give + 1 %}{% endif %}
+            {% endfor %}
+            {% set total_rent = ns.r_rent + ns.o_rent %}
+            {% set total_svc = ns.r_svc + ns.o_svc %}
+            {% set total_train = ns.r_train + ns.o_train %}
+            {% set total_sell = ns.r_sell + ns.o_sell %}
+            {% set total_give = ns.r_give + ns.o_give %}
             {% if history_renter or history_owner %}
-            <div class="space-y-6">
+            <!-- Filter pills with counts -->
+            <div class="mb-4 flex flex-wrap gap-2">
+                <button @click="historyFilter = ''"
+                        :class="historyFilter === '' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">All <span class="opacity-75">({{ history_renter|length + history_owner|length }})</span></button>
+                {% if total_rent > 0 %}
+                <button @click="historyFilter = 'rent'"
+                        :class="historyFilter === 'rent' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Rentals <span class="opacity-75">({{ total_rent }})</span></button>
+                {% endif %}
+                {% if total_svc > 0 %}
+                <button @click="historyFilter = 'service'"
+                        :class="historyFilter === 'service' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Services <span class="opacity-75">({{ total_svc }})</span></button>
+                {% endif %}
+                {% if total_train > 0 %}
+                <button @click="historyFilter = 'training'"
+                        :class="historyFilter === 'training' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Training <span class="opacity-75">({{ total_train }})</span></button>
+                {% endif %}
+                {% if total_sell > 0 %}
+                <button @click="historyFilter = 'sell'"
+                        :class="historyFilter === 'sell' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Purchases <span class="opacity-75">({{ total_sell }})</span></button>
+                {% endif %}
+                {% if total_give > 0 %}
+                <button @click="historyFilter = 'giveaway'"
+                        :class="historyFilter === 'giveaway' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Giveaways <span class="opacity-75">({{ total_give }})</span></button>
+                {% endif %}
+            </div>
+
+            <div class="space-y-4">
                 {% if history_renter %}
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ t('dashboard.my_rentals') }}</h3>
-                    <div class="space-y-3">
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button @click="ordersOpen = !ordersOpen" class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide flex items-center">
+                            {{ t('dashboard.my_rentals') }}
+                            <span class="ml-2 text-xs font-normal bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">{{ history_renter|length }}</span>
+                        </h3>
+                        <svg class="w-5 h-5 text-gray-400 transition-transform" :class="ordersOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div x-show="ordersOpen" x-transition class="space-y-3 p-4">
                         {% for rental in history_renter %}
-                        <div class="bg-white rounded-lg border border-gray-200 p-4">
+                        {% set rlt = rental.listing.listing_type.value if rental.listing and rental.listing.listing_type else 'rent' %}
+                        <div class="bg-white rounded-lg border border-gray-200 p-4" x-show="!historyFilter || historyFilter === '{{ rlt }}'">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between">
-                                <div>
-                                    <p class="font-medium text-gray-900">{{ rental.listing.item.name if rental.listing and rental.listing.item else 'Item' }}</p>
+                                <div class="flex-1 min-w-0">
+                                    <a href="/items/{{ rental.listing.item.slug if rental.listing and rental.listing.item else '' }}" class="font-medium text-gray-900 hover:text-indigo-600">{{ rental.listing.item.name if rental.listing and rental.listing.item else 'Item' }}</a>
                                     <p class="text-sm text-gray-500">
                                         {% if rental.listing and rental.listing.listing_type %}
                                         {% set lt = rental.listing.listing_type.value %}
@@ -355,50 +504,219 @@
                                         {% endif %}
                                     </p>
                                 </div>
-                                <div class="mt-2 sm:mt-0 flex items-center space-x-3">
+                                <div class="mt-2 sm:mt-0 flex items-center space-x-2 flex-shrink-0">
+                                    {% if rental.status.value == 'completed' %}
+                                    <!-- Review button (renter reviews the owner) -->
+                                    <template x-if="myReviews['{{ rental.id }}']">
+                                        <button @click="openReviewModal('{{ rental.id }}', '{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}', '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', true)"
+                                                class="text-xs px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors min-h-[32px]">
+                                            Edit Review
+                                        </button>
+                                    </template>
+                                    <template x-if="!myReviews['{{ rental.id }}']">
+                                        <button @click="openReviewModal('{{ rental.id }}', '{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}', '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', false)"
+                                                class="text-xs px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors min-h-[32px]">
+                                            Leave Review
+                                        </button>
+                                    </template>
+                                    <!-- Re-order button -->
+                                    {% if rental.listing and rental.listing.item %}
+                                    <a href="/items/{{ rental.listing.item.slug }}"
+                                       class="text-xs px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors min-h-[32px] inline-flex items-center">
+                                        {% set lt = rental.listing.listing_type.value if rental.listing and rental.listing.listing_type else 'rent' %}
+                                        {% if lt == 'sell' %}Buy Again{% elif lt == 'service' %}Rebook{% elif lt == 'training' %}Rebook{% elif lt == 'giveaway' %}View{% else %}Rent Again{% endif %}
+                                    </a>
+                                    {% endif %}
+                                    {% endif %}
                                     <span class="text-xs px-3 py-1 rounded-full font-medium
                                         {% if rental.status.value == 'completed' %}bg-emerald-50 text-emerald-700
                                         {% elif rental.status.value in ['declined','cancelled'] %}bg-red-50 text-red-700
                                         {% else %}bg-gray-100 text-gray-700{% endif %}">
                                         {{ t('rental.status.' + rental.status.value) }}
                                     </span>
-                                    <span class="text-xs text-gray-400">{{ rental.created_at.strftime('%B %d, %Y') }}</span>
+                                    <span class="text-xs text-gray-400 whitespace-nowrap">{{ rental.created_at.strftime('%b %d') }}</span>
                                 </div>
                             </div>
+                            <!-- Show existing review inline -->
+                            <template x-if="myReviews['{{ rental.id }}']">
+                                <div class="mt-3 pt-3 border-t border-gray-100">
+                                    <div class="flex items-center space-x-1">
+                                        <template x-for="s in 5">
+                                            <svg class="w-4 h-4" :class="s <= myReviews['{{ rental.id }}'].rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                        </template>
+                                        <span class="text-xs text-gray-500 ml-2" x-text="myReviews['{{ rental.id }}'].title"></span>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
                 {% endif %}
                 {% if history_owner %}
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ t('dashboard.incoming_requests') }}</h3>
-                    <div class="space-y-3">
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button @click="incomingOpen = !incomingOpen" class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide flex items-center">
+                            {{ t('dashboard.incoming_requests') }}
+                            <span class="ml-2 text-xs font-normal bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">{{ history_owner|length }}</span>
+                        </h3>
+                        <svg class="w-5 h-5 text-gray-400 transition-transform" :class="incomingOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div x-show="incomingOpen" x-transition class="space-y-3 p-4">
                         {% for rental in history_owner %}
-                        <div class="bg-white rounded-lg border border-gray-200 p-4">
+                        {% set olt = rental.listing.listing_type.value if rental.listing and rental.listing.listing_type else 'rent' %}
+                        <div class="bg-white rounded-lg border border-gray-200 p-4" x-show="!historyFilter || historyFilter === '{{ olt }}'">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between">
-                                <div>
+                                <div class="flex-1 min-w-0">
                                     <p class="font-medium text-gray-900">{{ rental.listing.item.name if rental.listing and rental.listing.item else 'Item' }}</p>
+                                    <p class="text-sm text-gray-500">
+                                        <span class="inline-block text-xs px-2 py-0.5 rounded-full mr-1
+                                            {% if olt == 'sell' %}bg-purple-50 text-purple-700
+                                            {% elif olt == 'service' %}bg-cyan-50 text-cyan-700
+                                            {% elif olt == 'training' %}bg-teal-50 text-teal-700
+                                            {% elif olt == 'giveaway' %}bg-green-50 text-green-700
+                                            {% else %}bg-indigo-50 text-indigo-700{% endif %}">
+                                            {% if olt == 'sell' %}Purchase{% elif olt == 'service' %}Service{% elif olt == 'training' %}Training{% elif olt == 'giveaway' %}Giveaway{% else %}Rental{% endif %}
+                                        </span>
+                                    </p>
                                     {% if rental.renter_message %}
-                                    <p class="text-sm text-gray-600 mt-1 italic">"{{ rental.renter_message }}"</p>
+                                    <p class="text-sm text-gray-600 mt-1 italic truncate">"{{ rental.renter_message }}"</p>
                                     {% endif %}
                                 </div>
-                                <div class="mt-2 sm:mt-0 flex items-center space-x-3">
+                                <div class="mt-2 sm:mt-0 flex items-center space-x-2 flex-shrink-0">
+                                    {% if rental.status.value == 'completed' %}
+                                    <!-- Review button (owner reviews the renter) -->
+                                    <template x-if="myReviews['{{ rental.id }}']">
+                                        <button @click="openReviewModal('{{ rental.id }}', '{{ rental.renter_id }}', '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', true)"
+                                                class="text-xs px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors min-h-[32px]">
+                                            Edit Review
+                                        </button>
+                                    </template>
+                                    <template x-if="!myReviews['{{ rental.id }}']">
+                                        <button @click="openReviewModal('{{ rental.id }}', '{{ rental.renter_id }}', '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', false)"
+                                                class="text-xs px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors min-h-[32px]">
+                                            Leave Review
+                                        </button>
+                                    </template>
+                                    {% endif %}
                                     <span class="text-xs px-3 py-1 rounded-full font-medium
                                         {% if rental.status.value == 'completed' %}bg-emerald-50 text-emerald-700
                                         {% elif rental.status.value in ['declined','cancelled'] %}bg-red-50 text-red-700
                                         {% else %}bg-gray-100 text-gray-700{% endif %}">
                                         {{ t('rental.status.' + rental.status.value) }}
                                     </span>
-                                    <span class="text-xs text-gray-400">{{ rental.created_at.strftime('%B %d, %Y') }}</span>
+                                    <span class="text-xs text-gray-400 whitespace-nowrap">{{ rental.created_at.strftime('%b %d') }}</span>
                                 </div>
                             </div>
+                            <!-- Show existing review inline -->
+                            <template x-if="myReviews['{{ rental.id }}']">
+                                <div class="mt-3 pt-3 border-t border-gray-100">
+                                    <div class="flex items-center space-x-1">
+                                        <template x-for="s in 5">
+                                            <svg class="w-4 h-4" :class="s <= myReviews['{{ rental.id }}'].rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                        </template>
+                                        <span class="text-xs text-gray-500 ml-2" x-text="myReviews['{{ rental.id }}'].title"></span>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
                 {% endif %}
             </div>
+
+            <!-- Review Modal (full-featured) -->
+            <div x-show="showReviewModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="showReviewModal = false">
+                <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6 max-h-[90vh] overflow-y-auto">
+                    <h3 class="text-lg font-semibold text-gray-900" x-text="isEdit ? 'Edit Review' : 'Leave a Review'"></h3>
+                    <p class="text-sm text-gray-500 mt-1" x-text="reviewItemName"></p>
+                    <!-- Locked warning -->
+                    <div x-show="reviewLocked" class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <p class="text-xs text-amber-700">This review is locked because the owner has responded. Contact support to make changes.</p>
+                    </div>
+
+                    <!-- Overall star rating -->
+                    <div class="mt-4">
+                        <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Overall Rating</label>
+                        <div class="flex items-center space-x-1 mt-1">
+                            <template x-for="s in 5" :key="s">
+                                <button @click="if(!reviewLocked) reviewRating = s" class="focus:outline-none" :class="reviewLocked ? 'cursor-not-allowed' : ''">
+                                    <svg class="w-8 h-8 transition-colors" :class="s <= reviewRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 hover:text-yellow-200'" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                </button>
+                            </template>
+                            <span class="ml-2 text-sm text-gray-500" x-text="reviewRating + '/5'"></span>
+                        </div>
+                    </div>
+
+                    <!-- Subcategory ratings -->
+                    <div class="mt-4 grid grid-cols-2 gap-3">
+                        <template x-for="[label, key] in [['Accuracy','rAccuracy'],['Communication','rCommunication'],['Value','rValue'],['Timeliness','rTimeliness']]" :key="key">
+                            <div>
+                                <label class="text-xs text-gray-500" x-text="label"></label>
+                                <div class="flex items-center space-x-0.5 mt-0.5">
+                                    <template x-for="s in 5" :key="key+s">
+                                        <button @click="if(!reviewLocked) $data[key] = ($data[key] === s ? 0 : s)" class="focus:outline-none" :class="reviewLocked ? 'cursor-not-allowed' : ''">
+                                            <svg class="w-5 h-5 transition-colors" :class="s <= $data[key] ? 'text-amber-400 fill-amber-400' : 'text-gray-200 hover:text-amber-200'" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Would recommend -->
+                    <div class="mt-4">
+                        <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Would you recommend?</label>
+                        <div class="flex items-center space-x-3 mt-1">
+                            <button @click="if(!reviewLocked) wouldRecommend = wouldRecommend === true ? null : true"
+                                    :class="wouldRecommend === true ? 'bg-emerald-100 text-emerald-700 border-emerald-300' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-emerald-50'"
+                                    class="flex items-center space-x-1 px-3 py-1.5 text-sm rounded-lg border transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                                <span>Yes</span>
+                            </button>
+                            <button @click="if(!reviewLocked) wouldRecommend = wouldRecommend === false ? null : false"
+                                    :class="wouldRecommend === false ? 'bg-red-100 text-red-700 border-red-300' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-red-50'"
+                                    class="flex items-center space-x-1 px-3 py-1.5 text-sm rounded-lg border transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v2a3.5 3.5 0 003.5 3.5h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2m5-6h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5"/></svg>
+                                <span>No</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Title -->
+                    <input type="text" x-model="reviewTitle" maxlength="200" placeholder="Review title (optional)"
+                           :disabled="reviewLocked"
+                           class="mt-4 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-50 disabled:text-gray-400">
+
+                    <!-- Body -->
+                    <textarea x-model="reviewBody" rows="3" placeholder="Share your experience..."
+                              :disabled="reviewLocked"
+                              class="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-50 disabled:text-gray-400"></textarea>
+
+                    <!-- Buttons -->
+                    <div class="mt-4 flex justify-end space-x-3">
+                        <button @click="showReviewModal = false"
+                                class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 min-h-[40px]">Cancel</button>
+                        <button x-show="!reviewLocked" @click="submitReview()" :disabled="reviewSubmitting || reviewRating === 0"
+                                class="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 min-h-[40px]">
+                            <span x-show="!reviewSubmitting" x-text="isEdit ? 'Update Review' : 'Submit Review'"></span>
+                            <span x-show="reviewSubmitting">Saving...</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             {% else %}
             <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
                 <p class="text-gray-500">{{ t('dashboard.no_history') }}</p>
@@ -408,60 +726,190 @@
 
         <!-- Favorites tab -->
         <div x-show="tab === 'favorites'" x-cloak x-data="dashboardFavorites()" x-effect="if (tab === 'favorites') loadFavorites()">
+            <!-- Sub-tabs: Members / Items -->
+            <div class="flex space-x-1 mb-4 bg-gray-100 rounded-lg p-1">
+                <button @click="favTab = 'members'"
+                        :class="favTab === 'members' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'"
+                        class="flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors min-h-[40px]">
+                    {{ t('nav.members') }}
+                    <span x-show="favMembers.length > 0" class="ml-1 text-xs bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded-full" x-text="favMembers.length"></span>
+                </button>
+                <button @click="favTab = 'items'; loadItemFavorites()"
+                        :class="favTab === 'items' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'"
+                        class="flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors min-h-[40px]">
+                    {{ t('dashboard.items') }}
+                    <span x-show="favItemsList.length > 0" class="ml-1 text-xs bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded-full" x-text="favItemsList.length"></span>
+                </button>
+            </div>
+
             <template x-if="favLoading">
                 <div class="text-center py-12">
                     <p class="text-gray-500">{{ t('common.loading') }}</p>
                 </div>
             </template>
-            <template x-if="!favLoading && favItems.length === 0">
-                <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
-                    <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                    </svg>
-                    <p class="text-gray-500 mt-4">{{ t('dashboard.no_favorites') }}</p>
-                    <a href="/members" class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 min-h-[44px]">
-                        {{ t('nav.members') }}
-                    </a>
-                </div>
-            </template>
-            <template x-if="!favLoading && favItems.length > 0">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <template x-for="fav in favItems" :key="fav.id">
-                        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group relative">
-                            <button @click="removeFavorite(fav.favorite_user.id, fav.id)"
-                                    class="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/80 hover:bg-white shadow-sm transition-colors"
-                                    title="{{ t('favorites.remove') }}">
-                                <svg class="w-5 h-5 text-red-500 fill-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                </svg>
-                            </button>
-                            <a :href="'/workshop/' + fav.favorite_user.slug" class="block p-6">
-                                <div class="flex items-start space-x-4">
-                                    <div class="w-14 h-14 rounded-full flex-shrink-0 flex items-center justify-center bg-gray-100">
-                                        <template x-if="fav.favorite_user.avatar_url">
-                                            <img :src="fav.favorite_user.avatar_url" :alt="fav.favorite_user.display_name" class="w-14 h-14 rounded-full object-cover">
-                                        </template>
-                                        <template x-if="!fav.favorite_user.avatar_url">
-                                            <span class="text-xl font-bold text-gray-500" x-text="fav.favorite_user.display_name[0]"></span>
-                                        </template>
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors truncate" x-text="fav.favorite_user.display_name"></h3>
-                                        <p class="text-sm text-gray-500 truncate" x-show="fav.favorite_user.workshop_name" x-text="fav.favorite_user.workshop_name"></p>
-                                        <p class="text-xs text-gray-400 mt-1" x-show="fav.favorite_user.city" x-text="fav.favorite_user.city"></p>
-                                    </div>
-                                </div>
-                                <div class="mt-3 flex items-center space-x-2">
-                                    <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-600" x-text="fav.favorite_user.badge_tier"></span>
-                                    <template x-for="lang in (fav.favorite_user.languages || []).slice(0, 3)" :key="lang.language_code">
-                                        <span class="text-xs px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded font-medium" x-text="lang.language_code.toUpperCase()"></span>
-                                    </template>
-                                </div>
-                            </a>
+
+            <!-- Members sub-tab -->
+            <div x-show="favTab === 'members' && !favLoading">
+                <template x-if="favMembers.length === 0">
+                    <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
+                        <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                        <p class="text-gray-500 mt-4">{{ t('dashboard.no_favorites') }}</p>
+                        <a href="/members" class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 min-h-[44px]">
+                            {{ t('nav.members') }}
+                        </a>
+                    </div>
+                </template>
+                <template x-if="favMembers.length > 0">
+                    <div>
+                        <!-- Filter by badge tier -->
+                        <div x-show="memberBadges.length > 1" class="mb-3 flex flex-wrap gap-2">
+                            <button @click="memberFilter = ''"
+                                    :class="memberFilter === '' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                                    class="px-3 py-1 text-xs font-medium rounded-full transition-colors">All</button>
+                            <template x-for="badge in memberBadges" :key="badge">
+                                <button @click="memberFilter = badge"
+                                        :class="memberFilter === badge ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                                        class="px-3 py-1 text-xs font-medium rounded-full transition-colors" x-text="badge"></button>
+                            </template>
                         </div>
-                    </template>
-                </div>
-            </template>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <template x-for="fav in paginatedMembers" :key="fav.id">
+                                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group relative">
+                                    <button @click="removeMemberFavorite(fav.favorite_user.id, fav.id)"
+                                            class="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/80 hover:bg-white shadow-sm transition-colors"
+                                            title="{{ t('favorites.remove') }}">
+                                        <svg class="w-5 h-5 text-red-500 fill-red-500" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                        </svg>
+                                    </button>
+                                    <a :href="'/workshop/' + fav.favorite_user.slug" class="block p-6">
+                                        <div class="flex items-start space-x-4">
+                                            <div class="w-14 h-14 rounded-full flex-shrink-0 flex items-center justify-center bg-gray-100">
+                                                <template x-if="fav.favorite_user.avatar_url">
+                                                    <img :src="fav.favorite_user.avatar_url" :alt="fav.favorite_user.display_name" class="w-14 h-14 rounded-full object-cover">
+                                                </template>
+                                                <template x-if="!fav.favorite_user.avatar_url">
+                                                    <span class="text-xl font-bold text-gray-500" x-text="fav.favorite_user.display_name[0]"></span>
+                                                </template>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors truncate" x-text="fav.favorite_user.display_name"></h3>
+                                                <p class="text-sm text-gray-500 truncate" x-show="fav.favorite_user.workshop_name" x-text="fav.favorite_user.workshop_name"></p>
+                                                <p class="text-xs text-gray-400 mt-1" x-show="fav.favorite_user.city" x-text="fav.favorite_user.city"></p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3 flex items-center space-x-2">
+                                            <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-600" x-text="fav.favorite_user.badge_tier"></span>
+                                            <template x-for="lang in (fav.favorite_user.languages || []).slice(0, 3)" :key="lang.language_code">
+                                                <span class="text-xs px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded font-medium" x-text="lang.language_code.toUpperCase()"></span>
+                                            </template>
+                                        </div>
+                                    </a>
+                                </div>
+                            </template>
+                        </div>
+                        <!-- Pagination -->
+                        <div x-show="filteredMembers.length > memberPageSize" class="mt-4 flex items-center justify-between">
+                            <p class="text-sm text-gray-500" x-text="'Showing ' + Math.min(memberPage * memberPageSize, filteredMembers.length) + ' of ' + filteredMembers.length"></p>
+                            <div class="flex space-x-2">
+                                <button @click="memberPage = Math.max(1, memberPage - 1)" :disabled="memberPage === 1"
+                                        :class="memberPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-200'"
+                                        class="px-3 py-1 text-sm bg-gray-100 rounded-md transition-colors">Prev</button>
+                                <button @click="memberPage++" :disabled="memberPage * memberPageSize >= filteredMembers.length"
+                                        :class="memberPage * memberPageSize >= filteredMembers.length ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-200'"
+                                        class="px-3 py-1 text-sm bg-gray-100 rounded-md transition-colors">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Items sub-tab -->
+            <div x-show="favTab === 'items' && !favLoading">
+                <template x-if="favItemsLoading">
+                    <div class="text-center py-12">
+                        <p class="text-gray-500">{{ t('common.loading') }}</p>
+                    </div>
+                </template>
+                <template x-if="!favItemsLoading && favItemsList.length === 0">
+                    <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
+                        <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                        <p class="text-gray-500 mt-4">No favorite items yet. Browse listings to find items you like.</p>
+                        <a href="/browse" class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 min-h-[44px]">
+                            {{ t('nav.browse') }}
+                        </a>
+                    </div>
+                </template>
+                <template x-if="!favItemsLoading && favItemsList.length > 0">
+                    <div>
+                        <!-- Filter by category -->
+                        <div x-show="itemCategories.length > 1" class="mb-3 flex flex-wrap gap-2">
+                            <button @click="itemFilter = ''"
+                                    :class="itemFilter === '' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                                    class="px-3 py-1 text-xs font-medium rounded-full transition-colors">All</button>
+                            <template x-for="cat in itemCategories" :key="cat">
+                                <button @click="itemFilter = cat"
+                                        :class="itemFilter === cat ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                                        class="px-3 py-1 text-xs font-medium rounded-full transition-colors capitalize" x-text="cat.replace(/_/g, ' ')"></button>
+                            </template>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <template x-for="item in paginatedItems" :key="item.id">
+                                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group relative">
+                                    <button @click="removeItemFavorite(item.id)"
+                                            class="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/80 hover:bg-white shadow-sm transition-colors"
+                                            title="{{ t('favorites.remove') }}">
+                                        <svg class="w-5 h-5 text-red-500 fill-red-500" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                        </svg>
+                                    </button>
+                                    <a :href="'/items/' + item.slug" class="block">
+                                        <div class="h-40 bg-gray-100 overflow-hidden">
+                                            <template x-if="item.media && item.media.length > 0">
+                                                <img :src="item.media[0].url" :alt="item.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                                            </template>
+                                            <template x-if="!item.media || item.media.length === 0">
+                                                <div class="w-full h-full flex items-center justify-center">
+                                                    <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                </div>
+                                            </template>
+                                        </div>
+                                        <div class="p-4">
+                                            <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors truncate" x-text="item.name"></h3>
+                                            <div class="mt-1 flex items-center space-x-2">
+                                                <span class="text-xs px-2 py-0.5 rounded-full font-medium capitalize"
+                                                      :class="item.category === 'services' ? 'bg-green-100 text-green-700' : item.category === 'electronics' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'"
+                                                      x-text="(item.category || '').replace(/_/g, ' ')"></span>
+                                                <template x-if="item.listings && item.listings.length > 0">
+                                                    <span class="text-sm font-medium text-gray-700" x-text="(item.listings[0].price > 0 ? 'EUR ' + item.listings[0].price : 'FREE')"></span>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </template>
+                        </div>
+                        <!-- Pagination -->
+                        <div x-show="filteredItems.length > itemPageSize" class="mt-4 flex items-center justify-between">
+                            <p class="text-sm text-gray-500" x-text="'Showing ' + Math.min(itemPage * itemPageSize, filteredItems.length) + ' of ' + filteredItems.length"></p>
+                            <div class="flex space-x-2">
+                                <button @click="itemPage = Math.max(1, itemPage - 1)" :disabled="itemPage === 1"
+                                        :class="itemPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-200'"
+                                        class="px-3 py-1 text-sm bg-gray-100 rounded-md transition-colors">Prev</button>
+                                <button @click="itemPage++" :disabled="itemPage * itemPageSize >= filteredItems.length"
+                                        :class="itemPage * itemPageSize >= filteredItems.length ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-200'"
+                                        class="px-3 py-1 text-sm bg-gray-100 rounded-md transition-colors">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
         </div>
 
         <!-- Incoming Requests tab (as owner) -->
@@ -810,26 +1258,226 @@
         };
     }
 
-    // Dashboard favorites (lazy-loaded)
+    // History tab with review + re-order support
+    function deliveryTimeline(rentalId) {
+        return {
+            rentalId,
+            tracking: null,
+            loaded: false,
+            async load() {
+                try {
+                    var resp = await fetch('/api/v1/deliveries/' + this.rentalId);
+                    if (resp.ok) {
+                        this.tracking = await resp.json();
+                    }
+                } catch(e) {}
+                this.loaded = true;
+            },
+            async updateStatus(status, description) {
+                try {
+                    var resp = await fetch('/api/v1/deliveries/' + this.rentalId + '/status', {
+                        method: 'PATCH',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({status: status, description: description})
+                    });
+                    if (resp.ok) {
+                        this.tracking = await resp.json();
+                        window.dispatchEvent(new CustomEvent('toast', {
+                            detail: {type: 'success', message: status === 'confirmed' ? 'Receipt confirmed!' : 'Status updated'}
+                        }));
+                    } else {
+                        var err = await resp.json().catch(function() { return {}; });
+                        window.dispatchEvent(new CustomEvent('toast', {
+                            detail: {type: 'error', message: err.detail || 'Failed to update'}
+                        }));
+                    }
+                } catch(e) {
+                    window.dispatchEvent(new CustomEvent('toast', {detail: {type: 'error', message: 'Network error'}}));
+                }
+            }
+        };
+    }
+
+    function historyTab() {
+        return {
+            historyFilter: '',
+            ordersOpen: true,
+            incomingOpen: true,
+            myReviews: {},
+            reviewsLoaded: false,
+            showReviewModal: false,
+            isEdit: false,
+            reviewRentalId: '',
+            revieweeId: '',
+            reviewItemName: '',
+            reviewRating: 0,
+            reviewTitle: '',
+            reviewBody: '',
+            rAccuracy: 0,
+            rCommunication: 0,
+            rValue: 0,
+            rTimeliness: 0,
+            wouldRecommend: null,
+            reviewLocked: false,
+            reviewSubmitting: false,
+            existingReviewId: null,
+            async loadMyReviews() {
+                if (this.reviewsLoaded) return;
+                try {
+                    var resp = await fetch('/api/v1/reviews?reviewer_id={{ user.id if user else "" }}&limit=100');
+                    if (resp.ok) {
+                        var reviews = await resp.json();
+                        reviews.forEach(r => { this.myReviews[r.rental_id] = r; });
+                    }
+                } catch(e) {}
+                this.reviewsLoaded = true;
+            },
+            openReviewModal(rentalId, revieweeId, itemName, isEdit) {
+                this.reviewRentalId = rentalId;
+                this.revieweeId = revieweeId;
+                this.reviewItemName = itemName;
+                this.isEdit = isEdit;
+                if (isEdit && this.myReviews[rentalId]) {
+                    var existing = this.myReviews[rentalId];
+                    this.reviewRating = existing.rating;
+                    this.reviewTitle = existing.title || '';
+                    this.reviewBody = existing.body || '';
+                    this.rAccuracy = existing.rating_accuracy || 0;
+                    this.rCommunication = existing.rating_communication || 0;
+                    this.rValue = existing.rating_value || 0;
+                    this.rTimeliness = existing.rating_timeliness || 0;
+                    this.wouldRecommend = existing.would_recommend;
+                    this.reviewLocked = !!existing.owner_response;
+                    this.existingReviewId = existing.id;
+                } else {
+                    this.reviewRating = 0;
+                    this.reviewTitle = '';
+                    this.reviewBody = '';
+                    this.rAccuracy = 0;
+                    this.rCommunication = 0;
+                    this.rValue = 0;
+                    this.rTimeliness = 0;
+                    this.wouldRecommend = null;
+                    this.reviewLocked = false;
+                    this.existingReviewId = null;
+                }
+                this.showReviewModal = true;
+            },
+            async submitReview() {
+                if (this.reviewRating === 0) return;
+                this.reviewSubmitting = true;
+                try {
+                    var method = this.isEdit ? 'PUT' : 'POST';
+                    var url = this.isEdit ? '/api/v1/reviews/' + this.existingReviewId : '/api/v1/reviews';
+                    var resp = await fetch(url, {
+                        method: method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            rental_id: this.reviewRentalId,
+                            reviewee_id: this.revieweeId,
+                            rating: this.reviewRating,
+                            title: this.reviewTitle || null,
+                            body: this.reviewBody || null,
+                            content_language: document.documentElement.lang || 'en',
+                            rating_accuracy: this.rAccuracy || null,
+                            rating_communication: this.rCommunication || null,
+                            rating_value: this.rValue || null,
+                            rating_timeliness: this.rTimeliness || null,
+                            would_recommend: this.wouldRecommend
+                        })
+                    });
+                    if (resp.ok) {
+                        var review = await resp.json();
+                        this.myReviews[this.reviewRentalId] = review;
+                        this.showReviewModal = false;
+                        window.dispatchEvent(new CustomEvent('toast', {
+                            detail: { type: 'success', message: this.isEdit ? 'Review updated!' : 'Review submitted!' }
+                        }));
+                    } else {
+                        var err = await resp.json().catch(() => ({}));
+                        window.dispatchEvent(new CustomEvent('toast', {
+                            detail: { type: 'error', message: err.detail || 'Failed to submit review' }
+                        }));
+                    }
+                } catch(e) {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Network error' } }));
+                }
+                this.reviewSubmitting = false;
+            }
+        };
+    }
+
+    // Dashboard favorites (lazy-loaded, members + items with filtering & pagination)
     function dashboardFavorites() {
         return {
-            favItems: [],
+            favTab: 'members',
+            favMembers: [],
+            favItemsList: [],
             favLoading: false,
             favLoaded: false,
+            favItemsLoading: false,
+            favItemsLoaded: false,
+            memberFilter: '',
+            itemFilter: '',
+            memberPage: 1,
+            itemPage: 1,
+            memberPageSize: 9,
+            itemPageSize: 9,
+            get memberBadges() {
+                var badges = [...new Set(this.favMembers.map(f => f.favorite_user.badge_tier).filter(Boolean))];
+                return badges.sort();
+            },
+            get filteredMembers() {
+                if (!this.memberFilter) return this.favMembers;
+                return this.favMembers.filter(f => f.favorite_user.badge_tier === this.memberFilter);
+            },
+            get paginatedMembers() {
+                var start = (this.memberPage - 1) * this.memberPageSize;
+                return this.filteredMembers.slice(start, start + this.memberPageSize);
+            },
+            get itemCategories() {
+                var cats = [...new Set(this.favItemsList.map(i => i.category).filter(Boolean))];
+                return cats.sort();
+            },
+            get filteredItems() {
+                if (!this.itemFilter) return this.favItemsList;
+                return this.favItemsList.filter(i => i.category === this.itemFilter);
+            },
+            get paginatedItems() {
+                var start = (this.itemPage - 1) * this.itemPageSize;
+                return this.filteredItems.slice(start, start + this.itemPageSize);
+            },
             async loadFavorites() {
                 if (this.favLoaded) return;
                 this.favLoading = true;
                 try {
                     var resp = await fetch('/api/v1/users/me/favorites');
-                    if (resp.ok) this.favItems = await resp.json();
+                    if (resp.ok) this.favMembers = await resp.json();
                 } catch(e) {}
                 this.favLoading = false;
                 this.favLoaded = true;
             },
-            async removeFavorite(userId, favId) {
+            async loadItemFavorites() {
+                if (this.favItemsLoaded) return;
+                this.favItemsLoading = true;
+                try {
+                    var resp = await fetch('/api/v1/items/me/favorites');
+                    if (resp.ok) this.favItemsList = await resp.json();
+                } catch(e) {}
+                this.favItemsLoading = false;
+                this.favItemsLoaded = true;
+            },
+            async removeMemberFavorite(userId, favId) {
                 var resp = await fetch('/api/v1/users/' + userId + '/favorite', { method: 'DELETE' });
                 if (resp.ok) {
-                    this.favItems = this.favItems.filter(f => f.id !== favId);
+                    this.favMembers = this.favMembers.filter(f => f.id !== favId);
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: 'Removed from favorites' } }));
+                }
+            },
+            async removeItemFavorite(itemId) {
+                var resp = await fetch('/api/v1/items/' + itemId + '/favorite', { method: 'DELETE' });
+                if (resp.ok) {
+                    this.favItemsList = this.favItemsList.filter(i => i.id !== itemId);
                     window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: 'Removed from favorites' } }));
                 }
             }

@@ -420,7 +420,9 @@
     "favorites": "Favorites",
     "no_favorites": "No favorites yet. Browse Members to find people to follow.",
     "history": "History",
-    "no_history": "No completed or cancelled orders yet."
+    "no_history": "No completed or cancelled orders yet.",
+    "items": "Items",
+    "no_item_favorites": "No favorite items yet. Browse listings to find items you like."
   },
   "onboarding": {
     "title": "Welcome to BorrowHood",
