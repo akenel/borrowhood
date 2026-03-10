@@ -1,0 +1,1229 @@
+{
+  "help_posts": [
+    {
+      "author_slug": "mikes-garage",
+      "help_type": "offer",
+      "status": "open",
+      "urgency": "low",
+      "title": "Free Safety Check for Power Tools & Equipment",
+      "body": "30 years in the garage. I've seen fingers, arms, and egos get chewed up by tools people didn't respect. If you're renting a pressure washer, angle grinder, chipper, or circular saw for the first time -- come by my garage or message me. Free. No appointment needed. I'll walk you through the basics in 10 minutes. And for the love of God, don't stick your arm in the chipper.",
+      "category": "power_tools",
+      "neighborhood": "Centro Storico",
+      "content_language": "en",
+      "upvote_count": 14,
+      "reply_count": 3,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "sallys-kitchen",
+          "body": "Mike saved me from electrocuting myself with a faulty extension cord last month. Listen to this man.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "community-member-23",
+          "body": "Came by yesterday with a rented circular saw. Mike spent 20 minutes showing me the kickback zone. I had NO idea. Thank you.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "mikes-garage",
+          "body": "Anytime. Better 20 minutes of my time than 6 hours in pronto soccorso.",
+          "parent_index": 1
+        }
+      ]
+    },
+    {
+      "author_slug": "leonardos-bottega",
+      "help_type": "offer",
+      "status": "open",
+      "urgency": "low",
+      "title": "I Can Help With: Furniture Restoration & Wood Repair",
+      "body": "Before I was a painter I was a carpenter's apprentice. If you have a wobbly chair, a cracked table leg, or a drawer that won't close -- bring it by the Bottega. I have wood glue, clamps, and spare dowels. Small fixes are free. Bigger jobs we talk. Don't throw out good furniture because of one loose joint.",
+      "category": "furniture",
+      "neighborhood": "Centro Storico",
+      "content_language": "en",
+      "upvote_count": 11,
+      "reply_count": 2,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "rosas-home",
+          "body": "Leo fixed my nonna's rocking chair last week. She cried. 60 years old, that chair. Grazie mille.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "leonardos-bottega",
+          "body": "That chair had beautiful bones. Just needed fresh glue and two new dowels. Tell your nonna to keep rocking.",
+          "parent_index": 0
+        }
+      ]
+    },
+    {
+      "author_slug": "community-member-45",
+      "help_type": "need",
+      "status": "resolved",
+      "urgency": "normal",
+      "title": "Need Help: Washing Machine Making Grinding Noise",
+      "body": "My washing machine started making a terrible grinding noise during the spin cycle. It still works but the noise is getting worse. I don't want to call a repairman if it's something simple. Anyone dealt with this before? It's a 5-year-old Samsung.",
+      "category": "home_improvement",
+      "neighborhood": "Borgo Annunziata",
+      "content_language": "en",
+      "upvote_count": 6,
+      "reply_count": 4,
+      "resolved_by_slug": "jakes-electronics",
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "jakes-electronics",
+          "body": "That's almost certainly the drum bearings. On a 5-year Samsung, it's a known issue. I have the replacement bearings -- did 3 of these last month. Takes about an hour. I can come to you with tools. EUR 15 for the parts, no labor charge if you help me hold the drum.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "community-member-45",
+          "body": "Seriously?! The repair shop quoted me EUR 180. When can you come?",
+          "parent_index": 0
+        },
+        {
+          "author_slug": "jakes-electronics",
+          "body": "Tomorrow morning? I'll bring the seal kit too, usually goes at the same time.",
+          "parent_index": 1
+        },
+        {
+          "author_slug": "community-member-45",
+          "body": "Jake came, fixed it in 45 minutes. Machine is silent now. EUR 15 vs EUR 180. This board is incredible.",
+          "parent_index": null
+        }
+      ]
+    },
+    {
+      "author_slug": "chiaras-kitchen",
+      "help_type": "need",
+      "status": "resolved",
+      "urgency": "normal",
+      "title": "Cercasi: qualcuno che affili coltelli professionali",
+      "body": "Ho un set di coltelli Wusthof che non tagliano piu come una volta. Li uso ogni giorno per lavoro. Non mi fido dei servizi generici -- servono angoli precisi. Qualcuno a Trapani sa affilare coltelli da chef?",
+      "category": "kitchen",
+      "neighborhood": "Centro Storico",
+      "content_language": "it",
+      "upvote_count": 8,
+      "reply_count": 3,
+      "resolved_by_slug": "leonardos-bottega",
+      "item_slug": "wusthof-professional-knife-set-8pc",
+      "replies": [
+        {
+          "author_slug": "leonardos-bottega",
+          "body": "I sharpen my own chisels and plane blades on Japanese waterstones. Same technique works beautifully for kitchen knives. Bring them by the Bottega -- I'll do the full set for a coffee.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "chiaras-kitchen",
+          "body": "Leo affilato tutti e 8 i coltelli. Tagliano come il primo giorno. E mi ha insegnato l'angolo giusto per il mantenimento. Un caffe per 8 coltelli!",
+          "parent_index": null
+        },
+        {
+          "author_slug": "mikes-garage",
+          "body": "Leo does good work. He sharpened my wood chisels too. The man has patience with a stone.",
+          "parent_index": null
+        }
+      ]
+    },
+    {
+      "author_slug": "community-member-12",
+      "help_type": "need",
+      "status": "open",
+      "urgency": "urgent",
+      "title": "URGENT: Toilet Leaking from Base -- Need Help Today",
+      "body": "My toilet is leaking from the base onto the bathroom floor. Not a lot but it's constant. I put towels around it but I need this fixed today before it damages the floor. I think it might be the wax ring? I can pay for parts and your time.",
+      "category": "home_improvement",
+      "neighborhood": "Fontanelle",
+      "content_language": "en",
+      "upvote_count": 4,
+      "reply_count": 2,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "lucas-plumbing",
+          "body": "That's the wax ring, 99% sure. I have spares in my van. DM me your address, I can be there in an hour. Parts are EUR 5, don't worry about labor.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "community-member-12",
+          "body": "Just messaged you. Thank you so much, I was about to call an emergency plumber for EUR 150.",
+          "parent_index": 0
+        }
+      ]
+    },
+    {
+      "author_slug": "sallys-kitchen",
+      "help_type": "offer",
+      "status": "open",
+      "urgency": "low",
+      "title": "Standing Offer: Baking Questions & Recipe Help",
+      "body": "40 years in commercial kitchens. If your bread won't rise, your cookies are flat, your crostata cracks, or your meringue weeps -- ask me before you throw the batch away. I've made every mistake in the book so you don't have to. No question is too basic.",
+      "category": "kitchen",
+      "neighborhood": "Centro Storico",
+      "content_language": "en",
+      "upvote_count": 12,
+      "reply_count": 2,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "sofias-bakes",
+          "body": "Sally literally taught me everything I know. Her secret cookie recipe changed my life. If she says ask, ASK.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "valentinas-bakery",
+          "body": "Sally helped me fix my sfogliatella recipe over Telegram in 5 minutes. The woman is a treasure.",
+          "parent_index": null
+        }
+      ]
+    },
+    {
+      "author_slug": "community-member-67",
+      "help_type": "need",
+      "status": "resolved",
+      "urgency": "normal",
+      "title": "La mia bici ha la catena che salta -- come si regola?",
+      "body": "Ho una vecchia bici da citta e la catena salta ogni 2 km. Non so se devo cambiarla o se basta regolare il deragliatore. Qualcuno mi puo aiutare? Non voglio portarla in negozio per una cosa che magari e' semplice.",
+      "category": "cycling",
+      "neighborhood": "San Giuliano",
+      "content_language": "it",
+      "upvote_count": 5,
+      "reply_count": 3,
+      "resolved_by_slug": "georges-villa",
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "georges-villa",
+          "body": "Probably just the derailleur cable tension. Bring it by my place tomorrow -- I have a bike stand and all the tools. Takes 5 minutes if that's the problem. If the chain is stretched, I have a spare I can give you.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "community-member-67",
+          "body": "Grazie George! Era solo il cavo del deragliatore. 5 minuti come hai detto. Mi ha anche controllato i freni gratis.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "georges-villa",
+          "body": "Anytime. Those brake pads were done though -- glad we caught it before you needed them going downhill.",
+          "parent_index": 1
+        }
+      ]
+    },
+    {
+      "author_slug": "pietros-drones",
+      "help_type": "offer",
+      "status": "open",
+      "urgency": "low",
+      "title": "Free Drone Roof Inspections for Neighbors",
+      "body": "I do drone aerial photography and I realized my drone is perfect for roof inspections. If you need to check your roof tiles, gutters, or solar panels but don't want to climb a ladder, I can fly over and take HD photos from above. Free for neighbors. Better than risking a fall.",
+      "category": "drones",
+      "neighborhood": "Bonagia",
+      "content_language": "en",
+      "upvote_count": 9,
+      "reply_count": 2,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "community-member-34",
+          "body": "Pietro flew over my roof last week and found 3 cracked tiles I didn't know about. Would have leaked this winter for sure. Thank you!",
+          "parent_index": null
+        },
+        {
+          "author_slug": "ninos-campers",
+          "body": "Can you check the roof of my warehouse? It's pretty big. I'll buy you lunch.",
+          "parent_index": null
+        }
+      ]
+    },
+    {
+      "author_slug": "community-member-89",
+      "help_type": "need",
+      "status": "open",
+      "urgency": "normal",
+      "title": "Need Help: Garden Irrigation System Won't Start",
+      "body": "I installed a drip irrigation system last year and it worked fine all summer. This spring I turned it on and nothing comes out. The pump hums but no water flows. I checked the filter and it's clean. Could be an air lock? Anyone know how to prime these things?",
+      "category": "garden",
+      "neighborhood": "Fontanelle",
+      "content_language": "en",
+      "upvote_count": 3,
+      "reply_count": 1,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "marias-garden",
+          "body": "Classic air lock problem after winter. You need to open the furthest emitter and run the pump until water comes through. If that doesn't work, check the check valve -- they get stuck after sitting dry. I had the same issue. Come by and I'll give you a spare check valve.",
+          "parent_index": null
+        }
+      ]
+    },
+    {
+      "author_slug": "jakes-electronics",
+      "help_type": "offer",
+      "status": "open",
+      "urgency": "low",
+      "title": "I Can Help With: Phone Screen Repairs & Electronics",
+      "body": "I do phone screen replacements, battery swaps, and basic electronics repair. If your phone cracked, your tablet won't charge, or your laptop keyboard died -- bring it over before you buy a new one. Parts at cost, no labor charge for neighbors. I also have a soldering station if you need components reattached.",
+      "category": "electronics",
+      "neighborhood": "Rione Italia",
+      "content_language": "en",
+      "upvote_count": 10,
+      "reply_count": 1,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "community-member-56",
+          "body": "Jake replaced my iPhone screen in 30 minutes. EUR 25 for the part. Apple store wanted EUR 280. This man is a saint.",
+          "parent_index": null
+        }
+      ]
+    },
+    {
+      "author_slug": "community-member-78",
+      "help_type": "need",
+      "status": "in_progress",
+      "urgency": "normal",
+      "title": "Cerco qualcuno per montare scaffali IKEA",
+      "body": "Ho comprato 3 scaffali Kallax da IKEA ma non ho il trapano e sinceramente le istruzioni mi fanno venire il mal di testa. Qualcuno ha un trapano e 30 minuti liberi? Offro birra e pizza.",
+      "category": "furniture",
+      "neighborhood": "Borgo Annunziata",
+      "content_language": "it",
+      "upvote_count": 7,
+      "reply_count": 2,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "marcos-workshop",
+          "body": "Ho il trapano e ho montato piu Kallax di quanti ne voglia ammettere. Passo sabato mattina. La pizza la prendo margherita.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "community-member-78",
+          "body": "Perfetto! Ti mando l'indirizzo in DM. Margherita ordinata!",
+          "parent_index": 0
+        }
+      ]
+    },
+    {
+      "author_slug": "francescas-flowers",
+      "help_type": "need",
+      "status": "resolved",
+      "urgency": "urgent",
+      "title": "URGENTE: Serve furgone per trasporto fiori -- matrimonio sabato",
+      "body": "Ho un matrimonio sabato e il mio fornitore di trasporto ha cancellato all'ultimo minuto. Devo portare 200 composizioni floreali dalla mia bottega alla chiesa di San Lorenzo e poi alla villa per il ricevimento. Serve un furgone refrigerato o almeno uno con aria condizionata. Pago bene!",
+      "category": "vehicles",
+      "neighborhood": "Centro Storico",
+      "content_language": "it",
+      "upvote_count": 8,
+      "reply_count": 3,
+      "resolved_by_slug": "ninos-campers",
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "ninos-campers",
+          "body": "Ho un furgone con aria condizionata disponibile sabato mattina. Posso anche aiutare a caricare. Francesca, ti mando un messaggio.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "francescas-flowers",
+          "body": "Nino sei un angelo! Matrimonio salvato. Il furgone era perfetto, i fiori sono arrivati freschi. Ti devo una composizione per il negozio.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "sallys-kitchen",
+          "body": "This is what this board is for. Crisis averted in 2 hours. Love this community.",
+          "parent_index": null
+        }
+      ]
+    },
+    {
+      "author_slug": "community-member-91",
+      "help_type": "need",
+      "status": "open",
+      "urgency": "normal",
+      "title": "Cat Sitter Needed -- 1 Week in April",
+      "body": "Going to visit family on the mainland April 10-17. I have two cats, very chill, indoor only. They need feeding twice a day and someone to scoop the litter. They're friendly but the orange one will try to escape when you open the door. He's fast. Can anyone help?",
+      "category": "pets",
+      "neighborhood": "San Giuliano",
+      "content_language": "en",
+      "upvote_count": 6,
+      "reply_count": 2,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "elenas-yoga",
+          "body": "I love cats and I'm right around the corner in San Giuliano. Happy to stop by twice a day. I've had cats my whole life -- the orange escape artist won't get past me.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "community-member-91",
+          "body": "Elena you're a lifesaver! I'll DM you. Fair warning, his name is Houdini for a reason.",
+          "parent_index": 0
+        }
+      ]
+    },
+    {
+      "author_slug": "alessias-music",
+      "help_type": "need",
+      "status": "open",
+      "urgency": "low",
+      "title": "Looking for Someone to Practice Guitar Duets With",
+      "body": "I play classical guitar and I'm looking for someone to practice duets with once a week. Intermediate level -- I can read sheet music. I have a spare guitar if you need one. Not looking to start a band, just want to play with another human instead of a metronome.",
+      "category": "music",
+      "neighborhood": "Centro Storico",
+      "content_language": "en",
+      "upvote_count": 5,
+      "reply_count": 1,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "community-member-103",
+          "body": "I play fingerstyle! Not great at sight-reading but I learn fast. Would love to try some Carulli duets. Tuesdays work?",
+          "parent_index": null
+        }
+      ]
+    },
+    {
+      "author_slug": "giuseppes-electric",
+      "help_type": "need",
+      "status": "resolved",
+      "urgency": "normal",
+      "title": "Need Help: Generator Won't Start After Winter Storage",
+      "body": "My Honda generator has been sitting in the shed since October. Now it won't start -- pulls the cord but nothing happens. I drained the fuel before storing it like the manual said. Could be the spark plug? The carb? I need it working before the next power outage.",
+      "category": "power_tools",
+      "neighborhood": "Bonagia",
+      "content_language": "en",
+      "upvote_count": 4,
+      "reply_count": 3,
+      "resolved_by_slug": "mikes-garage",
+      "item_slug": "honda-eu2200i-portable-generator",
+      "replies": [
+        {
+          "author_slug": "mikes-garage",
+          "body": "Spark plug first -- pull it and check for carbon buildup. If you drained the fuel, the carb is probably dry but clean. Give it 3 pulls with the choke full open. If nothing, spray a tiny bit of starting fluid into the air intake. I have spare Honda spark plugs if yours is shot.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "giuseppes-electric",
+          "body": "Spark plug was completely fouled. Cleaned it, 2 pulls and it fired right up. Mike you saved me a EUR 100 service call.",
+          "parent_index": 0
+        },
+        {
+          "author_slug": "mikes-garage",
+          "body": "Glad it was simple. Pro tip: next time you store it, run it dry AND pull the spark plug to squirt a drop of oil in the cylinder. Keeps the rings from sticking.",
+          "parent_index": 1
+        }
+      ]
+    },
+    {
+      "author_slug": "community-member-42",
+      "help_type": "need",
+      "status": "open",
+      "urgency": "normal",
+      "title": "Need a Drill for ONE Hole -- Don't Want to Buy One",
+      "body": "I need to drill one hole in a concrete wall to hang a TV mount. Just one hole. 10mm masonry bit. I am NOT buying a EUR 150 hammer drill for one hole. Can I borrow someone's for 20 minutes? I'll bring it right back. Or if someone wants to come drill it, I'll make you the best espresso in Trapani.",
+      "category": "power_tools",
+      "neighborhood": "Rione Italia",
+      "content_language": "en",
+      "upvote_count": 9,
+      "reply_count": 3,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "mikes-garage",
+          "body": "Come grab my Bosch hammer drill. It's on BorrowHood -- rent it for a day, EUR 5. Comes with masonry bits. And make sure you use the depth stop so you don't go through to your neighbor's living room.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "community-member-42",
+          "body": "EUR 5 vs EUR 150. I love this platform. Renting it now.",
+          "parent_index": 0
+        },
+        {
+          "author_slug": "matteos-carpentry",
+          "body": "Pro tip: put tape on the wall first where you're drilling. Keeps the plaster from cracking around the hole.",
+          "parent_index": null
+        }
+      ]
+    },
+    {
+      "author_slug": "paolos-painting",
+      "help_type": "need",
+      "status": "in_progress",
+      "urgency": "normal",
+      "title": "Devo dipingere 3 stanze -- consigli su colori e tecnica?",
+      "body": "Voglio ridipingere 3 stanze del mio appartamento. Ho comprato rulli e pennelli ma non ho mai dipinto pareti prima. Devo usare primer? Quante mani? Come faccio gli angoli senza nastro adesivo? Qualsiasi consiglio e' benvenuto.",
+      "category": "home_improvement",
+      "neighborhood": "Fontanelle",
+      "content_language": "it",
+      "upvote_count": 3,
+      "reply_count": 2,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "mikes-garage",
+          "body": "Primer SEMPRE, soprattutto su muri vecchi. Due mani di colore dopo. Per gli angoli: pennello da taglio angolato 5cm, mano ferma. Se vuoi, ho una pistola a spruzzo che fa le pareti in meta tempo. E' su BorrowHood a EUR 8/giorno.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "leonardos-bottega",
+          "body": "Mike is right about the primer. For the colors -- bring me a photo of the rooms with the natural light. Color changes completely depending on which direction the windows face. North-facing rooms need warm tones.",
+          "parent_index": null
+        }
+      ]
+    },
+    {
+      "author_slug": "sofias-bakes",
+      "help_type": "need",
+      "status": "resolved",
+      "urgency": "normal",
+      "title": "Need Advice: How to Ship Cookies Without Them Breaking",
+      "body": "I've been getting orders from outside Trapani and I can't figure out how to ship cookies without them arriving as crumbs. I've tried bubble wrap, tissue paper, packing peanuts -- still broken. My nonna says just make them thicker but that changes the recipe. Anyone have experience shipping baked goods?",
+      "category": "kitchen",
+      "neighborhood": "Bonagia",
+      "content_language": "en",
+      "upvote_count": 7,
+      "reply_count": 3,
+      "resolved_by_slug": "sallys-kitchen",
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "sallys-kitchen",
+          "body": "Sofia, the secret is individual cellophane wraps with a small piece of parchment between each cookie, packed standing UP (like records in a crate) not flat. Use a rigid box -- shoeboxes work great. Fill ALL empty space with crumpled parchment. I shipped 500 cookies to a wedding in Palermo once. Two broke. TWO.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "sofias-bakes",
+          "body": "Standing up like records!! That's genius Sally! I shipped my first box to Palermo yesterday using your method. ZERO breakage. You're the best mentor ever.",
+          "parent_index": 0
+        },
+        {
+          "author_slug": "valentinas-bakery",
+          "body": "I do the same thing for my biscotti. Standing up and tight. Sally's method works perfectly. Welcome to the shipping club, Sofia.",
+          "parent_index": 0
+        }
+      ]
+    },
+    {
+      "author_slug": "community-member-55",
+      "help_type": "need",
+      "status": "open",
+      "urgency": "urgent",
+      "title": "Help: My 3D Printer is Jamming Mid-Print",
+      "body": "I'm printing a project for work due Friday and my Ender 3 keeps jamming halfway through. It extrudes fine for the first hour then just stops pushing filament. I've tried different filament, different temps. I think the hotend is partially clogged. Anyone have experience with this? I have a spare nozzle but not sure if that's the problem.",
+      "category": "3d_printing",
+      "neighborhood": "Rione Italia",
+      "content_language": "en",
+      "upvote_count": 4,
+      "reply_count": 2,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "jakes-electronics",
+          "body": "Classic heat creep. The PTFE tube inside the hotend has probably deformed from heat. Swap the nozzle AND the bowden coupler at the hotend. If the PTFE tube end is mushroomed, cut 1cm off and reseat it flush against the nozzle. I have spare couplers -- come by.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "marcos-workshop",
+          "body": "Jake is right, it's heat creep. Also check your retraction settings -- if retraction is too aggressive it pulls molten filament into the cold zone and it solidifies. Lower retraction to 4mm and see.",
+          "parent_index": null
+        }
+      ]
+    },
+    {
+      "author_slug": "robertos-fishing",
+      "help_type": "offer",
+      "status": "open",
+      "urgency": "low",
+      "title": "Offro: lezioni di pesca dalla barca gratis per principianti",
+      "body": "Esco in barca 3-4 volte a settimana da Bonagia. Se qualcuno vuole imparare a pescare, ha un posto libero sulla barca. Porto io tutta l'attrezzatura. Usciamo all'alba, torniamo per colazione. L'unica regola: niente telefono. Il mare non si filma, si vive.",
+      "category": "water_sports",
+      "neighborhood": "Bonagia",
+      "content_language": "it",
+      "upvote_count": 13,
+      "reply_count": 2,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "georges-villa",
+          "body": "Roberto, count me in. I haven't fished since I was a kid. The no-phone rule is perfect -- I could use a morning without notifications.",
+          "parent_index": null
+        },
+        {
+          "author_slug": "community-member-19",
+          "body": "Sono venuto martedi scorso. Abbiamo preso 6 orate. Roberto e' un maestro. E la regola del telefono... all'inizio mi dava fastidio, adesso la capisco.",
+          "parent_index": null
+        }
+      ]
+    },
+    {
+      "author_slug": "tommasos-farm",
+      "help_type": "need",
+      "status": "open",
+      "urgency": "normal",
+      "title": "Serve aiuto per potatura olivi -- 30 alberi",
+      "body": "Ho 30 olivi che non vengono potati da 2 anni. Sono troppi per me solo. Cerco qualcuno con esperienza nella potatura degli olivi -- non e' come potare un albero qualsiasi, servono tagli specifici per la produzione. Ho la scala e le cesoie. Offro olio d'oliva fresco come pagamento.",
+      "category": "garden",
+      "neighborhood": "Bonagia",
+      "content_language": "it",
+      "upvote_count": 6,
+      "reply_count": 1,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "marias-garden",
+          "body": "Tommaso, mio padre potava olivi per 50 anni. Mi ha insegnato il taglio a vaso policonico. Posso aiutarti questo weekend. 30 alberi in due giorni se il tempo tiene. L'olio e' il miglior pagamento che esista.",
+          "parent_index": null
+        }
+      ]
+    },
+    {
+      "author_slug": "carmens-sewing",
+      "help_type": "offer",
+      "status": "open",
+      "urgency": "low",
+      "title": "Offro: riparazioni sartoriali gratuite per chi ha bisogno",
+      "body": "Sono sarta da 25 anni. Vedo troppa gente che butta vestiti per uno strappo o un bottone. Portatemeli -- cerniere, orli, bottoni, strappi piccoli. Gratis per chi non puo permettersi un sarto. Per lavori piu grossi parliamo. Ho anche stoffe di recupero se vi serve un pezzo per una toppa.",
+      "category": "sewing",
+      "neighborhood": "Centro Storico",
+      "content_language": "it",
+      "upvote_count": 15,
+      "reply_count": 1,
+      "resolved_by_slug": null,
+      "item_slug": null,
+      "replies": [
+        {
+          "author_slug": "community-member-77",
+          "body": "Carmen mi ha riparato il giubbotto preferito di mio figlio. Lo strappo non si vede nemmeno. Santa donna.",
+          "parent_index": null
+        }
+      ]
+    }
+  ],
+  "reviews": [
+    {
+      "reviewer_slug": "community-member-23",
+      "item_slug": "bosch-professional-drill-driver-set",
+      "owner_slug": "mikes-garage",
+      "rating": 5,
+      "title": "Best drill on the platform",
+      "body": "Rented this for a bathroom renovation. The drill is in perfect condition -- Mike clearly maintains his tools. Came with every bit I needed plus a few I didn't know existed. Mike even showed me how to use the depth stop. Returned it clean, he checked it over, done. No drama.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 8,
+      "not_helpful_count": 0,
+      "owner_response": null,
+      "owner_response_at": null,
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-45",
+      "item_slug": "floor-jack-jack-stands-3-ton",
+      "owner_slug": "mikes-garage",
+      "rating": 5,
+      "title": "Mike's safety briefing alone is worth the rental",
+      "body": "I needed to change brake pads on my Fiat Punto. Rented the jack and stands from Mike. He made me demonstrate I knew how to use jack stands before he'd let me take them. At first I thought he was being difficult -- turns out the car I jacked at home last year was on the bump jack only. Mike probably saved my life.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 12,
+      "not_helpful_count": 0,
+      "owner_response": "Glad you're working safe now. Never get under a car on just a jack. Ever.",
+      "owner_response_at": "2026-02-18T14:30:00Z",
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "sallys-kitchen",
+      "item_slug": "3d-printer-creality-ender-3-v3",
+      "owner_slug": "jakes-electronics",
+      "rating": 4,
+      "title": "Printed custom cookie cutters!",
+      "body": "Jake helped me print custom cookie cutter shapes for a birthday party. The printer is great and he included a roll of food-safe PLA. Only 4 stars because the pickup was a bit late -- he was finishing another print. But the results were perfect and he walked me through the slicer software like a saint.",
+      "rating_accuracy": 5,
+      "rating_communication": 4,
+      "rating_value": 5,
+      "rating_timeliness": 3,
+      "would_recommend": true,
+      "reviewer_tier": "TRUSTED",
+      "weight": 5.0,
+      "helpful_count": 6,
+      "not_helpful_count": 0,
+      "owner_response": "Fair point on the timing Sally! I've started blocking 30 min between rentals now. Glad the cutters worked out.",
+      "owner_response_at": "2026-02-22T09:15:00Z",
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-34",
+      "item_slug": "camping-table-4-chairs-set",
+      "owner_slug": "ninos-campers",
+      "rating": 5,
+      "title": "Perfect for our beach picnic",
+      "body": "Rented the camping table and chairs for a family beach day at San Vito. Everything was clean, folded neatly in a bag, easy to carry. The chairs are surprisingly comfortable. Nino had it ready at 8am like he promised. Already planning to rent again for Easter.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 3,
+      "not_helpful_count": 0,
+      "owner_response": null,
+      "owner_response_at": null,
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-56",
+      "item_slug": "set-completo-attrezzi-da-giardino",
+      "owner_slug": "marias-garden",
+      "rating": 5,
+      "title": "Tutto quello che serve per il giardino",
+      "body": "Ho affittato il set completo per sistemare il mio terrazzo. Vanga, rastrello, cesoie, guanti -- tutto in ottimo stato. Maria mi ha anche dato consigli su come preparare il terreno per i pomodori. Torneranno da lei in primavera!",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 4,
+      "not_helpful_count": 0,
+      "owner_response": "Grazie! Per i pomodori ricordati: sole, acqua, e parla con loro ogni mattina. Funziona!",
+      "owner_response_at": "2026-02-10T11:20:00Z",
+      "content_language": "it",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "mikes-garage",
+      "item_slug": "drone-dji-mini-3-pro",
+      "owner_slug": "jakes-electronics",
+      "rating": 4,
+      "title": "Great drone, solid condition",
+      "body": "Borrowed the Mini 3 Pro to check a client's roof. The drone is in great shape and the camera quality is excellent. Jake showed me the basics in 10 minutes. Lost signal once near the port -- probably interference from the boats. But overall very happy. Saved me from climbing a ladder.",
+      "rating_accuracy": 4,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "PILLAR",
+      "weight": 8.0,
+      "helpful_count": 5,
+      "not_helpful_count": 0,
+      "owner_response": null,
+      "owner_response_at": null,
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-12",
+      "item_slug": "kitchenaid-stand-mixer-artisan-5qt",
+      "owner_slug": "sallys-kitchen",
+      "rating": 5,
+      "title": "Made my daughter's birthday cake with this beauty",
+      "body": "My daughter wanted a 3-tier rainbow cake for her 8th birthday. I've never used a stand mixer before. Sally not only rented me the KitchenAid but sent me her buttercream recipe on Telegram. The mixer is a beast -- whipped 6 egg whites to stiff peaks in 3 minutes. Cake was a hit. My daughter said it was the best day of her life.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 9,
+      "not_helpful_count": 0,
+      "owner_response": "This made my week. THAT is what sharing tools is about. Happy birthday to your daughter!",
+      "owner_response_at": "2026-02-15T16:45:00Z",
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-67",
+      "item_slug": "mountain-bike-specialized-rockhopper",
+      "owner_slug": "georges-villa",
+      "rating": 5,
+      "title": "Bici fantastica per Erice",
+      "body": "Ho noleggiato la Rockhopper per un giro a Erice. George l'ha preparata perfettamente -- gomme gonfie, freni regolati, catena lubrificata. La salita e' stata dura ma la bici ha retto alla grande. George mi ha anche consigliato il percorso migliore. Il ritorno in discesa... mamma mia, che adrenalina!",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 4,
+      "not_helpful_count": 0,
+      "owner_response": null,
+      "owner_response_at": null,
+      "content_language": "it",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "johns-cleaning",
+      "item_slug": "electric-cargo-bike-babboe",
+      "owner_slug": "georges-villa",
+      "rating": 5,
+      "title": "This bike changed my delivery game",
+      "body": "I rented George's cargo bike for a week to see if it could handle my cleaning equipment runs. It can. Loaded it with the pressure washer, hoses, and chemicals -- flew up the hill to Fontanelle like it was nothing. The electric assist is a game changer. I'm saving up to buy my own now. George, you've ruined regular bikes for me.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 4,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 7,
+      "not_helpful_count": 0,
+      "owner_response": "Johnny, you loaded that thing like a pack mule. Glad it worked for the business!",
+      "owner_response_at": "2026-02-28T10:00:00Z",
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-89",
+      "item_slug": "pottery-wheel-session-2-hours",
+      "owner_slug": "leonardos-bottega",
+      "rating": 5,
+      "title": "Life-changing 2 hours with a master",
+      "body": "I've always wanted to try pottery. Leo's session was pure magic. He's patient, funny, and he makes it look effortless. I made a bowl -- it's ugly, but I made it. Leo said 'The first one is always ugly. That's how you know it's honest.' I'm booking again next week. This man is a treasure.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 11,
+      "not_helpful_count": 0,
+      "owner_response": "Your bowl has character. Bring it back next session -- we'll glaze it.",
+      "owner_response_at": "2026-02-20T18:30:00Z",
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-67",
+      "item_slug": "watercolor-painting-kit-rental",
+      "owner_slug": "leonardos-bottega",
+      "rating": 4,
+      "title": "Great kit, wish it came with more paper",
+      "body": "Rented Leo's watercolor kit for my daughter. The paints are excellent quality -- real artist grade, not student stuff. The brushes are in perfect condition. Only complaint: the pad had 12 sheets and she went through them in one afternoon. Would be nice to include extra paper or at least mention it in the listing. Still, highly recommended.",
+      "rating_accuracy": 4,
+      "rating_communication": 5,
+      "rating_value": 4,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 3,
+      "not_helpful_count": 0,
+      "owner_response": "Good feedback! I've added a note to the listing and I'm now including a 20-sheet pad. Tell your daughter to keep painting.",
+      "owner_response_at": "2026-03-01T09:00:00Z",
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-42",
+      "item_slug": "industrial-carpet-cleaner",
+      "owner_slug": "johns-cleaning",
+      "rating": 4,
+      "title": "Carpet cleaner works great, instructions would help",
+      "body": "The machine itself is powerful -- got red wine stains out of a cream carpet. Johnny dropped it off on time and picked it up the next day. Only issue: there were no instructions included and I had to YouTube how to fill the solution tank. A quick start card would make this 5 stars.",
+      "rating_accuracy": 4,
+      "rating_communication": 4,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 5,
+      "not_helpful_count": 1,
+      "owner_response": "Fair feedback! I've printed a quick start card and it's now in the bag with every rental. Thanks for the idea.",
+      "owner_response_at": "2026-02-25T15:00:00Z",
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-19",
+      "item_slug": "cannoli-maker-kit-sicilian-traditional",
+      "owner_slug": "rosas-home",
+      "rating": 5,
+      "title": "Cannoli come quelli della nonna",
+      "body": "Ho affittato il kit per cannoli per la festa di Santa Rita. Rosa mi ha anche dato la ricetta della crema di ricotta. I tubi sono in acciaio inox, non quelli economici di alluminio. Ho fatto 60 cannoli -- ne sono sopravvissuti forse 10 fino al dolce. Sparivano dal tavolo. Il prossimo anno ne faccio 100.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 6,
+      "not_helpful_count": 0,
+      "owner_response": "60 cannoli e ne sono rimasti 10? Allora il prossimo anno ne servono 200!",
+      "owner_response_at": "2026-03-02T10:00:00Z",
+      "content_language": "it",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "sallys-kitchen",
+      "item_slug": "commercial-pasta-machine-imperia",
+      "owner_slug": "chiaras-kitchen",
+      "rating": 5,
+      "title": "Professional quality machine",
+      "body": "Chiara's Imperia is the real deal. Made fresh tagliatelle for a dinner party -- the dough came out perfectly even. The machine is heavy-duty and well-maintained. Chiara even included a dough scraper and dusting flour. This is how Italians do it. My KitchenAid pasta attachment can't compare.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "TRUSTED",
+      "weight": 5.0,
+      "helpful_count": 4,
+      "not_helpful_count": 0,
+      "owner_response": null,
+      "owner_response_at": null,
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-77",
+      "item_slug": "surfboard-76-funboard",
+      "owner_slug": "georges-villa",
+      "rating": 3,
+      "title": "Good board but wax was old",
+      "body": "The board itself is in good shape and the right size for a beginner. George was friendly at pickup. However, the wax was old and flaky -- I had to buy fresh wax at the surf shop before I could use it. For a EUR 15/day rental, it should come freshly waxed. The leash was also fraying at the ankle strap. Still fun but could be better.",
+      "rating_accuracy": 3,
+      "rating_communication": 4,
+      "rating_value": 3,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 3,
+      "not_helpful_count": 1,
+      "owner_response": "You're right -- that's on me. I've replaced the leash and I now re-wax between every rental. Appreciate the honest feedback.",
+      "owner_response_at": "2026-03-04T12:00:00Z",
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-103",
+      "item_slug": "portable-solar-panel-200w-foldable",
+      "owner_slug": "ninos-campers",
+      "rating": 5,
+      "title": "Kept our camper running off-grid for 4 days",
+      "body": "We rented the 200W panel for a camping trip near Scopello. No hookups, just us and the panel. Charged our phones, ran a small fridge, and powered LED lights every evening. Nino included a detailed charge controller guide and an adapter cable we didn't even know we'd need. This man thinks of everything.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 5,
+      "not_helpful_count": 0,
+      "owner_response": null,
+      "owner_response_at": null,
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "georges-villa",
+      "item_slug": "welding-machine-mig-200a",
+      "owner_slug": "mikes-garage",
+      "rating": 5,
+      "title": "Mike is the real deal",
+      "body": "I took Mike's 3-hour welding course because I wanted to learn for my property gate repairs. Mike is a natural teacher. He explains the theory THEN lets you burn through practice metal until you get it. By the end I could lay a decent bead. The machine is serious gear -- not some hobby kit. Mike's garage is spotless too. You can tell a lot about a mechanic by how clean the floor is.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "PILLAR",
+      "weight": 8.0,
+      "helpful_count": 10,
+      "not_helpful_count": 0,
+      "owner_response": "George, you picked it up faster than most. Bring the gate measurements next time -- we'll cut and weld the pieces together.",
+      "owner_response_at": "2026-03-05T11:00:00Z",
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-91",
+      "item_slug": "professional-floral-arrangement-kit",
+      "owner_slug": "francescas-flowers",
+      "rating": 5,
+      "title": "Made my wife's anniversary bouquet",
+      "body": "Rented Francesca's kit to make a bouquet for our 10th anniversary. She included foam, wire, tape, cutters, and even a guide on flower arranging basics. Francesca also texted me which flowers to buy at the market for the best combination. My wife thought I'd hired a florist. Best EUR 8 I ever spent.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 8,
+      "not_helpful_count": 0,
+      "owner_response": "Your wife called me to say thank you. That's never happened before. You made something beautiful.",
+      "owner_response_at": "2026-02-14T20:00:00Z",
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "leonardos-bottega",
+      "item_slug": "canon-eos-r5-camera-kit",
+      "owner_slug": "sofias-studio",
+      "rating": 5,
+      "title": "Perfect camera for portrait work",
+      "body": "Borrowed the R5 to photograph a commissioned portrait reference session. The autofocus tracking is incredible -- locked on the subject's eyes immediately. Sofia's studio had it charged, card formatted, and lens cleaned. She also included a spare battery and a 128GB card. Professional in every way.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "LEGEND",
+      "weight": 10.0,
+      "helpful_count": 4,
+      "not_helpful_count": 0,
+      "owner_response": null,
+      "owner_response_at": null,
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-55",
+      "item_slug": "3d-printer-prusa-i3-mk3s-plus",
+      "owner_slug": "marcos-workshop",
+      "rating": 4,
+      "title": "Solid printer, bed was a bit off",
+      "body": "Rented the Prusa for a week to print parts for a prototype. Print quality is excellent once I re-leveled the bed -- it was slightly off on the left side, first print had a thin corner. After adjustment it was perfect. Marco was very responsive when I messaged him about the leveling. Good printer, just needs a pre-rental check.",
+      "rating_accuracy": 4,
+      "rating_communication": 5,
+      "rating_value": 4,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 2,
+      "not_helpful_count": 0,
+      "owner_response": "Thanks for the heads up. I now run a test print and level check before every rental. Won't happen again.",
+      "owner_response_at": "2026-03-06T08:30:00Z",
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-78",
+      "item_slug": "sega-circolare-makita",
+      "owner_slug": "marcos-workshop",
+      "rating": 2,
+      "title": "Lama spuntata, taglio impreciso",
+      "body": "Ho noleggiato la sega circolare per tagliare pannelli di compensato. La lama era spuntata -- bruciava il legno invece di tagliarlo. Ho dovuto comprare una lama nuova EUR 18 per finire il lavoro. Marco si e' scusato ma per quel prezzo di noleggio mi aspetto attrezzi pronti all'uso. La sega in se e' buona quando la lama taglia.",
+      "rating_accuracy": 2,
+      "rating_communication": 3,
+      "rating_value": 2,
+      "rating_timeliness": 5,
+      "would_recommend": false,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 3,
+      "not_helpful_count": 2,
+      "owner_response": "Hai ragione al 100%. Ho cambiato la lama e ne tengo una di scorta. Ti rimborso i EUR 18 della lama. Mi scuso -- non deve succedere.",
+      "owner_response_at": "2026-03-03T14:00:00Z",
+      "content_language": "it",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "sofias-bakes",
+      "item_slug": "furgone-con-autista-traslochi",
+      "owner_slug": "ninos-campers",
+      "rating": 5,
+      "title": "Nino saved my cookie delivery to Palermo",
+      "body": "I had a bulk order for a wedding in Palermo and no way to get 400 cookies there safely. Nino drove me there in his van with the AC blasting. He even helped carry the boxes inside. The cookies arrived perfect -- not one broken. Nino is the most reliable person on this platform. Period.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 6,
+      "not_helpful_count": 0,
+      "owner_response": null,
+      "owner_response_at": null,
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-34",
+      "item_slug": "pipe-threading-set-ridgid",
+      "owner_slug": "lucas-plumbing",
+      "rating": 5,
+      "title": "Saved me from calling a plumber",
+      "body": "My garden tap was leaking at the thread. Luca rented me the RIDGID set and showed me how to cut and re-thread the pipe in 5 minutes. A plumber quoted me EUR 120 for this job. I did it myself for a EUR 6 rental. The tools are in immaculate condition -- Luca clearly takes pride in his gear.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 5,
+      "not_helpful_count": 0,
+      "owner_response": null,
+      "owner_response_at": null,
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "mikes-garage",
+      "item_slug": "electrical-testing-kit-fluke",
+      "owner_slug": "giuseppes-electric",
+      "rating": 5,
+      "title": "Proper Fluke kit -- no cheap knockoffs",
+      "body": "Needed a proper multimeter and circuit tester for a rewiring job. Giuseppe's kit is the real deal -- Fluke brand, calibrated, with leads in good condition. I've used cheap meters that read garbage. This one reads true. Giuseppe also included a reference card for wire color codes (Italian standard). Appreciated.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "PILLAR",
+      "weight": 8.0,
+      "helpful_count": 4,
+      "not_helpful_count": 0,
+      "owner_response": null,
+      "owner_response_at": null,
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-19",
+      "item_slug": "stand-up-paddleboard-inflatable-10-6",
+      "owner_slug": "georges-villa",
+      "rating": 1,
+      "title": "Board had a slow leak -- ruined our day",
+      "body": "Rented the SUP for a calm day at Lido Valderice. Within 30 minutes it was noticeably softer. After an hour it was barely rideable. Had to swim it back to shore deflating under me. Complete waste of a rental and a perfect beach day. I messaged George immediately and he was apologetic, but the damage was done. At minimum check for leaks before renting this out.",
+      "rating_accuracy": 1,
+      "rating_communication": 3,
+      "rating_value": 1,
+      "rating_timeliness": 5,
+      "would_recommend": false,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 2,
+      "not_helpful_count": 3,
+      "owner_response": "You're absolutely right and I'm sorry. I should have inflated it the night before to check. I've found the leak (valve seal), replaced it, and pressure-tested for 24 hours. Full refund issued. This won't happen again.",
+      "owner_response_at": "2026-03-07T09:00:00Z",
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "johns-cleaning",
+      "item_slug": "cargo-trailer-rental-750kg",
+      "owner_slug": "mikes-garage",
+      "rating": 5,
+      "title": "Moved all my equipment in one trip",
+      "body": "I was moving my cleaning business to a new storage unit. Rented Mike's cargo trailer for the day. Fit my carpet cleaner, pressure washer, all my chemicals and hoses, plus boxes of supplies. One trip. Mike showed me how to properly secure the load with ratchet straps -- something I would have done wrong with bungee cords. The man cares about safety even with trailer loading.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 3,
+      "not_helpful_count": 0,
+      "owner_response": null,
+      "owner_response_at": null,
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-103",
+      "item_slug": "lezione-di-giardinaggio-con-maria",
+      "owner_slug": "marias-garden",
+      "rating": 5,
+      "title": "Maria knows every plant by name -- literally",
+      "body": "Took Maria's gardening lesson thinking I'd learn to plant tomatoes. She taught me about companion planting, soil pH, when to prune what, how to read the signs of nutrient deficiency in leaves. In TWO HOURS. She talks to her plants and they listen. My balcony herbs have never looked better since following her advice. Worth every cent.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 7,
+      "not_helpful_count": 0,
+      "owner_response": "Le piante ascoltano chi le rispetta. Manda una foto dei tuoi pomodori ad agosto -- voglio vederli!",
+      "owner_response_at": "2026-03-08T07:30:00Z",
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-42",
+      "item_slug": "photography-walk-lesson-trapani",
+      "owner_slug": "leonardos-bottega",
+      "rating": 5,
+      "title": "Leo sees light like nobody else",
+      "body": "Booked Leo's photography walk through the old town. He doesn't just teach you camera settings -- he teaches you to SEE. Where the light falls at golden hour, how shadows create depth, why the blue door on Via Garibaldi is the most photographed in Trapani. My photos from that walk are the best I've ever taken. The man is an artist with or without a canvas.",
+      "rating_accuracy": 5,
+      "rating_communication": 5,
+      "rating_value": 5,
+      "rating_timeliness": 5,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 6,
+      "not_helpful_count": 0,
+      "owner_response": null,
+      "owner_response_at": null,
+      "content_language": "en",
+      "visible": true
+    },
+    {
+      "reviewer_slug": "community-member-56",
+      "item_slug": "deep-cleaning-service-move-in-out",
+      "owner_slug": "johns-cleaning",
+      "rating": 4,
+      "title": "Thorough cleaning but arrived late",
+      "body": "Johnny did a deep clean on my apartment before the new tenants moved in. The work was excellent -- kitchen spotless, bathroom tiles like new, even got the grout between tiles white again. He arrived 40 minutes late though, which pushed my whole day back. The quality is 5 stars, the punctuality knocked it down.",
+      "rating_accuracy": 5,
+      "rating_communication": 3,
+      "rating_value": 5,
+      "rating_timeliness": 3,
+      "would_recommend": true,
+      "reviewer_tier": "NEWCOMER",
+      "weight": 1.0,
+      "helpful_count": 2,
+      "not_helpful_count": 0,
+      "owner_response": "Fair point. I had a job run over before yours. I've started building 30-minute buffers between jobs. Won't happen again. Glad the cleaning itself was good.",
+      "owner_response_at": "2026-03-02T16:00:00Z",
+      "content_language": "en",
+      "visible": true
+    }
+  ]
+}

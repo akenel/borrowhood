@@ -5,185 +5,494 @@
 {% block content %}
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="helpBoard()">
 
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ t('helpboard.title') }}</h1>
-            <p class="text-sm text-gray-500 mt-1">{{ t('helpboard.subtitle') }}</p>
-        </div>
-        <button @click="showCreate = true"
-                class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px]">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            {{ t('helpboard.new_post') }}
-        </button>
-    </div>
+    <!-- Breadcrumb -->
+    <nav class="text-sm text-gray-500 mb-4">
+        <a href="/" class="hover:text-indigo-600">Home</a>
+        <span class="mx-1">/</span>
+        <span class="text-gray-900 font-medium">Help Board</span>
+    </nav>
 
-    <!-- Summary cards -->
-    <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
-            <p class="text-2xl font-bold text-gray-900" x-text="summary.total">0</p>
-            <p class="text-xs text-gray-500">{{ t('helpboard.total') }}</p>
-        </div>
-        <div class="bg-white rounded-lg border border-emerald-200 p-4 text-center">
-            <p class="text-2xl font-bold text-emerald-600" x-text="summary.open">0</p>
-            <p class="text-xs text-gray-500">{{ t('helpboard.open') }}</p>
-        </div>
-        <div class="bg-white rounded-lg border border-blue-200 p-4 text-center">
-            <p class="text-2xl font-bold text-blue-600" x-text="summary.needs">0</p>
-            <p class="text-xs text-gray-500">{{ t('helpboard.needs_count') }}</p>
-        </div>
-        <div class="bg-white rounded-lg border border-purple-200 p-4 text-center">
-            <p class="text-2xl font-bold text-purple-600" x-text="summary.offers">0</p>
-            <p class="text-xs text-gray-500">{{ t('helpboard.offers_count') }}</p>
-        </div>
-    </div>
+    <!-- ── LIST VIEW ── -->
+    <div x-show="!activePost">
 
-    <!-- Row 1: Type pills + Search -->
-    <div class="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
-        <div class="flex flex-wrap gap-2 flex-shrink-0">
-            <button @click="filter.type = ''; resetAndLoad()"
-                    class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
-                    :class="filter.type === '' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-indigo-50'">
-                {{ t('helpboard.all') }}
-            </button>
-            <button @click="filter.type = 'need'; resetAndLoad()"
-                    class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
-                    :class="filter.type === 'need' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-blue-50'">
-                {{ t('helpboard.needs') }}
-            </button>
-            <button @click="filter.type = 'offer'; resetAndLoad()"
-                    class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
-                    :class="filter.type === 'offer' ? 'bg-purple-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-purple-50'">
-                {{ t('helpboard.offers') }}
-            </button>
-        </div>
-        <div class="flex-1 relative">
-            <input type="text" x-model="filter.q" @input.debounce.300ms="resetAndLoad()"
-                   placeholder="{{ t('helpboard.search_placeholder') }}"
-                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm min-h-[36px]"
-                   autocomplete="off">
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-        </div>
-    </div>
-
-    <!-- Row 2: Category + Status + Sort dropdowns -->
-    <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <select x-model="filter.category" @change="resetAndLoad()"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 min-h-[36px]">
-            <option value="">{{ t('helpboard.all_categories') }}</option>
-            {% for group_key, cats in category_groups.items() %}
-            <optgroup label="{{ t('cat_groups.' + group_key) }}">
-                {% for cat in cats %}
-                <option value="{{ cat }}">{{ t('categories.' + cat) }}</option>
-                {% endfor %}
-            </optgroup>
-            {% endfor %}
-        </select>
-        <select x-model="filter.status" @change="resetAndLoad()"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 min-h-[36px]">
-            <option value="">{{ t('helpboard.all_statuses') }}</option>
-            <option value="open">{{ t('helpboard.status_open') }}</option>
-            <option value="in_progress">{{ t('helpboard.status_in_progress') }}</option>
-            <option value="resolved">{{ t('helpboard.status_resolved') }}</option>
-        </select>
-        <select x-model="filter.sort" @change="resetAndLoad()"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 min-h-[36px]">
-            <option value="newest">{{ t('helpboard.sort_newest') }}</option>
-            <option value="oldest">{{ t('helpboard.sort_oldest') }}</option>
-            <option value="most_replies">{{ t('helpboard.sort_most_replies') }}</option>
-            <option value="urgent_first">{{ t('helpboard.sort_urgent') }}</option>
-        </select>
-    </div>
-
-    <!-- Posts list -->
-    <div class="mt-6 space-y-4">
-        <template x-if="posts.length === 0 && !loading">
-            <div class="text-center py-16 bg-white rounded-lg border border-gray-200">
-                <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">{{ t('helpboard.title') }}</h1>
+                <p class="text-sm text-gray-500 mt-1">{{ t('helpboard.subtitle') }}</p>
+            </div>
+            <button @click="showCreate = true"
+                    class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px]">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
-                <h3 class="mt-4 text-lg font-semibold text-gray-900">{{ t('helpboard.no_posts') }}</h3>
-                <p class="mt-2 text-sm text-gray-500">{{ t('helpboard.be_first') }}</p>
-            </div>
-        </template>
+                {{ t('helpboard.new_post') }}
+            </button>
+        </div>
 
-        <template x-for="post in posts" :key="post.id">
-            <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-sm transition-shadow">
-                <div class="flex items-start justify-between">
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-2 flex-wrap">
-                            <span class="text-xs px-2.5 py-1 rounded-full font-medium"
-                                  :class="post.help_type === 'need' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'"
-                                  x-text="post.help_type === 'need' ? '{{ t('helpboard.need_label') }}' : '{{ t('helpboard.offer_label') }}'">
-                            </span>
-                            <span class="text-xs px-2 py-0.5 rounded-full font-medium"
-                                  :class="{
-                                      'bg-red-100 text-red-700': post.urgency === 'urgent',
-                                      'bg-gray-100 text-gray-600': post.urgency === 'normal',
-                                      'bg-green-100 text-green-700': post.urgency === 'low'
-                                  }"
-                                  x-text="post.urgency" x-show="post.urgency !== 'normal'">
-                            </span>
-                            <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full" x-text="post.category"></span>
-                            <span class="text-xs px-2 py-0.5 rounded-full font-medium"
-                                  :class="{
-                                      'bg-emerald-100 text-emerald-700': post.status === 'open',
-                                      'bg-amber-100 text-amber-700': post.status === 'in_progress',
-                                      'bg-gray-100 text-gray-500': post.status === 'resolved' || post.status === 'closed'
-                                  }"
-                                  x-text="post.status.replace('_', ' ')">
-                            </span>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900" x-text="post.title"
-                            data-translatable :data-content-lang="post.content_language || 'en'"></h3>
-                        <p class="mt-1 text-sm text-gray-600 line-clamp-2" x-text="post.body" x-show="post.body"
-                           data-translatable :data-content-lang="post.content_language || 'en'"></p>
-                    </div>
-                </div>
-                <div class="mt-4 flex items-center justify-between text-xs text-gray-400">
-                    <div class="flex items-center gap-3">
-                        <span x-text="new Date(post.created_at).toLocaleDateString()"></span>
-                        <span x-show="post.neighborhood" x-text="post.neighborhood"></span>
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                        </svg>
-                        <span x-text="post.reply_count"></span>
-                    </div>
-                </div>
+        <!-- Summary cards -->
+        <div class="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="bg-white rounded-lg border border-gray-200 p-4 text-center">
+                <p class="text-2xl font-bold text-gray-900" x-text="summary.total">0</p>
+                <p class="text-xs text-gray-500">{{ t('helpboard.total') }}</p>
             </div>
-        </template>
-    </div>
+            <div class="bg-white rounded-lg border border-emerald-200 p-4 text-center">
+                <p class="text-2xl font-bold text-emerald-600" x-text="summary.open">0</p>
+                <p class="text-xs text-gray-500">{{ t('helpboard.open') }}</p>
+            </div>
+            <div class="bg-white rounded-lg border border-blue-200 p-4 text-center">
+                <p class="text-2xl font-bold text-blue-600" x-text="summary.needs">0</p>
+                <p class="text-xs text-gray-500">{{ t('helpboard.needs_count') }}</p>
+            </div>
+            <div class="bg-white rounded-lg border border-purple-200 p-4 text-center">
+                <p class="text-2xl font-bold text-purple-600" x-text="summary.offers">0</p>
+                <p class="text-xs text-gray-500">{{ t('helpboard.offers_count') }}</p>
+            </div>
+            <div class="bg-white rounded-lg border border-green-200 p-4 text-center">
+                <p class="text-2xl font-bold text-green-600" x-text="summary.resolved || 0">0</p>
+                <p class="text-xs text-gray-500">Resolved</p>
+            </div>
+        </div>
 
-    <!-- Pagination footer: showing count + Load More -->
-    <div x-show="posts.length > 0" class="mt-6 text-center space-y-3">
-        <div class="flex items-center justify-center gap-3">
-            <p class="text-sm text-gray-500"
-               x-text="'{{ t('helpboard.showing_count') }}'.replace('{shown}', posts.length).replace('{total}', page.total)">
-            </p>
-            <select x-model="page.limit" @change="resetAndLoad()"
-                    class="text-xs border border-gray-300 rounded-lg py-1.5 px-2 focus:ring-2 focus:ring-indigo-500">
-                <option value="12">{{ t('pagination.per_page_12') }}</option>
-                <option value="24">{{ t('pagination.per_page_24') }}</option>
-                <option value="48">{{ t('pagination.per_page_48') }}</option>
+        <!-- Row 1: Type pills + Search -->
+        <div class="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div class="flex flex-wrap gap-2 flex-shrink-0">
+                <button @click="filter.type = ''; resetAndLoad()"
+                        class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
+                        :class="filter.type === '' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-indigo-50'">
+                    {{ t('helpboard.all') }}
+                </button>
+                <button @click="filter.type = 'need'; resetAndLoad()"
+                        class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
+                        :class="filter.type === 'need' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-blue-50'">
+                    {{ t('helpboard.needs') }}
+                </button>
+                <button @click="filter.type = 'offer'; resetAndLoad()"
+                        class="px-3 py-2 rounded-full text-sm font-medium transition-colors min-h-[36px]"
+                        :class="filter.type === 'offer' ? 'bg-purple-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-purple-50'">
+                    {{ t('helpboard.offers') }}
+                </button>
+            </div>
+            <div class="flex-1 relative">
+                <input type="text" x-model="filter.q" @input.debounce.300ms="resetAndLoad()"
+                       placeholder="{{ t('helpboard.search_placeholder') }}"
+                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm min-h-[36px]"
+                       autocomplete="off">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Row 2: Category + Status + Sort dropdowns -->
+        <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <select x-model="filter.category" @change="resetAndLoad()"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 min-h-[36px]">
+                <option value="">{{ t('helpboard.all_categories') }}</option>
+                {% for group_key, cats in category_groups.items() %}
+                <optgroup label="{{ t('cat_groups.' + group_key) }}">
+                    {% for cat in cats %}
+                    <option value="{{ cat }}">{{ t('categories.' + cat) }}</option>
+                    {% endfor %}
+                </optgroup>
+                {% endfor %}
+            </select>
+            <select x-model="filter.status" @change="resetAndLoad()"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 min-h-[36px]">
+                <option value="">{{ t('helpboard.all_statuses') }}</option>
+                <option value="open">{{ t('helpboard.status_open') }}</option>
+                <option value="in_progress">{{ t('helpboard.status_in_progress') }}</option>
+                <option value="resolved">{{ t('helpboard.status_resolved') }}</option>
+            </select>
+            <select x-model="filter.sort" @change="resetAndLoad()"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 min-h-[36px]">
+                <option value="newest">{{ t('helpboard.sort_newest') }}</option>
+                <option value="oldest">{{ t('helpboard.sort_oldest') }}</option>
+                <option value="most_replies">{{ t('helpboard.sort_most_replies') }}</option>
+                <option value="most_upvoted">Most Upvoted</option>
+                <option value="urgent_first">{{ t('helpboard.sort_urgent') }}</option>
             </select>
         </div>
-        <button x-show="page.hasMore" @click="loadMore()" :disabled="loadingMore"
-                class="inline-flex items-center px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px] disabled:opacity-50">
-            <span x-show="!loadingMore">{{ t('helpboard.load_more') }}</span>
-            <span x-show="loadingMore" x-cloak>{{ t('common.loading') }}</span>
-        </button>
-    </div>
 
-    <!-- Create post modal -->
+        <!-- Posts list -->
+        <div class="mt-6 space-y-4">
+            <template x-if="posts.length === 0 && !loading">
+                <div class="text-center py-16 bg-white rounded-lg border border-gray-200">
+                    <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <h3 class="mt-4 text-lg font-semibold text-gray-900">{{ t('helpboard.no_posts') }}</h3>
+                    <p class="mt-2 text-sm text-gray-500">{{ t('helpboard.be_first') }}</p>
+                </div>
+            </template>
+
+            <template x-for="post in posts" :key="post.id">
+                <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-sm transition-shadow cursor-pointer"
+                     @click="openPost(post.id)">
+                    <div class="flex items-start gap-3">
+                        <!-- Author avatar -->
+                        <img :src="post.author_avatar || '/static/img/default-avatar.svg'" :alt="post.author_name"
+                             class="w-10 h-10 rounded-full object-cover flex-shrink-0">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                <span class="text-xs px-2.5 py-1 rounded-full font-medium"
+                                      :class="post.help_type === 'need' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'"
+                                      x-text="post.help_type === 'need' ? '{{ t('helpboard.need_label') }}' : '{{ t('helpboard.offer_label') }}'">
+                                </span>
+                                <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-red-100 text-red-700"
+                                      x-show="post.urgency === 'urgent'" x-text="post.urgency">
+                                </span>
+                                <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full" x-text="post.category"></span>
+                                <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                                      :class="{
+                                          'bg-emerald-100 text-emerald-700': post.status === 'open',
+                                          'bg-amber-100 text-amber-700': post.status === 'in_progress',
+                                          'bg-green-100 text-green-600': post.status === 'resolved',
+                                          'bg-gray-100 text-gray-500': post.status === 'closed'
+                                      }"
+                                      x-text="post.status.replace('_', ' ')">
+                                </span>
+                                <!-- Item tag -->
+                                <a x-show="post.item_name" :href="'/items/' + post.item_slug"
+                                   class="text-xs px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full hover:bg-indigo-100"
+                                   @click.stop x-text="post.item_name"></a>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900" x-text="post.title"
+                                data-translatable :data-content-lang="post.content_language || 'en'"></h3>
+                            <p class="text-xs text-gray-500 mt-0.5">
+                                by <span x-text="post.author_name" class="font-medium"></span>
+                                <span x-show="post.neighborhood"> in <span x-text="post.neighborhood"></span></span>
+                            </p>
+                            <p class="mt-1 text-sm text-gray-600 line-clamp-2" x-text="post.body" x-show="post.body"
+                               data-translatable :data-content-lang="post.content_language || 'en'"></p>
+
+                            <!-- Media preview thumbnails -->
+                            <div x-show="post.media && post.media.length > 0" class="mt-2 flex gap-2 flex-wrap">
+                                <template x-for="m in (post.media || []).slice(0, 3)" :key="m.id">
+                                    <div class="w-16 h-16 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                                        <template x-if="m.media_type === 'photo'">
+                                            <img :src="m.url" class="w-full h-full object-cover" :alt="m.alt_text || ''">
+                                        </template>
+                                        <template x-if="m.media_type === 'video'">
+                                            <div class="w-full h-full flex items-center justify-center bg-gray-800 text-white">
+                                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                                <span x-show="(post.media || []).length > 3"
+                                      class="w-16 h-16 rounded-md bg-gray-100 flex items-center justify-center text-xs text-gray-500 font-medium"
+                                      x-text="'+' + ((post.media || []).length - 3)"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
+                        <span x-text="new Date(post.created_at).toLocaleDateString()"></span>
+                        <div class="flex items-center gap-4">
+                            <!-- Upvote count -->
+                            <span class="flex items-center gap-1" :class="post.user_upvoted ? 'text-indigo-600' : ''">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                </svg>
+                                <span x-text="post.upvote_count"></span>
+                            </span>
+                            <!-- Reply count -->
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                </svg>
+                                <span x-text="post.reply_count"></span>
+                            </span>
+                            <!-- Resolved badge -->
+                            <span x-show="post.resolved_by_name" class="text-green-600 font-medium">
+                                Helped by <span x-text="post.resolved_by_name"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Pagination footer -->
+        <div x-show="posts.length > 0" class="mt-6 text-center space-y-3">
+            <div class="flex items-center justify-center gap-3">
+                <p class="text-sm text-gray-500"
+                   x-text="'{{ t('helpboard.showing_count') }}'.replace('{shown}', posts.length).replace('{total}', page.total)">
+                </p>
+                <select x-model="page.limit" @change="resetAndLoad()"
+                        class="text-xs border border-gray-300 rounded-lg py-1.5 px-2 focus:ring-2 focus:ring-indigo-500">
+                    <option value="12">{{ t('pagination.per_page_12') }}</option>
+                    <option value="24">{{ t('pagination.per_page_24') }}</option>
+                    <option value="48">{{ t('pagination.per_page_48') }}</option>
+                </select>
+            </div>
+            <button x-show="page.hasMore" @click="loadMore()" :disabled="loadingMore"
+                    class="inline-flex items-center px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px] disabled:opacity-50">
+                <span x-show="!loadingMore">{{ t('helpboard.load_more') }}</span>
+                <span x-show="loadingMore" x-cloak>{{ t('common.loading') }}</span>
+            </button>
+        </div>
+
+    </div><!-- end list view -->
+
+
+    <!-- ── POST DETAIL VIEW ── -->
+    <div x-show="activePost" x-cloak>
+
+        <!-- Back button -->
+        <button @click="closePost()" class="text-sm text-indigo-600 hover:text-indigo-800 mb-4 inline-flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Back to Help Board
+        </button>
+
+        <template x-if="activePost">
+            <div>
+                <!-- Post header -->
+                <div class="bg-white rounded-lg border border-gray-200 p-6">
+                    <div class="flex items-start gap-4">
+                        <img :src="activePost.author_avatar || '/static/img/default-avatar.svg'" :alt="activePost.author_name"
+                             class="w-12 h-12 rounded-full object-cover flex-shrink-0">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2 flex-wrap">
+                                <span class="text-xs px-2.5 py-1 rounded-full font-medium"
+                                      :class="activePost.help_type === 'need' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'"
+                                      x-text="activePost.help_type === 'need' ? 'I need help' : 'I can help'"></span>
+                                <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-red-100 text-red-700"
+                                      x-show="activePost.urgency === 'urgent'">URGENT</span>
+                                <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full" x-text="activePost.category"></span>
+                                <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                                      :class="{
+                                          'bg-emerald-100 text-emerald-700': activePost.status === 'open',
+                                          'bg-amber-100 text-amber-700': activePost.status === 'in_progress',
+                                          'bg-green-100 text-green-600': activePost.status === 'resolved',
+                                          'bg-gray-100 text-gray-500': activePost.status === 'closed'
+                                      }"
+                                      x-text="activePost.status.replace('_', ' ')"></span>
+                            </div>
+                            <h1 class="text-xl font-bold text-gray-900" x-text="activePost.title"></h1>
+                            <p class="text-sm text-gray-500 mt-1">
+                                by <span x-text="activePost.author_name" class="font-medium text-gray-700"></span>
+                                <span x-text="new Date(activePost.created_at).toLocaleDateString()" class="ml-2"></span>
+                                <span x-show="activePost.neighborhood" class="ml-2">in <span x-text="activePost.neighborhood"></span></span>
+                            </p>
+                            <!-- Tagged item -->
+                            <a x-show="activePost.item_name" :href="'/items/' + activePost.item_slug"
+                               class="inline-block mt-2 text-sm px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full hover:bg-indigo-100">
+                                Tagged item: <span x-text="activePost.item_name" class="font-medium"></span>
+                            </a>
+                        </div>
+                        <!-- Upvote button -->
+                        <button @click="toggleUpvote()" class="flex flex-col items-center gap-1 px-3 py-2 rounded-lg border transition-colors min-w-[60px]"
+                                :class="activePost.user_upvoted ? 'border-indigo-300 bg-indigo-50 text-indigo-600' : 'border-gray-200 text-gray-400 hover:border-indigo-200 hover:text-indigo-500'">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                            </svg>
+                            <span class="text-sm font-bold" x-text="activePost.upvote_count"></span>
+                        </button>
+                    </div>
+
+                    <!-- Body (view mode) -->
+                    <div x-show="!editMode" class="mt-4 text-gray-700 whitespace-pre-wrap" x-text="activePost.body"></div>
+
+                    <!-- Edit mode -->
+                    <div x-show="editMode" class="mt-4 space-y-3" x-cloak>
+                        <input x-model="editTitle" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold">
+                        <textarea x-model="editBody" rows="5" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                        <div class="flex gap-2">
+                            <button @click="saveEdit()" class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 min-h-[44px]">Save</button>
+                            <button @click="editMode = false" class="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 min-h-[44px]">Cancel</button>
+                        </div>
+                    </div>
+
+                    <!-- Edit button (author only, not resolved/closed) -->
+                    <button x-show="isPostAuthor && !editMode && activePost.status !== 'resolved' && activePost.status !== 'closed'"
+                            @click="startEdit()"
+                            class="mt-2 text-xs text-indigo-600 hover:text-indigo-800">
+                        Edit post
+                    </button>
+
+                    <!-- Media gallery -->
+                    <div x-show="activePost.media && activePost.media.length > 0" class="mt-4">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <template x-for="m in (activePost.media || [])" :key="m.id">
+                                <div class="rounded-lg overflow-hidden bg-gray-100">
+                                    <template x-if="m.media_type === 'photo'">
+                                        <img :src="m.url" class="w-full h-48 object-cover cursor-pointer hover:opacity-90"
+                                             :alt="m.alt_text || ''" @click="window.open(m.url, '_blank')">
+                                    </template>
+                                    <template x-if="m.media_type === 'video'">
+                                        <video :src="m.url" controls class="w-full h-48 object-cover bg-black"
+                                               preload="metadata"></video>
+                                    </template>
+                                    <p class="text-xs text-gray-400 px-2 py-1 truncate" x-text="m.filename"></p>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Media upload (author only) -->
+                    <div x-show="isPostAuthor" class="mt-4 border-t pt-4">
+                        <label class="inline-flex items-center gap-2 px-4 py-2 border border-dashed border-gray-300 rounded-lg text-sm text-gray-600 hover:border-indigo-400 hover:text-indigo-600 cursor-pointer transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            Add photo or video (max 10MB)
+                            <input type="file" class="hidden" accept="image/*,video/mp4,video/webm,video/quicktime"
+                                   @change="uploadPostMedia($event)">
+                        </label>
+                        <p x-show="uploadError" class="text-xs text-red-600 mt-1" x-text="uploadError"></p>
+                    </div>
+
+                    <!-- Resolved-by badge -->
+                    <div x-show="activePost.status === 'resolved' && activePost.resolved_by_name"
+                         class="mt-4 p-3 bg-green-50 rounded-lg border border-green-200 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-sm text-green-700">Resolved -- helped by <span x-text="activePost.resolved_by_name" class="font-semibold"></span></span>
+                    </div>
+
+                    <!-- Resolve controls (author only, if still open) -->
+                    <div x-show="isPostAuthor && activePost.status !== 'resolved' && activePost.status !== 'closed'"
+                         class="mt-4 border-t pt-4">
+                        <div class="flex items-center gap-3">
+                            <button @click="resolvePost()" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 min-h-[44px]">
+                                Mark as Resolved
+                            </button>
+                            <p class="text-xs text-gray-500">Pick a helper from the replies, or self-resolve</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── REPLIES ── -->
+                <div class="mt-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        Replies <span class="text-gray-400 font-normal" x-text="'(' + replies.length + ')'"></span>
+                    </h3>
+
+                    <!-- Reply tree -->
+                    <div class="space-y-4">
+                        <template x-for="reply in replies" :key="reply.id">
+                            <div>
+                                <!-- Top-level reply -->
+                                <div class="bg-white rounded-lg border border-gray-200 p-4">
+                                    <div class="flex items-start gap-3">
+                                        <img :src="reply.author_avatar || '/static/img/default-avatar.svg'" :alt="reply.author_name"
+                                             class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm font-medium text-gray-900" x-text="reply.author_name"></span>
+                                                <span class="text-xs text-gray-400" x-text="new Date(reply.created_at).toLocaleDateString()"></span>
+                                            </div>
+                                            <p class="mt-1 text-sm text-gray-700 whitespace-pre-wrap" x-text="reply.body"></p>
+                                            <!-- Reply media -->
+                                            <div x-show="reply.media && reply.media.length > 0" class="mt-2 flex gap-2 flex-wrap">
+                                                <template x-for="m in (reply.media || [])" :key="m.id">
+                                                    <div class="w-24 h-24 rounded-md overflow-hidden bg-gray-100">
+                                                        <template x-if="m.media_type === 'photo'">
+                                                            <img :src="m.url" class="w-full h-full object-cover cursor-pointer" @click="window.open(m.url, '_blank')">
+                                                        </template>
+                                                        <template x-if="m.media_type === 'video'">
+                                                            <video :src="m.url" controls class="w-full h-full object-cover bg-black" preload="metadata"></video>
+                                                        </template>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                            <div class="mt-2 flex items-center gap-3">
+                                                <button @click="replyingTo = (replyingTo === reply.id ? null : reply.id)"
+                                                        class="text-xs text-indigo-600 hover:text-indigo-800">Reply</button>
+                                                <!-- Resolve with this person -->
+                                                <button x-show="isPostAuthor && activePost.status !== 'resolved'"
+                                                        @click="resolvePost(reply.author_id)"
+                                                        class="text-xs text-green-600 hover:text-green-800">Mark as Helper</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Thread reply form -->
+                                    <div x-show="replyingTo === reply.id" class="mt-3 ml-11" x-cloak>
+                                        <textarea x-model="threadReplyBody" rows="2" placeholder="Reply to this comment..."
+                                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                                        <div class="flex justify-end gap-2 mt-2">
+                                            <button @click="replyingTo = null" class="px-3 py-1 text-xs text-gray-600">Cancel</button>
+                                            <button @click="submitReply(reply.id)" :disabled="!threadReplyBody.trim()"
+                                                    class="px-3 py-1 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">Reply</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Children (threaded replies) -->
+                                    <template x-if="reply.children && reply.children.length > 0">
+                                        <div class="mt-3 ml-11 space-y-3 border-l-2 border-gray-100 pl-4">
+                                            <template x-for="child in reply.children" :key="child.id">
+                                                <div class="flex items-start gap-3">
+                                                    <img :src="child.author_avatar || '/static/img/default-avatar.svg'" :alt="child.author_name"
+                                                         class="w-7 h-7 rounded-full object-cover flex-shrink-0">
+                                                    <div class="flex-1 min-w-0">
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="text-sm font-medium text-gray-900" x-text="child.author_name"></span>
+                                                            <span class="text-xs text-gray-400" x-text="new Date(child.created_at).toLocaleDateString()"></span>
+                                                        </div>
+                                                        <p class="mt-0.5 text-sm text-gray-700 whitespace-pre-wrap" x-text="child.body"></p>
+                                                        <!-- Child media -->
+                                                        <div x-show="child.media && child.media.length > 0" class="mt-1 flex gap-2 flex-wrap">
+                                                            <template x-for="m in (child.media || [])" :key="m.id">
+                                                                <div class="w-20 h-20 rounded-md overflow-hidden bg-gray-100">
+                                                                    <template x-if="m.media_type === 'photo'">
+                                                                        <img :src="m.url" class="w-full h-full object-cover cursor-pointer" @click="window.open(m.url, '_blank')">
+                                                                    </template>
+                                                                    <template x-if="m.media_type === 'video'">
+                                                                        <video :src="m.url" controls class="w-full h-full object-cover bg-black" preload="metadata"></video>
+                                                                    </template>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- New top-level reply -->
+                    <div class="mt-6 bg-white rounded-lg border border-gray-200 p-4">
+                        <h4 class="text-sm font-medium text-gray-900 mb-2">Add a reply</h4>
+                        <textarea x-model="newReplyBody" rows="3" placeholder="Share your experience or offer help..."
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                        <!-- Reply media upload -->
+                        <div class="flex items-center justify-between mt-2">
+                            <label class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-indigo-600 cursor-pointer">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                                </svg>
+                                Attach file
+                                <input type="file" class="hidden" accept="image/*,video/mp4,video/webm,video/quicktime"
+                                       x-ref="replyFileInput" @change="replyFileSelected = $event.target.files[0]">
+                            </label>
+                            <div class="flex items-center gap-2">
+                                <span x-show="replyFileSelected" class="text-xs text-gray-500" x-text="replyFileSelected ? replyFileSelected.name : ''"></span>
+                                <button @click="submitReply(null)" :disabled="!newReplyBody.trim() || submittingReply"
+                                        class="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 min-h-[44px]">
+                                    Reply
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+    </div><!-- end detail view -->
+
+
+    <!-- ── CREATE POST MODAL ── -->
     <template x-teleport="body">
         <div x-show="showCreate" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="showCreate = false">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6 max-h-[90vh] overflow-y-auto">
                 <h3 class="text-lg font-bold text-gray-900 mb-4">{{ t('helpboard.new_post') }}</h3>
 
                 <!-- Type toggle -->
@@ -200,13 +509,49 @@
                     </button>
                 </div>
 
+                <!-- AI Draft -->
+                <div class="mb-4 p-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-100">
+                    <p class="text-xs text-indigo-700 font-medium mb-2">AI Assistant -- describe your situation in a few words</p>
+                    <div class="flex gap-2">
+                        <input x-model="aiDraftInput" type="text" placeholder="e.g. my bike frame cracked again, aluminum Bianchi"
+                               class="flex-1 px-3 py-2 border border-indigo-200 rounded-lg text-sm min-h-[44px] bg-white"
+                               @keydown.enter="generateDraft()">
+                        <button @click="generateDraft()" :disabled="!aiDraftInput.trim() || aiDrafting"
+                                class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 min-h-[44px] whitespace-nowrap">
+                            <span x-show="!aiDrafting">Draft with AI</span>
+                            <span x-show="aiDrafting" x-cloak>Thinking...</span>
+                        </button>
+                    </div>
+                    <!-- AI value insight -->
+                    <div x-show="aiDraftResult" class="mt-3 space-y-2" x-cloak>
+                        <div x-show="aiDraftResult && aiDraftResult.estimated_value > 0"
+                             class="p-2 bg-amber-50 border border-amber-200 rounded-lg">
+                            <p class="text-sm font-bold text-amber-800">
+                                Estimated value: EUR <span x-text="aiDraftResult ? aiDraftResult.estimated_value : ''"></span>
+                            </p>
+                            <p class="text-xs text-amber-700 mt-1" x-text="aiDraftResult ? aiDraftResult.value_explanation : ''"></p>
+                        </div>
+                        <div x-show="aiDraftResult && aiDraftResult.suggestions && aiDraftResult.suggestions.length > 0">
+                            <p class="text-xs font-medium text-indigo-700">Before you post, consider:</p>
+                            <ul class="text-xs text-indigo-600 mt-1 space-y-1">
+                                <template x-for="s in (aiDraftResult ? aiDraftResult.suggestions : [])" :key="s">
+                                    <li class="flex items-start gap-1">
+                                        <span class="text-indigo-400 mt-0.5">-</span>
+                                        <span x-text="s"></span>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
                 <input x-model="newPost.title" type="text" placeholder="{{ t('helpboard.title_placeholder') }}"
                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-3 min-h-[44px]">
 
-                <textarea x-model="newPost.body" rows="3" placeholder="{{ t('helpboard.body_placeholder') }}"
+                <textarea x-model="newPost.body" rows="4" placeholder="{{ t('helpboard.body_placeholder') }}"
                           class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-3"></textarea>
 
-                <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="grid grid-cols-2 gap-3 mb-3">
                     <select x-model="newPost.category" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm min-h-[44px]">
                         {% for group_key, cats in category_groups.items() %}
                         <optgroup label="{{ t('cat_groups.' + group_key) }}">
@@ -224,7 +569,27 @@
                 </div>
 
                 <input x-model="newPost.neighborhood" type="text" placeholder="{{ t('helpboard.neighborhood_placeholder') }}"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4 min-h-[44px]">
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-3 min-h-[44px]">
+
+                <!-- File attachments for new post -->
+                <div class="mb-4">
+                    <label class="inline-flex items-center gap-2 px-4 py-2 border border-dashed border-gray-300 rounded-lg text-sm text-gray-600 hover:border-indigo-400 hover:text-indigo-600 cursor-pointer transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Add photos or videos (max 10MB each)
+                        <input type="file" class="hidden" accept="image/*,video/mp4,video/webm,video/quicktime" multiple
+                               @change="addCreateFiles($event)">
+                    </label>
+                    <div x-show="createFiles.length > 0" class="mt-2 flex flex-wrap gap-2">
+                        <template x-for="(f, i) in createFiles" :key="i">
+                            <span class="text-xs bg-gray-100 px-2 py-1 rounded flex items-center gap-1">
+                                <span x-text="f.name" class="truncate max-w-[120px]"></span>
+                                <button @click="createFiles.splice(i, 1)" class="text-gray-400 hover:text-red-500">&times;</button>
+                            </span>
+                        </template>
+                    </div>
+                </div>
 
                 <div class="flex justify-end space-x-2">
                     <button @click="showCreate = false"
@@ -233,7 +598,8 @@
                     </button>
                     <button @click="submitPost()" :disabled="submitting || !newPost.title.trim()"
                             class="px-6 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 min-h-[44px]">
-                        {{ t('helpboard.post') }}
+                        <span x-show="!submitting">{{ t('helpboard.post') }}</span>
+                        <span x-show="submitting" x-cloak>Posting...</span>
                     </button>
                 </div>
                 <p x-show="error" class="text-xs text-red-600 mt-2" x-text="error"></p>
@@ -247,15 +613,36 @@
 <script>
 function helpBoard() {
     return {
+        // List view state
         posts: [],
-        summary: { total: 0, open: 0, needs: 0, offers: 0 },
+        summary: { total: 0, open: 0, needs: 0, offers: 0, resolved: 0 },
         filter: { type: '', category: '', status: '', q: '', sort: 'newest' },
         page: { total: 0, limit: 12, offset: 0, hasMore: false },
+        loading: true,
+        loadingMore: false,
+
+        // Detail view state
+        activePost: null,
+        replies: [],
+        isPostAuthor: false,
+        replyingTo: null,
+        threadReplyBody: '',
+        newReplyBody: '',
+        replyFileSelected: null,
+        submittingReply: false,
+        uploadError: '',
+        editMode: false,
+        editTitle: '',
+        editBody: '',
+
+        // Create modal state
         showCreate: false,
         submitting: false,
         error: '',
-        loading: true,
-        loadingMore: false,
+        createFiles: [],
+        aiDraftInput: '',
+        aiDrafting: false,
+        aiDraftResult: null,
         newPost: {
             help_type: 'need',
             title: '',
@@ -265,11 +652,15 @@ function helpBoard() {
             neighborhood: '',
             content_language: '{{ lang }}'
         },
+
         async init() {
             await Promise.all([this.loadPosts(), this.loadSummary()]);
             this.loading = false;
-            this.$nextTick(() => BHTranslate.autoTranslatePage());
+            this.$nextTick(() => { if (window.BHTranslate) BHTranslate.autoTranslatePage(); });
         },
+
+        // ── List methods ──
+
         _buildParams() {
             var params = new URLSearchParams();
             if (this.filter.type) params.set('help_type', this.filter.type);
@@ -306,11 +697,80 @@ function helpBoard() {
         },
         resetAndLoad() {
             this.page.offset = 0;
-            this.loadPosts().then(() => this.$nextTick(() => BHTranslate.autoTranslatePage()));
+            this.loadPosts().then(() => this.$nextTick(() => { if (window.BHTranslate) BHTranslate.autoTranslatePage(); }));
         },
         async loadSummary() {
             var resp = await fetch('/api/v1/helpboard/summary');
             if (resp.ok) this.summary = await resp.json();
+        },
+
+        // ── AI Draft ──
+
+        async generateDraft() {
+            if (!this.aiDraftInput.trim()) return;
+            this.aiDrafting = true;
+            this.aiDraftResult = null;
+            try {
+                var resp = await fetch('/api/v1/helpboard/draft', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        description: this.aiDraftInput,
+                        help_type: this.newPost.help_type,
+                        language: this.newPost.content_language
+                    })
+                });
+                if (resp.status === 401) { window.location.href = '/login'; return; }
+                if (resp.ok) {
+                    var data = await resp.json();
+                    this.aiDraftResult = data;
+                    // Fill in the form
+                    if (data.title) this.newPost.title = data.title;
+                    if (data.body) this.newPost.body = data.body;
+                    if (data.category) this.newPost.category = data.category;
+                    if (data.urgency) this.newPost.urgency = data.urgency;
+                }
+            } catch(e) {}
+            this.aiDrafting = false;
+        },
+
+        // ── Edit post ──
+
+        startEdit() {
+            this.editMode = true;
+            this.editTitle = this.activePost.title;
+            this.editBody = this.activePost.body || '';
+        },
+        async saveEdit() {
+            var payload = {};
+            if (this.editTitle !== this.activePost.title) payload.title = this.editTitle;
+            if (this.editBody !== (this.activePost.body || '')) payload.body = this.editBody;
+            if (Object.keys(payload).length === 0) { this.editMode = false; return; }
+            var resp = await fetch('/api/v1/helpboard/posts/' + this.activePost.id, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (resp.ok) {
+                var updated = await resp.json();
+                this.activePost = updated;
+                this.editMode = false;
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Post updated!' } }));
+            }
+        },
+
+        // ── Create post ──
+
+        addCreateFiles(event) {
+            var files = Array.from(event.target.files);
+            for (var f of files) {
+                if (f.size > 10 * 1024 * 1024) {
+                    this.error = f.name + ' is too large (max 10MB)';
+                    return;
+                }
+                this.createFiles.push(f);
+            }
+            event.target.value = '';
         },
         async submitPost() {
             this.submitting = true;
@@ -329,16 +789,26 @@ function helpBoard() {
                         content_language: this.newPost.content_language
                     })
                 });
-                if (resp.status === 401) {
-                    window.location.href = '/login';
-                    return;
-                }
+                if (resp.status === 401) { window.location.href = '/login'; return; }
                 if (!resp.ok) {
                     var err = await resp.json();
                     this.error = err.detail || 'Failed to create post';
+                    this.submitting = false;
                     return;
                 }
+                var post = await resp.json();
+
+                // Upload attached files
+                for (var f of this.createFiles) {
+                    var fd = new FormData();
+                    fd.append('file', f);
+                    await fetch('/api/v1/helpboard/posts/' + post.id + '/media', {
+                        method: 'POST', body: fd
+                    });
+                }
+
                 this.showCreate = false;
+                this.createFiles = [];
                 this.newPost = { help_type: 'need', title: '', body: '', category: 'power_tools', urgency: 'normal', neighborhood: '', content_language: '{{ lang }}' };
                 this.page.offset = 0;
                 await Promise.all([this.loadPosts(), this.loadSummary()]);
@@ -347,6 +817,134 @@ function helpBoard() {
                 this.error = 'Network error';
             }
             this.submitting = false;
+        },
+
+        // ── Post detail ──
+
+        async openPost(postId) {
+            var resp = await fetch('/api/v1/helpboard/posts/' + postId);
+            if (!resp.ok) return;
+            this.activePost = await resp.json();
+            this.isPostAuthor = false;
+            // Check if current user is author
+            try {
+                var me = await fetch('/api/v1/users/me');
+                if (me.ok) {
+                    var user = await me.json();
+                    this.isPostAuthor = user.id === this.activePost.author_id;
+                }
+            } catch(e) {}
+            await this.loadReplies();
+        },
+        closePost() {
+            this.activePost = null;
+            this.replies = [];
+            this.replyingTo = null;
+            this.threadReplyBody = '';
+            this.newReplyBody = '';
+            this.replyFileSelected = null;
+        },
+        async loadReplies() {
+            if (!this.activePost) return;
+            var resp = await fetch('/api/v1/helpboard/posts/' + this.activePost.id + '/replies');
+            if (resp.ok) this.replies = await resp.json();
+        },
+
+        // ── Upvote ──
+
+        async toggleUpvote() {
+            if (!this.activePost) return;
+            var resp = await fetch('/api/v1/helpboard/posts/' + this.activePost.id + '/upvote', { method: 'POST' });
+            if (resp.status === 401) { window.location.href = '/login'; return; }
+            if (resp.ok) {
+                var data = await resp.json();
+                this.activePost.upvote_count = data.upvote_count;
+                this.activePost.user_upvoted = data.action === 'upvoted';
+            }
+        },
+
+        // ── Resolve ──
+
+        async resolvePost(helperId) {
+            if (!this.activePost) return;
+            var body = helperId ? { resolved_by_id: helperId } : {};
+            var resp = await fetch('/api/v1/helpboard/posts/' + this.activePost.id + '/resolve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            if (resp.ok) {
+                await this.openPost(this.activePost.id);
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Post marked as resolved!' } }));
+            }
+        },
+
+        // ── Reply ──
+
+        async submitReply(parentReplyId) {
+            var body = parentReplyId ? this.threadReplyBody : this.newReplyBody;
+            if (!body.trim()) return;
+            this.submittingReply = true;
+            try {
+                var payload = { body: body };
+                if (parentReplyId) payload.parent_reply_id = parentReplyId;
+                var resp = await fetch('/api/v1/helpboard/posts/' + this.activePost.id + '/replies', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (resp.status === 401) { window.location.href = '/login'; return; }
+                if (resp.ok) {
+                    var reply = await resp.json();
+                    // Upload reply attachment if present and this is a top-level reply
+                    if (!parentReplyId && this.replyFileSelected) {
+                        var fd = new FormData();
+                        fd.append('file', this.replyFileSelected);
+                        await fetch('/api/v1/helpboard/replies/' + reply.id + '/media', {
+                            method: 'POST', body: fd
+                        });
+                        this.replyFileSelected = null;
+                        if (this.$refs.replyFileInput) this.$refs.replyFileInput.value = '';
+                    }
+                    // Reload replies
+                    await this.loadReplies();
+                    this.activePost.reply_count++;
+                    if (parentReplyId) {
+                        this.threadReplyBody = '';
+                        this.replyingTo = null;
+                    } else {
+                        this.newReplyBody = '';
+                    }
+                }
+            } catch(e) {}
+            this.submittingReply = false;
+        },
+
+        // ── Media upload ──
+
+        async uploadPostMedia(event) {
+            this.uploadError = '';
+            var file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 10 * 1024 * 1024) {
+                this.uploadError = 'File too large (max 10MB)';
+                return;
+            }
+            var fd = new FormData();
+            fd.append('file', file);
+            var resp = await fetch('/api/v1/helpboard/posts/' + this.activePost.id + '/media', {
+                method: 'POST', body: fd
+            });
+            if (resp.ok) {
+                var media = await resp.json();
+                if (!this.activePost.media) this.activePost.media = [];
+                this.activePost.media.push(media);
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Media uploaded!' } }));
+            } else {
+                var err = await resp.json().catch(() => ({}));
+                this.uploadError = err.detail || 'Upload failed';
+            }
+            event.target.value = '';
         }
     };
 }
