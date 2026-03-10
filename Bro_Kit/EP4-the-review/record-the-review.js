@@ -314,11 +314,18 @@ async function showRing(page, x, y) {
 }
 
 // -- Click element by text with ring --
+// Visibility check: element has size and is not hidden (works for fixed/modal elements too)
+function _isVisible(el) {
+  const box = el.getBoundingClientRect();
+  return box.width > 0 && box.height > 0;
+}
+
 async function clickWithRing(page, text, scope = 'button') {
   const found = await page.evaluate((txt, s) => {
     const els = document.querySelectorAll(s);
     for (const el of els) {
-      if (el.textContent.trim().includes(txt) && !el.closest('.fixed')) {
+      const box = el.getBoundingClientRect();
+      if (el.textContent.trim().includes(txt) && box.width > 0 && box.height > 0) {
         el.scrollIntoView({ block: 'center', behavior: 'smooth' });
         return true;
       }
@@ -331,11 +338,9 @@ async function clickWithRing(page, text, scope = 'button') {
   const pos = await page.evaluate((txt, s) => {
     const els = document.querySelectorAll(s);
     for (const el of els) {
-      if (el.textContent.trim().includes(txt) && !el.closest('.fixed')) {
-        const box = el.getBoundingClientRect();
-        if (box.width > 0 && box.height > 0) {
-          return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-        }
+      const box = el.getBoundingClientRect();
+      if (el.textContent.trim().includes(txt) && box.width > 0 && box.height > 0) {
+        return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
       }
     }
     return null;
@@ -346,7 +351,8 @@ async function clickWithRing(page, text, scope = 'button') {
   await page.evaluate((txt, s) => {
     const els = document.querySelectorAll(s);
     for (const el of els) {
-      if (el.textContent.trim().includes(txt) && !el.closest('.fixed')) {
+      const box = el.getBoundingClientRect();
+      if (el.textContent.trim().includes(txt) && box.width > 0 && box.height > 0) {
         el.click();
         return;
       }
@@ -608,40 +614,60 @@ async function goToDashboardTab(page, tabName) {
   // ============================================================
   console.log('  Scene 12: Johnny edits draft and posts');
 
-  // Set the title if not already filled
+  // Set the title, body, and category via Alpine.js data + DOM (belt and suspenders)
   await page.evaluate(() => {
-    const titleInput = document.querySelector('input[name="title"], input[placeholder*="Title"], input[x-model*="title"]');
+    const title = 'Need Help: Pressure Washer -- Trigger Stuck & Pump Leaking';
+    const body = 'My Karcher K5 pressure washer has a stuck trigger and the pump is leaking. Everything is plastic so I thought it was done for. Was about to put it on the curb for big garbage day Thursday.\n\nThe AI says this could be worth EUR 80-120 working. The fix might be a simple gasket replacement -- EUR 0.50 in parts and 20 minutes with a pocket knife.\n\nAnyone have spare gaskets or know how to fix this? Photo of the leaking pump attached.';
+
+    // Try Alpine.js data first
+    const modal = document.querySelector('[x-show="showCreate"]');
+    if (modal) {
+      const comp = modal.closest('[x-data]') || document.querySelector('[x-data]');
+      if (comp && comp._x_dataStack) {
+        const data = comp._x_dataStack[0];
+        if (data.newPost) {
+          if (!data.newPost.title) data.newPost.title = title;
+          if (!data.newPost.body) data.newPost.body = body;
+          data.newPost.category = 'home_improvement';
+        }
+      }
+    }
+
+    // Also set DOM values as fallback
+    const titleInput = document.querySelector('input[x-model="newPost.title"], input[x-model*="title"]');
     if (titleInput && !titleInput.value) {
-      titleInput.value = 'Need Help: Pressure Washer -- Trigger Stuck & Pump Leaking';
+      titleInput.value = title;
       titleInput.dispatchEvent(new Event('input', { bubbles: true }));
     }
-  });
-  await sleep(1000);
-
-  // Set the body if not already filled
-  await page.evaluate(() => {
-    const bodyInput = document.querySelector('textarea[name="body"], textarea[x-model*="body"]');
+    const bodyInput = document.querySelector('textarea[x-model="newPost.body"], textarea[x-model*="body"]');
     if (bodyInput && !bodyInput.value) {
-      bodyInput.value = 'My Karcher K5 pressure washer has a stuck trigger and the pump is leaking. Everything is plastic so I thought it was done for. Was about to put it on the curb for big garbage day Thursday.\n\nThe AI says this could be worth EUR 80-120 working. The fix might be a simple gasket replacement -- EUR 0.50 in parts and 20 minutes with a pocket knife.\n\nAnyone have spare gaskets or know how to fix this? Photo of the leaking pump attached.';
+      bodyInput.value = body;
       bodyInput.dispatchEvent(new Event('input', { bubbles: true }));
     }
-  });
-  await sleep(2000);
-
-  // Select category if dropdown exists
-  await page.evaluate(() => {
-    const cat = document.querySelector('select[name="category"], select[x-model*="category"]');
+    const cat = document.querySelector('select[x-model="newPost.category"], select[x-model*="category"]');
     if (cat) {
       cat.value = 'home_improvement';
       cat.dispatchEvent(new Event('change', { bubbles: true }));
     }
   });
-  await sleep(500);
+  await sleep(2000);
 
-  // Submit the post
-  await clickWithRing(page, 'Post', 'button') ||
-  await clickWithRing(page, 'Submit', 'button') ||
-  await clickWithRing(page, 'Create', 'button');
+  // Submit the post -- click inside the modal
+  await page.evaluate(() => {
+    const modal = document.querySelector('[x-show="showCreate"]');
+    if (modal) {
+      const btns = modal.querySelectorAll('button');
+      for (const btn of btns) {
+        const txt = btn.textContent.trim();
+        if (txt === 'Post' || txt === 'Posting...' || txt.includes('Post')) {
+          btn.click(); return;
+        }
+      }
+    }
+  });
+  // Fallback: try clickWithRing (now works in fixed containers)
+  await sleep(1000);
+  await clickWithRing(page, 'Post', 'button');
   await sleep(5000);
 
   // Show the posted result
@@ -703,12 +729,19 @@ async function goToDashboardTab(page, tabName) {
   await clickWithRing(page, 'Reply', 'button, a');
   await sleep(2000);
 
-  // Type Leo's expert reply
+  // Type Leo's expert reply (textarea uses x-model="newReplyBody")
   await page.evaluate(() => {
-    const textarea = document.querySelector('textarea');
+    const replyText = 'Johnny, that\'s a Karcher K-series. The trigger assembly pops off with a flat-head. The pump gasket is a standard O-ring -- I have a bag of 50 in my Bottega. Come by tomorrow, we\'ll fix it in the field in 20 minutes. Bring a pocket knife.';
+    // Try Alpine.js data
+    const comp = document.querySelector('[x-data]');
+    if (comp && comp._x_dataStack) {
+      comp._x_dataStack[0].newReplyBody = replyText;
+    }
+    // Also set DOM
+    const textarea = document.querySelector('textarea[x-model="newReplyBody"], textarea');
     if (textarea) {
       textarea.focus();
-      textarea.value = 'Johnny, that\'s a Karcher K-series. The trigger assembly pops off with a flat-head. The pump gasket is a standard O-ring -- I have a bag of 50 in my Bottega. Come by tomorrow, we\'ll fix it in the field in 20 minutes. Bring a pocket knife.';
+      textarea.value = replyText;
       textarea.dispatchEvent(new Event('input', { bubbles: true }));
     }
   });
@@ -747,41 +780,38 @@ async function goToDashboardTab(page, tabName) {
   await clickWithRing(page, 'New Post', 'button, a');
   await sleep(2000);
 
-  // Click "I can help" toggle button to switch to OFFER type
-  await clickWithRing(page, 'I can help', 'button') ||
-  await clickWithRing(page, 'offer', 'button');
-  await sleep(1000);
-
+  // Fill Mike's offer via Alpine.js data
   await page.evaluate(() => {
-    const titleInput = document.querySelector('input[name="title"], input[x-model*="title"]');
-    if (titleInput) {
-      titleInput.value = 'I Can Help With: Power Tool & Equipment Safety';
-      titleInput.dispatchEvent(new Event('input', { bubbles: true }));
+    const comp = document.querySelector('[x-data]');
+    if (comp && comp._x_dataStack) {
+      const data = comp._x_dataStack[0];
+      if (data.newPost) {
+        data.newPost.help_type = 'offer';
+        data.newPost.title = 'I Can Help With: Power Tool & Equipment Safety';
+        data.newPost.body = '30 years in the garage. I\'ve seen what happens when you skip the safety check. If you\'re renting a pressure washer, chipper, or saw for the first time -- message me. Free. No appointment. And for the love of God, don\'t stick your arm in the chipper.';
+        data.newPost.category = 'home_improvement';
+      }
     }
-  });
-  await sleep(1000);
-
-  await page.evaluate(() => {
-    const bodyInput = document.querySelector('textarea[name="body"], textarea[x-model*="body"]');
-    if (bodyInput) {
-      bodyInput.value = '30 years in the garage. I\'ve seen what happens when you skip the safety check. If you\'re renting a pressure washer, chipper, or saw for the first time -- message me. Free. No appointment. And for the love of God, don\'t stick your arm in the chipper.';
-      bodyInput.dispatchEvent(new Event('input', { bubbles: true }));
-    }
+    // DOM fallback
+    const titleInput = document.querySelector('input[x-model="newPost.title"]');
+    if (titleInput) { titleInput.value = 'I Can Help With: Power Tool & Equipment Safety'; titleInput.dispatchEvent(new Event('input', { bubbles: true })); }
+    const bodyInput = document.querySelector('textarea[x-model="newPost.body"]');
+    if (bodyInput) { bodyInput.value = '30 years in the garage. I\'ve seen what happens when you skip the safety check. If you\'re renting a pressure washer, chipper, or saw for the first time -- message me. Free. No appointment. And for the love of God, don\'t stick your arm in the chipper.'; bodyInput.dispatchEvent(new Event('input', { bubbles: true })); }
+    const cat = document.querySelector('select[x-model="newPost.category"]');
+    if (cat) { cat.value = 'home_improvement'; cat.dispatchEvent(new Event('change', { bubbles: true })); }
   });
   await sleep(2000);
 
+  // Submit
   await page.evaluate(() => {
-    const cat = document.querySelector('select[name="category"], select[x-model*="category"]');
-    if (cat) {
-      cat.value = 'home_improvement';
-      cat.dispatchEvent(new Event('change', { bubbles: true }));
+    const modal = document.querySelector('[x-show="showCreate"]');
+    if (modal) {
+      const btns = modal.querySelectorAll('button');
+      for (const btn of btns) {
+        if (btn.textContent.trim() === 'Post' || btn.textContent.includes('Post')) { btn.click(); return; }
+      }
     }
   });
-  await sleep(500);
-
-  await clickWithRing(page, 'Post', 'button') ||
-  await clickWithRing(page, 'Submit', 'button') ||
-  await clickWithRing(page, 'Create', 'button');
   await sleep(4000);
 
 
@@ -802,10 +832,15 @@ async function goToDashboardTab(page, tabName) {
   await sleep(2000);
 
   await page.evaluate(() => {
-    const textarea = document.querySelector('textarea');
+    const replyText = 'Johnny, the pump gasket is 50 cents at any hardware store. But check the unloader valve too -- if that\'s stuck, the trigger won\'t release pressure. I can walk you through it. And next time -- POST HERE FIRST before throwing things out.';
+    const comp = document.querySelector('[x-data]');
+    if (comp && comp._x_dataStack) {
+      comp._x_dataStack[0].newReplyBody = replyText;
+    }
+    const textarea = document.querySelector('textarea[x-model="newReplyBody"], textarea');
     if (textarea) {
       textarea.focus();
-      textarea.value = 'Johnny, the pump gasket is 50 cents at any hardware store. But check the unloader valve too -- if that\'s stuck, the trigger won\'t release pressure. I can walk you through it. And next time -- POST HERE FIRST before throwing things out.';
+      textarea.value = replyText;
       textarea.dispatchEvent(new Event('input', { bubbles: true }));
     }
   });
@@ -994,73 +1029,68 @@ async function goToDashboardTab(page, tabName) {
   // ============================================================
   console.log('  Scene 25: Sofia writes 5-star review');
 
-  // Click the Review button (uses $dispatch)
+  // Click the Review button (span with $dispatch, not inside fixed)
   await clickWithRing(page, 'Review', 'span, button');
   await sleep(3000);
 
-  // The review modal should be open now
-  // Fill in 5 stars -- click the 5th star
+  // Review modal is now open (class="fixed" container)
+  // Use Alpine.js data manipulation -- the modal uses x-data with reviewRating, etc.
+  // Set 5 stars via Alpine
   await page.evaluate(() => {
-    // Find star rating buttons (usually radio inputs or clickable stars)
-    const stars = document.querySelectorAll('[data-rating="5"], .star-5, input[value="5"]');
-    if (stars.length > 0) {
-      stars[0].click();
-      return;
-    }
-    // Try finding star buttons by position (5th star element)
-    const allStars = document.querySelectorAll('.star, [x-on\\:click*="rating"], svg[class*="star"]');
-    if (allStars.length >= 5) {
-      allStars[4].click();
-    }
-  });
-  await sleep(2000);
-
-  // Fill subcategory ratings if visible
-  await page.evaluate(() => {
-    const selects = document.querySelectorAll('select');
-    for (const sel of selects) {
-      const label = sel.closest('label, div')?.textContent?.toLowerCase() || '';
-      if (label.includes('accuracy') || label.includes('communication') ||
-          label.includes('value') || label.includes('timeli')) {
-        sel.value = '5';
-        sel.dispatchEvent(new Event('change', { bubbles: true }));
+    // Find the review modal's Alpine component
+    const modal = document.querySelector('[x-show="showReviewModal"]');
+    if (modal) {
+      const comp = modal.closest('[x-data]');
+      if (comp && comp._x_dataStack) {
+        const data = comp._x_dataStack[0];
+        data.reviewRating = 5;
+        data.rAccuracy = 5;
+        data.rCommunication = 5;
+        data.rValue = 5;
+        data.rTimeliness = 5;
+        data.wouldRecommend = true;
+        data.reviewBody = 'Johnny delivered my cookies in 20 minutes, still warm. He even asked if the customer was happy before leaving. If you need delivery in Trapani, Johnny is your man. He deserves every star.';
+        return true;
       }
     }
-    // Also try radio/star inputs for subcategories
-    const subInputs = document.querySelectorAll('[name*="accuracy"], [name*="communication"], [name*="value"], [name*="timeli"]');
-    for (const input of subInputs) {
-      if (input.value === '5') input.click();
+    // Fallback: click the 5th star button inside the modal
+    const fixedModal = document.querySelector('.fixed [x-show="showReviewModal"]') ||
+                       document.querySelector('[x-show="showReviewModal"]');
+    if (fixedModal) {
+      const starBtns = fixedModal.querySelectorAll('button');
+      // Stars are in groups of 5, first group is overall rating
+      let starCount = 0;
+      for (const btn of starBtns) {
+        if (btn.querySelector('svg') && btn.closest('.flex.items-center')) {
+          starCount++;
+          if (starCount === 5) { btn.click(); break; } // 5th star = 5 stars
+        }
+      }
     }
+    return false;
   });
   await sleep(2000);
 
-  // Would recommend: YES
-  await clickWithRing(page, 'Yes', 'button, label') ||
+  // Show the filled form visually -- scroll modal content
   await page.evaluate(() => {
-    const rec = document.querySelector('input[name*="recommend"][value="true"], button[data-recommend="true"]');
-    if (rec) rec.click();
+    const modal = document.querySelector('[x-show="showReviewModal"] .overflow-y-auto');
+    if (modal) modal.scrollTop = modal.scrollHeight;
   });
-  await sleep(1000);
+  await sleep(3000);
 
-  // Write the review body
+  // Click "Submit Review" inside the modal
   await page.evaluate(() => {
-    const textarea = document.querySelector('textarea[name="body"], textarea[x-model*="body"], textarea[placeholder*="review"], textarea[placeholder*="Review"]');
-    if (textarea) {
-      textarea.focus();
-      textarea.value = 'Johnny delivered my cookies in 20 minutes, still warm. He even asked if the customer was happy before leaving. If you need delivery in Trapani, Johnny is your man. He deserves every star.';
-      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    const modal = document.querySelector('[x-show="showReviewModal"]');
+    if (modal) {
+      const btns = modal.querySelectorAll('button');
+      for (const btn of btns) {
+        if (btn.textContent.includes('Submit Review') || btn.textContent.includes('Update Review')) {
+          btn.click();
+          return;
+        }
+      }
     }
   });
-  await sleep(4000);
-
-  // Scroll to show the full review form
-  await smoothScroll(page, 200);
-  await sleep(2000);
-
-  // Submit
-  await clickWithRing(page, 'Submit', 'button') ||
-  await clickWithRing(page, 'Post', 'button') ||
-  await clickWithRing(page, 'Save', 'button');
   await sleep(5000);
 
 
@@ -1106,60 +1136,42 @@ async function goToDashboardTab(page, tabName) {
   await clickWithRing(page, 'Review', 'span, button');
   await sleep(3000);
 
-  // 3 stars overall
+  // Review modal open -- set 3 stars, mixed subcategories, via Alpine.js
   await page.evaluate(() => {
-    const stars = document.querySelectorAll('[data-rating="3"], .star-3, input[value="3"]');
-    if (stars.length > 0) {
-      stars[0].click();
-      return;
-    }
-    const allStars = document.querySelectorAll('.star, [x-on\\:click*="rating"], svg[class*="star"]');
-    if (allStars.length >= 3) {
-      allStars[2].click();
-    }
-  });
-  await sleep(2000);
-
-  // Subcategories: Accuracy 5, Communication 2, Value 5, Timeliness 1
-  await page.evaluate(() => {
-    const selects = document.querySelectorAll('select');
-    for (const sel of selects) {
-      const label = sel.closest('label, div')?.textContent?.toLowerCase() || '';
-      if (label.includes('accuracy')) {
-        sel.value = '5'; sel.dispatchEvent(new Event('change', { bubbles: true }));
-      } else if (label.includes('communication')) {
-        sel.value = '2'; sel.dispatchEvent(new Event('change', { bubbles: true }));
-      } else if (label.includes('value')) {
-        sel.value = '5'; sel.dispatchEvent(new Event('change', { bubbles: true }));
-      } else if (label.includes('timeli')) {
-        sel.value = '1'; sel.dispatchEvent(new Event('change', { bubbles: true }));
+    const modal = document.querySelector('[x-show="showReviewModal"]');
+    if (modal) {
+      const comp = modal.closest('[x-data]');
+      if (comp && comp._x_dataStack) {
+        const data = comp._x_dataStack[0];
+        data.reviewRating = 3;
+        data.rAccuracy = 5;
+        data.rCommunication = 2;
+        data.rValue = 5;
+        data.rTimeliness = 1;
+        data.wouldRecommend = true;
+        data.reviewBody = 'Best cookies in Trapani. But if Johnny delivers them, get the bike option. The drone left mine on the balcony like a seagull dropping a fish. Cookies were cold 3 hours later.';
       }
-    }
-  });
-  await sleep(2000);
-
-  // Would recommend: YES (despite 3 stars)
-  await clickWithRing(page, 'Yes', 'button, label') ||
-  await page.evaluate(() => {
-    const rec = document.querySelector('input[name*="recommend"][value="true"], button[data-recommend="true"]');
-    if (rec) rec.click();
-  });
-  await sleep(1000);
-
-  // Leo's review body
-  await page.evaluate(() => {
-    const textarea = document.querySelector('textarea[name="body"], textarea[x-model*="body"], textarea[placeholder*="review"], textarea[placeholder*="Review"]');
-    if (textarea) {
-      textarea.focus();
-      textarea.value = 'Best cookies in Trapani. But if Johnny delivers them, get the bike option. The drone left mine on the balcony like a seagull dropping a fish. Cookies were cold 3 hours later.';
-      textarea.dispatchEvent(new Event('input', { bubbles: true }));
     }
   });
   await sleep(4000);
 
+  // Show the filled form
+  await page.evaluate(() => {
+    const modal = document.querySelector('[x-show="showReviewModal"] .overflow-y-auto');
+    if (modal) modal.scrollTop = modal.scrollHeight;
+  });
+  await sleep(3000);
+
   // Submit
-  await clickWithRing(page, 'Submit', 'button') ||
-  await clickWithRing(page, 'Post', 'button');
+  await page.evaluate(() => {
+    const modal = document.querySelector('[x-show="showReviewModal"]');
+    if (modal) {
+      const btns = modal.querySelectorAll('button');
+      for (const btn of btns) {
+        if (btn.textContent.includes('Submit Review')) { btn.click(); return; }
+      }
+    }
+  });
   await sleep(5000);
 
 
@@ -1311,37 +1323,35 @@ async function goToDashboardTab(page, tabName) {
   await clickWithRing(page, 'Review', 'span, button');
   await sleep(3000);
 
-  // 5 stars
+  // Review modal open -- set 5 stars via Alpine.js
   await page.evaluate(() => {
-    const stars = document.querySelectorAll('[data-rating="5"], .star-5, input[value="5"]');
-    if (stars.length > 0) {
-      stars[0].click();
-      return;
-    }
-    const allStars = document.querySelectorAll('.star, [x-on\\:click*="rating"], svg[class*="star"]');
-    if (allStars.length >= 5) {
-      allStars[4].click();
-    }
-  });
-  await sleep(2000);
-
-  // Would recommend: YES
-  await clickWithRing(page, 'Yes', 'button, label');
-  await sleep(1000);
-
-  // Pietro's review body
-  await page.evaluate(() => {
-    const textarea = document.querySelector('textarea[name="body"], textarea[x-model*="body"], textarea[placeholder*="review"], textarea[placeholder*="Review"]');
-    if (textarea) {
-      textarea.focus();
-      textarea.value = 'I always pick Johnny delivery. Cookies arrive warm. RTFM on the delivery options, people.';
-      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    const modal = document.querySelector('[x-show="showReviewModal"]');
+    if (modal) {
+      const comp = modal.closest('[x-data]');
+      if (comp && comp._x_dataStack) {
+        const data = comp._x_dataStack[0];
+        data.reviewRating = 5;
+        data.rAccuracy = 5;
+        data.rCommunication = 5;
+        data.rValue = 5;
+        data.rTimeliness = 5;
+        data.wouldRecommend = true;
+        data.reviewBody = 'I always pick Johnny delivery. Cookies arrive warm. RTFM on the delivery options, people.';
+      }
     }
   });
   await sleep(3000);
 
   // Submit
-  await clickWithRing(page, 'Submit', 'button');
+  await page.evaluate(() => {
+    const modal = document.querySelector('[x-show="showReviewModal"]');
+    if (modal) {
+      const btns = modal.querySelectorAll('button');
+      for (const btn of btns) {
+        if (btn.textContent.includes('Submit Review')) { btn.click(); return; }
+      }
+    }
+  });
   await sleep(5000);
 
 
