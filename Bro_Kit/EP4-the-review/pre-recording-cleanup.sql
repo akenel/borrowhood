@@ -12,7 +12,13 @@ DELETE FROM bh_lockbox_access WHERE rental_id IN
 DELETE FROM bh_rental WHERE status NOT IN ('COMPLETED','DECLINED','CANCELLED');
 
 -- ============================================================
--- 2. CLEAN HELP BOARD (Johnny creates the first post live)
+-- 2. CLEAN ALL REVIEWS (Sofia, Leo, Pietro create reviews live on camera)
+-- ============================================================
+DELETE FROM bh_review_vote;
+DELETE FROM bh_review;
+
+-- ============================================================
+-- 3. CLEAN HELP BOARD (Johnny creates the first post live)
 -- Delete ALL help posts -- EP4 seed data will repopulate community posts
 -- but Johnny's pressure washer post must be created live on camera
 -- ============================================================
@@ -22,7 +28,7 @@ DELETE FROM bh_help_upvote;
 DELETE FROM bh_help_post;
 
 -- ============================================================
--- 3. ENSURE JOHNNY'S PRESSURE WASHER EXISTS AND IS LISTED
+-- 4. ENSURE JOHNNY'S PRESSURE WASHER EXISTS AND IS LISTED
 -- The item should already exist from seed data (slug: pressure-washer-karcher-k5)
 -- Make sure the listing is ACTIVE
 -- ============================================================
@@ -39,7 +45,7 @@ FROM bh_item i JOIN bh_user u ON i.owner_id = u.id
 WHERE i.slug = 'pressure-washer-karcher-k5';
 
 -- ============================================================
--- 4. CLEAN OLD SEEDED COOKIE DELIVERY RENTALS (from EP3 setup)
+-- 5. CLEAN OLD SEEDED COOKIE DELIVERY RENTALS (from EP3 setup)
 -- Remove pending/cancelled cookie orders from previous takes
 -- ============================================================
 DELETE FROM bh_delivery_event WHERE tracking_id IN (
@@ -85,7 +91,7 @@ DELETE FROM bh_review WHERE rental_id IN (
 DELETE FROM bh_rental WHERE renter_message LIKE '%EP4-seed%';
 
 -- ============================================================
--- 5. CREATE SOFIA'S COMPLETED COOKIE ORDERS WITH JOHNNY AS DELIVERY
+-- 6. CREATE SOFIA'S COMPLETED COOKIE ORDERS WITH JOHNNY AS DELIVERY
 -- 4 completed rentals of Sofia's cookies, Johnny delivered by bike
 -- ============================================================
 -- Order 1: Community member, Johnny bike delivery, 3 days ago
@@ -137,7 +143,7 @@ VALUES (
 );
 
 -- ============================================================
--- 6. CREATE DELIVERY TRACKING FOR JOHNNY'S BIKE DELIVERIES
+-- 7. CREATE DELIVERY TRACKING FOR JOHNNY'S BIKE DELIVERIES
 -- Fast 20-minute deliveries (dispatched -> delivered quickly)
 -- ============================================================
 INSERT INTO bh_delivery_tracking (id, rental_id, delivery_method, status, delivery_notes, delivery_person_name, delivery_person_id, dispatched_at, delivered_at, confirmed_at, auto_confirm_hours, created_at, updated_at)
@@ -204,7 +210,7 @@ JOIN bh_rental r ON dt.rental_id = r.id
 WHERE r.renter_message = 'EP4-seed: Cookie delivery by Johnny (bike)';
 
 -- ============================================================
--- 7. CREATE LEO'S COMPLETED COOKIE ORDER (DRONE DELIVERY -- the bad one)
+-- 8. CREATE LEO'S COMPLETED COOKIE ORDER (DRONE DELIVERY -- the bad one)
 -- 3-star review order: cookies great, drone delivery terrible
 -- ============================================================
 INSERT INTO bh_rental (id, listing_id, renter_id, status, renter_message, created_at, updated_at)
@@ -280,7 +286,7 @@ JOIN bh_rental r ON dt.rental_id = r.id
 WHERE r.renter_message = 'EP4-seed: Cookie delivery by drone (the bad one)';
 
 -- ============================================================
--- 8. ENSURE MIKE'S WORKSHOP IS ACTIVE WITH WELDING/SAFETY COURSES
+-- 9. ENSURE MIKE'S WORKSHOP IS ACTIVE WITH WELDING/SAFETY COURSES
 -- ============================================================
 -- Mike's welding machine training listing should be ACTIVE
 UPDATE bh_listing SET status = 'ACTIVE'
@@ -296,25 +302,25 @@ SELECT 'Mike workshop' AS check, u.display_name, u.workshop_name, u.workshop_typ
 FROM bh_user u WHERE u.slug = 'mikes-garage';
 
 -- ============================================================
--- 9. ENSURE LEO'S BOTTEGA WORKSHOP IS ACTIVE
+-- 10. ENSURE LEO'S BOTTEGA WORKSHOP IS ACTIVE
 -- ============================================================
 SELECT 'Leo workshop' AS check, u.display_name, u.workshop_name, u.workshop_type
 FROM bh_user u WHERE u.slug = 'leonardos-bottega';
 
 -- ============================================================
--- 10. ENSURE GEORGE EXISTS (for breadcrumb cameo scene)
+-- 11. ENSURE GEORGE EXISTS (for breadcrumb cameo scene)
 -- ============================================================
 SELECT 'George exists' AS check, u.display_name, u.slug
 FROM bh_user u WHERE u.slug = 'georges-villa';
 
 -- ============================================================
--- 11. FIX SALLY'S DISPLAY NAME (consistency from EP3)
+-- 12. FIX SALLY'S DISPLAY NAME (consistency from EP3)
 -- ============================================================
 UPDATE bh_user SET display_name = 'Sally Thompson'
 WHERE slug = 'sallys-kitchen' AND display_name != 'Sally Thompson';
 
 -- ============================================================
--- 12. VERIFY COUNTS
+-- 13. VERIFY COUNTS
 -- ============================================================
 SELECT 'Completed cookie rentals (Johnny bike)' AS check, COUNT(*)
 FROM bh_rental WHERE renter_message = 'EP4-seed: Cookie delivery by Johnny (bike)';
@@ -335,6 +341,12 @@ WHERE r.renter_message LIKE 'EP4-seed%';
 
 SELECT 'Help posts (should be 0 -- Johnny creates first one live)' AS check, COUNT(*)
 FROM bh_help_post;
+
+SELECT 'Reviews (should be 0 -- created live on camera)' AS check, COUNT(*)
+FROM bh_review;
+
+SELECT 'Review votes (should be 0)' AS check, COUNT(*)
+FROM bh_review_vote;
 
 SELECT 'Stale rentals (should be 0)' AS check, COUNT(*)
 FROM bh_rental WHERE status NOT IN ('COMPLETED','DECLINED','CANCELLED');

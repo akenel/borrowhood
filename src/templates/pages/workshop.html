@@ -277,7 +277,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-900">{{ skill.skill_name }}</p>
-                                <p class="text-xs text-gray-500">{{ skill.category | replace('categories.', '') | capitalize }}{% if skill.years_experience %} &middot; {{ skill.years_experience }}y{% endif %}</p>
+                                <p class="text-xs text-gray-500">{{ t('categories.' + skill.category) }}{% if skill.years_experience %} &middot; {{ skill.years_experience }}y{% endif %}</p>
                             </div>
                             <div class="flex items-center space-x-1">
                                 {% for i in range(5) %}
