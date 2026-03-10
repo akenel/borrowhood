@@ -1,0 +1,39 @@
+BorrowHood: The Legends -- 272 Members, 10 Eras, One Brotherhood
+
+We seeded 272 legendary figures into BorrowHood. Each one has a workshop, a bio, items to share, and services to offer. Movie stars teach acting. Warriors run combat training. Inventors host lab workshops. This is the neighborhood we built.
+
+315 members. 721 items. 10 DiceBear avatar styles. 12 workshop types.
+
+0:00 Intro -- The Legends
+0:08 By the Numbers -- 315 Members, 721 Items
+0:16 Members Page -- The Grid
+0:28 Filter -- Legend Tier
+0:36 The Movie Stars -- 34 Cinema Legends
+0:44 Bruce Lee -- Bruce's Dojo
+0:57 Audrey Hepburn -- Audrey's Atelier
+1:09 The Warriors -- 34 Warrior Legends
+1:17 Spartacus -- Spartacus Arena
+1:30 Joan of Arc -- Joan's Banner Hall
+1:42 Miyamoto Musashi -- Musashi's Niten Dojo
+1:54 The Inventors -- 34 Inventor Legends
+2:02 Marie Curie -- Curie's Radiation Laboratory
+2:15 Galileo Galilei -- Galileo's Observatory
+2:27 Browse Page -- 721 Items
+2:37 Education Category
+2:45 Science Category
+2:53 Feature Recap
+
+The Garage Sessions -- BorrowHood Demo Series
+Episode 1: Full Rental Walkthrough
+Episode 2: Edge Cases -- When Things Go Wrong
+Episode 3: Community and Reputation
+Episode 4: The Auction -- Live Bidding
+Episode 5: The Legends -- 272 Members (this video)
+
+Built with FastAPI, Keycloak OIDC, PostgreSQL, Tailwind CSS, Alpine.js.
+Co-piloted by Claude Code (Opus 4.6).
+
+No ads. No algorithm. No monthly ransom. Just neighbors helping neighbors.
+
+Live demo: https://46.62.138.218
+Source: https://github.com/akenel/borrowhood

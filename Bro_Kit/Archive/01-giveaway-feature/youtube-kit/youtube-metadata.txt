@@ -1,0 +1,55 @@
+YOUTUBE VIDEO METADATA
+=====================
+
+TITLE:
+BorrowHood Giveaway Feature -- Claim Free Items From Your Neighbors
+
+DESCRIPTION:
+People have stuff in their attic they want to give away for free. Pick it up and it's yours.
+
+We built a dedicated Giveaway feature for BorrowHood -- a community sharing platform running on FastAPI + Keycloak.
+
+What you'll see in under 2 minutes:
+- Browse page with green "Give Away" badges and FREE labels
+- Item detail with "Claim This Item" button (no dates, no deposits)
+- Sally claims Mike's old garden hose with a message
+- Mike approves the claim -- giveaway auto-completes, listing pauses
+- "Give Away" option on the List Item form (hides price fields)
+- Full Italian localization ("Regalo" = Give Away)
+
+The entire claim flow: see it, claim it, owner approves, go pick it up. Done.
+
+Behind the scenes:
+- New GIVEAWAY listing type (separate from rentals and offers)
+- Simplified claim modal -- just a message, no date pickers
+- Auto-complete on approve (skips pickup/return state machine)
+- Listing auto-pauses after claim (one item, one claimant)
+- "Generous Neighbor" badge at 3+ giveaways (25 points each)
+- EN + IT localization
+
+Built with Claude Code (AI co-pilot). Recorded with Puppeteer + OBS.
+
+Tech stack: FastAPI, SQLAlchemy, Jinja2, Tailwind CSS, Alpine.js, Keycloak OIDC, Docker, Hetzner Cloud.
+
+Music: Brotherhood Run
+
+0:00 Intro
+0:05 Browse page -- giveaway items
+0:15 Item detail -- Garden Hose (FREE)
+0:27 Sally claims the garden hose
+0:50 Mike approves the claim
+1:13 List Item form -- "Give Away" option
+1:25 Italian localization -- "Regalo"
+1:42 Feature complete
+
+TAGS:
+borrowhood, giveaway, free stuff, community sharing, fastapi, python, web development, keycloak, fullstack, live demo, alpine.js, tailwind css, docker, hetzner, claude code, ai coding, sharing economy, neighborhood, open source
+
+CATEGORY:
+Science & Technology
+
+VISIBILITY:
+Public
+
+THUMBNAIL:
+thumbnail-giveaway.jpg (1280x720)

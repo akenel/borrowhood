@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1280px; height: 720px;
+  overflow: hidden;
+  font-family: 'Outfit', sans-serif;
+  color: white;
+  background: #0a0f1e;
+  position: relative;
+}
+
+/* ── Warm radial glow from center ── */
+.glow-center {
+  position: absolute;
+  width: 800px; height: 800px;
+  background: radial-gradient(circle, rgba(217,119,6,0.07) 0%, transparent 65%);
+  top: -40px; left: 200px;
+  z-index: 0;
+}
+.glow-emerald {
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(5,150,105,0.09) 0%, transparent 65%);
+  top: 80px; left: -60px;
+  z-index: 0;
+}
+.glow-indigo {
+  position: absolute;
+  width: 450px; height: 450px;
+  background: radial-gradient(circle, rgba(67,56,202,0.07) 0%, transparent 65%);
+  bottom: -60px; right: 80px;
+  z-index: 0;
+}
+.glow-warm {
+  position: absolute;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(251,191,36,0.04) 0%, transparent 60%);
+  bottom: 40px; left: 300px;
+  z-index: 0;
+}
+
+/* ── Soft top accent line (warm gradient) ── */
+.top-accent {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    #059669 0%, #D97706 30%, #4338CA 65%, #7C3AED 100%
+  );
+  z-index: 40;
+  opacity: 0.8;
+}
+
+/* ── Constellation dots (subtle background network) ── */
+.constellation {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.constellation .dot {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+}
+.constellation .dot.bright {
+  background: rgba(255,255,255,0.15);
+  box-shadow: 0 0 8px rgba(255,255,255,0.06);
+}
+.constellation .line {
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  transform-origin: left center;
+}
+
+/* ── Layout ── */
+.container {
+  display: flex;
+  width: 100%; height: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+/* ── LEFT SIDE ── */
+.left {
+  width: 55%;
+  padding: 52px 30px 40px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.badge-community {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 20px;
+  border-radius: 20px;
+  border: 2px solid #059669;
+  background: rgba(5,150,105,0.08);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: #34d399;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  width: fit-content;
+  margin-bottom: 22px;
+}
+.badge-community::before {
+  content: '';
+  width: 8px; height: 8px;
+  background: #34d399;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(52,211,153,0.5);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+.heading {
+  font-size: 66px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -1px;
+  margin-bottom: 34px;
+  background: linear-gradient(170deg, #ffffff 20%, #d4d4e0 60%, #a8a8b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Feature list with connection lines ── */
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 32px;
+  position: relative;
+}
+/* Vertical connecting line */
+.features::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 7px;
+  bottom: 7px;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    rgba(217,119,6,0.3) 0%,
+    rgba(5,150,105,0.3) 30%,
+    rgba(67,56,202,0.3) 65%,
+    rgba(124,58,237,0.3) 100%
+  );
+  border-radius: 1px;
+}
+
+.feature-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-left: 0;
+}
+.feature-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+.feature-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 21px;
+  font-weight: 700;
+  color: #c8c8d4;
+  letter-spacing: 0.5px;
+}
+.dot-amber { background: #D97706; box-shadow: 0 0 14px rgba(217,119,6,0.5); }
+.dot-emerald { background: #059669; box-shadow: 0 0 14px rgba(5,150,105,0.5); }
+.dot-indigo { background: #4338CA; box-shadow: 0 0 14px rgba(67,56,202,0.5); }
+.dot-purple { background: #7C3AED; box-shadow: 0 0 14px rgba(124,58,237,0.5); }
+
+/* ── Duration badge ── */
+.duration {
+  position: absolute;
+  bottom: 40px; left: 56px;
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: #7a7a8e;
+  letter-spacing: 1px;
+}
+.duration-icon { font-size: 13px; }
+
+/* ── Vertical divider ── */
+.divider {
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent 5%,
+    rgba(217,119,6,0.25) 20%,
+    rgba(5,150,105,0.2) 40%,
+    rgba(67,56,202,0.25) 60%,
+    rgba(124,58,237,0.2) 80%,
+    transparent 95%
+  );
+  align-self: stretch;
+  margin: 30px 0;
+}
+
+/* ── RIGHT SIDE ── */
+.right {
+  width: 45%;
+  padding: 40px 44px 40px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+}
+
+/* ── Notification cards ── */
+.notif-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.05);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+.notif-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 4px 0 0 4px;
+}
+.card-amber::before { background: #D97706; box-shadow: 0 0 16px rgba(217,119,6,0.3); }
+.card-emerald::before { background: #059669; box-shadow: 0 0 16px rgba(5,150,105,0.3); }
+.card-indigo::before { background: #4338CA; box-shadow: 0 0 16px rgba(67,56,202,0.3); }
+.card-purple::before { background: #7C3AED; box-shadow: 0 0 16px rgba(124,58,237,0.3); }
+
+.card-amber { border-color: rgba(217,119,6,0.12); }
+.card-emerald { border-color: rgba(5,150,105,0.12); }
+.card-indigo { border-color: rgba(67,56,202,0.12); }
+.card-purple { border-color: rgba(124,58,237,0.12); }
+
+.notif-icon {
+  width: 50px; height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.icon-amber { background: rgba(217,119,6,0.12); color: #fbbf24; }
+.icon-emerald { background: rgba(5,150,105,0.12); color: #34d399; }
+.icon-indigo { background: rgba(67,56,202,0.12); color: #818cf8; }
+.icon-purple { background: rgba(124,58,237,0.12); color: #a78bfa; }
+
+.notif-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.notif-status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.text-amber { color: #fbbf24; }
+.text-emerald { color: #34d399; }
+.text-indigo { color: #818cf8; }
+.text-purple { color: #a78bfa; }
+
+.notif-desc {
+  font-size: 13px;
+  color: #5a5a6e;
+  font-weight: 400;
+}
+
+/* ── Unread dot indicator on cards ── */
+.notif-card::after {
+  content: '';
+  position: absolute;
+  top: 10px; right: 12px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+}
+.card-amber::after { background: rgba(217,119,6,0.4); }
+.card-emerald::after { background: rgba(5,150,105,0.4); }
+.card-indigo::after { background: rgba(67,56,202,0.4); }
+.card-purple::after { background: rgba(124,58,237,0.4); }
+
+/* ── Brand ── */
+.brand {
+  position: absolute;
+  bottom: 40px; right: 44px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #4a4a5c;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.brand-dot {
+  width: 4px; height: 4px;
+  background: #4a4a5c;
+  border-radius: 50%;
+}
+
+/* ── Video number tag ── */
+.ep-tag {
+  position: absolute;
+  top: 18px; right: 44px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #3a3a4c;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  z-index: 20;
+}
+</style></head>
+<body>
+  <div class="glow-center"></div>
+  <div class="glow-emerald"></div>
+  <div class="glow-indigo"></div>
+  <div class="glow-warm"></div>
+  <div class="top-accent"></div>
+  <div class="ep-tag">EP 03</div>
+
+  <!-- Constellation background dots -->
+  <div class="constellation">
+    <div class="dot" style="width:3px;height:3px;top:120px;left:180px"></div>
+    <div class="dot bright" style="width:4px;height:4px;top:200px;left:420px"></div>
+    <div class="dot" style="width:2px;height:2px;top:80px;left:600px"></div>
+    <div class="dot" style="width:3px;height:3px;top:340px;left:280px"></div>
+    <div class="dot bright" style="width:3px;height:3px;top:500px;left:150px"></div>
+    <div class="dot" style="width:2px;height:2px;top:580px;left:450px"></div>
+    <div class="dot" style="width:3px;height:3px;top:150px;left:900px"></div>
+    <div class="dot bright" style="width:4px;height:4px;top:400px;left:1050px"></div>
+    <div class="dot" style="width:2px;height:2px;top:600px;left:850px"></div>
+    <div class="dot" style="width:3px;height:3px;top:280px;left:1150px"></div>
+    <div class="dot bright" style="width:3px;height:3px;top:520px;left:1200px"></div>
+    <div class="dot" style="width:2px;height:2px;top:60px;left:1100px"></div>
+    <!-- Connection lines -->
+    <div class="line" style="top:122px;left:183px;width:236px;transform:rotate(19deg)"></div>
+    <div class="line" style="top:202px;left:424px;width:178px;transform:rotate(-38deg)"></div>
+    <div class="line" style="top:342px;left:283px;width:140px;transform:rotate(48deg)"></div>
+    <div class="line" style="top:152px;left:903px;width:150px;transform:rotate(50deg)"></div>
+    <div class="line" style="top:402px;left:1053px;width:110px;transform:rotate(-48deg)"></div>
+  </div>
+
+  <div class="container">
+    <div class="left">
+      <div class="badge-community">COMMUNITY</div>
+      <div class="heading">BEYOND<br>THE<br>RENTAL</div>
+      <div class="features">
+        <div class="feature-row">
+          <div class="feature-dot dot-amber"></div>
+          <div class="feature-label">Reviews</div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-dot dot-emerald"></div>
+          <div class="feature-label">Badges</div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-dot dot-indigo"></div>
+          <div class="feature-label">Members</div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-dot dot-purple"></div>
+          <div class="feature-label">Helpboard</div>
+        </div>
+      </div>
+      <div class="duration">
+        <span class="duration-icon">&#9654;</span>
+        5 MIN
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="right">
+      <div class="notif-card card-amber">
+        <div class="notif-icon icon-amber">&#9733;</div>
+        <div class="notif-text">
+          <div class="notif-status text-amber">5 STARS</div>
+          <div class="notif-desc">Mike reviewed Sally</div>
+        </div>
+      </div>
+
+      <div class="notif-card card-emerald">
+        <div class="notif-icon icon-emerald">&#127942;</div>
+        <div class="notif-text">
+          <div class="notif-status text-emerald">BADGE EARNED</div>
+          <div class="notif-desc">First Review unlocked</div>
+        </div>
+      </div>
+
+      <div class="notif-card card-indigo">
+        <div class="notif-icon icon-indigo">&#10084;</div>
+        <div class="notif-text">
+          <div class="notif-status text-indigo">FAVORITED</div>
+          <div class="notif-desc">Sally saved Maria</div>
+        </div>
+      </div>
+
+      <div class="notif-card card-purple">
+        <div class="notif-icon icon-purple">&#10003;</div>
+        <div class="notif-text">
+          <div class="notif-status text-purple">POST RESOLVED</div>
+          <div class="notif-desc">Community helped</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="brand">
+    <span class="brand-text">BorrowHood</span>
+    <span class="brand-dot"></span>
+    <span class="brand-text">Garage Sessions</span>
+  </div>
+</body></html>

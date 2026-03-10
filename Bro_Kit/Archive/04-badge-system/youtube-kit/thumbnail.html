@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #0f172a;
+    position: relative;
+  }
+
+  .gradient-bg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(
+      135deg,
+      #4f46e5 0%,
+      #7c3aed 35%,
+      #a855f7 65%,
+      #ec4899 100%
+    );
+  }
+
+  .pattern-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background:
+      radial-gradient(circle at 20% 80%, rgba(255,255,255,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.06) 0%, transparent 40%);
+  }
+
+  .content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    padding: 50px 60px;
+  }
+
+  .left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .right {
+    width: 420px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .title-line1 {
+    font-size: 110px;
+    font-weight: 900;
+    color: white;
+    line-height: 1;
+    text-shadow: 3px 3px 12px rgba(0,0,0,0.4);
+    letter-spacing: -3px;
+  }
+
+  .title-line2 {
+    font-size: 48px;
+    font-weight: 700;
+    color: #fde68a;
+    line-height: 1.2;
+    text-shadow: 3px 3px 12px rgba(0,0,0,0.4);
+    letter-spacing: -1px;
+    margin-bottom: 18px;
+  }
+
+  .subtitle {
+    font-size: 28px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.9);
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+    line-height: 1.4;
+  }
+
+  .brand {
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand-dot {
+    width: 18px;
+    height: 18px;
+    background: #fde68a;
+    border-radius: 50%;
+  }
+
+  .brand-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Badge grid on right */
+  .badge-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+  }
+
+  .badge-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    text-align: center;
+    min-height: 80px;
+  }
+
+  .badge-card.highlight {
+    background: rgba(253, 232, 138, 0.2);
+    border: 2px solid #fde68a;
+  }
+
+  .badge-emoji {
+    font-size: 28px;
+    margin-bottom: 4px;
+  }
+
+  .badge-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: white;
+    line-height: 1.2;
+  }
+
+  /* Tier bar at bottom of right column */
+  .tier-bar {
+    display: flex;
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 36px;
+    margin-top: 6px;
+  }
+
+  .tier-segment {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .tier-segment.newcomer { background: #6b7280; }
+  .tier-segment.active { background: #3b82f6; }
+  .tier-segment.trusted { background: #10b981; }
+  .tier-segment.pillar { background: #f59e0b; }
+  .tier-segment.legend { background: #ef4444; }
+
+  .ep-badge {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    z-index: 20;
+  }
+</style>
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  <div class="pattern-overlay"></div>
+
+  <div class="ep-badge">EP 4</div>
+
+  <div class="content">
+    <div class="left">
+      <div class="title-line1">BADGES</div>
+      <div class="title-line2">Reputation System</div>
+      <div class="subtitle">
+        15 badges. 5 tiers.<br>
+        Every action builds your rank.
+      </div>
+      <div class="brand">
+        <div class="brand-dot"></div>
+        <div class="brand-name">BorrowHood</div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="badge-grid">
+        <div class="badge-card highlight">
+          <div class="badge-emoji">&#128230;</div>
+          <div class="badge-name">First Listing</div>
+        </div>
+        <div class="badge-card">
+          <div class="badge-emoji">&#129309;</div>
+          <div class="badge-name">First Rental</div>
+        </div>
+        <div class="badge-card">
+          <div class="badge-emoji">&#11088;</div>
+          <div class="badge-name">Five Star</div>
+        </div>
+        <div class="badge-card highlight">
+          <div class="badge-emoji">&#128081;</div>
+          <div class="badge-name">Legend</div>
+        </div>
+        <div class="badge-card">
+          <div class="badge-emoji">&#127873;</div>
+          <div class="badge-name">Generous</div>
+        </div>
+        <div class="badge-card">
+          <div class="badge-emoji">&#128737;</div>
+          <div class="badge-name">Trusted</div>
+        </div>
+        <div class="badge-card">
+          <div class="badge-emoji">&#127942;</div>
+          <div class="badge-name">Auction Win</div>
+        </div>
+        <div class="badge-card highlight">
+          <div class="badge-emoji">&#128640;</div>
+          <div class="badge-name">Early Adopter</div>
+        </div>
+        <div class="badge-card">
+          <div class="badge-emoji">&#10084;</div>
+          <div class="badge-name">Hero</div>
+        </div>
+      </div>
+
+      <div class="tier-bar">
+        <div class="tier-segment newcomer">New</div>
+        <div class="tier-segment active">Active</div>
+        <div class="tier-segment trusted">Trusted</div>
+        <div class="tier-segment pillar">Pillar</div>
+        <div class="tier-segment legend">Legend</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

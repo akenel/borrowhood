@@ -1,0 +1,62 @@
+YOUTUBE VIDEO METADATA
+=====================
+
+TITLE:
+BorrowHood Deposit System -- Hold, Release, Forfeit, Dispute
+
+DESCRIPTION:
+You lend your neighbor a EUR 2,000 drone. How do you know you will get it back in one piece?
+
+The deposit. That is the insurance. No insurance company. No paperwork. Just you and your neighbor.
+
+Here is how it works:
+- You list your drone for EUR 35/day and set a EUR 250 deposit
+- Your neighbor wants to rent it. They pay the deposit when they pick it up
+- They fly it, have fun, bring it back. The deposit goes straight back to them. Done.
+- But if they crash it? You keep the deposit. That is your compensation.
+
+The owner decides the deposit amount. A EUR 30 drill gets a EUR 30 deposit. A EUR 2,000 drone gets EUR 250. You set what you are comfortable with.
+
+What if they disagree? Dispute resolution. 3 steps:
+1. Either side files a dispute with a reason (damaged, not returned, wrong item, etc.)
+2. The other side responds with their version
+3. A resolution is applied and the deposit follows automatically -- returned, forfeited, or split
+
+No middlemen. No claims adjusters. Neighbors handle it themselves.
+
+What you will see in 75 seconds:
+- Items on BorrowHood showing deposit amounts next to rental prices
+- DJI Mini 3 Pro -- EUR 35/day + EUR 250 deposit
+- MacBook Pro M2 -- EUR 25/day + EUR 200 deposit
+- Canon EOS R5 -- EUR 45/day + EUR 200 deposit
+- The full deposit lifecycle: Hold, Release, Forfeit
+- The 3-step dispute resolution flow
+- The 4 API endpoints that power it all
+
+Built with Claude Code (AI co-pilot). Recorded with Puppeteer + OBS.
+
+Tech stack: FastAPI, SQLAlchemy, Jinja2, Tailwind CSS, Alpine.js, Keycloak OIDC, Docker, Hetzner Cloud.
+
+Music: Brotherhood Run
+
+0:00 Intro -- Security Deposits
+0:07 Browse page -- deposit amounts visible
+0:14 DJI Mini 3 Pro -- EUR 250 deposit
+0:22 MacBook Pro M2 -- EUR 200 deposit
+0:30 Deposit lifecycle diagram
+0:38 Dispute resolution flow
+0:48 REST API endpoints
+0:56 Canon EOS R5 -- EUR 200 deposit
+1:04 Feature complete summary
+
+TAGS:
+borrowhood, security deposits, dispute resolution, peer to peer rental, fastapi, python, web development, keycloak, fullstack, live demo, alpine.js, tailwind css, docker, hetzner, claude code, ai coding, sharing economy, open source, trust and safety
+
+CATEGORY:
+Science & Technology
+
+VISIBILITY:
+Public
+
+THUMBNAIL:
+thumbnail-deposit.jpg (1280x720)
