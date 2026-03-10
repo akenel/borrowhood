@@ -196,6 +196,12 @@ async function demoLogin(page, username) {
 }
 
 async function demoLogout(page) {
+  // Must be on a real HTTP page for fetch() to work (data: URLs can't fetch)
+  const url = page.url();
+  if (!url.startsWith('http')) {
+    await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded', timeout: 10000 });
+    await sleep(300);
+  }
   await apiCall(page, 'POST', '/api/v1/demo/logout', {});
   await sleep(300);
 }
@@ -566,57 +572,33 @@ async function goToDashboardTab(page, tabName) {
   // ============================================================
   console.log('  Scene 11: AI Draft');
 
-  // Try to find and click the AI assist button
-  const aiClicked = await clickWithRing(page, 'AI', 'button');
-  if (!aiClicked) {
-    // Fallback: look for "Draft" or "Generate" or "Assist"
-    await clickWithRing(page, 'Draft', 'button') ||
-    await clickWithRing(page, 'Generate', 'button') ||
-    await clickWithRing(page, 'Assist', 'button');
-  }
-  await sleep(2000);
-
-  // Type the problem description into the AI prompt field
+  // Type the problem into the AI Draft input field (x-model="aiDraftInput")
   await page.evaluate(() => {
-    const inputs = document.querySelectorAll('textarea, input[type="text"]');
-    for (const input of inputs) {
-      const placeholder = (input.placeholder || '').toLowerCase();
-      if (placeholder.includes('describe') || placeholder.includes('problem') || placeholder.includes('help') || placeholder.includes('prompt')) {
-        input.scrollIntoView({ block: 'center' });
-        input.focus();
-        input.value = 'pressure washer trigger stuck pump leaking all plastic';
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        return true;
-      }
-    }
-    // Fallback: find any visible textarea
-    for (const input of inputs) {
-      if (input.offsetParent !== null) {
-        input.focus();
-        input.value = 'pressure washer trigger stuck pump leaking all plastic';
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        return true;
-      }
+    // Target the AI draft input by Alpine x-model attribute or placeholder
+    const aiInput = document.querySelector('input[x-model="aiDraftInput"]') ||
+      document.querySelector('input[placeholder*="bike frame"]') ||
+      document.querySelector('input[placeholder*="e.g."]');
+    if (aiInput) {
+      aiInput.scrollIntoView({ block: 'center' });
+      aiInput.focus();
+      aiInput.value = 'pressure washer trigger stuck pump leaking all plastic';
+      aiInput.dispatchEvent(new Event('input', { bubbles: true }));
+      return true;
     }
     return false;
   });
   await sleep(3000);
 
-  // Click generate/submit
-  await clickWithRing(page, 'Generate', 'button') ||
-  await clickWithRing(page, 'Draft', 'button') ||
-  await clickWithRing(page, 'Submit', 'button');
-  await sleep(8000); // Wait for AI to generate
+  // Click "Draft with AI" button (exact text in helpboard.html)
+  await clickWithRing(page, 'Draft with AI', 'button') ||
+  await clickWithRing(page, 'Draft', 'button');
+  await sleep(8000); // Wait for AI to auto-fill title + body via Alpine.js
 
-  // Show the AI result -- scroll through it
+  // Show the AI-populated form -- scroll through it
   await smoothScroll(page, 400);
   await sleep(5000);
 
-  // Accept the draft
-  await clickWithRing(page, 'Accept', 'button') ||
-  await clickWithRing(page, 'Use', 'button') ||
-  await clickWithRing(page, 'Apply', 'button');
-  await sleep(3000);
+  // No Accept/Use step needed -- AI auto-fills the form fields directly
 
 
   // ============================================================
@@ -765,18 +747,9 @@ async function goToDashboardTab(page, tabName) {
   await clickWithRing(page, 'New Post', 'button, a');
   await sleep(2000);
 
-  // Fill in Mike's offer
-  await page.evaluate(() => {
-    // Set type to offer
-    const typeSelect = document.querySelector('select[name="help_type"], select[x-model*="type"], select[x-model*="help_type"]');
-    if (typeSelect) {
-      typeSelect.value = 'offer';
-      typeSelect.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-    // Check for radio buttons instead
-    const offerRadio = document.querySelector('input[value="offer"], button[data-value="offer"]');
-    if (offerRadio) offerRadio.click();
-  });
+  // Click "I can help" toggle button to switch to OFFER type
+  await clickWithRing(page, 'I can help', 'button') ||
+  await clickWithRing(page, 'offer', 'button');
   await sleep(1000);
 
   await page.evaluate(() => {
