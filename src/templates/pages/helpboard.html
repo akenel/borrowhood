@@ -726,7 +726,10 @@ function helpBoard() {
                         language: this.newPost.content_language
                     })
                 });
-                if (resp.status === 401) { window.location.href = '/login'; return; }
+                if (resp.status === 401) {
+                    this.aiDraftError = 'Not logged in -- please log in and try again';
+                    return;
+                }
                 if (resp.ok) {
                     var data = await resp.json();
                     this.aiDraftResult = data;
@@ -736,7 +739,9 @@ function helpBoard() {
                     if (data.category) this.newPost.category = data.category;
                     if (data.urgency) this.newPost.urgency = data.urgency;
                 } else {
-                    this.aiDraftError = 'AI draft failed -- try again or write manually';
+                    var errText = '';
+                    try { errText = await resp.text(); } catch(x) {}
+                    this.aiDraftError = 'AI draft failed (HTTP ' + resp.status + ') -- ' + (errText || 'try again or write manually');
                 }
             } catch(e) {
                 this.aiDraftError = 'AI draft timed out -- try again or write manually';
