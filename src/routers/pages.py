@@ -425,7 +425,8 @@ async def dashboard(request: Request,
             renter_result = await db.execute(
                 select(BHRental)
                 .options(
-                    selectinload(BHRental.listing).selectinload(BHListing.item)
+                    selectinload(BHRental.listing).selectinload(BHListing.item).selectinload(BHItem.owner),
+                    selectinload(BHRental.renter),
                 )
                 .where(BHRental.renter_id == db_user.id)
                 .order_by(BHRental.created_at.desc())
@@ -437,7 +438,8 @@ async def dashboard(request: Request,
             owner_result = await db.execute(
                 select(BHRental)
                 .options(
-                    selectinload(BHRental.listing).selectinload(BHListing.item)
+                    selectinload(BHRental.listing).selectinload(BHListing.item).selectinload(BHItem.owner),
+                    selectinload(BHRental.renter),
                 )
                 .join(BHListing)
                 .join(BHItem, BHListing.item_id == BHItem.id)
