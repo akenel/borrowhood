@@ -412,7 +412,8 @@
         </div>
 
         <!-- History tab (completed/cancelled/declined orders) -->
-        <div x-show="tab === 'history'" x-cloak x-data="historyTab()" x-effect="if (tab === 'history') loadMyReviews()">
+        <div x-show="tab === 'history'" x-cloak x-data="historyTab()" x-effect="if (tab === 'history') loadMyReviews()"
+             @open-review.window="openReviewModal($event.detail.rentalId, $event.detail.revieweeId, $event.detail.itemName, $event.detail.isEdit)">
             {% set history_renter = renter_rentals|selectattr('status.value', 'in', ['completed','cancelled','declined'])|list %}
             {% set history_owner = owner_rentals|selectattr('status.value', 'in', ['completed','cancelled','declined'])|list %}
             {# Count by listing type across both sections #}
@@ -527,11 +528,11 @@
                                     <!-- Review button on collapsed row -->
                                     {% if rental.status.value == 'completed' %}
                                     <template x-if="myReviews['{{ rental.id }}']">
-                                        <span @click.stop="openReviewModal('{{ rental.id }}', '{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}', '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', true)"
+                                        <span @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}', itemName: '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', isEdit: true})"
                                               class="text-xs px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full cursor-pointer hover:bg-amber-100 flex-shrink-0">Review</span>
                                     </template>
                                     <template x-if="!myReviews['{{ rental.id }}']">
-                                        <span @click.stop="openReviewModal('{{ rental.id }}', '{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}', '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', false)"
+                                        <span @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}', itemName: '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', isEdit: false})"
                                               class="text-xs px-2.5 py-1 bg-indigo-600 text-white rounded-full cursor-pointer hover:bg-indigo-700 flex-shrink-0">Review</span>
                                     </template>
                                     {% endif %}
@@ -612,13 +613,13 @@
                                     {% endif %}
                                     {% if rental.status.value == 'completed' %}
                                     <template x-if="myReviews['{{ rental.id }}']">
-                                        <button @click="openReviewModal('{{ rental.id }}', '{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}', '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', true)"
+                                        <button @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}', itemName: '{{ rental.listing.item.name|e if rental.listing and rental.listing.item else '' }}', isEdit: true})"
                                                 class="text-xs px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors min-h-[32px]">
                                             Edit Review
                                         </button>
                                     </template>
                                     <template x-if="!myReviews['{{ rental.id }}']">
-                                        <button @click="openReviewModal('{{ rental.id }}', '{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}', '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', false)"
+                                        <button @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}', itemName: '{{ rental.listing.item.name|e if rental.listing and rental.listing.item else '' }}', isEdit: false})"
                                                 class="text-xs px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors min-h-[32px]">
                                             Leave Review
                                         </button>
@@ -686,11 +687,11 @@
                                     <!-- Review button on collapsed row -->
                                     {% if rental.status.value == 'completed' %}
                                     <template x-if="myReviews['{{ rental.id }}']">
-                                        <span @click.stop="openReviewModal('{{ rental.id }}', '{{ rental.renter_id if rental.renter_id else '' }}', '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', true)"
+                                        <span @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.renter_id if rental.renter_id else '' }}', itemName: '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', isEdit: true})"
                                               class="text-xs px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full cursor-pointer hover:bg-amber-100 flex-shrink-0">Review</span>
                                     </template>
                                     <template x-if="!myReviews['{{ rental.id }}']">
-                                        <span @click.stop="openReviewModal('{{ rental.id }}', '{{ rental.renter_id if rental.renter_id else '' }}', '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', false)"
+                                        <span @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.renter_id if rental.renter_id else '' }}', itemName: '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', isEdit: false})"
                                               class="text-xs px-2.5 py-1 bg-indigo-600 text-white rounded-full cursor-pointer hover:bg-indigo-700 flex-shrink-0">Review</span>
                                     </template>
                                     {% endif %}
@@ -764,13 +765,13 @@
                                 <div class="mt-3 pt-3 border-t border-gray-200 flex flex-wrap items-center gap-2">
                                     {% if rental.status.value == 'completed' %}
                                     <template x-if="myReviews['{{ rental.id }}']">
-                                        <button @click="openReviewModal('{{ rental.id }}', '{{ rental.renter_id }}', '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', true)"
+                                        <button @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.renter_id }}', itemName: '{{ rental.listing.item.name|e if rental.listing and rental.listing.item else '' }}', isEdit: true})"
                                                 class="text-xs px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors min-h-[32px]">
                                             Edit Review
                                         </button>
                                     </template>
                                     <template x-if="!myReviews['{{ rental.id }}']">
-                                        <button @click="openReviewModal('{{ rental.id }}', '{{ rental.renter_id }}', '{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}', false)"
+                                        <button @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.renter_id }}', itemName: '{{ rental.listing.item.name|e if rental.listing and rental.listing.item else '' }}', isEdit: false})"
                                                 class="text-xs px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors min-h-[32px]">
                                             Leave Review
                                         </button>
