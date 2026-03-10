@@ -786,7 +786,7 @@
             </div>
 
             <!-- Review Modal (full-featured) -->
-            <div x-show="showReviewModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="showReviewModal = false">
+            <div x-show="showReviewModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50" @click.self="showReviewModal = false">
                 <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6 max-h-[90vh] overflow-y-auto">
                     <h3 class="text-lg font-semibold text-gray-900" x-text="isEdit ? 'Edit Review' : 'Leave a Review'"></h3>
                     <p class="text-sm text-gray-500 mt-1" x-text="reviewItemName"></p>
