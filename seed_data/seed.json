@@ -14332,9 +14332,9 @@
     },
     {
       "owner_slug": "mikes-garage",
-      "name": "Welding Machine (MIG 200A)",
+      "name": "3-Hour MIG Welding Course (Beginner Friendly)",
       "slug": "welding-machine-mig-200a",
-      "description": "MIG welder, 200A, gas/gasless. Good for steel, stainless, aluminum with the right wire. NOT for beginners -- you need to know what you're doing or book a training session.",
+      "description": "MIG welder, 200A, gas/gasless. Good for steel, stainless, aluminum with the right wire. Beginners welcome -- book the training course and bring your own broken stuff to weld.",
       "content_language": "en",
       "item_type": "physical",
       "category": "power_tools",
@@ -14364,7 +14364,7 @@
           "price": 30.0,
           "price_unit": "per_hour",
           "currency": "EUR",
-          "notes": "Intro to MIG welding. 3-hour session. You'll weld a small project by the end."
+          "notes": "3-hour hands-on welding course. Bring your own broken stuff and we weld it up as part of your practical training. All skill levels welcome."
         }
       ],
       "latitude": 38.021,
@@ -14832,17 +14832,17 @@
         },
         {
           "media_type": "photo",
-          "url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop&q=80",
+          "url": "/static/images/items/pressure-washer/karcher-patio-washing.jpg",
           "alt_text": "Pressure washing stone patio - before and after"
         },
         {
           "media_type": "photo",
-          "url": "https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?w=800&h=600&fit=crop&q=80",
+          "url": "/static/images/items/pressure-washer/karcher-garden-tools.jpg",
           "alt_text": "Pressure washing car in driveway"
         },
         {
           "media_type": "photo",
-          "url": "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=800&h=600&fit=crop&q=80",
+          "url": "/static/images/items/pressure-washer/karcher-boat-washing.jpg",
           "alt_text": "Pressure washing concrete driveway"
         }
       ],
@@ -15959,7 +15959,7 @@
       "media": [
         {
           "media_type": "photo",
-          "url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop&q=80",
+          "url": "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=800&h=600&fit=crop&q=80",
           "alt_text": "Garden workers with wheelbarrow doing yard cleanup"
         }
       ],
@@ -16073,7 +16073,7 @@
       "media": [
         {
           "media_type": "photo",
-          "url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop&q=80",
+          "url": "/static/images/items/pressure-washer/karcher-k5-product.jpg",
           "alt_text": "Pressure washing stone patio clean"
         },
         {
@@ -16233,7 +16233,7 @@
       "media": [
         {
           "media_type": "photo",
-          "url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop&q=80",
+          "url": "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&h=600&fit=crop&q=80",
           "alt_text": "Vintage celeste blue Vespa Primavera 125"
         }
       ],
@@ -30159,9 +30159,9 @@
     },
     {
       "owner_slug": "johns-cleaning",
-      "name": "Johnny's Delivery Bike (Broken -- Needs Repair)",
+      "name": "Johnny's Bianchi Kuma 26 (Broken -- FREE for Parts)",
       "slug": "johnnys-delivery-bike-broken",
-      "description": "My delivery bike. 26-inch mountain bike, panniers on both sides, can carry 15kg of goods. Problem: chain snaps every two weeks, frame is bent from a pothole on Via Fardella. I've fixed it 6 times already. If someone has a welder or knows bikes, I'd trade cleaning services for a proper repair. This bike is my business.",
+      "description": "My delivery bike. 26-inch Bianchi Kuma, panniers on both sides, can carry 15kg of goods. Problem: chain snaps every two weeks, frame is cracked from a pothole on Via Fardella. I've fixed it 6 times already. If someone has a welder or knows bikes, I'd trade cleaning services for a proper repair. This bike was my business.",
       "content_language": "en",
       "item_type": "physical",
       "category": "cycling",
@@ -30178,11 +30178,12 @@
       ],
       "listings": [
         {
-          "listing_type": "offer",
+          "listing_type": "giveaway",
           "price": 0,
           "price_unit": "flat",
           "currency": "EUR",
-          "notes": "Not for rent -- listed because I need help fixing it. Will trade cleaning services for bike repair. The frame needs welding and the chain needs replacing. Again."
+          "delivery_fee": 20.0,
+          "notes": "FREE -- good for parts. Pickup is free. Delivery EUR 20 (I carry it on my shoulder, frame won't roll). Panniers, wheels, gears, brakes all usable. Frame is cracked and bent beyond what I can fix. If you're a parts person, come get it."
         }
       ],
       "latitude": 38.012,

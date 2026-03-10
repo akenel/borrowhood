@@ -48,13 +48,22 @@
                         :class="tab === 'renting' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
                         class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
                     {{ t('dashboard.my_rentals') }}
-                    {% if renter_rentals %}<span class="ml-1.5 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full bg-indigo-100 text-indigo-600">{{ renter_rentals|length }}</span>{% endif %}
+                    {% set active_renter = renter_rentals|rejectattr('status.value', 'in', ['completed','cancelled','declined'])|list %}
+                    {% if active_renter %}<span class="ml-1.5 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full bg-indigo-100 text-indigo-600">{{ active_renter|length }}</span>{% endif %}
                 </button>
                 <button @click="tab = 'requests'"
                         :class="tab === 'requests' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
                         class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
                     {{ t('dashboard.incoming_requests') }}
-                    {% if owner_rentals %}<span class="ml-1.5 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full bg-indigo-100 text-indigo-600">{{ owner_rentals|length }}</span>{% endif %}
+                    {% set active_owner = owner_rentals|rejectattr('status.value', 'in', ['completed','cancelled','declined'])|list %}
+                    {% if active_owner %}<span class="ml-1.5 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full bg-indigo-100 text-indigo-600">{{ active_owner|length }}</span>{% endif %}
+                </button>
+                <button @click="tab = 'history'"
+                        :class="tab === 'history' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
+                    {{ t('dashboard.history') }}
+                    {% set history_count = (renter_rentals|selectattr('status.value', 'in', ['completed','cancelled','declined'])|list|length) + (owner_rentals|selectattr('status.value', 'in', ['completed','cancelled','declined'])|list|length) %}
+                    {% if history_count %}<span class="ml-1.5 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full bg-gray-100 text-gray-600">{{ history_count }}</span>{% endif %}
                 </button>
                 <button @click="tab = 'favorites'"
                         :class="tab === 'favorites' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
@@ -159,9 +168,10 @@
 
         <!-- My Rentals tab (as renter) -->
         <div x-show="tab === 'renting'" x-cloak>
-            {% if renter_rentals %}
+            {% set active_renter_rentals = renter_rentals|rejectattr('status.value', 'in', ['completed','cancelled','declined'])|list %}
+            {% if active_renter_rentals %}
             <div class="space-y-3">
-                {% for rental in renter_rentals %}
+                {% for rental in active_renter_rentals %}
                 <div class="bg-white rounded-lg border border-gray-200 p-4"
                      x-data="lockboxRenter('{{ rental.id }}', '{{ rental.status.value }}')">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between">
@@ -316,6 +326,86 @@
             {% endif %}
         </div>
 
+        <!-- History tab (completed/cancelled/declined orders) -->
+        <div x-show="tab === 'history'" x-cloak>
+            {% set history_renter = renter_rentals|selectattr('status.value', 'in', ['completed','cancelled','declined'])|list %}
+            {% set history_owner = owner_rentals|selectattr('status.value', 'in', ['completed','cancelled','declined'])|list %}
+            {% if history_renter or history_owner %}
+            <div class="space-y-6">
+                {% if history_renter %}
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ t('dashboard.my_rentals') }}</h3>
+                    <div class="space-y-3">
+                        {% for rental in history_renter %}
+                        <div class="bg-white rounded-lg border border-gray-200 p-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-900">{{ rental.listing.item.name if rental.listing and rental.listing.item else 'Item' }}</p>
+                                    <p class="text-sm text-gray-500">
+                                        {% if rental.listing and rental.listing.listing_type %}
+                                        {% set lt = rental.listing.listing_type.value %}
+                                        <span class="inline-block text-xs px-2 py-0.5 rounded-full mr-1
+                                            {% if lt == 'sell' %}bg-purple-50 text-purple-700
+                                            {% elif lt == 'service' %}bg-cyan-50 text-cyan-700
+                                            {% elif lt == 'training' %}bg-teal-50 text-teal-700
+                                            {% elif lt == 'giveaway' %}bg-green-50 text-green-700
+                                            {% else %}bg-indigo-50 text-indigo-700{% endif %}">
+                                            {% if lt == 'sell' %}Purchase{% elif lt == 'service' %}Service{% elif lt == 'training' %}Training{% elif lt == 'giveaway' %}Giveaway{% else %}Rental{% endif %}
+                                        </span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="mt-2 sm:mt-0 flex items-center space-x-3">
+                                    <span class="text-xs px-3 py-1 rounded-full font-medium
+                                        {% if rental.status.value == 'completed' %}bg-emerald-50 text-emerald-700
+                                        {% elif rental.status.value in ['declined','cancelled'] %}bg-red-50 text-red-700
+                                        {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                        {{ t('rental.status.' + rental.status.value) }}
+                                    </span>
+                                    <span class="text-xs text-gray-400">{{ rental.created_at.strftime('%B %d, %Y') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% if history_owner %}
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ t('dashboard.incoming_requests') }}</h3>
+                    <div class="space-y-3">
+                        {% for rental in history_owner %}
+                        <div class="bg-white rounded-lg border border-gray-200 p-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-900">{{ rental.listing.item.name if rental.listing and rental.listing.item else 'Item' }}</p>
+                                    {% if rental.renter_message %}
+                                    <p class="text-sm text-gray-600 mt-1 italic">"{{ rental.renter_message }}"</p>
+                                    {% endif %}
+                                </div>
+                                <div class="mt-2 sm:mt-0 flex items-center space-x-3">
+                                    <span class="text-xs px-3 py-1 rounded-full font-medium
+                                        {% if rental.status.value == 'completed' %}bg-emerald-50 text-emerald-700
+                                        {% elif rental.status.value in ['declined','cancelled'] %}bg-red-50 text-red-700
+                                        {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                        {{ t('rental.status.' + rental.status.value) }}
+                                    </span>
+                                    <span class="text-xs text-gray-400">{{ rental.created_at.strftime('%B %d, %Y') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
+                <p class="text-gray-500">{{ t('dashboard.no_history') }}</p>
+            </div>
+            {% endif %}
+        </div>
+
         <!-- Favorites tab -->
         <div x-show="tab === 'favorites'" x-cloak x-data="dashboardFavorites()" x-effect="if (tab === 'favorites') loadFavorites()">
             <template x-if="favLoading">
@@ -376,9 +466,10 @@
 
         <!-- Incoming Requests tab (as owner) -->
         <div x-show="tab === 'requests'" x-cloak>
-            {% if owner_rentals %}
+            {% set active_owner_rentals = owner_rentals|rejectattr('status.value', 'in', ['completed','cancelled','declined'])|list %}
+            {% if active_owner_rentals %}
             <div class="space-y-3">
-                {% for rental in owner_rentals %}
+                {% for rental in active_owner_rentals %}
                 <div class="bg-white rounded-lg border border-gray-200 p-4"
                      x-data="lockboxOwner('{{ rental.id }}', '{{ rental.status.value }}')">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between">
@@ -418,6 +509,9 @@
                                     class="text-xs px-3 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 min-h-[32px]">Approve</button>
                             <button @click="updateStatus('declined', 'Declined by owner')" :disabled="processing"
                                     class="text-xs px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 min-h-[32px]">Decline</button>
+                            {% elif rental.status.value == 'approved' %}
+                            <button @click="if(confirm('Cancel this booking and issue a refund?')) updateStatus('cancelled', 'Cancelled by owner -- service not needed, full refund issued')" :disabled="processing"
+                                    class="text-xs px-3 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 min-h-[32px]">Cancel & Refund</button>
                             {% elif rental.status.value == 'returned' %}
                             <button @click="updateStatus('completed')" :disabled="processing"
                                     class="text-xs px-3 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 min-h-[32px]">Complete</button>

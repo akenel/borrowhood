@@ -203,8 +203,8 @@ async def update_rental_status(
 
     # Role-based transition rules
     owner_actions = {RentalStatus.APPROVED, RentalStatus.DECLINED, RentalStatus.COMPLETED}
-    renter_actions = {RentalStatus.CANCELLED, RentalStatus.PICKED_UP}
-    either_actions = {RentalStatus.DISPUTED, RentalStatus.RETURNED}
+    renter_actions = {RentalStatus.PICKED_UP}
+    either_actions = {RentalStatus.DISPUTED, RentalStatus.RETURNED, RentalStatus.CANCELLED}
 
     if data.status in owner_actions and not is_owner:
         raise HTTPException(status_code=403, detail="Only the item owner can perform this action")
@@ -262,6 +262,20 @@ async def update_rental_status(
             deposit.status = DepositStatus.RELEASED
             deposit.released_amount = deposit.amount
             deposit.reason = "Auto-released on rental completion"
+
+    # Auto-release deposit on cancellation (refund)
+    if rental.status == RentalStatus.CANCELLED:
+        from src.models.deposit import BHDeposit, DepositStatus
+        dep_result = await db.execute(
+            select(BHDeposit)
+            .where(BHDeposit.rental_id == rental.id)
+            .where(BHDeposit.status == DepositStatus.HELD)
+        )
+        deposit = dep_result.scalars().first()
+        if deposit:
+            deposit.status = DepositStatus.RELEASED
+            deposit.released_amount = deposit.amount
+            deposit.reason = "Auto-released on cancellation -- full refund"
 
     # Notify the other party about the status change
     status_to_type = {

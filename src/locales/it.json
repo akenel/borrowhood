@@ -98,8 +98,8 @@
     "message_placeholder": "Ciao! Vorrei acquistare questo..."
   },
   "booking": {
-    "request_title": "Richiesta di Prenotazione",
-    "submit": "Invia Richiesta di Prenotazione",
+    "request_title": "Richiesta di Servizio",
+    "submit": "Invia Richiesta di Servizio",
     "message_placeholder": "Ciao! Vorrei prenotare questo servizio..."
   },
   "rental": {

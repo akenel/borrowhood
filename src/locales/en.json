@@ -98,8 +98,8 @@
     "message_placeholder": "Hi! I would like to buy this..."
   },
   "booking": {
-    "request_title": "Booking Request",
-    "submit": "Send Booking Request",
+    "request_title": "Service Request",
+    "submit": "Send Service Request",
     "message_placeholder": "Hi! I would like to book this service..."
   },
   "rental": {
@@ -418,7 +418,9 @@
     "load_more": "Load More",
     "showing_items": "Showing {shown} of {total} items",
     "favorites": "Favorites",
-    "no_favorites": "No favorites yet. Browse Members to find people to follow."
+    "no_favorites": "No favorites yet. Browse Members to find people to follow.",
+    "history": "History",
+    "no_history": "No completed or cancelled orders yet."
   },
   "onboarding": {
     "title": "Welcome to BorrowHood",

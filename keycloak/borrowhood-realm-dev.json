@@ -226,10 +226,10 @@
       ],
       "email": "sally@borrowhood.test",
       "firstName": "Sally",
-      "lastName": "Baker",
+      "lastName": "Thompson",
       "attributes": {
         "display_name": [
-          "Sally Baker"
+          "Sally Thompson"
         ],
         "workshop_name": [
           "Sally's Kitchen"
