@@ -528,11 +528,13 @@
                                     <!-- Review button on collapsed row -->
                                     {% if rental.status.value == 'completed' %}
                                     <template x-if="myReviews['{{ rental.id }}']">
-                                        <span @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}', itemName: {{ (rental.listing.item.name if rental.listing and rental.listing.item else '')|tojson|e }}, isEdit: true})"
+                                        <span data-rental-id="{{ rental.id }}" data-reviewee-id="{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}" data-item-name="{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}" data-is-edit="true"
+                                              @click.stop="$dispatch('open-review', {rentalId: $el.dataset.rentalId, revieweeId: $el.dataset.revieweeId, itemName: $el.dataset.itemName, isEdit: $el.dataset.isEdit === 'true'})"
                                               class="text-xs px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full cursor-pointer hover:bg-amber-100 flex-shrink-0">Review</span>
                                     </template>
                                     <template x-if="!myReviews['{{ rental.id }}']">
-                                        <span @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}', itemName: {{ (rental.listing.item.name if rental.listing and rental.listing.item else '')|tojson|e }}, isEdit: false})"
+                                        <span data-rental-id="{{ rental.id }}" data-reviewee-id="{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}" data-item-name="{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}" data-is-edit="false"
+                                              @click.stop="$dispatch('open-review', {rentalId: $el.dataset.rentalId, revieweeId: $el.dataset.revieweeId, itemName: $el.dataset.itemName, isEdit: $el.dataset.isEdit === 'true'})"
                                               class="text-xs px-2.5 py-1 bg-indigo-600 text-white rounded-full cursor-pointer hover:bg-indigo-700 flex-shrink-0">Review</span>
                                     </template>
                                     {% endif %}
@@ -613,13 +615,15 @@
                                     {% endif %}
                                     {% if rental.status.value == 'completed' %}
                                     <template x-if="myReviews['{{ rental.id }}']">
-                                        <button @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}', itemName: {{ (rental.listing.item.name if rental.listing and rental.listing.item else '')|tojson|e }}, isEdit: true})"
+                                        <button data-rental-id="{{ rental.id }}" data-reviewee-id="{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}" data-item-name="{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}" data-is-edit="true"
+                                                @click.stop="$dispatch('open-review', {rentalId: $el.dataset.rentalId, revieweeId: $el.dataset.revieweeId, itemName: $el.dataset.itemName, isEdit: $el.dataset.isEdit === 'true'})"
                                                 class="text-xs px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors min-h-[32px]">
                                             Edit Review
                                         </button>
                                     </template>
                                     <template x-if="!myReviews['{{ rental.id }}']">
-                                        <button @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}', itemName: {{ (rental.listing.item.name if rental.listing and rental.listing.item else '')|tojson|e }}, isEdit: false})"
+                                        <button data-rental-id="{{ rental.id }}" data-reviewee-id="{{ rental.listing.item.owner_id if rental.listing and rental.listing.item else '' }}" data-item-name="{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}" data-is-edit="false"
+                                                @click.stop="$dispatch('open-review', {rentalId: $el.dataset.rentalId, revieweeId: $el.dataset.revieweeId, itemName: $el.dataset.itemName, isEdit: $el.dataset.isEdit === 'true'})"
                                                 class="text-xs px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors min-h-[32px]">
                                             Leave Review
                                         </button>
@@ -687,11 +691,13 @@
                                     <!-- Review button on collapsed row -->
                                     {% if rental.status.value == 'completed' %}
                                     <template x-if="myReviews['{{ rental.id }}']">
-                                        <span @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.renter_id if rental.renter_id else '' }}', itemName: {{ (rental.listing.item.name if rental.listing and rental.listing.item else '')|tojson|e }}, isEdit: true})"
+                                        <span data-rental-id="{{ rental.id }}" data-reviewee-id="{{ rental.renter_id if rental.renter_id else '' }}" data-item-name="{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}" data-is-edit="true"
+                                              @click.stop="$dispatch('open-review', {rentalId: $el.dataset.rentalId, revieweeId: $el.dataset.revieweeId, itemName: $el.dataset.itemName, isEdit: $el.dataset.isEdit === 'true'})"
                                               class="text-xs px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full cursor-pointer hover:bg-amber-100 flex-shrink-0">Review</span>
                                     </template>
                                     <template x-if="!myReviews['{{ rental.id }}']">
-                                        <span @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.renter_id if rental.renter_id else '' }}', itemName: {{ (rental.listing.item.name if rental.listing and rental.listing.item else '')|tojson|e }}, isEdit: false})"
+                                        <span data-rental-id="{{ rental.id }}" data-reviewee-id="{{ rental.renter_id if rental.renter_id else '' }}" data-item-name="{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}" data-is-edit="false"
+                                              @click.stop="$dispatch('open-review', {rentalId: $el.dataset.rentalId, revieweeId: $el.dataset.revieweeId, itemName: $el.dataset.itemName, isEdit: $el.dataset.isEdit === 'true'})"
                                               class="text-xs px-2.5 py-1 bg-indigo-600 text-white rounded-full cursor-pointer hover:bg-indigo-700 flex-shrink-0">Review</span>
                                     </template>
                                     {% endif %}
@@ -765,13 +771,15 @@
                                 <div class="mt-3 pt-3 border-t border-gray-200 flex flex-wrap items-center gap-2">
                                     {% if rental.status.value == 'completed' %}
                                     <template x-if="myReviews['{{ rental.id }}']">
-                                        <button @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.renter_id }}', itemName: {{ (rental.listing.item.name if rental.listing and rental.listing.item else '')|tojson|e }}, isEdit: true})"
+                                        <button data-rental-id="{{ rental.id }}" data-reviewee-id="{{ rental.renter_id }}" data-item-name="{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}" data-is-edit="true"
+                                                @click.stop="$dispatch('open-review', {rentalId: $el.dataset.rentalId, revieweeId: $el.dataset.revieweeId, itemName: $el.dataset.itemName, isEdit: $el.dataset.isEdit === 'true'})"
                                                 class="text-xs px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors min-h-[32px]">
                                             Edit Review
                                         </button>
                                     </template>
                                     <template x-if="!myReviews['{{ rental.id }}']">
-                                        <button @click.stop="$dispatch('open-review', {rentalId: '{{ rental.id }}', revieweeId: '{{ rental.renter_id }}', itemName: {{ (rental.listing.item.name if rental.listing and rental.listing.item else '')|tojson|e }}, isEdit: false})"
+                                        <button data-rental-id="{{ rental.id }}" data-reviewee-id="{{ rental.renter_id }}" data-item-name="{{ rental.listing.item.name if rental.listing and rental.listing.item else '' }}" data-is-edit="false"
+                                                @click.stop="$dispatch('open-review', {rentalId: $el.dataset.rentalId, revieweeId: $el.dataset.revieweeId, itemName: $el.dataset.itemName, isEdit: $el.dataset.isEdit === 'true'})"
                                                 class="text-xs px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors min-h-[32px]">
                                             Leave Review
                                         </button>
