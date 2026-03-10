@@ -187,7 +187,7 @@
                         </div>
                     </div>
                     <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
-                        <span x-text="new Date(post.created_at).toLocaleDateString()"></span>
+                        <span x-text="formatDate(post.created_at)"></span>
                         <div class="flex items-center gap-4">
                             <!-- Upvote count -->
                             <span class="flex items-center gap-1" :class="post.user_upvoted ? 'text-indigo-600' : ''">
@@ -274,7 +274,7 @@
                             <h1 class="text-xl font-bold text-gray-900" x-text="activePost.title"></h1>
                             <p class="text-sm text-gray-500 mt-1">
                                 by <span x-text="activePost.author_name" class="font-medium text-gray-700"></span>
-                                <span x-text="new Date(activePost.created_at).toLocaleDateString()" class="ml-2"></span>
+                                <span x-text="formatDate(activePost.created_at)" class="ml-2"></span>
                                 <span x-show="activePost.neighborhood" class="ml-2">in <span x-text="activePost.neighborhood"></span></span>
                             </p>
                             <!-- Tagged item -->
@@ -413,7 +413,7 @@
                                         <div class="flex-1 min-w-0">
                                             <div class="flex items-center gap-2">
                                                 <span class="text-sm font-medium text-gray-900" x-text="reply.author_name"></span>
-                                                <span class="text-xs text-gray-400" x-text="new Date(reply.created_at).toLocaleDateString()"></span>
+                                                <span class="text-xs text-gray-400" x-text="formatDate(reply.created_at)"></span>
                                             </div>
                                             <p class="mt-1 text-sm text-gray-700 whitespace-pre-wrap" x-text="reply.body"></p>
                                             <!-- Reply media -->
@@ -461,7 +461,7 @@
                                                     <div class="flex-1 min-w-0">
                                                         <div class="flex items-center gap-2">
                                                             <span class="text-sm font-medium text-gray-900" x-text="child.author_name"></span>
-                                                            <span class="text-xs text-gray-400" x-text="new Date(child.created_at).toLocaleDateString()"></span>
+                                                            <span class="text-xs text-gray-400" x-text="formatDate(child.created_at)"></span>
                                                         </div>
                                                         <p class="mt-0.5 text-sm text-gray-700 whitespace-pre-wrap" x-text="child.body"></p>
                                                         <!-- Child media -->
@@ -646,6 +646,19 @@
 <script>
 function helpBoard() {
     return {
+        formatDate(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return '';
+                const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+                const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                const day = d.getDate();
+                const suffix = day === 1 || day === 21 || day === 31 ? 'st' : day === 2 || day === 22 ? 'nd' : day === 3 || day === 23 ? 'rd' : 'th';
+                return days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + day + suffix + ' ' + d.getFullYear();
+            } catch (e) { return ''; }
+        },
+
         // List view state
         posts: [],
         summary: { total: 0, open: 0, needs: 0, offers: 0, resolved: 0 },
