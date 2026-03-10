@@ -439,35 +439,36 @@
             {% set total_sell = ns.r_sell + ns.o_sell %}
             {% set total_give = ns.r_give + ns.o_give %}
             {% if history_renter or history_owner %}
-            <!-- Filter pills with split counts (mine / incoming) -->
+            <!-- Filter pills: split count only when both sides > 0 -->
+            {% macro pill_count(mine, theirs) %}{% if mine > 0 and theirs > 0 %}{{ mine }}+{{ theirs }}{% else %}{{ mine + theirs }}{% endif %}{% endmacro %}
             <div class="mb-4 flex flex-wrap gap-2">
                 <button @click="historyFilter = ''"
                         :class="historyFilter === '' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">All <span class="opacity-75">({{ history_renter|length }}+{{ history_owner|length }})</span></button>
+                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">All <span class="opacity-75">({{ pill_count(history_renter|length, history_owner|length) }})</span></button>
                 {% if total_rent > 0 %}
                 <button @click="historyFilter = 'rent'"
                         :class="historyFilter === 'rent' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Rentals <span class="opacity-75">({{ ns.r_rent }}+{{ ns.o_rent }})</span></button>
+                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Rentals <span class="opacity-75">({{ pill_count(ns.r_rent, ns.o_rent) }})</span></button>
                 {% endif %}
                 {% if total_svc > 0 %}
                 <button @click="historyFilter = 'service'"
                         :class="historyFilter === 'service' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Services <span class="opacity-75">({{ ns.r_svc }}+{{ ns.o_svc }})</span></button>
+                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Services <span class="opacity-75">({{ pill_count(ns.r_svc, ns.o_svc) }})</span></button>
                 {% endif %}
                 {% if total_train > 0 %}
                 <button @click="historyFilter = 'training'"
                         :class="historyFilter === 'training' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Training <span class="opacity-75">({{ ns.r_train }}+{{ ns.o_train }})</span></button>
+                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Training <span class="opacity-75">({{ pill_count(ns.r_train, ns.o_train) }})</span></button>
                 {% endif %}
                 {% if total_sell > 0 %}
                 <button @click="historyFilter = 'sell'"
                         :class="historyFilter === 'sell' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Purchases <span class="opacity-75">({{ ns.r_sell }}+{{ ns.o_sell }})</span></button>
+                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Purchases <span class="opacity-75">({{ pill_count(ns.r_sell, ns.o_sell) }})</span></button>
                 {% endif %}
                 {% if total_give > 0 %}
                 <button @click="historyFilter = 'giveaway'"
                         :class="historyFilter === 'giveaway' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Giveaways <span class="opacity-75">({{ ns.r_give }}+{{ ns.o_give }})</span></button>
+                        class="px-3 py-1.5 text-xs font-medium rounded-full transition-colors">Giveaways <span class="opacity-75">({{ pill_count(ns.r_give, ns.o_give) }})</span></button>
                 {% endif %}
             </div>
 
