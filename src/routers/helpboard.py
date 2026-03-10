@@ -329,7 +329,7 @@ async def ai_draft_post(
                 similar.append({
                     "name": item.name,
                     "category": item.category,
-                    "price": float(item.price_per_unit) if item.price_per_unit else 0,
+                    "price": 0,
                 })
 
     ai_result, provider = await helpboard_draft(
