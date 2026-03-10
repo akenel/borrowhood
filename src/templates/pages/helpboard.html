@@ -366,12 +366,31 @@
 
                     <!-- Resolve controls (author only, if still open) -->
                     <div x-show="isPostAuthor && activePost.status !== 'resolved' && activePost.status !== 'closed'"
-                         class="mt-4 border-t pt-4">
-                        <div class="flex items-center gap-3">
-                            <button @click="resolvePost()" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 min-h-[44px]">
+                         class="mt-4 border-t pt-4" x-data="{ showPicker: false }">
+                        <div x-show="!showPicker">
+                            <button @click="showPicker = true" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 min-h-[44px]">
                                 Mark as Resolved
                             </button>
-                            <p class="text-xs text-gray-500">Pick a helper from the replies, or self-resolve</p>
+                        </div>
+                        <div x-show="showPicker" x-cloak class="space-y-3">
+                            <p class="text-sm font-medium text-gray-700">Who helped you?</p>
+                            <!-- Repliers as picker buttons -->
+                            <div class="space-y-2">
+                                <template x-for="r in replies.filter(r => r.author_id !== activePost.author_id)" :key="r.id">
+                                    <button @click="resolvePost(r.author_id)"
+                                            class="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors text-left">
+                                        <img :src="r.author_avatar || '/static/img/default-avatar.svg'" class="w-8 h-8 rounded-full object-cover">
+                                        <div>
+                                            <span class="text-sm font-medium text-gray-900" x-text="r.author_name"></span>
+                                            <p class="text-xs text-gray-500 line-clamp-1" x-text="r.body"></p>
+                                        </div>
+                                    </button>
+                                </template>
+                            </div>
+                            <div class="flex gap-2 pt-2 border-t border-gray-100">
+                                <button @click="resolvePost()" class="px-3 py-2 text-xs text-gray-500 hover:text-gray-700">I solved it myself</button>
+                                <button @click="showPicker = false" class="px-3 py-2 text-xs text-gray-500 hover:text-gray-700">Cancel</button>
+                            </div>
                         </div>
                     </div>
                 </div>
