@@ -14546,7 +14546,7 @@
       "media": [
         {
           "media_type": "photo",
-          "url": "https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=800&h=600&fit=crop&q=80",
+          "url": "/static/images/seed/3d-printer-prusa.png",
           "alt_text": "3D Printer (Creality Ender 3 V3) - product photo"
         }
       ],
@@ -15027,7 +15027,7 @@
       "media": [
         {
           "media_type": "photo",
-          "url": "https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=800&h=600&fit=crop&q=80",
+          "url": "/static/images/seed/3d-printer-prusa.png",
           "alt_text": "3D Printer (Prusa i3 MK3S+) - product photo"
         }
       ],
@@ -29659,7 +29659,7 @@
           "currency": "EUR",
           "delivery_available": true,
           "pickup_only": false,
-          "notes": "12 cookies per box. Custom shapes. Message me your theme and I'll bake it fresh."
+          "notes": "25 cookies per bag. Various one-of-a-kind shapes. Message me your theme and I'll bake it fresh."
         }
       ],
       "latitude": 38.069,

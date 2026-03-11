@@ -5,7 +5,7 @@
 **EP4 Ending Question:** "What if asking for help... was the bravest thing you ever did?"
 
 ---
-
+💰️
 ## The Theme
 
 Johnny's pressure washer broke. The trigger is stuck, the pump leaks. It's all
