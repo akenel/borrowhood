@@ -348,16 +348,8 @@ async function clickWithRing(page, text, scope = 'button') {
   if (!pos) { console.log(`  WARN: "${text}" position not found`); return false; }
   await showRing(page, pos.x, pos.y);
   await sleep(400);
-  await page.evaluate((txt, s) => {
-    const els = document.querySelectorAll(s);
-    for (const el of els) {
-      const box = el.getBoundingClientRect();
-      if (el.textContent.trim().includes(txt) && box.width > 0 && box.height > 0) {
-        el.click();
-        return;
-      }
-    }
-  }, text, scope);
+  // Use page.mouse.click for proper browser-level events (Alpine.js needs real MouseEvent)
+  await page.mouse.click(pos.x, pos.y);
   await sleep(2000);
   return true;
 }
@@ -399,6 +391,115 @@ async function goToDashboardTab(page, tabName) {
   await sleep(1500);
   await clickWithRing(page, tabName, '[role="tab"], button, a');
   await sleep(3000);
+}
+
+// -- Open a Help Board post by title text (Alpine SPA) --
+// clickWithRing shows the ring but Alpine @click on template x-for divs
+// can be unreliable. This function: ring + mouse click, then fallback to
+// calling openPost() directly via Alpine data if the detail panel doesn't load.
+async function openHelpPost(page, titleText) {
+  // First try: normal clickWithRing (now uses page.mouse.click)
+  const clicked = await clickWithRing(page, titleText, '.bg-white, div, a, h3, h4, button');
+  await sleep(2000);
+
+  // Check if post detail loaded (reply textarea appears)
+  let loaded = await page.evaluate(() => {
+    return document.querySelector('textarea[x-model="newReplyBody"]') !== null;
+  });
+  if (loaded) {
+    console.log('  Post detail loaded via click');
+    return true;
+  }
+
+  // Fallback: call openPost() directly via Alpine data
+  console.log('  Click didn\'t open post detail, using Alpine.js openPost() fallback');
+  const opened = await page.evaluate((txt) => {
+    // Find the post id from the Alpine component's posts array
+    const comp = document.querySelector('[x-data]');
+    if (comp && comp._x_dataStack) {
+      const data = comp._x_dataStack[0];
+      if (data.posts && Array.isArray(data.posts)) {
+        const post = data.posts.find(p =>
+          (p.title || '').toLowerCase().includes(txt.toLowerCase())
+        );
+        if (post && typeof data.openPost === 'function') {
+          data.openPost(post.id);
+          return true;
+        }
+      }
+    }
+    return false;
+  }, titleText);
+
+  if (opened) {
+    await sleep(3000);
+    loaded = await page.evaluate(() => {
+      return document.querySelector('textarea[x-model="newReplyBody"]') !== null;
+    });
+    if (loaded) {
+      console.log('  Post detail loaded via Alpine.js openPost()');
+      return true;
+    }
+  }
+
+  // Last resort: navigate to API-fetched post URL if available
+  console.log('  WARN: Could not open post detail for "' + titleText + '"');
+  return false;
+}
+
+// -- Click "Leave Review" on dashboard with proper event dispatch --
+// The button uses $dispatch('open-review', {...}) which needs real DOM events.
+// After clickWithRing (now mouse-based), verify modal appeared.
+async function clickLeaveReview(page) {
+  // Scroll to find it first
+  await page.evaluate(() => {
+    const btns = document.querySelectorAll('button');
+    for (const btn of btns) {
+      if (btn.textContent.trim().includes('Leave Review')) {
+        btn.scrollIntoView({ block: 'center' });
+        return true;
+      }
+    }
+    return false;
+  });
+  await sleep(1000);
+
+  const clicked = await clickWithRing(page, 'Leave Review', 'button');
+  if (!clicked) {
+    console.log('  WARN: "Leave Review" button not found on page');
+    return false;
+  }
+  await sleep(2000);
+
+  // Verify modal appeared
+  const modalOpen = await page.evaluate(() => {
+    const modal = document.querySelector('[x-show="showReviewModal"]');
+    if (modal) {
+      // Check computed style -- Alpine x-show sets display
+      const style = window.getComputedStyle(modal);
+      return style.display !== 'none';
+    }
+    return false;
+  });
+
+  if (!modalOpen) {
+    console.log('  Modal didn\'t open, dispatching open-review event manually');
+    await page.evaluate(() => {
+      // Find the Leave Review button and extract its dispatch payload
+      const btns = document.querySelectorAll('button');
+      for (const btn of btns) {
+        if (btn.textContent.trim().includes('Leave Review')) {
+          // Trigger a real click via dispatchEvent
+          btn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+          return true;
+        }
+      }
+      return false;
+    });
+    await sleep(2000);
+  }
+
+  return true;
 }
 
 
@@ -535,7 +636,7 @@ async function goToDashboardTab(page, tabName) {
     '',
     '<div class="extra" style="font-size:42px; line-height:1.7">' +
     'Last time he gave away the bike for free.<br>' +
-    'Leo sold it for <span class="hl">50 euros</span>.<br><br>' +
+    'Leo fixed it. Now it\'s worth <span class="hl">50 euros</span>.<br><br>' +
     '<span class="red">He\'s not making that mistake twice.</span></div>'
   ));
   await sleep(10000);
@@ -652,6 +753,16 @@ async function goToDashboardTab(page, tabName) {
   });
   await sleep(2000);
 
+  // Scroll modal to show "Add photos or videos" option (visible on camera)
+  await page.evaluate(() => {
+    const modal = document.querySelector('[x-show="showCreate"]');
+    if (modal) {
+      const scrollable = modal.querySelector('.overflow-y-auto') || modal;
+      scrollable.scrollTop = scrollable.scrollHeight;
+    }
+  });
+  await sleep(3000);
+
   // Submit the post -- click inside the modal
   await page.evaluate(() => {
     const modal = document.querySelector('[x-show="showCreate"]');
@@ -717,40 +828,45 @@ async function goToDashboardTab(page, tabName) {
   // ============================================================
   console.log('  Scene 15: Leo replies to Johnny\'s post');
 
-  // Click on Johnny's pressure washer post
-  await clickWithRing(page, 'Pressure Washer', 'a, h3, h4, div, button');
-  await sleep(3000);
-
-  // Show the post detail
-  await smoothScroll(page, 300);
-  await sleep(3000);
-
-  // Click Reply
-  await clickWithRing(page, 'Reply', 'button, a');
+  // Click on Johnny's pressure washer post (Alpine SPA -- needs special handling)
+  await openHelpPost(page, 'Pressure Washer');
   await sleep(2000);
 
+  // Show the post detail -- scroll to reply area
+  await smoothScroll(page, 400);
+  await sleep(3000);
+
   // Type Leo's expert reply (textarea uses x-model="newReplyBody")
-  await page.evaluate(() => {
-    const replyText = 'Johnny, that\'s a Karcher K-series. The trigger assembly pops off with a flat-head. The pump gasket is a standard O-ring -- I have a bag of 50 in my Bottega. Come by tomorrow, we\'ll fix it in the field in 20 minutes. Bring a pocket knife.';
+  const replyText = 'Johnny, that\'s a Karcher K-series. The trigger assembly pops off with a flat-head. The pump gasket is a standard O-ring -- I have a bag of 50 in my Bottega. Come by tomorrow, we\'ll fix it in the field in 20 minutes. Bring a pocket knife.';
+  await page.evaluate((txt) => {
     // Try Alpine.js data
     const comp = document.querySelector('[x-data]');
     if (comp && comp._x_dataStack) {
-      comp._x_dataStack[0].newReplyBody = replyText;
+      comp._x_dataStack[0].newReplyBody = txt;
     }
     // Also set DOM
-    const textarea = document.querySelector('textarea[x-model="newReplyBody"], textarea');
+    const textarea = document.querySelector('textarea[x-model="newReplyBody"]');
     if (textarea) {
       textarea.focus();
-      textarea.value = replyText;
+      textarea.value = txt;
       textarea.dispatchEvent(new Event('input', { bubbles: true }));
     }
-  });
+  }, replyText);
   await sleep(4000);
 
-  // Submit reply
-  await clickWithRing(page, 'Reply', 'button') ||
-  await clickWithRing(page, 'Submit', 'button') ||
-  await clickWithRing(page, 'Post', 'button');
+  // Submit reply -- the indigo Reply button (px-4 py-2 font-semibold) near the textarea
+  // Use clickWithRing which now dispatches proper mouse events for Alpine
+  const leoReplyClicked = await clickWithRing(page, 'Reply', 'button.bg-indigo-600') ||
+    await clickWithRing(page, 'Reply', 'button');
+  if (!leoReplyClicked) {
+    // Last resort: call submitReply directly via Alpine
+    await page.evaluate(() => {
+      const comp = document.querySelector('[x-data]');
+      if (comp && comp._x_dataStack && typeof comp._x_dataStack[0].submitReply === 'function') {
+        comp._x_dataStack[0].submitReply(null);
+      }
+    });
+  }
   await sleep(3000);
 
   // Show Leo's business model card
@@ -825,29 +941,38 @@ async function goToDashboardTab(page, tabName) {
   await setZoom(page);
   await sleep(2000);
 
-  await clickWithRing(page, 'Pressure Washer', 'a, h3, h4, div, button');
-  await sleep(3000);
-
-  await clickWithRing(page, 'Reply', 'button, a');
+  await openHelpPost(page, 'Pressure Washer');
   await sleep(2000);
 
-  await page.evaluate(() => {
-    const replyText = 'Johnny, the pump gasket is 50 cents at any hardware store. But check the unloader valve too -- if that\'s stuck, the trigger won\'t release pressure. I can walk you through it. And next time -- POST HERE FIRST before throwing things out.';
+  await smoothScroll(page, 400);
+  await sleep(2000);
+
+  const mikeReply = 'Johnny, the pump gasket is 50 cents at any hardware store. But check the unloader valve too -- if that\'s stuck, the trigger won\'t release pressure. I can walk you through it. And next time -- POST HERE FIRST before throwing things out.';
+  await page.evaluate((txt) => {
     const comp = document.querySelector('[x-data]');
     if (comp && comp._x_dataStack) {
-      comp._x_dataStack[0].newReplyBody = replyText;
+      comp._x_dataStack[0].newReplyBody = txt;
     }
-    const textarea = document.querySelector('textarea[x-model="newReplyBody"], textarea');
+    const textarea = document.querySelector('textarea[x-model="newReplyBody"]');
     if (textarea) {
       textarea.focus();
-      textarea.value = replyText;
+      textarea.value = txt;
       textarea.dispatchEvent(new Event('input', { bubbles: true }));
     }
-  });
+  }, mikeReply);
   await sleep(3000);
 
-  await clickWithRing(page, 'Reply', 'button') ||
-  await clickWithRing(page, 'Submit', 'button');
+  // Submit reply -- indigo Reply button
+  const mikeReplyClicked = await clickWithRing(page, 'Reply', 'button.bg-indigo-600') ||
+    await clickWithRing(page, 'Reply', 'button');
+  if (!mikeReplyClicked) {
+    await page.evaluate(() => {
+      const comp = document.querySelector('[x-data]');
+      if (comp && comp._x_dataStack && typeof comp._x_dataStack[0].submitReply === 'function') {
+        comp._x_dataStack[0].submitReply(null);
+      }
+    });
+  }
   await sleep(3000);
 
 
@@ -862,17 +987,25 @@ async function goToDashboardTab(page, tabName) {
   await setZoom(page);
   await sleep(2000);
 
-  // Click into Johnny's own post
-  await clickWithRing(page, 'Pressure Washer', 'a, h3, h4, div, button');
-  await sleep(3000);
-
-  // Click Edit
-  await clickWithRing(page, 'Edit', 'button, a');
+  // Click into Johnny's own post (Alpine SPA)
+  await openHelpPost(page, 'Pressure Washer');
   await sleep(2000);
 
-  // Update the body
+  // Click Edit Post
+  await clickWithRing(page, 'Edit Post', 'button');
+  await sleep(2000);
+
+  // Update the body via Alpine.js
   await page.evaluate(() => {
-    const bodyInput = document.querySelector('textarea[name="body"], textarea[x-model*="body"]');
+    const comp = document.querySelector('[x-data]');
+    if (comp && comp._x_dataStack) {
+      const data = comp._x_dataStack[0];
+      if (data.editBody !== undefined) {
+        data.editBody += '\n\nUPDATE: Leo has the gasket! Going to his Bottega tomorrow. Mike says check the unloader valve too.';
+      }
+    }
+    // DOM fallback
+    const bodyInput = document.querySelector('textarea[x-model="editBody"]');
     if (bodyInput) {
       bodyInput.value += '\n\nUPDATE: Leo has the gasket! Going to his Bottega tomorrow. Mike says check the unloader valve too.';
       bodyInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -881,8 +1014,7 @@ async function goToDashboardTab(page, tabName) {
   await sleep(3000);
 
   // Save
-  await clickWithRing(page, 'Save', 'button') ||
-  await clickWithRing(page, 'Update', 'button');
+  await clickWithRing(page, 'Save', 'button');
   await sleep(3000);
 
 
@@ -908,39 +1040,31 @@ async function goToDashboardTab(page, tabName) {
   await setZoom(page);
   await sleep(2000);
 
-  // Click into the post
-  await clickWithRing(page, 'Pressure Washer', 'a, h3, h4, div, button');
-  await sleep(3000);
+  // Click into the post (Alpine SPA)
+  await openHelpPost(page, 'Pressure Washer');
+  await sleep(2000);
 
-  // Click "Mark as Resolved" or "Resolve"
-  await clickWithRing(page, 'Resolve', 'button') ||
+  // Scroll down to see the Resolve button
+  await smoothScroll(page, 600);
+  await sleep(2000);
+
+  // Click "Mark as Resolved"
   await clickWithRing(page, 'Mark as Resolved', 'button');
   await sleep(3000);
 
-  // Pick Leo as the helper (if a picker appears)
+  // Pick Leo as the helper -- repliers show as clickable buttons with author names
+  await clickWithRing(page, 'Leonardo', 'button') ||
   await page.evaluate(() => {
-    // Look for a helper picker -- dropdown, radio, or button with Leo's name
-    const leoOption = document.querySelector('[data-helper*="leonardo"], option[value*="leonardo"]');
-    if (leoOption) leoOption.click();
-    // Or select from dropdown
-    const select = document.querySelector('select[name="helper"], select[x-model*="helper"]');
-    if (select) {
-      const options = select.querySelectorAll('option');
-      for (const opt of options) {
-        if (opt.textContent.includes('Leonardo') || opt.textContent.includes('Leo')) {
-          select.value = opt.value;
-          select.dispatchEvent(new Event('change', { bubbles: true }));
-          break;
-        }
+    // Find button containing Leo's name in the resolve picker
+    const buttons = document.querySelectorAll('button');
+    for (const b of buttons) {
+      if (b.textContent.includes('Leonardo') || b.textContent.includes('Leo')) {
+        const onclick = b.getAttribute('@click') || '';
+        if (onclick.includes('resolvePost')) { b.click(); return true; }
       }
     }
+    return false;
   });
-  await sleep(2000);
-
-  // Confirm resolve
-  await clickWithRing(page, 'Confirm', 'button') ||
-  await clickWithRing(page, 'Save', 'button') ||
-  await clickWithRing(page, 'Resolve', 'button');
   await sleep(4000);
 
 
@@ -1006,21 +1130,17 @@ async function goToDashboardTab(page, tabName) {
   // ============================================================
   console.log('  Scene 24: Sofia opens completed order');
 
-  // Look for a completed order with "Review" button (Johnny delivered)
-  // The review buttons use $dispatch pattern, look for them
-  const reviewBtnFound = await page.evaluate(() => {
-    const btns = document.querySelectorAll('span[data-rental-id], button');
+  // Scroll to find a completed cookie order with "Leave Review" button
+  await page.evaluate(() => {
+    const btns = document.querySelectorAll('button');
     for (const btn of btns) {
-      if (btn.textContent.trim() === 'Review') {
+      if (btn.textContent.trim().includes('Leave Review')) {
         btn.scrollIntoView({ block: 'center' });
         return true;
       }
     }
     return false;
   });
-  if (reviewBtnFound) {
-    await sleep(1000);
-  }
   await sleep(3000);
 
 
@@ -1029,9 +1149,9 @@ async function goToDashboardTab(page, tabName) {
   // ============================================================
   console.log('  Scene 25: Sofia writes 5-star review');
 
-  // Click the Review button (span with $dispatch, not inside fixed)
-  await clickWithRing(page, 'Review', 'span, button');
-  await sleep(3000);
+  // Click the first "Leave Review" button (cookie order)
+  await clickLeaveReview(page);
+  await sleep(2000);
 
   // Review modal is now open (class="fixed" container)
   // Use Alpine.js data manipulation -- the modal uses x-data with reviewRating, etc.
@@ -1132,9 +1252,9 @@ async function goToDashboardTab(page, tabName) {
   // ============================================================
   console.log('  Scene 28: Leo writes 3-star review');
 
-  // Click Review button on Leo's completed cookie order
-  await clickWithRing(page, 'Review', 'span, button');
-  await sleep(3000);
+  // Click Leave Review button on Leo's completed cookie order
+  await clickLeaveReview(page);
+  await sleep(2000);
 
   // Review modal open -- set 3 stars, mixed subcategories, via Alpine.js
   await page.evaluate(() => {
@@ -1292,17 +1412,30 @@ async function goToDashboardTab(page, tabName) {
   // ============================================================
   console.log('  Scene 34: Pietro clicks Helpful');
 
-  // Find Leo's review (the 3-star one) and click helpful
-  await clickWithRing(page, 'Helpful', 'button') ||
-  await page.evaluate(() => {
-    const helpfulBtns = document.querySelectorAll('button');
-    for (const btn of helpfulBtns) {
-      if (btn.textContent.includes('Helpful') || btn.innerHTML.includes('thumbs-up')) {
-        btn.click();
-        break;
+  // Find the helpful (thumbs-up) button -- it's an SVG icon with title="Helpful"
+  // Use clickSelector with proper mouse event for Alpine @click binding
+  const helpfulClicked = await clickSelector(page, 'button[title="Helpful"]');
+  if (!helpfulClicked) {
+    console.log('  WARN: Helpful button not found by title, trying fallback');
+    // Fallback: find by Alpine @click attribute via evaluate + mouse click
+    const helpfulPos = await page.evaluate(() => {
+      const allBtns = document.querySelectorAll('button');
+      for (const btn of allBtns) {
+        const onclick = btn.getAttribute('@click') || '';
+        if (onclick.includes('voteReview') && onclick.includes('true')) {
+          btn.scrollIntoView({ block: 'center' });
+          const box = btn.getBoundingClientRect();
+          return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+        }
       }
+      return null;
+    });
+    if (helpfulPos) {
+      await showRing(page, helpfulPos.x, helpfulPos.y);
+      await sleep(400);
+      await page.mouse.click(helpfulPos.x, helpfulPos.y);
     }
-  });
+  }
   await sleep(4000);
 
 
@@ -1319,9 +1452,9 @@ async function goToDashboardTab(page, tabName) {
   await clickWithRing(page, 'Orders', '[role="tab"], button, a');
   await sleep(3000);
 
-  // Click Review button on a completed order
-  await clickWithRing(page, 'Review', 'span, button');
-  await sleep(3000);
+  // Click Leave Review button on a completed order
+  await clickLeaveReview(page);
+  await sleep(2000);
 
   // Review modal open -- set 5 stars via Alpine.js
   await page.evaluate(() => {
@@ -1403,7 +1536,7 @@ async function goToDashboardTab(page, tabName) {
   await sleep(3000);
 
   // Navigate to browse
-  await page.goto(`${BASE}/browse?category=food_and_drinks`, { waitUntil: 'networkidle2', timeout: 15000 });
+  await page.goto(`${BASE}/browse?category=kitchen`, { waitUntil: 'networkidle2', timeout: 15000 });
   await setZoom(page);
   await sleep(3000);
 
@@ -1437,9 +1570,9 @@ async function goToDashboardTab(page, tabName) {
   await setZoom(page);
   await sleep(2000);
 
-  // Click into his resolved post
-  await clickWithRing(page, 'Pressure Washer', 'a, h3, h4, div, button');
-  await sleep(3000);
+  // Click into his resolved post (Alpine SPA)
+  await openHelpPost(page, 'Pressure Washer');
+  await sleep(2000);
 
   // Scroll through -- show Leo's reply, Mike's reply, the RESOLVED badge
   await smoothScroll(page, 500);
@@ -1489,10 +1622,10 @@ async function goToDashboardTab(page, tabName) {
   console.log('  Scene 42: Grace Hopper narration card');
   await page.goto(card(
     'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-    'GRACE HOPPER',
-    'Post-Production Narration',
-    '<div class="extra" style="text-align:left; font-size:32px; line-height:1.8; max-width:1500px">' +
-    '<span class="hl">GRACE (V.O.):</span><br><br>' +
+    '',
+    '',
+    '<div class="extra" style="text-align:left; font-size:26px; line-height:1.65; max-width:1400px; opacity:0.9">' +
+    '<span class="hl" style="font-size:32px">GRACE (V.O.):</span><br><br>' +
     '"A ship in port is safe, but that\'s not what ships are built for."<br><br>' +
     'Johnny\'s pressure washer sat in his hallway for two weeks.<br>' +
     'He walked past it every morning. Thought about the curb.<br>' +
