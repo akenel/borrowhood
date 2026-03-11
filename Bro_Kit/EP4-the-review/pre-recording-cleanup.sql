@@ -424,6 +424,11 @@ WHERE slug = 'alessias-music' AND (avatar_url IS NULL OR avatar_url = '');
 UPDATE bh_listing SET notes = '25 cookies per bag. Various one-of-a-kind shapes. Message me your theme and I''ll bake it fresh.'
 WHERE id IN (SELECT l.id FROM bh_listing l JOIN bh_item i ON l.item_id = i.id WHERE i.slug = 'cookie-jar-refill-ooak-cookies-750g');
 
+-- Johnny's bike was claimed by Leo in EP3 -- no longer available
+UPDATE bh_listing SET status = 'REMOVED'
+WHERE item_id = (SELECT id FROM bh_item WHERE slug = 'johnnys-delivery-bike-broken')
+  AND listing_type = 'GIVEAWAY' AND status = 'ACTIVE';
+
 -- Fix 3D printer broken image (Thai food photo instead of printer)
 UPDATE bh_item_media SET url = '/static/images/seed/3d-printer-prusa.png'
 WHERE url LIKE '%photo-1631515243349%';
