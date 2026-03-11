@@ -120,7 +120,7 @@ async function authedFetch(path, cookie) {
   }
 
   // ============================================================
-  // 6. HELP BOARD IS CLEAN (0 posts -- Johnny creates first one live)
+  // 6. HELP BOARD HAS COMMUNITY POSTS (6 seeded, Johnny creates his live)
   // ============================================================
   console.log('\n  --- Help Board ---');
   const helpPage = await fetchPage('/helpboard');
@@ -132,10 +132,10 @@ async function authedFetch(path, cookie) {
 
   const helpSummary = await fetchJSON('/api/v1/helpboard/summary');
   if (helpSummary.status === 200 && helpSummary.data) {
-    if (helpSummary.data.total === 0) {
-      pass('Help Board is clean (0 posts)');
+    if (helpSummary.data.total >= 5) {
+      pass(`Help Board has ${helpSummary.data.total} community posts (seeded)`);
     } else {
-      fail(`Help Board has ${helpSummary.data.total} posts -- should be 0 (run cleanup SQL)`);
+      fail(`Help Board has ${helpSummary.data.total} posts -- should be 6+ (run cleanup SQL)`);
     }
   } else {
     fail('Could not fetch Help Board summary');
