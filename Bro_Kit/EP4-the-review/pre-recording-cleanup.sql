@@ -28,6 +28,88 @@ DELETE FROM bh_help_upvote;
 DELETE FROM bh_help_post;
 
 -- ============================================================
+-- 3b. SEED COMMUNITY HELP BOARD POSTS (pre-existing before Johnny's post)
+-- These make the Help Board look alive when the camera arrives.
+-- Johnny's pressure washer post is created LIVE on camera (Scene 12).
+-- ============================================================
+
+-- Rosa: need help with her garden gate hinge
+INSERT INTO bh_help_post (id, author_id, title, body, help_type, category, urgency, status, created_at, updated_at)
+VALUES (
+  gen_random_uuid(),
+  (SELECT id FROM bh_user WHERE slug = 'rosas-home'),
+  'Garden gate hinge rusted shut -- can''t open it anymore',
+  'The hinge on my side garden gate has completely rusted. I can''t open it without the whole frame shaking. It''s a wrought iron gate from the 1970s. Anyone know how to free a seized hinge without replacing the whole thing?',
+  'need', 'home_improvement', 'normal', 'open',
+  NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days'
+);
+
+-- Leo replied to Rosa's gate post (3 days ago)
+INSERT INTO bh_help_reply (id, post_id, author_id, body, created_at, updated_at)
+VALUES (
+  gen_random_uuid(),
+  (SELECT id FROM bh_help_post WHERE title LIKE '%garden gate%'),
+  (SELECT id FROM bh_user WHERE slug = 'leonardos-bottega'),
+  'WD-40 won''t cut it on 50-year-old wrought iron. You need penetrating oil -- PB Blaster or Kroil. Soak it overnight, then tap the pin out with a hammer and punch. I''ve done this on old Bottega shutters. Bring it by if you can''t get the pin out.',
+  NOW() - INTERVAL '3 days', NOW() - INTERVAL '3 days'
+);
+
+-- Aiko: offering calligraphy lessons
+INSERT INTO bh_help_post (id, author_id, title, body, help_type, category, urgency, status, created_at, updated_at)
+VALUES (
+  gen_random_uuid(),
+  (SELECT id FROM bh_user WHERE slug = 'aiko-studio'),
+  'I can teach Japanese calligraphy -- free for beginners',
+  'I have 15 years of experience with brush calligraphy (Shodo). If anyone wants to learn the basics -- brush grip, stroke order, first kanji -- I''m happy to do a 1-hour session for free. You just need a brush and ink (I have extras). Weekends work best.',
+  'offer', 'art', 'normal', 'open',
+  NOW() - INTERVAL '8 days', NOW() - INTERVAL '8 days'
+);
+
+-- Andrea: needs help fixing a leaking faucet
+INSERT INTO bh_help_post (id, author_id, title, body, help_type, category, urgency, status, created_at, updated_at)
+VALUES (
+  gen_random_uuid(),
+  (SELECT id FROM bh_user WHERE slug = 'andreas-water'),
+  'Kitchen faucet dripping non-stop -- landlord says "fix it yourself"',
+  'My kitchen faucet has been dripping for 2 weeks. The landlord told me to handle it. I watched 3 YouTube videos and I''m more confused than before. It''s a single-handle mixer. Is this a cartridge thing? Do I need a plumber or can someone walk me through it?',
+  'need', 'home_improvement', 'normal', 'open',
+  NOW() - INTERVAL '4 days', NOW() - INTERVAL '4 days'
+);
+
+-- Mike replied to Andrea's faucet post
+INSERT INTO bh_help_reply (id, post_id, author_id, body, created_at, updated_at)
+VALUES (
+  gen_random_uuid(),
+  (SELECT id FROM bh_help_post WHERE title LIKE '%Kitchen faucet%'),
+  (SELECT id FROM bh_user WHERE slug = 'mikes-garage'),
+  'Single-handle mixer = ceramic disc cartridge 99% of the time. Turn off the water under the sink, pop the cap off the handle, unscrew the retaining nut, pull out the cartridge. Take it to the hardware store and match it. EUR 8 part, 15 minutes. Don''t pay a plumber EUR 80 for this.',
+  NOW() - INTERVAL '3 days', NOW() - INTERVAL '3 days'
+);
+
+-- Alessia: resolved post about guitar strings
+INSERT INTO bh_help_post (id, author_id, title, body, help_type, category, urgency, status, resolved_by_id, created_at, updated_at)
+VALUES (
+  gen_random_uuid(),
+  (SELECT id FROM bh_user WHERE slug = 'alessias-music'),
+  'Where to find nylon guitar strings in Trapani?',
+  'I need D''Addario EJ45 nylon strings for my classical guitar. Can''t find them anywhere in the centro. Does anyone know a music shop that stocks them, or has a spare set I could buy?',
+  'need', 'art', 'low', 'resolved',
+  (SELECT id FROM bh_user WHERE slug = 'leonardos-bottega'),
+  NOW() - INTERVAL '12 days', NOW() - INTERVAL '10 days'
+);
+
+-- George: offering cooking lessons
+INSERT INTO bh_help_post (id, author_id, title, body, help_type, category, urgency, status, created_at, updated_at)
+VALUES (
+  gen_random_uuid(),
+  (SELECT id FROM bh_user WHERE slug = 'georges-villa'),
+  'Italian cooking basics -- I can host a group at the villa',
+  'I''ve been learning Sicilian cooking from my neighbor Carmela for 3 years. Happy to host a small group (4-6 people) at the villa for a pasta-making session. Flour, eggs, and wine provided. Just bring an appetite and a good story.',
+  'offer', 'services', 'normal', 'open',
+  NOW() - INTERVAL '6 days', NOW() - INTERVAL '6 days'
+);
+
+-- ============================================================
 -- 4. ENSURE JOHNNY'S PRESSURE WASHER EXISTS AND IS LISTED
 -- The item should already exist from seed data (slug: pressure-washer-karcher-k5)
 -- Make sure the listing is ACTIVE
@@ -349,7 +431,7 @@ JOIN bh_delivery_tracking dt ON de.tracking_id = dt.id
 JOIN bh_rental r ON dt.rental_id = r.id
 WHERE r.renter_message LIKE 'EP4-seed%';
 
-SELECT 'Help posts (should be 0 -- Johnny creates first one live)' AS check, COUNT(*)
+SELECT 'Help posts (should be 6 -- community posts seeded, Johnny creates his live)' AS check, COUNT(*)
 FROM bh_help_post;
 
 SELECT 'Reviews (should be 0 -- created live on camera)' AS check, COUNT(*)
