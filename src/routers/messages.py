@@ -57,7 +57,7 @@ async def list_threads(
         else_=BHMessage.sender_id,
     )
 
-    # Subquery: latest message id per conversation partner
+    # Subquery: latest message created_at per conversation partner
     latest_sub = (
         select(
             other_id.label("other_id"),
@@ -74,10 +74,33 @@ async def list_threads(
         .subquery()
     )
 
-    # Join back to get the actual message row + other user info
+    # Second subquery: get the actual message ID for each latest message
+    # Using DISTINCT ON to get exactly one row per conversation partner
     other_id_col = case(
         (BHMessage.sender_id == user.id, BHMessage.recipient_id),
         else_=BHMessage.sender_id,
+    )
+
+    latest_msg_sub = (
+        select(
+            func.distinct(latest_sub.c.other_id).label("other_id"),
+            BHMessage.id.label("msg_id"),
+        )
+        .join(
+            latest_sub,
+            and_(
+                other_id_col == latest_sub.c.other_id,
+                BHMessage.created_at >= latest_sub.c.max_created,
+            ),
+        )
+        .where(BHMessage.deleted_at.is_(None))
+        .where(
+            or_(
+                BHMessage.sender_id == user.id,
+                BHMessage.recipient_id == user.id,
+            )
+        )
+        .subquery()
     )
 
     query = (
@@ -87,14 +110,8 @@ async def list_threads(
             BHUser.display_name.label("other_user_name"),
             BHUser.avatar_url.label("other_user_avatar"),
         )
-        .join(
-            latest_sub,
-            and_(
-                other_id_col == latest_sub.c.other_id,
-                BHMessage.created_at == latest_sub.c.max_created,
-            ),
-        )
-        .join(BHUser, BHUser.id == latest_sub.c.other_id)
+        .join(latest_msg_sub, BHMessage.id == latest_msg_sub.c.msg_id)
+        .join(BHUser, BHUser.id == latest_msg_sub.c.other_id)
         .where(BHMessage.deleted_at.is_(None))
         .order_by(BHMessage.created_at.desc())
     )
