@@ -183,10 +183,12 @@
                         </a>
                     </div>
                     <a href="/orders" class="text-sm text-gray-700 hover:text-indigo-600 hidden md:block">{% if lang == 'it' %}Ordini{% else %}Orders{% endif %}</a>
-                    <div class="hidden md:block" x-data="{ u: null }" x-init="fetch('/api/v1/users/me').then(r=>r.ok?r.json():null).then(d=>u=d).catch(()=>{})">
+                    <div class="hidden md:block"
+                         x-data="{ u: null, avatarOk: false }"
+                         x-init="fetch('/api/v1/users/me').then(r=>r.ok?r.json():null).then(d=>{u=d; if(d&&d.avatar_url){var img=new Image();img.onload=()=>{avatarOk=true};img.onerror=()=>{avatarOk=false};img.src=d.avatar_url;}}).catch(()=>{})">
                         <a href="/profile" class="inline-flex items-center text-sm text-gray-700 hover:text-indigo-600 transition-colors" :title="u ? u.display_name : '{{ user.get('preferred_username', '') }}'">
-                            <img x-show="u && u.avatar_url" :src="u && u.avatar_url ? u.avatar_url : ''" @error="u.avatar_url = null" class="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-200 hover:ring-indigo-400 transition-all">
-                            <div x-show="!u || !u.avatar_url" class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-bold text-indigo-600 ring-2 ring-indigo-200 hover:ring-indigo-400 transition-all"
+                            <img x-show="avatarOk" :src="u && u.avatar_url ? u.avatar_url : ''" class="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-200 hover:ring-indigo-400 transition-all">
+                            <div x-show="!avatarOk" class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-bold text-indigo-600 ring-2 ring-indigo-200 hover:ring-indigo-400 transition-all"
                                  x-text="u ? (u.display_name||'?')[0] : '{{ user.get('preferred_username', '?')[0] | upper }}'"></div>
                         </a>
                     </div>
