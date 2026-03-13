@@ -14,6 +14,10 @@ class MessageCreate(BaseModel):
     rental_id: Optional[UUID] = None
 
 
+class MessageUpdate(BaseModel):
+    body: str = Field(..., min_length=1, max_length=5000)
+
+
 class MessageOut(BaseModel):
     id: UUID
     sender_id: UUID
@@ -22,6 +26,7 @@ class MessageOut(BaseModel):
     listing_id: Optional[UUID] = None
     rental_id: Optional[UUID] = None
     read_at: Optional[datetime] = None
+    edited_at: Optional[datetime] = None
     created_at: datetime
     sender_name: Optional[str] = None
     sender_avatar: Optional[str] = None

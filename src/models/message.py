@@ -41,6 +41,11 @@ class BHMessage(BHBase, Base):
         DateTime(timezone=True), default=None
     )
 
+    # Edit tracking
+    edited_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), default=None
+    )
+
     # Relationships
     sender: Mapped["BHUser"] = relationship(foreign_keys=[sender_id])
     recipient: Mapped["BHUser"] = relationship(foreign_keys=[recipient_id])

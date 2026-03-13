@@ -289,13 +289,23 @@ async function getMyId(page) {
 async function resolveUserIds(page) {
   const cast = ['john', 'leonardo', 'mike', 'sally', 'nino', 'sofiaferretti'];
   for (const username of cast) {
-    await apiCall(page, 'POST', '/api/v1/demo/login', { username, password: 'helix_pass' });
-    const id = await getMyId(page);
-    if (id) {
-      userIdCache[username] = id;
-      console.log(`  Resolved ${username} → ${id}`);
-    } else {
-      console.log(`  WARN: Could not resolve ID for ${username}`);
+    try {
+      // Ensure we're on the real site (not data: or about:blank)
+      const url = page.url();
+      if (!url.startsWith(BASE)) {
+        await retry(() => page.goto(BASE, { waitUntil: 'networkidle2', timeout: 15000 }), 'resolveUserIds nav');
+        await sleep(500);
+      }
+      await retry(() => apiCall(page, 'POST', '/api/v1/demo/login', { username, password: 'helix_pass' }), `login ${username}`);
+      const id = await getMyId(page);
+      if (id) {
+        userIdCache[username] = id;
+        console.log(`  Resolved ${username} → ${id}`);
+      } else {
+        console.log(`  WARN: Could not resolve ID for ${username}`);
+      }
+    } catch (err) {
+      console.log(`  WARN: resolveUserIds failed for ${username}: ${err.message}`);
     }
     // bh_session is httponly -- use CDP to delete it
     const domain = new URL(BASE).hostname;
