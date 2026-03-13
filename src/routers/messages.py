@@ -15,7 +15,7 @@ from src.database import get_db
 from src.dependencies import get_user, require_auth, user_throttle
 from src.models.message import BHMessage
 from src.models.user import BHUser
-from src.schemas.message import MessageCreate, MessageOut, MessageSummary, ThreadSummary
+from src.schemas.message import MessageCreate, MessageOut, MessageSummary, MessageUpdate, ThreadSummary
 
 router = APIRouter(prefix="/api/v1/messages", tags=["messages"])
 
@@ -204,6 +204,7 @@ async def get_thread(
                 listing_id=msg.listing_id,
                 rental_id=msg.rental_id,
                 read_at=msg.read_at,
+                edited_at=msg.edited_at,
                 created_at=msg.created_at,
                 sender_name=sender.display_name if sender else None,
                 sender_avatar=sender.avatar_url if sender else None,
@@ -268,7 +269,73 @@ async def send_message(
         listing_id=message.listing_id,
         rental_id=message.rental_id,
         read_at=message.read_at,
+        edited_at=message.edited_at,
         created_at=message.created_at,
         sender_name=user.display_name,
         sender_avatar=user.avatar_url,
     )
+
+
+@router.patch("/{message_id}", response_model=MessageOut)
+async def edit_message(
+    message_id: UUID,
+    data: MessageUpdate,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Edit a message body. Only the sender can edit, and only within 15 minutes."""
+    user = await get_user(db, token)
+
+    msg = await db.get(BHMessage, message_id)
+    if not msg or msg.deleted_at is not None:
+        raise HTTPException(status_code=404, detail="Message not found")
+
+    if msg.sender_id != user.id:
+        raise HTTPException(status_code=403, detail="You can only edit your own messages")
+
+    # 15-minute edit window
+    now = datetime.now(timezone.utc)
+    age_seconds = (now - msg.created_at).total_seconds()
+    if age_seconds > 900:
+        raise HTTPException(status_code=403, detail="Messages can only be edited within 15 minutes")
+
+    msg.body = data.body
+    msg.edited_at = now
+    await db.commit()
+    await db.refresh(msg)
+
+    return MessageOut(
+        id=msg.id,
+        sender_id=msg.sender_id,
+        recipient_id=msg.recipient_id,
+        body=msg.body,
+        listing_id=msg.listing_id,
+        rental_id=msg.rental_id,
+        read_at=msg.read_at,
+        edited_at=msg.edited_at,
+        created_at=msg.created_at,
+        sender_name=user.display_name,
+        sender_avatar=user.avatar_url,
+    )
+
+
+@router.delete("/{message_id}", status_code=200)
+async def delete_message(
+    message_id: UUID,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Soft-delete a message. Only the sender can delete."""
+    user = await get_user(db, token)
+
+    msg = await db.get(BHMessage, message_id)
+    if not msg or msg.deleted_at is not None:
+        raise HTTPException(status_code=404, detail="Message not found")
+
+    if msg.sender_id != user.id:
+        raise HTTPException(status_code=403, detail="You can only delete your own messages")
+
+    msg.deleted_at = datetime.now(timezone.utc)
+    await db.commit()
+
+    return {"status": "deleted", "id": str(message_id)}

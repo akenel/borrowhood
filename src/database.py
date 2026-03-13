@@ -93,6 +93,8 @@ async def run_migrations():
         "ALTER TABLE bh_review ADD COLUMN IF NOT EXISTS photo_urls TEXT[]",
         # 2026-03-08: Activity tracking
         "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMPTZ",
+        # 2026-03-13: Message edit tracking
+        "ALTER TABLE bh_message ADD COLUMN IF NOT EXISTS edited_at TIMESTAMPTZ",
     ]
     # ALTER TYPE ... ADD VALUE -- SQLAlchemy uses enum .name (UPPERCASE) for PG enums
     enum_migrations = [
