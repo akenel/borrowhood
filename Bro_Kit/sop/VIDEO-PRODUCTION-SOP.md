@@ -122,9 +122,13 @@ Add **2 extra seconds** of pause after each click on UI pages. Phone viewers nee
 
 ## 4. Recording Script Rules
 
-### 4.1 Self-Contained
+### 4.1 Per-Shot Architecture (EP5+)
 
-Each script is self-contained. Copy all utility functions into the script -- no shared imports. This means any script can run standalone on Hetzner without dependencies beyond Puppeteer.
+Starting EP5, episodes use per-shot recording scripts with shared `helpers.js`. See **SHOT-PRODUCTION-SOP.md** for the full methodology, Notion Shot Tracker workflow, and dependency management.
+
+Each shot is a separate script that launches its own browser, records 30s-2m, and closes cleanly. This prevents memory crashes on 16GB systems and allows re-recording individual shots without affecting the rest.
+
+**Legacy (EP1-EP4):** Self-contained monolithic scripts. Still work but risk memory pressure on long recordings.
 
 ### 4.2 Required Utilities (copy from previous script)
 
@@ -238,7 +242,7 @@ ffmpeg -i "raw-obs-recording.mp4" -ss START -to END \
 ### 6.2 Background Music
 
 **Track: Brotherhood Run** -- always. No exceptions.
-**Volume: 30%** -- always. No exceptions.
+**Volume: 10%** -- always. No exceptions. (Was 40%, then 30%, then 20%. 10% is the sweet spot.)
 **Location:** `BorrowHood/Bro_Kit/Archive/archive/Brotherhood Run.mp3` (209.9s / 3:30)
 
 Loop if video is longer than 3:30. Fade in 3s at start, fade out 5s before end.
@@ -262,7 +266,7 @@ ffmpeg -y -i /tmp/br-2x.wav -i /tmp/br-2x.wav \
 
 # Step 4: Apply volume, fades, trim to video length
 ffmpeg -y -i /tmp/br-4x.wav \
-  -af "volume=0.3,afade=t=in:d=3,afade=t=out:st=${FADE_OUT_START}:d=5" \
+  -af "volume=0.1,afade=t=in:d=3,afade=t=out:st=${FADE_OUT_START}:d=5" \
   -t $DURATION -c:a aac -b:a 128k -ar 48000 music-loop.m4a
 ```
 
@@ -383,7 +387,7 @@ Analyze the final video frame by frame (5-second intervals) to map accurate chap
 **PHASE 3 -- Post-production (only video files + timestamp update):**
 - [ ] Video trimmed with re-encode (`-c:v libx264`, NOT `-c:v copy`)
 - [ ] Audio stripped from trimmed video
-- [ ] Brotherhood Run at 40% volume, looped, faded
+- [ ] Brotherhood Run at 10% volume, looped, faded
 - [ ] Video + music merged
 - [ ] Final video verified (play start to finish)
 - [ ] Chapter timestamps updated in YOUTUBE-METADATA.md (from frame analysis)
@@ -433,7 +437,71 @@ This is the team's sprint retrospective. No publishing without it.
 
 ---
 
-## 10. Test Credentials
+## 10. Bug Discovery & Resolution During Recording (S2E1+)
+
+When a bug is found during UAT recording, we don't skip it or "fix it later." We stop, fix, verify, and resume. This is the triple-entry bug tracking workflow established during S2E1 recording.
+
+### 10.1 The Triple-Entry System
+
+Every bug discovered during recording gets logged in THREE places:
+
+| Layer | Where | Audience | What goes there |
+|-------|-------|----------|-----------------|
+| **Production Board** | Notion Production Board (comment on shot card) | Producers | What broke on screen, which shot, visual impact |
+| **Project Board** | Notion Project Board (new Bug card) | Project management | Priority, status, assignment, sprint tracking |
+| **In-App Backlog** | BorrowHood `/backlog` (BL-XXX entry) | Developers | Commit SHA, file changed, deploy method, re-test URL |
+
+### 10.2 BL Entry Requirements
+
+Every Backlog entry (BL-XXX) MUST include:
+
+- **Commit SHA** -- the exact commit that fixes the bug (publicly verifiable on GitHub)
+- **File changed** -- which source file was modified
+- **Deploy method** -- how it was deployed (e.g., `scp + docker compose restart`)
+- **Re-test URL** -- the exact URL to verify the fix on UAT
+
+### 10.3 Workflow (Step by Step)
+
+```
+1. Bug spotted during recording
+   ↓
+2. Log on Notion Production Board (comment on the shot card)
+   ↓
+3. Log on Notion Project Board (Bug card with priority + status)
+   ↓
+4. Log in BorrowHood /backlog (BL-XXX)
+   ↓
+5. Fix the code
+   ↓
+6. Commit with descriptive message referencing the bug
+   ↓
+7. Deploy to Hetzner (scp file + docker compose restart)
+   ↓
+8. Push to GitHub (so commit SHA is publicly verifiable)
+   ↓
+9. Update BL activity with commit SHA + deploy confirmation
+   ↓
+10. Resume recording
+```
+
+### 10.4 Why Three Places
+
+- **Notion Production Board** -- so the video producer knows which shots need re-recording
+- **Notion Project Board** -- so the project manager can track bug velocity and priorities
+- **In-App Backlog** -- so the developer has the exact technical details to verify and audit
+
+This is the NMPS (Notion Motion Production Studio) paying off. The tooling exists, use it.
+
+### 10.5 Source Files
+
+- Backlog model: `src/models/backlog.py`
+- Backlog router: `src/routers/backlog.py`
+- Backlog schema: `src/schemas/backlog.py`
+- UI: `/backlog` route in the app
+
+---
+
+## 11. Test Credentials
 
 All test users across all realms: password is `helix_pass`
 
@@ -441,7 +509,7 @@ Seed users: sally, mike, angel, maria, nino
 
 ---
 
-## 11. Hetzner Server
+## 12. Hetzner Server
 
 - IP: 46.62.138.218
 - SSH: `ssh root@46.62.138.218`

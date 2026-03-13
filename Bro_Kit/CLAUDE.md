@@ -32,6 +32,8 @@ This file loads when working in the Bro_Kit directory. Follow these rules for ev
 
 13. **Mobile-first text sizes** -- Most viewers watch on phones. Double all card font sizes (headings 96-128px, subtitles 48-64px, body 36-48px). Set browser zoom to 150% for UI demo pages (`document.body.style.zoom = '1.5'`). Bigger click rings (60px diameter, 5px border). Extra 2s pause after each UI click.
 
+14. **Bug found during recording = triple-entry log** -- Every bug discovered during UAT recording gets logged in THREE places before fixing: (1) Notion Production Board (comment on shot card), (2) Notion Project Board (Bug card with priority/status), (3) BorrowHood in-app Backlog at `/backlog` (BL-XXX with commit SHA, file, deploy method, re-test URL). Fix, deploy, push to GitHub so SHA is verifiable, update BL activity, then resume recording. Full workflow: `sop/VIDEO-PRODUCTION-SOP.md` Section 10.
+
 ---
 
 ## Folder Convention
@@ -126,6 +128,7 @@ All users: password `helix_pass`. Seed users: sally, mike, angel, maria, nino.
 | 9 | The Crash | `15-the-crash/` | FINAL (EP1 PUBLISHED) |
 | 10 | The Cookie Run | `16-the-cookie-run/` | FINAL (11:08, EP2 PUBLISHED) |
 | 11 | The Scooter | `EP3-the-scooter/` | PRE-PACKAGED (EP3) |
+| 12 | The Review | `EP4-the-review/` | FINAL (11:31, EP4 Take 6) |
 
 ---
 

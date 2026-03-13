@@ -33,6 +33,7 @@
                                     <span x-show="thread.unread_count > 0" class="w-5 h-5 bg-blue-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center" x-text="thread.unread_count"></span>
                                 </div>
                                 <p class="text-xs text-gray-400 truncate" x-text="thread.last_message"></p>
+                                <p class="text-[10px] text-gray-300 mt-0.5" x-text="formatMsgTime(thread.last_message_at)"></p>
                             </div>
                         </div>
                     </button>
@@ -46,18 +47,41 @@
             <template x-if="activeThread">
                 <div class="flex flex-col h-full">
                     <!-- Thread header -->
-                    <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                    <div class="px-4 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
+                        <template x-if="activeThreadAvatar">
+                            <img :src="activeThreadAvatar" class="w-8 h-8 rounded-full object-cover">
+                        </template>
+                        <template x-if="!activeThreadAvatar">
+                            <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-600"
+                                 x-text="(activeThreadName||'?')[0]"></div>
+                        </template>
                         <p class="text-sm font-semibold text-gray-900" x-text="activeThreadName"></p>
                     </div>
 
                     <!-- Messages -->
-                    <div class="flex-1 overflow-y-auto p-4 space-y-3 max-h-[400px]" id="msg-scroll">
+                    <div class="flex-1 overflow-y-auto p-4 space-y-4 max-h-[400px]" id="msg-scroll">
                         <template x-for="msg in messages" :key="msg.id">
-                            <div :class="msg.sender_id === myUserId ? 'flex justify-end' : 'flex justify-start'">
+                            <div :class="msg.sender_id === myUserId ? 'flex justify-end' : 'flex justify-start gap-2'">
+                                <!-- Sender avatar (received messages only) -->
+                                <template x-if="msg.sender_id !== myUserId">
+                                    <div class="flex-shrink-0 mt-1">
+                                        <template x-if="msg.sender_avatar">
+                                            <img :src="msg.sender_avatar" class="w-8 h-8 rounded-full object-cover">
+                                        </template>
+                                        <template x-if="!msg.sender_avatar">
+                                            <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-600"
+                                                 x-text="(msg.sender_name||'?')[0]"></div>
+                                        </template>
+                                    </div>
+                                </template>
                                 <div :class="msg.sender_id === myUserId ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-900'"
-                                     class="max-w-[75%] px-4 py-2 rounded-2xl">
+                                     class="max-w-[70%] px-4 py-2 rounded-2xl">
+                                    <!-- Sender name (received messages only) -->
+                                    <template x-if="msg.sender_id !== myUserId && msg.sender_name">
+                                        <p class="text-xs font-semibold text-indigo-600 mb-1" x-text="msg.sender_name"></p>
+                                    </template>
                                     <p class="text-sm" x-text="msg.body"></p>
-                                    <p class="text-[10px] mt-1 opacity-60" x-text="new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})"></p>
+                                    <p class="text-[10px] mt-1 opacity-60" x-text="formatMsgTime(msg.created_at)"></p>
                                 </div>
                             </div>
                         </template>
@@ -91,6 +115,23 @@
 
 {% block scripts %}
 <script>
+function formatMsgTime(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var day = days[d.getUTCDay()];
+    var month = months[d.getUTCMonth()];
+    var date = d.getUTCDate();
+    var year = d.getUTCFullYear();
+    var hours = d.getUTCHours();
+    var minutes = d.getUTCMinutes();
+    var ampm = hours >= 12 ? 'pm' : 'am';
+    var h12 = hours % 12 || 12;
+    var min = minutes < 10 ? '0' + minutes : minutes;
+    return day + ', ' + month + ' ' + date + ', ' + year + ' ' + h12 + ':' + min + ampm + ' UTC';
+}
+
 function messagesApp() {
     return {
         threads: [],
@@ -98,6 +139,7 @@ function messagesApp() {
         loaded: false,
         activeThread: null,
         activeThreadName: '',
+        activeThreadAvatar: null,
         newMessage: '',
         sending: false,
         myUserId: '',
@@ -137,6 +179,7 @@ function messagesApp() {
         async selectThread(thread) {
             this.activeThread = thread.other_user_id;
             this.activeThreadName = thread.other_user_name;
+            this.activeThreadAvatar = thread.other_user_avatar || null;
             await this.loadMessages(thread.other_user_id);
             thread.unread_count = 0;
         },
@@ -144,9 +187,12 @@ function messagesApp() {
         async openThread(userId) {
             this.activeThread = userId;
             await this.loadMessages(userId);
-            // Find thread name
+            // Find thread name + avatar
             var t = this.threads.find(function(t) { return t.other_user_id === userId; });
-            if (t) this.activeThreadName = t.other_user_name;
+            if (t) {
+                this.activeThreadName = t.other_user_name;
+                this.activeThreadAvatar = t.other_user_avatar || null;
+            }
         },
 
         async loadMessages(userId) {
