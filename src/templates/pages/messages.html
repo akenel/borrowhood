@@ -39,7 +39,7 @@
                                 </div>
                                 <div class="min-w-0">
                                     <p class="text-sm font-medium text-gray-900 truncate" x-text="member.display_name"></p>
-                                    <p x-show="member.city" class="text-xs text-gray-400 truncate" x-text="member.city"></p>
+                                    <p x-show="member.workshop_name || member.city" class="text-xs text-gray-400 truncate" x-text="member.workshop_name || member.city || ''"></p>
                                 </div>
                             </button>
                         </template>
