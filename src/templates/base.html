@@ -186,10 +186,10 @@
                     <div class="hidden md:block" x-data="{ u: null }" x-init="fetch('/api/v1/users/me').then(r=>r.ok?r.json():null).then(d=>u=d).catch(()=>{})">
                         <a href="/profile" class="flex items-center text-sm text-gray-700 hover:text-indigo-600 transition-colors" :title="u ? u.display_name : ''">
                             <template x-if="u && u.avatar_url">
-                                <img :src="u.avatar_url" class="w-7 h-7 rounded-full object-cover">
+                                <img :src="u.avatar_url" class="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-200 hover:ring-indigo-400 transition-all">
                             </template>
                             <template x-if="u && !u.avatar_url">
-                                <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-600"
+                                <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-bold text-indigo-600 ring-2 ring-indigo-200 hover:ring-indigo-400 transition-all"
                                      x-text="(u.display_name||'?')[0]"></div>
                             </template>
                         </a>
