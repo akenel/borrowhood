@@ -42,6 +42,7 @@
             content_language: '{{ lang }}',
             currency: 'EUR',
             delivery_available: false,
+            delivery_fee: '',
             notes: ''
         },
         selectedTypes: ['rent'],
@@ -50,8 +51,9 @@
             sell: { price: '', price_unit: 'flat', deposit: '' },
             commission: { price: '', price_unit: 'flat', deposit: '' },
             offer: { price: '', price_unit: 'negotiable', deposit: '' },
-            service: { price: '', price_unit: 'per_hour', deposit: '' },
-            training: { price: '', price_unit: 'per_hour', deposit: '' },
+            service: { price: '', price_unit: 'per_hour', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '' },
+            training: { price: '', price_unit: 'per_hour', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '' },
+            auction: { price: '', price_unit: 'flat', deposit: '', bid_increment: '1', auction_days: '7' },
             giveaway: { price: '', price_unit: 'flat', deposit: '' }
         },
         toggleListingType(val) {
@@ -222,20 +224,36 @@
                 for (const lt of this.selectedTypes) {
                     const terms = this.listingPrices[lt];
                     const isGiveaway = lt === 'giveaway';
+                    const isSvcType = (lt === 'service' || lt === 'training');
+                    const payload = {
+                        item_id: item.id,
+                        listing_type: lt,
+                        price: isGiveaway ? null : (terms.price ? parseFloat(terms.price) : null),
+                        price_unit: isGiveaway ? 'flat' : terms.price_unit,
+                        currency: this.form.currency,
+                        deposit: (isGiveaway || isSvcType) ? null : (terms.deposit ? parseFloat(terms.deposit) : null),
+                        delivery_available: isGiveaway ? false : this.form.delivery_available,
+                        pickup_only: isGiveaway ? true : !this.form.delivery_available,
+                        notes: this.form.notes || null
+                    };
+                    if (isSvcType) {
+                        if (terms.minimum_charge) payload.minimum_charge = parseFloat(terms.minimum_charge);
+                        if (terms.per_person_rate) payload.per_person_rate = parseFloat(terms.per_person_rate);
+                        if (terms.max_participants) payload.max_participants = parseInt(terms.max_participants);
+                        if (terms.group_discount_pct) payload.group_discount_pct = parseFloat(terms.group_discount_pct);
+                    }
+                    if (lt === 'auction') {
+                        if (terms.bid_increment) payload.bid_increment = parseFloat(terms.bid_increment);
+                        if (terms.auction_days) {
+                            const end = new Date();
+                            end.setDate(end.getDate() + parseInt(terms.auction_days));
+                            payload.auction_end = end.toISOString();
+                        }
+                    }
                     const listingResp = await fetch('/api/v1/listings', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            item_id: item.id,
-                            listing_type: lt,
-                            price: isGiveaway ? null : (terms.price ? parseFloat(terms.price) : null),
-                            price_unit: isGiveaway ? 'flat' : terms.price_unit,
-                            currency: this.form.currency,
-                            deposit: isGiveaway ? null : (terms.deposit ? parseFloat(terms.deposit) : null),
-                            delivery_available: isGiveaway ? false : this.form.delivery_available,
-                            pickup_only: isGiveaway ? true : !this.form.delivery_available,
-                            notes: this.form.notes || null
-                        })
+                        body: JSON.stringify(payload)
                     });
                     if (!listingResp.ok) {
                         console.warn(`Listing creation failed for type: ${lt}`);
@@ -341,7 +359,26 @@
                         {% endfor %}
                     </select>
                 </div>
+
             </div>
+
+            <!-- Auto-select item_type + listing type based on category -->
+            <template x-effect="
+                const svcCats = ['repairs', 'training_service', 'custom_orders', 'education'];
+                const spaceCats = ['workshops', 'kitchens', 'garages', 'studios'];
+                if (svcCats.includes(form.category)) {
+                    form.item_type = 'service';
+                    if (!selectedTypes.includes('service') && !selectedTypes.includes('training')) {
+                        if (form.category === 'training_service' || form.category === 'education') {
+                            selectedTypes = ['training'];
+                        } else {
+                            selectedTypes = ['service'];
+                        }
+                    }
+                } else if (spaceCats.includes(form.category)) {
+                    form.item_type = 'space';
+                }
+            "></template>
 
             <!-- AI Generate Button -->
             <div>
@@ -541,7 +578,8 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Condition + Brand (hidden for service/space) -->
+            <div x-show="form.item_type !== 'service' && form.item_type !== 'space'" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label for="condition" class="block text-sm font-medium text-gray-700 mb-1">{{ t('list_item.condition') }}</label>
                     <select id="condition" x-model="form.condition"
@@ -560,6 +598,8 @@
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 min-h-[44px]">
                 </div>
             </div>
+            <!-- Clear condition for services (don't send meaningless value) -->
+            <template x-effect="if (form.item_type === 'service' || form.item_type === 'space') form.condition = null;"></template>
 
             <div class="flex justify-end pt-4">
                 <button @click="if(form.name.trim()) step = 2" :disabled="!form.name.trim()"
@@ -572,12 +612,37 @@
         <!-- Step 2: Listing Terms -->
         <div x-show="step === 2" x-cloak class="bg-white rounded-lg border border-gray-200 p-6 space-y-5">
 
+            <!-- Step 1 Summary Card -->
+            <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <!-- Thumbnail -->
+                <div class="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-200">
+                    <img x-show="uploadPreview" :src="uploadPreview" class="w-full h-full object-cover">
+                    <img x-show="!uploadPreview && aiImageUrl" :src="aiImageUrl" class="w-full h-full object-cover">
+                    <div x-show="!uploadPreview && !aiImageUrl" class="w-full h-full flex items-center justify-center text-gray-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                </div>
+                <!-- Details -->
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-gray-900 truncate" x-text="form.name || 'Untitled'"></p>
+                    <div class="flex flex-wrap gap-2 mt-1">
+                        <span class="text-xs px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full" x-text="form.category.replace(/_/g, ' ')"></span>
+                        <span class="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full" x-text="form.item_type.replace(/_/g, ' ')"></span>
+                        <span x-show="form.condition && form.item_type !== 'service' && form.item_type !== 'space'" class="text-xs px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full" x-text="form.condition?.replace(/_/g, ' ')"></span>
+                    </div>
+                </div>
+                <!-- Edit button -->
+                <button @click="step = 1" class="flex-shrink-0 text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+                    {% if lang == 'it' %}Modifica{% else %}Edit{% endif %}
+                </button>
+            </div>
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('list_item.listing_type') }} *
                     <span class="text-xs text-gray-400 font-normal ml-1">{% if lang == 'it' %}(seleziona tutti quelli che si applicano){% else %}(select all that apply){% endif %}</span>
                 </label>
                 <div class="space-y-3">
-                    {% for ltype in ['rent','sell','commission','offer','service','training','giveaway'] %}
+                    {% for ltype in ['rent','sell','commission','offer','service','training','auction','giveaway'] %}
                     <div>
                         <label class="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer transition-colors min-h-[44px]"
                                :class="selectedTypes.includes('{{ ltype }}') ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'">
@@ -585,7 +650,34 @@
                                    :checked="selectedTypes.includes('{{ ltype }}')"
                                    @change="toggleListingType('{{ ltype }}')"
                                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                            <span class="text-sm font-medium text-gray-900">{{ t('listing_types.' + ltype) }}</span>
+                            <span class="text-sm font-medium text-gray-900 flex-1">{{ t('listing_types.' + ltype) }}</span>
+                            <!-- Help tooltip -->
+                            <span x-data="{ show: false }" class="relative flex-shrink-0" @click.stop>
+                                <button @click.prevent="show = !show" class="w-5 h-5 rounded-full bg-gray-200 hover:bg-indigo-100 text-gray-500 hover:text-indigo-600 text-xs font-bold flex items-center justify-center transition-colors" type="button">?</button>
+                                <div x-show="show" x-cloak @click.outside="show = false"
+                                     x-transition:enter="transition ease-out duration-100"
+                                     x-transition:enter-start="opacity-0 scale-95"
+                                     x-transition:enter-end="opacity-100 scale-100"
+                                     class="absolute right-0 top-7 z-20 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-xs text-gray-600 leading-relaxed">
+                                    {% if ltype == 'rent' %}
+                                    {% if lang == 'it' %}Presta il tuo oggetto per un periodo. Lo riavrai indietro. Imposta prezzo giornaliero/orario e un deposito cauzionale.{% else %}Lend your item for a period. You get it back. Set a daily/hourly rate and a security deposit.{% endif %}
+                                    {% elif ltype == 'sell' %}
+                                    {% if lang == 'it' %}Vendi l'oggetto. Trasferimento di proprieta. Una volta venduto, e del compratore.{% else %}Sell the item outright. Transfer of ownership. Once sold, it belongs to the buyer.{% endif %}
+                                    {% elif ltype == 'commission' %}
+                                    {% if lang == 'it' %}Fatto su ordinazione. Il compratore paga, tu crei l'oggetto su misura. Es: torte, mobili, artigianato.{% else %}Made to order. Buyer pays, you create the item to their specs. E.g. custom cakes, furniture, crafts.{% endif %}
+                                    {% elif ltype == 'offer' %}
+                                    {% if lang == 'it' %}Nessun prezzo fisso. Il compratore propone un'offerta e tu decidi se accettare.{% else %}No fixed price. Buyer makes an offer and you decide whether to accept.{% endif %}
+                                    {% elif ltype == 'service' %}
+                                    {% if lang == 'it' %}Offri un servizio. Riparazioni, consegne, installazioni. Tu vai dal cliente o lavori da remoto.{% else %}Offer a service. Repairs, deliveries, installations. You go to the client or work remotely.{% endif %}
+                                    {% elif ltype == 'training' %}
+                                    {% if lang == 'it' %}Insegna un'abilita. Lezioni private o di gruppo. Imposta tariffa oraria e prezzi di gruppo.{% else %}Teach a skill. Private or group lessons. Set hourly rate and group pricing.{% endif %}
+                                    {% elif ltype == 'auction' %}
+                                    {% if lang == 'it' %}Asta a tempo. Imposta prezzo di partenza e durata. I compratori fanno offerte. Vince la piu alta.{% else %}Timed auction. Set a starting price and duration. Buyers place bids. Highest bid wins when time runs out.{% endif %}
+                                    {% elif ltype == 'giveaway' %}
+                                    {% if lang == 'it' %}Regalalo. Gratis. Nessun prezzo, nessun deposito. Qualcuno ne ha bisogno piu di te.{% else %}Give it away. Free. No price, no deposit. Someone needs it more than you.{% endif %}
+                                    {% endif %}
+                                </div>
+                            </span>
                         </label>
                         <!-- Per-type pricing row (hidden for giveaway) -->
                         <div x-show="selectedTypes.includes('{{ ltype }}')" x-cloak
@@ -595,7 +687,90 @@
                              class="ml-7 mt-2 p-3 bg-gray-50 rounded-lg">
                             {% if ltype == 'giveaway' %}
                             <p class="text-sm text-green-700 font-medium">{{ t('giveaway.free_hint') }}</p>
+                            {% elif ltype in ('service', 'training') %}
+                            <!-- Service/Training pricing (no deposit, service-specific fields) -->
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">
+                                            {% if ltype == 'training' %}{% if lang == 'it' %}Tariffa{% else %}Rate{% endif %}{% else %}{{ t('list_item.price') }}{% endif %} (EUR)
+                                        </label>
+                                        <input type="number" step="0.01" min="0" placeholder="0.00"
+                                               x-model="listingPrices['{{ ltype }}'].price"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">{{ t('list_item.price_unit') }}</label>
+                                        <select x-model="listingPrices['{{ ltype }}'].price_unit"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
+                                            <option value="per_hour">{{ t('common.per_hour') }}</option>
+                                            <option value="per_session">{% if lang == 'it' %}Per sessione{% else %}Per session{% endif %}</option>
+                                            <option value="flat">{{ t('common.flat') }}</option>
+                                            <option value="negotiable">{{ t('common.negotiable') }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Min. EUR{% else %}Min. charge EUR{% endif %}</label>
+                                        <input type="number" step="0.01" min="0" placeholder="--"
+                                               x-model="listingPrices['{{ ltype }}'].minimum_charge"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Per persona EUR{% else %}Per person EUR{% endif %}</label>
+                                        <input type="number" step="0.01" min="0" placeholder="--"
+                                               x-model="listingPrices['{{ ltype }}'].per_person_rate"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Max persone{% else %}Max people{% endif %}</label>
+                                        <input type="number" step="1" min="1" placeholder="--"
+                                               x-model="listingPrices['{{ ltype }}'].max_participants"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Sconto gruppo %{% else %}Group discount %{% endif %}</label>
+                                        <input type="number" step="1" min="0" max="100" placeholder="--"
+                                               x-model="listingPrices['{{ ltype }}'].group_discount_pct"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-400">{% if lang == 'it' %}Campi opzionali per prezzi di gruppo{% else %}Optional fields for group pricing{% endif %}</p>
+                            </div>
+                            {% elif ltype == 'auction' %}
+                            <!-- Auction pricing -->
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-3 gap-3">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Prezzo partenza EUR{% else %}Starting price EUR{% endif %}</label>
+                                        <input type="number" step="0.01" min="0" placeholder="1.00"
+                                               x-model="listingPrices['auction'].price"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Rilancio min. EUR{% else %}Min. bid increment EUR{% endif %}</label>
+                                        <input type="number" step="0.01" min="0.01" placeholder="1.00"
+                                               x-model="listingPrices['auction'].bid_increment"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Durata (giorni){% else %}Duration (days){% endif %}</label>
+                                        <select x-model="listingPrices['auction'].auction_days"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
+                                            <option value="1">1 {% if lang == 'it' %}giorno{% else %}day{% endif %}</option>
+                                            <option value="3">3 {% if lang == 'it' %}giorni{% else %}days{% endif %}</option>
+                                            <option value="5">5 {% if lang == 'it' %}giorni{% else %}days{% endif %}</option>
+                                            <option value="7">7 {% if lang == 'it' %}giorni{% else %}days{% endif %}</option>
+                                            <option value="14">14 {% if lang == 'it' %}giorni{% else %}days{% endif %}</option>
+                                            <option value="30">30 {% if lang == 'it' %}giorni{% else %}days{% endif %}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-400">{% if lang == 'it' %}L'asta termina automaticamente. L'offerta piu alta vince.{% else %}Auction ends automatically. Highest bid wins.{% endif %}</p>
+                            </div>
                             {% else %}
+                            <!-- Physical item pricing (with deposit) -->
                             <div class="grid grid-cols-3 gap-3">
                                 <div>
                                     <label class="block text-xs text-gray-500 mb-1">{{ t('list_item.price') }} (EUR)</label>
@@ -627,10 +802,25 @@
                 </div>
             </div>
 
-            <div class="flex items-center space-x-3">
-                <input id="delivery" type="checkbox" x-model="form.delivery_available"
-                       class="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                <label for="delivery" class="text-sm font-medium text-gray-700">{{ t('list_item.delivery') }}</label>
+            <div class="space-y-2">
+                <div class="flex items-center space-x-3">
+                    <input id="delivery" type="checkbox" x-model="form.delivery_available"
+                           class="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                    <label for="delivery" class="text-sm font-medium text-gray-700">{{ t('list_item.delivery') }}</label>
+                </div>
+                <div x-show="form.delivery_available" x-cloak
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 -translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="ml-8 flex items-center gap-3">
+                    <div class="w-32">
+                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Costo consegna EUR{% else %}Delivery fee EUR{% endif %}</label>
+                        <input type="number" step="0.01" min="0" placeholder="0.00"
+                               x-model="form.delivery_fee"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <p class="text-xs text-gray-400 mt-4">{% if lang == 'it' %}Lascia vuoto per consegna gratuita{% else %}Leave empty for free delivery{% endif %}</p>
+                </div>
             </div>
 
             <div>
