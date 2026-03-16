@@ -283,6 +283,12 @@ function messagesApp() {
                 await this.openThread(toUser);
             }
 
+            // Pre-fill message with item context
+            var about = params.get('about');
+            if (about && !this.newMessage) {
+                this.newMessage = 'Hi, I\'m interested in: ' + about;
+            }
+
             // Poll for new messages every 10s
             this.pollTimer = setInterval(() => {
                 this.loadThreads();
