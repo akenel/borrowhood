@@ -83,13 +83,27 @@
             <template x-if="activeThread">
                 <div class="flex flex-col h-full">
                     <!-- Thread header -->
-                    <div class="px-4 py-3 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full flex-shrink-0 overflow-hidden">
-                            <img x-show="activeThreadAvatar" :src="activeThreadAvatar" class="w-8 h-8 rounded-full object-cover">
-                            <div x-show="!activeThreadAvatar" class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-600"
-                                 x-text="(activeThreadName||'?')[0]"></div>
+                    <div class="border-b border-gray-100 bg-gray-50">
+                        <div class="px-4 py-3 flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full flex-shrink-0 overflow-hidden">
+                                <img x-show="activeThreadAvatar" :src="activeThreadAvatar" class="w-8 h-8 rounded-full object-cover">
+                                <div x-show="!activeThreadAvatar" class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-600"
+                                     x-text="(activeThreadName||'?')[0]"></div>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-gray-900" x-text="activeThreadName"></p>
+                                <p x-show="activeOrderContext && activeOrderContext.item_name" class="text-xs text-gray-500" x-text="activeOrderContext ? activeOrderContext.item_name : ''"></p>
+                            </div>
                         </div>
-                        <p class="text-sm font-semibold text-gray-900" x-text="activeThreadName"></p>
+                        <!-- Order context banner -->
+                        <div x-show="activeOrderContext" x-cloak class="px-4 py-2 bg-indigo-50 border-t border-indigo-100 flex items-center gap-3 text-xs">
+                            <svg class="w-4 h-4 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                            <span class="text-indigo-700 font-medium" x-text="activeOrderContext ? 'Order: ' + (activeOrderContext.status || '').replace(/_/g, ' ') : ''"></span>
+                            <span x-show="activeOrderContext && activeOrderContext.start_date" class="text-indigo-500" x-text="activeOrderContext && activeOrderContext.start_date ? activeOrderContext.start_date.substring(0,10) + ' - ' + (activeOrderContext.end_date || '').substring(0,10) : ''"></span>
+                            <a x-show="activeRentalId" :href="'/orders'" class="ml-auto text-indigo-600 hover:underline">{% if lang == 'it' %}Vedi ordine{% else %}View order{% endif %}</a>
+                        </div>
                     </div>
 
                     <!-- Messages -->
@@ -227,6 +241,8 @@ function messagesApp() {
         activeThread: null,
         activeThreadName: '',
         activeThreadAvatar: null,
+        activeRentalId: null,
+        activeOrderContext: null,
         newMessage: '',
         sending: false,
         myUserId: '',
@@ -253,18 +269,63 @@ function messagesApp() {
             await this.loadThreads();
             this.loaded = true;
 
-            // Check URL for ?to=userId
+            // Check URL params
             var params = new URLSearchParams(window.location.search);
+            var rentalId = params.get('rental');
             var toUser = params.get('to');
-            if (toUser) {
+
+            if (rentalId && toUser) {
+                // Open order-specific thread
+                this.activeRentalId = rentalId;
+                await this.openThread(toUser);
+                await this.loadOrderContext(rentalId);
+            } else if (toUser) {
                 await this.openThread(toUser);
             }
 
             // Poll for new messages every 10s
             this.pollTimer = setInterval(() => {
                 this.loadThreads();
-                if (this.activeThread) this.loadMessages(this.activeThread);
+                if (this.activeThread) {
+                    if (this.activeRentalId) {
+                        this.loadOrderMessages(this.activeRentalId);
+                    } else {
+                        this.loadMessages(this.activeThread);
+                    }
+                }
             }, 10000);
+        },
+
+        async loadOrderContext(rentalId) {
+            try {
+                var resp = await fetch('/api/v1/rentals/' + rentalId);
+                if (resp.ok) {
+                    var rental = await resp.json();
+                    this.activeOrderContext = {
+                        status: rental.status,
+                        listing_type: rental.listing_type || 'order',
+                        item_name: rental.item_name || rental.listing_name || null,
+                        start_date: rental.requested_start,
+                        end_date: rental.requested_end,
+                    };
+                }
+            } catch(e) {}
+        },
+
+        async loadOrderMessages(rentalId) {
+            try {
+                var resp = await fetch('/api/v1/messages/order/' + rentalId);
+                if (resp.ok) {
+                    this.messages = await resp.json();
+                    this.$nextTick(() => {
+                        var el = document.getElementById('msg-scroll');
+                        if (el) el.scrollTop = el.scrollHeight;
+                    });
+                }
+            } catch(e) {
+                // Fallback to user-to-user thread
+                if (this.activeThread) await this.loadMessages(this.activeThread);
+            }
         },
 
         async loadThreads() {
@@ -278,7 +339,14 @@ function messagesApp() {
             this.activeThread = thread.other_user_id;
             this.activeThreadName = thread.other_user_name;
             this.activeThreadAvatar = thread.other_user_avatar || null;
-            await this.loadMessages(thread.other_user_id);
+            this.activeRentalId = thread.rental_id || null;
+            this.activeOrderContext = null;
+            if (this.activeRentalId) {
+                await this.loadOrderMessages(this.activeRentalId);
+                await this.loadOrderContext(this.activeRentalId);
+            } else {
+                await this.loadMessages(thread.other_user_id);
+            }
             thread.unread_count = 0;
         },
 
@@ -320,13 +388,15 @@ function messagesApp() {
             if (!this.newMessage.trim() || !this.activeThread) return;
             this.sending = true;
             try {
+                var payload = {
+                    recipient_id: this.activeThread,
+                    body: this.newMessage.trim()
+                };
+                if (this.activeRentalId) payload.rental_id = this.activeRentalId;
                 var resp = await fetch('/api/v1/messages', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        recipient_id: this.activeThread,
-                        body: this.newMessage.trim()
-                    })
+                    body: JSON.stringify(payload)
                 });
                 if (resp.ok) {
                     var msg = await resp.json();

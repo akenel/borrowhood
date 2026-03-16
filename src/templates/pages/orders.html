@@ -120,16 +120,28 @@
                 </div>
 
                 <!-- Date + actions -->
-                <div class="flex-shrink-0 text-right">
+                <div class="flex-shrink-0 text-right space-y-1">
                     <p class="text-sm text-gray-500">{{ order.created_at.strftime('%b %d, %Y') }}</p>
                     {% if order.requested_start %}
                     <p class="text-xs text-gray-400">{{ order.requested_start.strftime('%b %d') }} - {{ order.requested_end.strftime('%b %d') if order.requested_end else '...' }}</p>
                     {% endif %}
-                    {% if order.status.value == 'completed' and item %}
-                    <a href="/items/{{ item.slug }}#reviews" class="inline-flex items-center text-xs text-indigo-600 hover:underline mt-1">
-                        {% if lang == 'it' %}Lascia recensione{% else %}Leave review{% endif %}
-                    </a>
-                    {% endif %}
+                    <div class="flex items-center justify-end gap-2 mt-1">
+                        <!-- Message about this order -->
+                        {% if item and item.owner %}
+                        {% set other_id = item.owner.id if (viewer_user_id and item.owner.id != viewer_user_id) else order.renter_id %}
+                        <a href="/messages?rental={{ order.id }}&to={{ other_id }}" class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-indigo-600 transition-colors" title="{% if lang == 'it' %}Messaggia{% else %}Message{% endif %}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                            <span>{% if lang == 'it' %}Messaggio{% else %}Message{% endif %}</span>
+                        </a>
+                        {% endif %}
+                        {% if order.status.value == 'completed' and item %}
+                        <a href="/items/{{ item.slug }}#reviews" class="inline-flex items-center text-xs text-indigo-600 hover:underline">
+                            {% if lang == 'it' %}Lascia recensione{% else %}Leave review{% endif %}
+                        </a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
