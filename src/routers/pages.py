@@ -846,6 +846,7 @@ async def members_directory(
 async def demo_login_page(
     request: Request,
     token: Optional[dict] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
 ):
     """One-click demo login page. Debug mode only."""
     if not settings.debug:
@@ -869,6 +870,18 @@ async def demo_login_page(
         {"username": "rosa", "display_name": "Rosa Ferretti", "workshop": None, "roles": "member only", "badge": "newcomer", "color": "gray", "avatar": f"{_av}/rosa.svg"},
         {"username": "anne", "display_name": "Anne Muthoni", "workshop": None, "roles": "qa-tester", "badge": "active", "color": "blue", "avatar": f"{_av}/anne.svg"},
     ]
+
+    # Use real avatar_url from DB so demo login matches profile pages
+    emails = [f"{du['username']}@borrowhood.local" for du in demo_users]
+    result = await db.execute(
+        select(BHUser.email, BHUser.avatar_url)
+        .where(BHUser.email.in_(emails))
+        .where(BHUser.deleted_at.is_(None))
+    )
+    avatar_map = {row[0].split("@")[0]: row[1] for row in result.all() if row[1]}
+    for du in demo_users:
+        if du["username"] in avatar_map:
+            du["avatar"] = avatar_map[du["username"]]
 
     ctx = _ctx(request, token, demo_users=demo_users)
     return _render("pages/demo_login.html", ctx)

@@ -31,8 +31,10 @@ from src.models.user import AccountStatus, BadgeTier, BHUser, BHUserFavorite, Wo
 from src.services.search import haversine_km
 
 UPLOAD_DIR = Path(__file__).resolve().parent.parent / "static" / "uploads" / "avatars"
+BANNER_DIR = Path(__file__).resolve().parent.parent / "static" / "uploads" / "banners"
 ALLOWED_AVATAR_TYPES = {"image/jpeg", "image/png", "image/webp"}
 MAX_AVATAR_SIZE = 5 * 1024 * 1024  # 5 MB
+MAX_BANNER_SIZE = 10 * 1024 * 1024  # 10 MB
 from src.schemas.user import (
     FavoriteCreate,
     FavoriteOut,
@@ -99,6 +101,37 @@ async def upload_avatar(
     user.avatar_url = f"/static/uploads/avatars/{filename}"
     await db.commit()
     return {"status": "ok", "avatar_url": user.avatar_url}
+
+
+# ── Banner upload ──
+
+
+@router.post("/me/banner", status_code=200)
+async def upload_banner(
+    file: UploadFile = File(...),
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Upload a profile banner image."""
+    if file.content_type not in ALLOWED_AVATAR_TYPES:
+        raise HTTPException(status_code=400, detail="File must be JPEG, PNG, or WebP")
+
+    user = await get_user(db, token)
+
+    contents = await file.read()
+    if len(contents) > MAX_BANNER_SIZE:
+        raise HTTPException(status_code=400, detail="File too large (max 10 MB)")
+
+    ext = file.filename.rsplit(".", 1)[-1].lower() if file.filename and "." in file.filename else "jpg"
+    if ext not in ("jpg", "jpeg", "png", "webp"):
+        ext = "jpg"
+    filename = f"{uuid_mod.uuid4().hex}.{ext}"
+    BANNER_DIR.mkdir(parents=True, exist_ok=True)
+    (BANNER_DIR / filename).write_bytes(contents)
+
+    user.banner_url = f"/static/uploads/banners/{filename}"
+    await db.commit()
+    return {"status": "ok", "banner_url": user.banner_url}
 
 
 # ── Favorites (auth-gated) ── must be BEFORE /{user_id} routes ──

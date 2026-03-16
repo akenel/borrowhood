@@ -189,7 +189,7 @@
                                 <span class="text-sm font-bold text-indigo-600" x-text="u ? (u.display_name||'?')[0] : '{{ user.get('preferred_username', '?')[0] | upper }}'"></span>
                                 <img x-show="u && u.avatar_url" :src="u ? u.avatar_url : ''" @error="$el.style.display='none'" class="absolute inset-0 w-full h-full object-cover rounded-full">
                             </div>
-                            <span class="max-w-[120px] truncate" x-text="u ? u.display_name : '{{ user.get('preferred_username', '') }}'"></span>
+                            <span class="max-w-[120px] truncate">{{ user.get('preferred_username', '') }}</span>
                         </a>
                     </div>
                     <a href="/logout" class="px-3 py-1.5 text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg hidden md:block whitespace-nowrap transition-colors">{{ t('nav.logout') }}</a>
