@@ -118,6 +118,11 @@ class BHUser(BHBase, Base):
     offers_custom_orders: Mapped[bool] = mapped_column(default=False)
     offers_repair: Mapped[bool] = mapped_column(default=False)
 
+    # Seller type (BL-069: tax/VAT compliance)
+    seller_type: Mapped[Optional[str]] = mapped_column(String(20), default="personal")  # personal | business
+    business_name: Mapped[Optional[str]] = mapped_column(String(200), default=None)
+    vat_number: Mapped[Optional[str]] = mapped_column(String(50), default=None)
+
     # Stripe Connect (marketplace payouts)
     stripe_account_id: Mapped[Optional[str]] = mapped_column(String(200), default=None)
 
