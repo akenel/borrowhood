@@ -66,6 +66,9 @@ class UserOut(BaseModel):
     city: Optional[str] = None
     country_code: Optional[str] = None
     badge_tier: BadgeTier
+    seller_type: Optional[str] = "personal"
+    business_name: Optional[str] = None
+    vat_number: Optional[str] = None
     languages: List[UserLanguageOut] = []
     skills: List[UserSkillOut] = []
     social_links: List[UserSocialLinkOut] = []
@@ -133,6 +136,9 @@ class UserProfileUpdate(BaseModel):
     altitude: Optional[float] = None  # meters ASL
     notify_telegram: Optional[bool] = None
     notify_email: Optional[bool] = None
+    seller_type: Optional[str] = Field(None, pattern="^(personal|business)$")
+    business_name: Optional[str] = Field(None, max_length=200)
+    vat_number: Optional[str] = Field(None, max_length=50)
 
     @field_validator("latitude", mode="before")
     @classmethod
