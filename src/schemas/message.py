@@ -43,6 +43,7 @@ class ThreadSummary(BaseModel):
     last_message_at: datetime
     unread_count: int
     listing_id: Optional[UUID] = None
+    rental_id: Optional[UUID] = None
 
 
 class MessageSummary(BaseModel):
