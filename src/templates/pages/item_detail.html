@@ -212,6 +212,24 @@
                             {% if listing.deposit %}
                             <p class="text-xs text-gray-400">(+&euro;{{ "%.0f"|format(listing.deposit) }} {{ t('item.deposit') }})</p>
                             {% endif %}
+                            {% if listing.minimum_charge %}
+                            <p class="text-xs text-gray-500">{% if lang == 'it' %}Min.{% else %}Min. charge{% endif %} &euro;{{ "%.0f"|format(listing.minimum_charge) }}</p>
+                            {% endif %}
+                            {% if listing.per_person_rate %}
+                            <p class="text-xs text-gray-500">&euro;{{ "%.0f"|format(listing.per_person_rate) }} {% if lang == 'it' %}per persona{% else %}per person{% endif %}</p>
+                            {% endif %}
+                            {% if listing.max_participants %}
+                            <p class="text-xs text-gray-500">{% if lang == 'it' %}Max{% else %}Max{% endif %} {{ listing.max_participants }} {% if lang == 'it' %}persone{% else %}people{% endif %}</p>
+                            {% endif %}
+                            {% if listing.group_discount_pct %}
+                            <p class="text-xs text-emerald-600">{{ "%.0f"|format(listing.group_discount_pct) }}% {% if lang == 'it' %}sconto gruppo{% else %}group discount{% endif %}</p>
+                            {% endif %}
+                            {% if listing.bid_increment %}
+                            <p class="text-xs text-gray-500">{% if lang == 'it' %}Rilancio min.{% else %}Min. bid{% endif %} &euro;{{ "%.0f"|format(listing.bid_increment) }}</p>
+                            {% endif %}
+                            {% if listing.auction_end %}
+                            <p class="text-xs text-amber-600">{% if lang == 'it' %}Scade{% else %}Ends{% endif %} {{ listing.auction_end.strftime('%b %d, %H:%M') }}</p>
+                            {% endif %}
                             {% else %}
                             <p class="text-lg font-bold text-gray-900">{{ t('common.negotiable') | title }}</p>
                             {% endif %}
