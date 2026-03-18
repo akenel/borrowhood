@@ -28,7 +28,7 @@ router = APIRouter(prefix="/api/v1/bids", tags=["bids"])
 @router.post("", response_model=BidOut, status_code=201)
 async def place_bid(
     bid_in: BidCreate,
-    token: dict = Depends(require_badge_tier("active")),
+    token: dict = Depends(require_badge_tier("newcomer")),
     db: AsyncSession = Depends(get_db),
 ):
     """Place a bid on an auction listing. Requires ACTIVE tier.
