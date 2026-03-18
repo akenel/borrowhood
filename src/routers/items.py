@@ -304,6 +304,36 @@ async def upload_item_image(
     return media
 
 
+@router.delete("/{item_id}/media/{media_id}", status_code=204)
+async def delete_item_media(
+    item_id: UUID,
+    media_id: UUID,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a media item. Only the owner can delete."""
+    user = await get_user(db, token)
+
+    result = await db.execute(
+        select(BHItem).where(BHItem.id == item_id).where(BHItem.deleted_at.is_(None))
+    )
+    item = result.scalars().first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    if item.owner_id != user.id:
+        raise HTTPException(status_code=403, detail="Not your item")
+
+    media_result = await db.execute(
+        select(BHItemMedia).where(BHItemMedia.id == media_id).where(BHItemMedia.item_id == item_id)
+    )
+    media = media_result.scalars().first()
+    if not media:
+        raise HTTPException(status_code=404, detail="Media not found")
+
+    await db.delete(media)
+    await db.commit()
+
+
 # ── Item Favorites ──
 
 
