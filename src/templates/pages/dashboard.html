@@ -686,18 +686,55 @@
                                             <p class="text-gray-600 italic">"{{ rental.owner_message }}"</p>
                                         </div>
                                         {% endif %}
-                                        <!-- Existing review display -->
+                                        <!-- Existing review display (enhanced) -->
                                         <template x-if="myReviews['{{ rental.id }}']">
-                                            <div>
-                                                <span class="text-xs text-gray-500 uppercase tracking-wide">Your Review</span>
-                                                <div class="flex items-center space-x-1 mt-0.5">
+                                            <div class="mt-2 p-3 bg-amber-50/50 border border-amber-100 rounded-lg">
+                                                <span class="text-xs text-amber-600 uppercase tracking-wide font-semibold">Your Review</span>
+                                                <div class="flex items-center space-x-1 mt-1">
                                                     <template x-for="s in 5">
                                                         <svg class="w-4 h-4" :class="s <= myReviews['{{ rental.id }}'].rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'" viewBox="0 0 20 20" fill="currentColor">
                                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                                         </svg>
                                                     </template>
-                                                    <span class="text-xs text-gray-500 ml-1" x-text="myReviews['{{ rental.id }}'].title"></span>
+                                                    <template x-if="myReviews['{{ rental.id }}'].would_recommend === true">
+                                                        <span class="text-xs text-emerald-600 ml-2">Would recommend</span>
+                                                    </template>
+                                                    <template x-if="myReviews['{{ rental.id }}'].would_recommend === false">
+                                                        <span class="text-xs text-red-500 ml-2">Would not recommend</span>
+                                                    </template>
                                                 </div>
+                                                <template x-if="myReviews['{{ rental.id }}'].title">
+                                                    <p class="text-sm font-semibold text-gray-900 mt-1.5" x-text="myReviews['{{ rental.id }}'].title"></p>
+                                                </template>
+                                                <template x-if="myReviews['{{ rental.id }}'].body">
+                                                    <p class="text-sm text-gray-700 mt-1 leading-relaxed" x-text="myReviews['{{ rental.id }}'].body"></p>
+                                                </template>
+                                                <!-- Subcategory ratings -->
+                                                <template x-if="myReviews['{{ rental.id }}'].rating_accuracy || myReviews['{{ rental.id }}'].rating_communication || myReviews['{{ rental.id }}'].rating_value || myReviews['{{ rental.id }}'].rating_timeliness">
+                                                    <div class="flex flex-wrap gap-3 mt-2 text-xs text-gray-500">
+                                                        <template x-if="myReviews['{{ rental.id }}'].rating_accuracy">
+                                                            <span>Accuracy: <span class="font-medium text-gray-700" x-text="myReviews['{{ rental.id }}'].rating_accuracy"></span>/5</span>
+                                                        </template>
+                                                        <template x-if="myReviews['{{ rental.id }}'].rating_communication">
+                                                            <span>Communication: <span class="font-medium text-gray-700" x-text="myReviews['{{ rental.id }}'].rating_communication"></span>/5</span>
+                                                        </template>
+                                                        <template x-if="myReviews['{{ rental.id }}'].rating_value">
+                                                            <span>Value: <span class="font-medium text-gray-700" x-text="myReviews['{{ rental.id }}'].rating_value"></span>/5</span>
+                                                        </template>
+                                                        <template x-if="myReviews['{{ rental.id }}'].rating_timeliness">
+                                                            <span>Timeliness: <span class="font-medium text-gray-700" x-text="myReviews['{{ rental.id }}'].rating_timeliness"></span>/5</span>
+                                                        </template>
+                                                    </div>
+                                                </template>
+                                                <!-- Review photos -->
+                                                <template x-if="myReviews['{{ rental.id }}'].photo_urls && myReviews['{{ rental.id }}'].photo_urls.length > 0">
+                                                    <div class="flex gap-2 mt-2">
+                                                        <template x-for="(url, idx) in myReviews['{{ rental.id }}'].photo_urls" :key="idx">
+                                                            <img :src="url" class="w-16 h-16 rounded-lg object-cover border border-amber-200" :alt="'Review photo ' + (idx+1)">
+                                                        </template>
+                                                    </div>
+                                                </template>
+                                                <span class="text-xs text-gray-400 mt-1.5 block" x-text="myReviews['{{ rental.id }}'].created_at ? new Date(myReviews['{{ rental.id }}'].created_at).toLocaleDateString() : ''"></span>
                                             </div>
                                         </template>
                                     </div>
@@ -849,18 +886,55 @@
                                             <p class="text-gray-600 italic">"{{ rental.owner_message }}"</p>
                                         </div>
                                         {% endif %}
-                                        <!-- Existing review display -->
+                                        <!-- Existing review display (enhanced) -->
                                         <template x-if="myReviews['{{ rental.id }}']">
-                                            <div>
-                                                <span class="text-xs text-gray-500 uppercase tracking-wide">Your Review</span>
-                                                <div class="flex items-center space-x-1 mt-0.5">
+                                            <div class="mt-2 p-3 bg-amber-50/50 border border-amber-100 rounded-lg">
+                                                <span class="text-xs text-amber-600 uppercase tracking-wide font-semibold">Your Review</span>
+                                                <div class="flex items-center space-x-1 mt-1">
                                                     <template x-for="s in 5">
                                                         <svg class="w-4 h-4" :class="s <= myReviews['{{ rental.id }}'].rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'" viewBox="0 0 20 20" fill="currentColor">
                                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                                         </svg>
                                                     </template>
-                                                    <span class="text-xs text-gray-500 ml-1" x-text="myReviews['{{ rental.id }}'].title"></span>
+                                                    <template x-if="myReviews['{{ rental.id }}'].would_recommend === true">
+                                                        <span class="text-xs text-emerald-600 ml-2">Would recommend</span>
+                                                    </template>
+                                                    <template x-if="myReviews['{{ rental.id }}'].would_recommend === false">
+                                                        <span class="text-xs text-red-500 ml-2">Would not recommend</span>
+                                                    </template>
                                                 </div>
+                                                <template x-if="myReviews['{{ rental.id }}'].title">
+                                                    <p class="text-sm font-semibold text-gray-900 mt-1.5" x-text="myReviews['{{ rental.id }}'].title"></p>
+                                                </template>
+                                                <template x-if="myReviews['{{ rental.id }}'].body">
+                                                    <p class="text-sm text-gray-700 mt-1 leading-relaxed" x-text="myReviews['{{ rental.id }}'].body"></p>
+                                                </template>
+                                                <!-- Subcategory ratings -->
+                                                <template x-if="myReviews['{{ rental.id }}'].rating_accuracy || myReviews['{{ rental.id }}'].rating_communication || myReviews['{{ rental.id }}'].rating_value || myReviews['{{ rental.id }}'].rating_timeliness">
+                                                    <div class="flex flex-wrap gap-3 mt-2 text-xs text-gray-500">
+                                                        <template x-if="myReviews['{{ rental.id }}'].rating_accuracy">
+                                                            <span>Accuracy: <span class="font-medium text-gray-700" x-text="myReviews['{{ rental.id }}'].rating_accuracy"></span>/5</span>
+                                                        </template>
+                                                        <template x-if="myReviews['{{ rental.id }}'].rating_communication">
+                                                            <span>Communication: <span class="font-medium text-gray-700" x-text="myReviews['{{ rental.id }}'].rating_communication"></span>/5</span>
+                                                        </template>
+                                                        <template x-if="myReviews['{{ rental.id }}'].rating_value">
+                                                            <span>Value: <span class="font-medium text-gray-700" x-text="myReviews['{{ rental.id }}'].rating_value"></span>/5</span>
+                                                        </template>
+                                                        <template x-if="myReviews['{{ rental.id }}'].rating_timeliness">
+                                                            <span>Timeliness: <span class="font-medium text-gray-700" x-text="myReviews['{{ rental.id }}'].rating_timeliness"></span>/5</span>
+                                                        </template>
+                                                    </div>
+                                                </template>
+                                                <!-- Review photos -->
+                                                <template x-if="myReviews['{{ rental.id }}'].photo_urls && myReviews['{{ rental.id }}'].photo_urls.length > 0">
+                                                    <div class="flex gap-2 mt-2">
+                                                        <template x-for="(url, idx) in myReviews['{{ rental.id }}'].photo_urls" :key="idx">
+                                                            <img :src="url" class="w-16 h-16 rounded-lg object-cover border border-amber-200" :alt="'Review photo ' + (idx+1)">
+                                                        </template>
+                                                    </div>
+                                                </template>
+                                                <span class="text-xs text-gray-400 mt-1.5 block" x-text="myReviews['{{ rental.id }}'].created_at ? new Date(myReviews['{{ rental.id }}'].created_at).toLocaleDateString() : ''"></span>
                                             </div>
                                         </template>
                                     </div>
