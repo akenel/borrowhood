@@ -103,7 +103,7 @@ async def get_item(item_id: UUID, db: AsyncSession = Depends(get_db)):
 @router.post("", response_model=ItemOut, status_code=201)
 async def create_item(
     data: ItemCreate,
-    token: dict = Depends(require_badge_tier("active")),
+    token: dict = Depends(require_badge_tier("newcomer")),
     _throttle: dict = Depends(user_throttle("create_item", 10, 3600)),
     db: AsyncSession = Depends(get_db),
 ):
