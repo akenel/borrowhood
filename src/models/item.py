@@ -137,6 +137,9 @@ class BHItem(BHBase, Base):
     # Story -- the human narrative behind this item
     story: Mapped[Optional[str]] = mapped_column(Text)  # "My father's drill from 1978..."
 
+    # Tags for search and discovery
+    tags: Mapped[Optional[str]] = mapped_column(Text)  # Comma-separated: "wool, felt, handmade, Swiss"
+
     # Safety & age
     age_restricted: Mapped[bool] = mapped_column(default=False)  # 18+ only (power tools, vehicles)
     safety_notes: Mapped[Optional[str]] = mapped_column(Text)  # Custom safety instructions from seller
