@@ -48,11 +48,18 @@ const JOHNNY_MSG = "Leo, I saw the Bianchi. That's my old bike. Can you hold it 
   await sleep(2000);
 
   // Find Johnny's login card by @username
+  // Johnny is #10 in the list -- below the fold. Scroll first, THEN read coords.
+  await page.evaluate(() => {
+    const buttons = [...document.querySelectorAll('button')];
+    const btn = buttons.find(b => (b.textContent || '').includes('@john'));
+    if (btn) btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+  await sleep(1000); // Wait for scroll to finish
+
   const johnBtn = await page.evaluate(() => {
     const buttons = [...document.querySelectorAll('button')];
     const btn = buttons.find(b => (b.textContent || '').includes('@john'));
-    if (btn) {
-      btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (btn && btn.offsetHeight > 0) {
       const r = btn.getBoundingClientRect();
       return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
     }
@@ -60,7 +67,7 @@ const JOHNNY_MSG = "Leo, I saw the Bianchi. That's my old bike. Can you hold it 
   });
 
   if (johnBtn) {
-    await sleep(800);
+    await sleep(500);
     await showRing(page, johnBtn.x, johnBtn.y);
     await sleep(600);
     await page.mouse.click(johnBtn.x, johnBtn.y);
@@ -74,37 +81,21 @@ const JOHNNY_MSG = "Leo, I saw the Bianchi. That's my old bike. Can you hold it 
     await sleep(1500);
   }
 
-  // ── 2. Johnny is on dashboard -- show the notification badge ──
+  // ── 2. Johnny is on dashboard -- brief pause then go to messages ──
+  await sleep(2000);
+
+  // ── 3. Navigate to messages page directly (cleaner for camera) ──
+  console.log('  Navigating to messages...');
+  await retry(() => page.goto(`${BASE}/messages`, { waitUntil: 'networkidle2', timeout: 15000 }), 'messages page');
+  await sleep(1500);
   await setZoom(page);
   await sleep(2000);
 
-  // ── 3. Click the messages icon in navbar (blue badge) ──
-  console.log('  Looking for messages icon in navbar...');
-  const msgIconCoords = await page.evaluate(() => {
-    const msgLink = document.querySelector('a[href="/messages"]');
-    if (msgLink && msgLink.offsetHeight > 0) {
-      const r = msgLink.getBoundingClientRect();
-      return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
-    }
-    return null;
-  });
-
-  if (msgIconCoords) {
-    await sleep(1000);
-    await showRing(page, msgIconCoords.x, msgIconCoords.y);
-    await sleep(800);
-    await page.mouse.click(msgIconCoords.x, msgIconCoords.y);
-    console.log('  Clicked messages icon');
-    await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 10000 }).catch(() => {});
-    await setZoom(page);
-    await sleep(2000);
-  } else {
-    console.log('  WARN: Messages icon not found, navigating directly');
-    await navigateTo(page, '/messages');
-    await sleep(2000);
-  }
-
   // ── 4. Click Nino's conversation to read his message ──
+  // Wait for Alpine to load threads
+  console.log('  Waiting for threads to load...');
+  await sleep(2000);
+
   console.log('  Looking for Nino conversation...');
   const ninoThread = await page.evaluate(() => {
     const buttons = [...document.querySelectorAll('button')];
@@ -127,7 +118,7 @@ const JOHNNY_MSG = "Leo, I saw the Bianchi. That's my old bike. Can you hold it 
     await page.mouse.click(ninoThread.x, ninoThread.y);
     console.log('  Opened Nino conversation');
   } else {
-    console.log('  WARN: Could not find Nino thread');
+    console.log('  WARN: Could not find Nino thread in sidebar');
   }
 
   // ── 5. Pause for viewer to read Nino's message ────────
@@ -161,6 +152,8 @@ const JOHNNY_MSG = "Leo, I saw the Bianchi. That's my old bike. Can you hold it 
     await page.mouse.click(composeBtn.x, composeBtn.y);
     console.log('  Clicked New Message button');
     await sleep(1000);
+    await setZoom(page);  // Re-apply zoom after compose UI change
+    await sleep(500);
   } else {
     console.log('  WARN: New Message button not found');
   }
@@ -183,8 +176,8 @@ const JOHNNY_MSG = "Leo, I saw the Bianchi. That's my old bike. Can you hold it 
   if (searchInput) {
     await page.mouse.click(searchInput.x, searchInput.y);
     await sleep(300);
-    await typeSlowly(page, 'input[placeholder*="Search members"], input[placeholder*="Cerca membro"]', 'Leo', 80);
-    console.log('  Typed "Leo" in search');
+    await typeSlowly(page, 'input[placeholder*="Search members"], input[placeholder*="Cerca membro"]', 'da Vinci', 80);
+    console.log('  Typed "da Vinci" in search');
     await sleep(2000); // Wait for debounce + API response
   }
 
@@ -195,11 +188,13 @@ const JOHNNY_MSG = "Leo, I saw the Bianchi. That's my old bike. Can you hold it 
     const dropdown = document.querySelector('.absolute.z-10');
     if (!dropdown) return null;
     const btns = [...dropdown.querySelectorAll('button')];
+    // Match "da Vinci" or "Leonardo di ser" -- unique to our Leonardo
     const btn = btns.find(b => {
-      const text = (b.textContent || '').toLowerCase();
-      return text.includes('leo');
+      const text = (b.textContent || '');
+      return text.includes('da Vinci') || text.includes('Bottega');
     });
     if (btn && btn.offsetHeight > 0) {
+      btn.scrollIntoView({ behavior: 'instant', block: 'center' });
       const r = btn.getBoundingClientRect();
       return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
     }
@@ -212,7 +207,9 @@ const JOHNNY_MSG = "Leo, I saw the Bianchi. That's my old bike. Can you hold it 
     await sleep(600);
     await page.mouse.click(leoResult.x, leoResult.y);
     console.log('  Selected Leonardo from search results');
-    await sleep(2000);
+    await sleep(1500);
+    await setZoom(page);  // Re-apply zoom after conversation switch
+    await sleep(1500);
   } else {
     // Fallback: navigate directly
     console.log('  WARN: Leonardo not found in search, using direct navigation');
@@ -224,16 +221,31 @@ const JOHNNY_MSG = "Leo, I saw the Bianchi. That's my old bike. Can you hold it 
 
   // ── 9. Type the message live ──────────────────────────
   console.log('  Typing message to Leo...');
-  await page.waitForSelector('input[x-model="newMessage"]', { visible: true, timeout: 10000 }).catch(() => {});
-  await sleep(500);
-  await page.click('input[x-model="newMessage"]');
-  await sleep(500);
-  await typeSlowly(page, 'input[x-model="newMessage"]', JOHNNY_MSG, 30);
-  await sleep(2000);
+  const composeInput = await page.waitForSelector('input[x-model="newMessage"]', { visible: true, timeout: 10000 }).catch(() => null);
+  if (composeInput) {
+    await sleep(500);
+    await composeInput.click();
+    await sleep(500);
+    await typeSlowly(page, 'input[x-model="newMessage"]', JOHNNY_MSG, 30);
+    await sleep(2000);
+  } else {
+    console.log('  WARN: Compose input not found, cannot type message');
+  }
 
   // ── 10. Click Send with ring ──────────────────────────
+  // Scroll send button into view first (zoom may push it off-screen)
+  await page.evaluate(() => {
+    const forms = [...document.querySelectorAll('form')];
+    const composeForm = forms[forms.length - 1];
+    const btn = composeForm ? composeForm.querySelector('button[type="submit"]') : null;
+    if (btn) btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+  await sleep(800);
+
   const sendCoords = await page.evaluate(() => {
-    const btn = document.querySelector('form button[type="submit"]');
+    const forms = [...document.querySelectorAll('form')];
+    const composeForm = forms[forms.length - 1];
+    const btn = composeForm ? composeForm.querySelector('button[type="submit"]') : null;
     if (btn && btn.offsetHeight > 0) {
       const r = btn.getBoundingClientRect();
       return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
@@ -243,20 +255,36 @@ const JOHNNY_MSG = "Leo, I saw the Bianchi. That's my old bike. Can you hold it 
 
   if (sendCoords) {
     await showRing(page, sendCoords.x, sendCoords.y);
-    await sleep(600);
+    await sleep(800);
     await page.mouse.click(sendCoords.x, sendCoords.y);
     console.log('  Message sent to Leo!');
   } else {
-    console.log('  WARN: Send button not found, submitting form');
+    console.log('  WARN: Send button not found, submitting via Alpine');
     await page.evaluate(() => {
-      const form = document.querySelector('form');
-      if (form) form.dispatchEvent(new Event('submit', { cancelable: true }));
+      const el = document.querySelector('[x-data]');
+      if (el && el._x_dataStack) {
+        const app = el._x_dataStack[0];
+        if (app.sendMessage) app.sendMessage();
+      }
     });
   }
 
-  // ── 11. Hold for viewer to absorb ─────────────────────
+  // ── 11. Scroll chat so the sent message is visible ────
+  await sleep(2000);
+  await setZoom(page);  // Re-apply zoom after send
+  await sleep(500);
+
+  // Scroll UP so the sent bubble + "Leonardo" header are visible on screen
+  // At 150% zoom the page extends below the fold -- scrolling DOWN shows footer/nothing.
+  // Scrolling to top puts the chat area (with our sent bubble) in view.
+  await page.evaluate(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  await sleep(1500);
+
   // Viewer sees: sent bubble + single checkmark (not yet read by Leo)
-  await sleep(6000);
+  console.log('  Holding for viewer to read sent message...');
+  await sleep(5000);
 
   // ── End ────────────────────────────────────────────────
   await endRoll(page);

@@ -288,9 +288,11 @@ async function getMyId(page) {
 
 async function resolveUserIds(page) {
   const cast = ['john', 'leonardo', 'mike', 'sally', 'nino', 'sofiaferretti'];
+  const domain = new URL(BASE).hostname;
+  await sleep(1000); // Let page context settle before first fetch
+
   for (const username of cast) {
     try {
-      // Ensure we're on the real site (not data: or about:blank)
       const url = page.url();
       if (!url.startsWith(BASE)) {
         await retry(() => page.goto(BASE, { waitUntil: 'networkidle2', timeout: 15000 }), 'resolveUserIds nav');
@@ -307,8 +309,24 @@ async function resolveUserIds(page) {
     } catch (err) {
       console.log(`  WARN: resolveUserIds failed for ${username}: ${err.message}`);
     }
-    // bh_session is httponly -- use CDP to delete it
-    const domain = new URL(BASE).hostname;
+    await page.deleteCookie({ name: 'bh_session', domain, path: '/' });
+  }
+
+  // Retry any that failed (hotspot micro-drops)
+  const missing = cast.filter(u => !userIdCache[u]);
+  for (const username of missing) {
+    try {
+      await retry(() => page.goto(BASE, { waitUntil: 'networkidle2', timeout: 15000 }), `retry nav ${username}`);
+      await sleep(500);
+      await retry(() => apiCall(page, 'POST', '/api/v1/demo/login', { username, password: 'helix_pass' }), `retry login ${username}`);
+      const id = await getMyId(page);
+      if (id) {
+        userIdCache[username] = id;
+        console.log(`  Resolved ${username} → ${id} (retry)`);
+      }
+    } catch (err) {
+      console.log(`  WARN: retry failed for ${username}: ${err.message}`);
+    }
     await page.deleteCookie({ name: 'bh_session', domain, path: '/' });
   }
 }
@@ -345,7 +363,68 @@ async function launchBrowser() {
   });
   const page = (await browser.pages())[0];
   await page.setViewport(VP);
+
+  // Block heavy images on non-recording pages to save hotspot data.
+  // Call page.setRequestInterception(false) before going on camera.
+  // Pollinations images are 200-500KB each -- 10 listing cards = 3-5MB wasted.
+  await page.setRequestInterception(true);
+  page._blockImages = true;
+  page.on('request', req => {
+    if (page._blockImages && req.resourceType() === 'image') {
+      req.abort();
+    } else {
+      req.continue();
+    }
+  });
+
   return { browser, page };
+}
+
+// Call before going on camera -- re-enables images for recording
+async function enableImages(page) {
+  page._blockImages = false;
+}
+
+// Call after recording -- blocks images again to save data
+async function disableImages(page) {
+  page._blockImages = true;
+}
+
+// ── Connection Check ─────────────────────────────────────
+
+// Verify server is reachable before burning a take.
+// Hits a lightweight endpoint, retries 3x with backoff.
+async function checkConnection(page) {
+  console.log('  Connection check...');
+  for (let i = 1; i <= 3; i++) {
+    try {
+      const result = await page.evaluate(async (b) => {
+        const r = await fetch(`${b}/api/v1/health`, { credentials: 'include' });
+        return r.ok;
+      }, BASE);
+      if (result) {
+        console.log('  Connection OK');
+        return true;
+      }
+    } catch (err) {
+      console.log(`  Connection attempt ${i}/3 failed: ${err.message.split(' at ')[0].trim()}`);
+      if (i < 3) await sleep(3000 * i);
+    }
+  }
+  console.log('  WARN: Connection unstable -- proceed with caution');
+  return false;
+}
+
+// Warm up the connection -- makes the first real page load faster.
+// TLS handshake + DNS resolution happen here, not on camera.
+async function warmConnection(page) {
+  console.log('  Warming connection...');
+  await retry(() => page.goto(BASE, { waitUntil: 'networkidle2', timeout: 20000 }), 'warmup');
+  await sleep(1000);
+  // Hit demo-login to warm Keycloak too (the main failure point)
+  await retry(() => page.goto(`${BASE}/demo-login`, { waitUntil: 'networkidle2', timeout: 20000 }), 'keycloak warmup');
+  await sleep(1000);
+  console.log('  Connection warm');
 }
 
 // ── Pre-Roll / End-Roll Cards ────────────────────────────
@@ -379,5 +458,7 @@ module.exports = {
   clickWithRing, clickSelector,
   userIdCache, getMyId, resolveUserIds, getUserId,
   navigateTo, typeSlowly,
-  launchBrowser, preRoll, endRoll,
+  launchBrowser, enableImages, disableImages,
+  checkConnection, warmConnection,
+  preRoll, endRoll,
 };
