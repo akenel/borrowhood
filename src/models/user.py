@@ -73,6 +73,7 @@ class BHUser(BHBase, Base):
 
     # Identity (synced from Keycloak)
     keycloak_id: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    username: Mapped[Optional[str]] = mapped_column(String(100), unique=True, nullable=True, index=True)  # Keycloak preferred_username
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     display_name: Mapped[str] = mapped_column(String(100), nullable=False)
     slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
