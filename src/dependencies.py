@@ -41,6 +41,10 @@ async def get_user(db: AsyncSession, token: dict) -> BHUser:
     user = result.scalars().first()
     if user:
         user.last_active_at = datetime.now(timezone.utc)
+        # Sync username from Keycloak if not set or changed
+        kc_username = token.get("preferred_username", "")
+        if kc_username and user.username != kc_username:
+            user.username = kc_username
         await db.commit()
         return user
 
@@ -63,6 +67,7 @@ async def get_user(db: AsyncSession, token: dict) -> BHUser:
         if user:
             logger.info("Auto-linking user '%s' (slug=%s) to keycloak_id %s", username, user.slug, kc_id)
             user.keycloak_id = kc_id
+            user.username = username
             user.last_active_at = datetime.now(timezone.utc)
             await db.commit()
             await db.refresh(user)
@@ -85,6 +90,7 @@ async def get_user(db: AsyncSession, token: dict) -> BHUser:
 
     new_user = BHUser(
         keycloak_id=kc_id,
+        username=username or None,
         email=email,
         display_name=display_name,
         slug=slug,

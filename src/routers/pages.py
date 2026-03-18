@@ -6,7 +6,7 @@ Every response includes t() translator and current lang in context.
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select, func
@@ -286,6 +286,26 @@ async def item_detail(slug: str, request: Request,
         og_image=item.media[0].url if item.media else None,
     )
     return _render("pages/item_detail.html", ctx)
+
+
+@router.get("/@{username}", response_class=HTMLResponse)
+async def at_username_redirect(username: str, db: AsyncSession = Depends(get_db)):
+    """/@username vanity URL -- redirects to workshop profile page."""
+    from starlette.responses import RedirectResponse
+    # Try username match first
+    result = await db.execute(
+        select(BHUser).where(BHUser.username == username).where(BHUser.deleted_at.is_(None))
+    )
+    user = result.scalars().first()
+    # Fall back to slug match
+    if not user:
+        result = await db.execute(
+            select(BHUser).where(BHUser.slug == username).where(BHUser.deleted_at.is_(None))
+        )
+        user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return RedirectResponse(url=f"/workshop/{user.slug}", status_code=302)
 
 
 @router.get("/workshop/{slug}", response_class=HTMLResponse)
