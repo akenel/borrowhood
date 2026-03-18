@@ -511,6 +511,7 @@ async def orders_page(
     orders = []
     total_count = 0
     earnings_total = 0.0
+    reviewed_rental_ids = set()
 
     if token:
         try:
@@ -566,6 +567,13 @@ async def orders_page(
             result = await db.execute(base)
             orders = result.scalars().unique().all()
 
+            # Which rentals has this user already reviewed?
+            from src.models.review import BHReview
+            reviewed_result = await db.execute(
+                select(BHReview.rental_id).where(BHReview.reviewer_id == db_user.id)
+            )
+            reviewed_rental_ids = {row[0] for row in reviewed_result}
+
             # Lifetime earnings
             earnings_row = await db.execute(
                 select(func.coalesce(func.sum(BHListing.price), 0))
@@ -582,6 +590,7 @@ async def orders_page(
         total_count=total_count,
         earnings_total=earnings_total,
         viewer_user_id=db_user.id if token and db_user else None,
+        reviewed_rental_ids=reviewed_rental_ids if token and db_user else set(),
         selected_status=status,
         selected_role=role,
         selected_sort=sort,
