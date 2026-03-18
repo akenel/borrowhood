@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ t('list_item.title') }} - {{ t('app.name') }}{% endblock %}
+{% block title %}{% if edit_mode %}Edit Item{% else %}{{ t('list_item.title') }}{% endif %} - {{ t('app.name') }}{% endblock %}
 
 {% block content %}
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -9,13 +9,16 @@
     <nav class="text-sm text-gray-500 mb-6">
         <a href="/" class="hover:text-indigo-600">{{ t('nav.home') }}</a>
         <span class="mx-2">/</span>
-        <span class="text-gray-900">{{ t('list_item.title') }}</span>
+        {% if edit_mode %}<a href="/items/{{ edit_item.slug }}" class="hover:text-indigo-600">{{ edit_item.name }}</a><span class="mx-2">/</span><span class="text-gray-900">Edit</span>{% else %}<span class="text-gray-900">{{ t('list_item.title') }}</span>{% endif %}
     </nav>
 
-    <h1 class="text-2xl font-bold text-gray-900 mb-8">{{ t('list_item.title') }}</h1>
+    <h1 class="text-2xl font-bold text-gray-900 mb-8">{% if edit_mode %}Edit: {{ edit_item.name }}{% else %}{{ t('list_item.title') }}{% endif %}</h1>
 
     <!-- Multi-step form powered by Alpine.js -->
     <div x-data="{
+        editMode: {{ 'true' if edit_mode else 'false' }},
+        editItemId: '{{ edit_item_id if edit_mode else '' }}',
+        existingMedia: {{ edit_media_json if edit_mode else '[]' }},
         step: 1,
         submitting: false,
         saveAsDraft: false,
@@ -33,16 +36,16 @@
         uploadPreviews: [],
         dragging: false,
         form: {
-            name: '',
-            description: '',
-            story: '',
-            category: 'power_tools',
-            item_type: 'physical',
-            condition: 'good',
-            brand: '',
-            age_restricted: false,
-            safety_notes: '',
-            tags: '',
+            name: '{{ edit_item.name | e if edit_mode else '' }}',
+            description: `{{ edit_item.description | e if edit_mode and edit_item.description else '' }}`,
+            story: `{{ edit_item.story | e if edit_mode and edit_item.story else '' }}`,
+            category: '{{ edit_item.category if edit_mode else 'power_tools' }}',
+            item_type: '{{ edit_item.item_type.value if edit_mode else 'physical' }}',
+            condition: '{{ edit_item.condition.value if edit_mode and edit_item.condition else 'good' }}',
+            brand: '{{ edit_item.brand | e if edit_mode and edit_item.brand else '' }}',
+            age_restricted: {{ 'true' if edit_mode and edit_item.age_restricted else 'false' }},
+            safety_notes: '{{ edit_item.safety_notes | e if edit_mode and edit_item.safety_notes else '' }}',
+            tags: '{{ edit_item.tags | e if edit_mode and edit_item.tags else '' }}',
             content_language: '{{ lang }}',
             currency: 'EUR',
             delivery_available: false,
@@ -67,7 +70,7 @@
         handleFiles(files) {
             if (!files || !files.length) return;
             for (var i = 0; i < files.length; i++) {
-                if (this.uploadFiles.length >= 5) {
+                if ((this.uploadFiles.length + this.existingMedia.length) >= 5) {
                     window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'warning', message: 'Maximum 5 photos per item' } }));
                     break;
                 }
@@ -180,30 +183,53 @@
         async submitItem() {
             this.submitting = true;
             try {
-                // Step 1: Create item
-                const itemResp = await fetch('/api/v1/items', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: this.form.name,
-                        description: this.form.description,
-                        story: this.form.story || null,
-                        category: this.form.category,
-                        item_type: this.form.item_type,
-                        condition: this.form.condition || null,
-                        brand: this.form.brand || null,
-                        age_restricted: this.form.age_restricted || false,
-                        safety_notes: this.form.safety_notes || null,
-                        tags: this.form.tags || null,
-                        content_language: this.form.content_language
-                    })
-                });
+                var item;
+                if (this.editMode) {
+                    // Edit mode: PATCH existing item
+                    const itemResp = await fetch('/api/v1/items/' + this.editItemId, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: this.form.name,
+                            description: this.form.description,
+                            story: this.form.story || null,
+                            category: this.form.category,
+                            condition: this.form.condition || null,
+                            brand: this.form.brand || null,
+                            tags: this.form.tags || null,
+                        })
+                    });
+                    if (!itemResp.ok) {
+                        const err = await itemResp.json();
+                        throw new Error(err.detail || 'Failed to update item');
+                    }
+                    item = await itemResp.json();
+                } else {
+                    // Create mode: POST new item
+                    const itemResp = await fetch('/api/v1/items', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: this.form.name,
+                            description: this.form.description,
+                            story: this.form.story || null,
+                            category: this.form.category,
+                            item_type: this.form.item_type,
+                            condition: this.form.condition || null,
+                            brand: this.form.brand || null,
+                            age_restricted: this.form.age_restricted || false,
+                            safety_notes: this.form.safety_notes || null,
+                            tags: this.form.tags || null,
+                            content_language: this.form.content_language
+                        })
+                    });
 
-                if (!itemResp.ok) {
-                    const err = await itemResp.json();
-                    throw new Error(err.detail || 'Failed to create item');
+                    if (!itemResp.ok) {
+                        const err = await itemResp.json();
+                        throw new Error(err.detail || 'Failed to create item');
+                    }
+                    item = await itemResp.json();
                 }
-                const item = await itemResp.json();
 
                 // Upload user photos (up to 5)
                 let hasImage = false;
@@ -264,7 +290,8 @@
                     } catch(e) { /* AI fallback is best-effort */ }
                 }
 
-                // Step 2: Create listings (one per selected type)
+                // Step 2: Create listings (skip in edit mode -- listings already exist)
+                if (!this.editMode)
                 for (const lt of this.selectedTypes) {
                     const terms = this.listingPrices[lt];
                     const isGiveaway = lt === 'giveaway';
@@ -305,7 +332,7 @@
                     }
                 }
 
-                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{{ t('list_item.success') }}' } }));
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: this.editMode ? 'Item updated!' : '{{ t('list_item.success') }}' } }));
                 setTimeout(() => window.location.href = '/items/' + item.slug, 1000);
 
             } catch (err) {
@@ -495,8 +522,21 @@
                     {% if lang == 'it' %}Foto Articolo{% else %}Item Photo{% endif %}
                 </label>
 
+                <!-- Existing photos (edit mode) -->
+                <div x-show="existingMedia.length > 0" class="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-3">
+                    <template x-for="(m, midx) in existingMedia" :key="m.id">
+                        <div class="relative group">
+                            <img :src="m.url" :alt="m.alt_text" class="w-full h-24 object-cover rounded-lg border border-gray-200"
+                                 :class="midx === 0 && uploadPreviews.length === 0 ? 'ring-2 ring-indigo-500' : ''">
+                            <span x-show="midx === 0 && uploadPreviews.length === 0" class="absolute top-1 left-1 text-[10px] px-1.5 py-0.5 bg-indigo-600 text-white rounded-full">Cover</span>
+                            <button type="button" @click="fetch('/api/v1/items/' + editItemId + '/media/' + m.id, {method:'DELETE'}).then(r=>{if(r.ok){existingMedia.splice(midx,1)}else{alert('Failed to delete')}})"
+                                    class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">&times;</button>
+                        </div>
+                    </template>
+                </div>
+
                 <!-- Photo upload buttons (always visible when under 5 photos) -->
-                <div x-show="uploadPreviews.length < 5 && !aiImageUrl" class="space-y-3">
+                <div x-show="(uploadPreviews.length + existingMedia.length) < 5 && !aiImageUrl" class="space-y-3">
                     <div class="flex gap-2">
                         <button type="button" @click="$refs.cameraInput.click()"
                                 class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px]">
@@ -531,8 +571,8 @@
                 </div>
 
                 <!-- Photo count indicator -->
-                <div x-show="uploadPreviews.length > 0" class="text-xs text-gray-500 mt-1">
-                    <span x-text="uploadPreviews.length"></span>/5 {% if lang == 'it' %}foto{% else %}photos{% endif %}
+                <div x-show="uploadPreviews.length > 0 || existingMedia.length > 0" class="text-xs text-gray-500 mt-1">
+                    <span x-text="uploadPreviews.length + existingMedia.length"></span>/5 {% if lang == 'it' %}foto{% else %}photos{% endif %}
                     <span x-show="uploadPreviews.length > 0" class="text-gray-400 ml-1">({% if lang == 'it' %}prima = copertina{% else %}first = cover{% endif %})</span>
                 </div>
 

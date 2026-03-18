@@ -288,6 +288,61 @@ async def item_detail(slug: str, request: Request,
     return _render("pages/item_detail.html", ctx)
 
 
+@router.get("/items/{slug}/edit", response_class=HTMLResponse)
+async def edit_item_page(slug: str, request: Request,
+                         db: AsyncSession = Depends(get_db),
+                         token: Optional[dict] = Depends(get_current_user_token)):
+    """Edit item page -- same form as list_item but pre-filled."""
+    if not token:
+        from starlette.responses import RedirectResponse
+        return RedirectResponse(url="/auth/login", status_code=302)
+
+    result = await db.execute(
+        select(BHItem)
+        .options(
+            selectinload(BHItem.media),
+            selectinload(BHItem.listings),
+        )
+        .where(BHItem.slug == slug)
+        .where(BHItem.deleted_at.is_(None))
+    )
+    item = result.scalars().first()
+    if not item:
+        ctx = _ctx(request, token)
+        return _render("errors/404.html", ctx, status_code=404)
+
+    # Verify ownership
+    user = await get_user(db, token)
+    if item.owner_id != user.id:
+        raise HTTPException(status_code=403, detail="Not your item")
+
+    import json
+    # Build existing media list for the template
+    existing_media = [{"id": str(m.id), "url": m.url, "alt_text": m.alt_text} for m in (item.media or [])]
+    # Build existing listings for the template
+    existing_listings = []
+    for l in (item.listings or []):
+        if not l.deleted_at:
+            existing_listings.append({
+                "id": str(l.id),
+                "listing_type": l.listing_type.value,
+                "status": l.status.value,
+                "price": float(l.price) if l.price else 0,
+                "price_unit": l.price_unit or "flat",
+                "deposit": float(l.deposit) if l.deposit else 0,
+                "currency": l.currency or "EUR",
+            })
+
+    ctx = _ctx(request, token,
+        edit_mode=True,
+        edit_item=item,
+        edit_item_id=str(item.id),
+        edit_media_json=json.dumps(existing_media),
+        edit_listings_json=json.dumps(existing_listings),
+    )
+    return _render("pages/list_item.html", ctx)
+
+
 @router.get("/@{username}", response_class=HTMLResponse)
 async def at_username_redirect(username: str, db: AsyncSession = Depends(get_db)):
     """/@username vanity URL -- redirects to workshop profile page."""
