@@ -700,6 +700,7 @@ async def profile(request: Request,
         languages=languages,
         skills=skills,
         stats=stats,
+        is_owner=True if profile_user else False,
     )
     return _render("pages/profile.html", ctx)
 
