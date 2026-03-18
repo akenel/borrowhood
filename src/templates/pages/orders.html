@@ -137,9 +137,18 @@
                         </a>
                         {% endif %}
                         {% if order.status.value == 'completed' and item %}
+                        {% if order.id in reviewed_rental_ids %}
+                        <a href="/items/{{ item.slug }}#reviews" class="inline-flex items-center gap-1 text-xs text-emerald-600 hover:underline">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            {% if lang == 'it' %}Recensito{% else %}Reviewed{% endif %}
+                        </a>
+                        {% else %}
                         <a href="/items/{{ item.slug }}#reviews" class="inline-flex items-center text-xs text-indigo-600 hover:underline">
                             {% if lang == 'it' %}Lascia recensione{% else %}Leave review{% endif %}
                         </a>
+                        {% endif %}
                         {% endif %}
                         {% if order.status.value in ('approved', 'picked_up', 'returned') %}
                         <button onclick="openDisputeModal('{{ order.id }}', '{{ item.name if item else 'Unknown' }}')"
