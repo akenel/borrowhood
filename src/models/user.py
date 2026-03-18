@@ -92,6 +92,7 @@ class BHUser(BHBase, Base):
     telegram_username: Mapped[Optional[str]] = mapped_column(String(100))
     telegram_chat_id: Mapped[Optional[str]] = mapped_column(String(50))  # Numeric Telegram chat ID for Bot API
     phone: Mapped[Optional[str]] = mapped_column(String(30))
+    whatsapp_number: Mapped[Optional[str]] = mapped_column(String(30))  # International format e.g. +39328123456
 
     # Location (fuzzy -- 3 decimal places max)
     latitude: Mapped[Optional[float]] = mapped_column(Float)
