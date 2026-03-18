@@ -3,6 +3,45 @@
 {% block title %}{{ item.name }} - {{ t('app.name') }}{% endblock %}
 
 {% block head %}
+<!-- Open Graph / WhatsApp / Facebook / LinkedIn preview -->
+<meta property="og:type" content="product">
+<meta property="og:title" content="{{ item.name }}">
+<meta property="og:description" content="{{ (item.description or '')|truncate(160, True, '...') }}">
+{% if item.media %}<meta property="og:image" content="{{ item.media[0].url }}">{% endif %}
+<meta property="og:url" content="{{ request.url }}">
+<meta property="og:site_name" content="{{ t('app.name') }}">
+{% if active_listing and active_listing.price %}<meta property="product:price:amount" content="{{ active_listing.price }}">
+<meta property="product:price:currency" content="{{ active_listing.currency or 'EUR' }}">{% endif %}
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ item.name }}">
+<meta name="twitter:description" content="{{ (item.description or '')|truncate(160, True, '...') }}">
+{% if item.media %}<meta name="twitter:image" content="{{ item.media[0].url }}">{% endif %}
+<!-- JSON-LD Structured Data (Google rich results: price, rating, availability) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "{{ item.name|e }}",
+  "description": "{{ (item.description or '')|truncate(300, True, '...')|e }}",
+  {% if item.media %}"image": "{{ item.media[0].url }}",{% endif %}
+  {% if item.owner %}"brand": {"@type": "Organization", "name": "{{ (item.owner.workshop_name or item.owner.display_name)|e }}"},{% endif %}
+  "url": "{{ request.url }}",
+  {% if active_listing and active_listing.price %}"offers": {
+    "@type": "Offer",
+    "price": "{{ active_listing.price }}",
+    "priceCurrency": "{{ active_listing.currency or 'EUR' }}",
+    "availability": "https://schema.org/InStock",
+    "url": "{{ request.url }}"
+  },{% endif %}
+  {% if avg_rating %}"aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ avg_rating }}",
+    "reviewCount": "{{ review_count or 1 }}"
+  },{% endif %}
+  "sku": "{{ item.slug }}"
+}
+</script>
 {% if item.latitude and item.longitude %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -128,6 +167,9 @@
                         {{ item.brand }}{% if item.model %} {{ item.model }}{% endif %}
                     </span>
                     {% endif %}
+                    {% if item.age_restricted %}
+                    <span class="text-xs px-2.5 py-1 bg-red-100 text-red-700 rounded-full font-semibold">18+</span>
+                    {% endif %}
                 </div>
 
                 <!-- Description -->
@@ -145,6 +187,23 @@
                     </div>
                     <p id="desc-text" class="mt-2 text-gray-700 leading-relaxed" data-translatable data-content-lang="{{ item.content_language or 'en' }}">{{ item.description }}</p>
                     <span class="text-xs text-gray-400 mt-1 inline-block">{{ t('item.written_in') }} {{ item.content_language | upper }}</span>
+                </div>
+                {% endif %}
+
+                <!-- Safety warning -->
+                {% if item.age_restricted or item.safety_notes %}
+                <div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    {% if item.age_restricted %}
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span class="text-sm font-semibold text-red-700">{% if lang == 'it' %}Solo 18+ -- Articolo con restrizione d'eta{% else %}18+ Only -- Age-Restricted Item{% endif %}</span>
+                    </div>
+                    {% endif %}
+                    {% if item.safety_notes %}
+                    <p class="text-sm text-red-700">{{ item.safety_notes }}</p>
+                    {% endif %}
                 </div>
                 {% endif %}
 
@@ -668,12 +727,45 @@
                     {% if lang == 'it' %}Contatta il venditore{% else %}Message Seller{% endif %}
                 </a>
                 {% endif %}
+                {% if item.owner and item.owner.whatsapp_number %}
+                <button onclick="(async()=>{const r=await fetch('/api/v1/items/by-slug/{{ item.slug }}/whatsapp-connect',{method:'POST',headers:{'Content-Type':'application/json'}});if(r.status===401){window.dispatchEvent(new CustomEvent('toast',{detail:{type:'info',message:'{% if lang == 'it' %}Accedi per contattare il venditore{% else %}Log in to contact the seller{% endif %}'}}));return}if(r.ok){const d=await r.json();window.open(d.url,'_blank')}else{const e=await r.json().catch(()=>({}));window.dispatchEvent(new CustomEvent('toast',{detail:{type:'error',message:e.detail||'Error'}}))}})()"
+                   class="w-full flex items-center justify-center gap-2 px-6 py-3 mt-3 bg-[#25D366] text-white font-semibold rounded-lg hover:bg-[#1DA851] transition-colors min-h-[44px] cursor-pointer">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    {% if lang == 'it' %}Contatta su WhatsApp{% else %}Contact on WhatsApp{% endif %}
+                </button>
+                {% endif %}
                 {% if item.owner and item.owner.telegram_username %}
                 <a href="https://t.me/{{ item.owner.telegram_username }}" target="_blank" rel="noopener"
                    class="w-full flex items-center justify-center px-6 py-3 mt-3 bg-white text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px]">
                     {{ t('item.contact_telegram') }}
                 </a>
                 {% endif %}
+
+                <!-- Share buttons -->
+                <div class="flex gap-2 mt-3">
+                    <!-- Native OS share (mobile: shows app picker / desktop: copy link fallback) -->
+                    <button onclick="if(navigator.share){navigator.share({title:'{{ item.name|e }}',url:window.location.href})}else{navigator.clipboard.writeText(window.location.href).then(()=>window.dispatchEvent(new CustomEvent('toast',{detail:{type:'success',message:'Link copied!'}})))}"
+                            class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px]">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                        </svg>
+                        {% if lang == 'it' %}Condividi{% else %}Share{% endif %}
+                    </button>
+                    <!-- WhatsApp direct -->
+                    <a href="https://wa.me/?text={{ (item.name + ' -- ' + request.url|string) | urlencode }}"
+                       target="_blank" rel="noopener"
+                       class="flex items-center justify-center px-4 py-3 bg-[#25D366] text-white rounded-lg hover:bg-[#1DA851] transition-colors min-h-[44px]"
+                       title="WhatsApp">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    </a>
+                    <!-- Telegram direct -->
+                    <a href="https://t.me/share/url?url={{ request.url|string|urlencode }}&text={{ item.name|urlencode }}"
+                       target="_blank" rel="noopener"
+                       class="flex items-center justify-center px-4 py-3 bg-[#0088cc] text-white rounded-lg hover:bg-[#006da3] transition-colors min-h-[44px]"
+                       title="Telegram">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                    </a>
+                </div>
 
                 <!-- Rental/Claim request modal -->
                 <div x-show="showRentalModal" x-cloak
@@ -705,6 +797,16 @@
                                       :placeholder="isGiveaway ? '{{ t('giveaway.claim_message_placeholder') }}' : listingType === 'sell' ? '{{ t('purchase.message_placeholder') }}' : listingType === 'service' || listingType === 'training' ? '{{ t('booking.message_placeholder') }}' : '{{ t('rental.message_placeholder') }}'"
                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
                         </div>
+
+                        <!-- Deposit + insurance notice for rentals -->
+                        {% if active_listing and active_listing.deposit %}
+                        <template x-if="listingType === 'rent'">
+                            <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+                                <p class="font-semibold">{% if lang == 'it' %}Deposito: EUR {{ "%.0f"|format(active_listing.deposit) }}{% else %}Deposit: EUR {{ "%.0f"|format(active_listing.deposit) }}{% endif %}</p>
+                                <p class="mt-1">{% if lang == 'it' %}Il deposito viene concordato direttamente con il proprietario. La piattaforma non gestisce depositi o pagamenti.{% else %}The deposit is arranged directly with the owner. The platform does not hold or process deposits or payments.{% endif %}</p>
+                            </div>
+                        </template>
+                        {% endif %}
 
                         <div class="flex justify-end space-x-3 pt-2">
                             <button @click="showRentalModal = false"

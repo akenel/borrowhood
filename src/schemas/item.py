@@ -53,6 +53,8 @@ class ItemCreate(BaseModel):
     condition: Optional[ItemCondition] = None
     brand: Optional[str] = Field(None, max_length=100)
     model: Optional[str] = Field(None, max_length=100)
+    age_restricted: bool = False
+    safety_notes: Optional[str] = None
     needs_equipment: Optional[str] = None
     compatible_with: Optional[str] = None
     latitude: Optional[float] = None
