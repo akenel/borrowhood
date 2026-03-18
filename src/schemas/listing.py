@@ -38,6 +38,7 @@ class ListingOut(BaseModel):
 class ListingCreate(BaseModel):
     item_id: UUID
     listing_type: ListingType
+    status: Optional[ListingStatus] = None  # None=active, "draft"=save without publishing
     price: Optional[float] = Field(None, ge=0)
     price_unit: Optional[str] = Field(None, max_length=20)
     currency: str = Field(default="EUR", max_length=3)

@@ -28,6 +28,7 @@ class ListingType(str, enum.Enum):
 
 class ListingStatus(str, enum.Enum):
     DRAFT = "draft"
+    PENDING = "pending"      # Awaiting moderator approval
     ACTIVE = "active"
     PAUSED = "paused"
     EXPIRED = "expired"

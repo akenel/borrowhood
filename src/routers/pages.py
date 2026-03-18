@@ -465,6 +465,21 @@ async def dashboard(request: Request,
             earnings_total = float(row[0])
             completed_count = row[1]
 
+    # Count ITEMS by their listing status for the dashboard header
+    # An item is "active" if ANY of its listings are active, etc.
+    active_count = paused_count = draft_count = pending_count = 0
+    if token and db_user:
+        for item in items:
+            statuses = {l.status for l in (item.listings or []) if not l.deleted_at}
+            if ListingStatus.ACTIVE in statuses:
+                active_count += 1
+            elif ListingStatus.PENDING in statuses:
+                pending_count += 1
+            elif ListingStatus.PAUSED in statuses:
+                paused_count += 1
+            elif ListingStatus.DRAFT in statuses:
+                draft_count += 1
+
     ctx = _ctx(request, token,
         items=items,
         item_total=item_count,
@@ -473,6 +488,10 @@ async def dashboard(request: Request,
         earnings_total=earnings_total,
         completed_count=completed_count,
         db_user_id=str(db_user.id) if token and db_user else "",
+        active_count=active_count,
+        pending_count=pending_count,
+        paused_count=paused_count,
+        draft_count=draft_count,
     )
     return _render("pages/dashboard.html", ctx)
 
