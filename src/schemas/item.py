@@ -32,6 +32,7 @@ class ItemOut(BaseModel):
     subcategory: Optional[str] = None
     condition: Optional[ItemCondition] = None
     brand: Optional[str] = None
+    tags: Optional[str] = None
     needs_equipment: Optional[str] = None
     compatible_with: Optional[str] = None
     owner_id: UUID
@@ -55,6 +56,7 @@ class ItemCreate(BaseModel):
     model: Optional[str] = Field(None, max_length=100)
     age_restricted: bool = False
     safety_notes: Optional[str] = None
+    tags: Optional[str] = None
     needs_equipment: Optional[str] = None
     compatible_with: Optional[str] = None
     latitude: Optional[float] = None
@@ -71,5 +73,6 @@ class ItemUpdate(BaseModel):
     subcategory: Optional[str] = Field(None, max_length=50)
     condition: Optional[ItemCondition] = None
     brand: Optional[str] = Field(None, max_length=100)
+    tags: Optional[str] = None
     needs_equipment: Optional[str] = None
     compatible_with: Optional[str] = None
