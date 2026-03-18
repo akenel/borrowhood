@@ -77,7 +77,8 @@
                 <!-- Main image -->
                 <div class="rounded-lg overflow-hidden bg-gray-100 relative group">
                     <img :src="images[active]" :alt="alts[active] || ''"
-                         class="w-full h-64 md:h-96 object-cover">
+                         @click="zoomOpen = true"
+                         class="w-full h-64 md:h-96 object-cover cursor-zoom-in">
                     {% if item.media | length > 1 %}
                     <!-- Left arrow -->
                     <button @click="prev()"
@@ -107,6 +108,23 @@
                     {% endfor %}
                 </div>
                 {% endif %}
+                <!-- Lightbox zoom overlay -->
+                <div x-show="zoomOpen" x-cloak
+                     @click="zoomOpen = false" @keydown.escape.window="zoomOpen = false"
+                     class="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center cursor-zoom-out"
+                     x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+                    <img :src="images[active]" :alt="alts[active] || ''" class="max-w-[95vw] max-h-[95vh] object-contain rounded-lg shadow-2xl">
+                    <button @click.stop="zoomOpen = false" class="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/40 text-white rounded-full flex items-center justify-center text-xl">&times;</button>
+                    {% if item.media | length > 1 %}
+                    <button @click.stop="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 hover:bg-white/40 text-white rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button @click.stop="next()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 hover:bg-white/40 text-white rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                    {% endif %}
+                </div>
             </div>
             {% else %}
             <div class="w-full h-64 md:h-96 bg-gray-100 rounded-lg flex items-center justify-center">
@@ -185,7 +203,7 @@
                             </button>
                         </div>
                     </div>
-                    <p id="desc-text" class="mt-2 text-gray-700 leading-relaxed" data-translatable data-content-lang="{{ item.content_language or 'en' }}">{{ item.description }}</p>
+                    <p id="desc-text" class="mt-2 text-gray-700 leading-relaxed whitespace-pre-line" data-translatable data-content-lang="{{ item.content_language or 'en' }}">{{ item.description }}</p>
                     <span class="text-xs text-gray-400 mt-1 inline-block">{{ t('item.written_in') }} {{ item.content_language | upper }}</span>
                 </div>
                 {% endif %}
@@ -1553,6 +1571,7 @@
     function imageGallery() {
         return {
             active: 0,
+            zoomOpen: false,
             images: {{ item.media | map(attribute='url') | list | tojson }},
             alts: {{ item.media | map(attribute='alt_text') | list | tojson }},
             init() {
