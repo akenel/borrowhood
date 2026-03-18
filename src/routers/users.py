@@ -69,6 +69,7 @@ async def get_current_user(
         "display_name": user.display_name,
         "slug": user.slug,
         "avatar_url": user.avatar_url,
+        "whatsapp_number": user.whatsapp_number,
     }
 
 
@@ -132,6 +133,30 @@ async def upload_banner(
     user.banner_url = f"/static/uploads/banners/{filename}"
     await db.commit()
     return {"status": "ok", "banner_url": user.banner_url}
+
+
+# ── WhatsApp number ──
+
+
+@router.put("/me/whatsapp", status_code=200)
+async def update_whatsapp(
+    request: Request,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Save or clear the user's WhatsApp number."""
+    data = await request.json()
+    user = await get_user(db, token)
+    raw = (data.get("whatsapp_number") or "").strip()
+    # Basic sanitization: keep only digits, spaces, + and -
+    if raw:
+        import re
+        cleaned = re.sub(r"[^\d\s+\-]", "", raw)
+        user.whatsapp_number = cleaned if cleaned else None
+    else:
+        user.whatsapp_number = None
+    await db.commit()
+    return {"status": "ok", "whatsapp_number": user.whatsapp_number}
 
 
 # ── Favorites (auth-gated) ── must be BEFORE /{user_id} routes ──
