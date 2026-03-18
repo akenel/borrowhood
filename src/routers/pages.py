@@ -339,6 +339,7 @@ async def edit_item_page(slug: str, request: Request,
         edit_item_id=str(item.id),
         edit_media_json=json.dumps(existing_media),
         edit_listings_json=json.dumps(existing_listings),
+        category_groups=CATEGORY_GROUPS,
     )
     return _render("pages/list_item.html", ctx)
 
