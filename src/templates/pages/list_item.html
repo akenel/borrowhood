@@ -18,6 +18,7 @@
     <div x-data="{
         step: 1,
         submitting: false,
+        saveAsDraft: false,
         aiGenerating: false,
         aiUsed: false,
         aiProvider: '',
@@ -39,6 +40,8 @@
             item_type: 'physical',
             condition: 'good',
             brand: '',
+            age_restricted: false,
+            safety_notes: '',
             content_language: '{{ lang }}',
             currency: 'EUR',
             delivery_available: false,
@@ -57,13 +60,8 @@
             giveaway: { price: '', price_unit: 'flat', deposit: '' }
         },
         toggleListingType(val) {
-            if (this.selectedTypes.includes(val)) {
-                if (this.selectedTypes.length > 1) {
-                    this.selectedTypes = this.selectedTypes.filter(t => t !== val);
-                }
-            } else {
-                this.selectedTypes = [...this.selectedTypes, val];
-            }
+            // Used by AI suggestion -- direct assignment for card buttons
+            this.selectedTypes = [val];
         },
         handleFiles(files) {
             if (!files || !files.length) return;
@@ -76,11 +74,45 @@
                 window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'File too large (max 10 MB)' } }));
                 return;
             }
-            this.uploadFile = file;
             this.aiImageUrl = '';
-            const reader = new FileReader();
-            reader.onload = (e) => { this.uploadPreview = e.target.result; };
-            reader.readAsDataURL(file);
+            // Resize large images client-side (phone cameras produce 4-12MB photos)
+            this.resizeAndStore(file);
+        },
+        async resizeAndStore(file) {
+            const MAX_DIM = 1200;
+            const img = new Image();
+            const url = URL.createObjectURL(file);
+            img.onload = () => {
+                let { width, height } = img;
+                // Only resize if larger than MAX_DIM
+                if (width > MAX_DIM || height > MAX_DIM) {
+                    if (width > height) {
+                        height = Math.round(height * MAX_DIM / width);
+                        width = MAX_DIM;
+                    } else {
+                        width = Math.round(width * MAX_DIM / height);
+                        height = MAX_DIM;
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob((blob) => {
+                        this.uploadFile = new File([blob], file.name, { type: 'image/jpeg' });
+                        this.uploadPreview = canvas.toDataURL('image/jpeg', 0.85);
+                        URL.revokeObjectURL(url);
+                    }, 'image/jpeg', 0.85);
+                } else {
+                    // Small enough, use as-is
+                    this.uploadFile = file;
+                    const reader = new FileReader();
+                    reader.onload = (e) => { this.uploadPreview = e.target.result; };
+                    reader.readAsDataURL(file);
+                    URL.revokeObjectURL(url);
+                }
+            };
+            img.src = url;
         },
         removeImage() {
             this.uploadFile = null;
@@ -153,6 +185,8 @@
                         item_type: this.form.item_type,
                         condition: this.form.condition || null,
                         brand: this.form.brand || null,
+                        age_restricted: this.form.age_restricted || false,
+                        safety_notes: this.form.safety_notes || null,
                         content_language: this.form.content_language
                     })
                 });
@@ -228,6 +262,7 @@
                     const payload = {
                         item_id: item.id,
                         listing_type: lt,
+                        status: this.saveAsDraft ? 'draft' : 'active',
                         price: isGiveaway ? null : (terms.price ? parseFloat(terms.price) : null),
                         price_unit: isGiveaway ? 'flat' : terms.price_unit,
                         currency: this.form.currency,
@@ -445,22 +480,41 @@
                 </label>
 
                 <!-- Drop zone (no image selected yet) -->
-                <div x-show="!uploadPreview && !aiImageUrl"
-                     @dragover.prevent="dragging = true"
-                     @dragleave.prevent="dragging = false"
-                     @drop.prevent="dragging = false; handleFiles($event.dataTransfer.files)"
-                     class="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors"
-                     :class="dragging ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 hover:border-indigo-400 hover:bg-gray-50'"
-                     @click="$refs.fileInput.click()">
+                <div x-show="!uploadPreview && !aiImageUrl" class="space-y-3">
+                    <!-- Take Photo button (prominent on mobile) -->
+                    <div class="flex gap-2">
+                        <button type="button" @click="$refs.cameraInput.click()"
+                                class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px]">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            {% if lang == 'it' %}Scatta foto{% else %}Take Photo{% endif %}
+                        </button>
+                        <button type="button" @click="$refs.fileInput.click()"
+                                class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px]">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            {% if lang == 'it' %}Scegli foto{% else %}Choose Photo{% endif %}
+                        </button>
+                    </div>
+                    <!-- Hidden file inputs -->
+                    <input type="file" x-ref="cameraInput" accept="image/*" capture="environment" class="hidden"
+                           @change="handleFiles($event.target.files)">
                     <input type="file" x-ref="fileInput" accept="image/*" class="hidden"
                            @change="handleFiles($event.target.files)">
-                    <svg class="mx-auto w-12 h-12 mb-3" :class="dragging ? 'text-indigo-500' : 'text-gray-300'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    <p class="text-sm font-medium" :class="dragging ? 'text-indigo-600' : 'text-gray-600'">
-                        {% if lang == 'it' %}Trascina un'immagine qui o clicca per sfogliare{% else %}Drop an image here or click to browse{% endif %}
-                    </p>
-                    <p class="text-xs text-gray-400 mt-1">JPEG, PNG, WebP, GIF - max 10 MB</p>
+                    <!-- Drop zone (desktop) -->
+                    <div @dragover.prevent="dragging = true"
+                         @dragleave.prevent="dragging = false"
+                         @drop.prevent="dragging = false; handleFiles($event.dataTransfer.files)"
+                         class="border-2 border-dashed rounded-lg p-4 text-center transition-colors hidden sm:block"
+                         :class="dragging ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'"
+                         @click="$refs.fileInput.click()">
+                        <p class="text-xs text-gray-400">
+                            {% if lang == 'it' %}oppure trascina un'immagine qui{% else %}or drop an image here{% endif %}
+                        </p>
+                    </div>
                 </div>
 
                 <!-- Image preview (user upload) -->
@@ -601,6 +655,24 @@
             <!-- Clear condition for services (don't send meaningless value) -->
             <template x-effect="if (form.item_type === 'service' || form.item_type === 'space') form.condition = null;"></template>
 
+            <!-- Safety flags -->
+            <div class="space-y-3 pt-2 border-t border-gray-100">
+                <div class="flex items-start space-x-3">
+                    <input id="age_restricted" type="checkbox" x-model="form.age_restricted"
+                           class="mt-0.5 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                    <div>
+                        <label for="age_restricted" class="text-sm font-medium text-gray-700">{% if lang == 'it' %}Solo 18+ (articolo con restrizione d'eta){% else %}18+ only (age-restricted item){% endif %}</label>
+                        <p class="text-xs text-gray-400">{% if lang == 'it' %}Attrezzi pericolosi, veicoli, attrezzature che richiedono esperienza{% else %}Power tools, vehicles, equipment requiring experience{% endif %}</p>
+                    </div>
+                </div>
+                <div x-show="form.age_restricted" x-cloak x-transition>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Note di sicurezza (opzionale){% else %}Safety notes (optional){% endif %}</label>
+                    <textarea x-model="form.safety_notes" rows="2"
+                              placeholder="{% if lang == 'it' %}Es: Indossare occhiali protettivi. Non usare da soli.{% else %}E.g. Wear safety goggles. Never operate alone.{% endif %}"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 text-sm"></textarea>
+                </div>
+            </div>
+
             <div class="flex justify-end pt-4">
                 <button @click="if(form.name.trim()) step = 2" :disabled="!form.name.trim()"
                         class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[44px]">
@@ -638,48 +710,77 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('list_item.listing_type') }} *
-                    <span class="text-xs text-gray-400 font-normal ml-1">{% if lang == 'it' %}(seleziona tutti quelli che si applicano){% else %}(select all that apply){% endif %}</span>
-                </label>
-                <div class="space-y-3">
-                    {% for ltype in ['rent','sell','commission','offer','service','training','auction','giveaway'] %}
-                    <div>
-                        <label class="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer transition-colors min-h-[44px]"
-                               :class="selectedTypes.includes('{{ ltype }}') ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'">
-                            <input type="checkbox" value="{{ ltype }}"
-                                   :checked="selectedTypes.includes('{{ ltype }}')"
-                                   @change="toggleListingType('{{ ltype }}')"
-                                   class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                            <span class="text-sm font-medium text-gray-900 flex-1">{{ t('listing_types.' + ltype) }}</span>
-                            <!-- Help tooltip -->
-                            <span x-data="{ show: false }" class="relative flex-shrink-0" @click.stop>
-                                <button @click.prevent="show = !show" class="w-5 h-5 rounded-full bg-gray-200 hover:bg-indigo-100 text-gray-500 hover:text-indigo-600 text-xs font-bold flex items-center justify-center transition-colors" type="button">?</button>
-                                <div x-show="show" x-cloak @click.outside="show = false"
-                                     x-transition:enter="transition ease-out duration-100"
-                                     x-transition:enter-start="opacity-0 scale-95"
-                                     x-transition:enter-end="opacity-100 scale-100"
-                                     class="absolute right-0 top-7 z-20 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-xs text-gray-600 leading-relaxed">
-                                    {% if ltype == 'rent' %}
-                                    {% if lang == 'it' %}Presta il tuo oggetto per un periodo. Lo riavrai indietro. Imposta prezzo giornaliero/orario e un deposito cauzionale.{% else %}Lend your item for a period. You get it back. Set a daily/hourly rate and a security deposit.{% endif %}
-                                    {% elif ltype == 'sell' %}
-                                    {% if lang == 'it' %}Vendi l'oggetto. Trasferimento di proprieta. Una volta venduto, e del compratore.{% else %}Sell the item outright. Transfer of ownership. Once sold, it belongs to the buyer.{% endif %}
-                                    {% elif ltype == 'commission' %}
-                                    {% if lang == 'it' %}Fatto su ordinazione. Il compratore paga, tu crei l'oggetto su misura. Es: torte, mobili, artigianato.{% else %}Made to order. Buyer pays, you create the item to their specs. E.g. custom cakes, furniture, crafts.{% endif %}
-                                    {% elif ltype == 'offer' %}
-                                    {% if lang == 'it' %}Nessun prezzo fisso. Il compratore propone un'offerta e tu decidi se accettare.{% else %}No fixed price. Buyer makes an offer and you decide whether to accept.{% endif %}
-                                    {% elif ltype == 'service' %}
-                                    {% if lang == 'it' %}Offri un servizio. Riparazioni, consegne, installazioni. Tu vai dal cliente o lavori da remoto.{% else %}Offer a service. Repairs, deliveries, installations. You go to the client or work remotely.{% endif %}
-                                    {% elif ltype == 'training' %}
-                                    {% if lang == 'it' %}Insegna un'abilita. Lezioni private o di gruppo. Imposta tariffa oraria e prezzi di gruppo.{% else %}Teach a skill. Private or group lessons. Set hourly rate and group pricing.{% endif %}
-                                    {% elif ltype == 'auction' %}
-                                    {% if lang == 'it' %}Asta a tempo. Imposta prezzo di partenza e durata. I compratori fanno offerte. Vince la piu alta.{% else %}Timed auction. Set a starting price and duration. Buyers place bids. Highest bid wins when time runs out.{% endif %}
-                                    {% elif ltype == 'giveaway' %}
-                                    {% if lang == 'it' %}Regalalo. Gratis. Nessun prezzo, nessun deposito. Qualcuno ne ha bisogno piu di te.{% else %}Give it away. Free. No price, no deposit. Someone needs it more than you.{% endif %}
-                                    {% endif %}
-                                </div>
-                            </span>
-                        </label>
-                        <!-- Per-type pricing row (hidden for giveaway) -->
+                <label class="block text-sm font-medium text-gray-700 mb-3">{% if lang == 'it' %}Cosa vuoi fare?{% else %}What do you want to do?{% endif %} *</label>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <!-- Sell -->
+                    <button type="button" @click="selectedTypes = ['sell']"
+                            class="flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all min-h-[90px]"
+                            :class="selectedTypes.includes('sell') ? 'border-indigo-500 bg-indigo-50 shadow-md' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'">
+                        <svg class="w-7 h-7" :class="selectedTypes.includes('sell') ? 'text-indigo-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-sm font-semibold" :class="selectedTypes.includes('sell') ? 'text-indigo-700' : 'text-gray-700'">{% if lang == 'it' %}Vendi{% else %}Sell{% endif %}</span>
+                        <span class="text-[10px] text-gray-400">{% if lang == 'it' %}Prezzo fisso{% else %}Fixed price{% endif %}</span>
+                    </button>
+                    <!-- Rent -->
+                    <button type="button" @click="selectedTypes = ['rent']"
+                            class="flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all min-h-[90px]"
+                            :class="selectedTypes.includes('rent') && !selectedTypes.includes('sell') ? 'border-indigo-500 bg-indigo-50 shadow-md' : selectedTypes.includes('rent') ? 'border-indigo-300 bg-indigo-50' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'">
+                        <svg class="w-7 h-7" :class="selectedTypes.includes('rent') ? 'text-indigo-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                        </svg>
+                        <span class="text-sm font-semibold" :class="selectedTypes.includes('rent') ? 'text-indigo-700' : 'text-gray-700'">{% if lang == 'it' %}Affitta{% else %}Rent{% endif %}</span>
+                        <span class="text-[10px] text-gray-400">{% if lang == 'it' %}Lo riavrai indietro{% else %}You get it back{% endif %}</span>
+                    </button>
+                    <!-- Service -->
+                    <button type="button" @click="selectedTypes = ['service']"
+                            class="flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all min-h-[90px]"
+                            :class="selectedTypes.includes('service') ? 'border-indigo-500 bg-indigo-50 shadow-md' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'">
+                        <svg class="w-7 h-7" :class="selectedTypes.includes('service') ? 'text-indigo-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span class="text-sm font-semibold" :class="selectedTypes.includes('service') ? 'text-indigo-700' : 'text-gray-700'">{% if lang == 'it' %}Servizio{% else %}Service{% endif %}</span>
+                        <span class="text-[10px] text-gray-400">{% if lang == 'it' %}Tu lo fai per loro{% else %}You do it for them{% endif %}</span>
+                    </button>
+                    <!-- Teach -->
+                    <button type="button" @click="selectedTypes = ['training']"
+                            class="flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all min-h-[90px]"
+                            :class="selectedTypes.includes('training') ? 'border-indigo-500 bg-indigo-50 shadow-md' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'">
+                        <svg class="w-7 h-7" :class="selectedTypes.includes('training') ? 'text-indigo-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                        <span class="text-sm font-semibold" :class="selectedTypes.includes('training') ? 'text-indigo-700' : 'text-gray-700'">{% if lang == 'it' %}Insegna{% else %}Teach{% endif %}</span>
+                        <span class="text-[10px] text-gray-400">{% if lang == 'it' %}Lezioni e corsi{% else %}Lessons & courses{% endif %}</span>
+                    </button>
+                    <!-- Auction -->
+                    <button type="button" @click="selectedTypes = ['auction']"
+                            class="flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all min-h-[90px]"
+                            :class="selectedTypes.includes('auction') ? 'border-indigo-500 bg-indigo-50 shadow-md' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'">
+                        <svg class="w-7 h-7" :class="selectedTypes.includes('auction') ? 'text-indigo-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
+                        <span class="text-sm font-semibold" :class="selectedTypes.includes('auction') ? 'text-indigo-700' : 'text-gray-700'">{% if lang == 'it' %}Asta{% else %}Auction{% endif %}</span>
+                        <span class="text-[10px] text-gray-400">{% if lang == 'it' %}Chi offre di piu{% else %}Highest bid wins{% endif %}</span>
+                    </button>
+                    <!-- Give Away -->
+                    <button type="button" @click="selectedTypes = ['giveaway']"
+                            class="flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all min-h-[90px]"
+                            :class="selectedTypes.includes('giveaway') ? 'border-emerald-500 bg-emerald-50 shadow-md' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'">
+                        <svg class="w-7 h-7" :class="selectedTypes.includes('giveaway') ? 'text-emerald-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+                        </svg>
+                        <span class="text-sm font-semibold" :class="selectedTypes.includes('giveaway') ? 'text-emerald-700' : 'text-gray-700'">{% if lang == 'it' %}Regala{% else %}Give Away{% endif %}</span>
+                        <span class="text-[10px] text-gray-400">{% if lang == 'it' %}Gratis{% else %}Free{% endif %}</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pricing section based on selection -->
+            <div class="space-y-3">
+                {% for ltype in ['rent','sell','commission','offer','service','training','auction','giveaway'] %}
+                <div>
+                    <div x-show="selectedTypes.includes('{{ ltype }}')" x-cloak
                         <div x-show="selectedTypes.includes('{{ ltype }}')" x-cloak
                              x-transition:enter="transition ease-out duration-150"
                              x-transition:enter-start="opacity-0 -translate-y-1"
@@ -769,8 +870,26 @@
                                 </div>
                                 <p class="text-xs text-gray-400">{% if lang == 'it' %}L'asta termina automaticamente. L'offerta piu alta vince.{% else %}Auction ends automatically. Highest bid wins.{% endif %}</p>
                             </div>
+                            {% elif ltype == 'sell' %}
+                            <!-- Sell pricing (flat price only, no deposit) -->
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">{{ t('list_item.price') }} (EUR)</label>
+                                    <input type="number" step="0.01" min="0" placeholder="0.00"
+                                           x-model="listingPrices['sell'].price"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">{{ t('list_item.price_unit') }}</label>
+                                    <select x-model="listingPrices['sell'].price_unit"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
+                                        <option value="flat">{{ t('common.flat') }}</option>
+                                        <option value="negotiable">{{ t('common.negotiable') }}</option>
+                                    </select>
+                                </div>
+                            </div>
                             {% else %}
-                            <!-- Physical item pricing (with deposit) -->
+                            <!-- Rent / Offer pricing (with deposit + time-based units) -->
                             <div class="grid grid-cols-3 gap-3">
                                 <div>
                                     <label class="block text-xs text-gray-500 mb-1">{{ t('list_item.price') }} (EUR)</label>
@@ -835,11 +954,18 @@
                         class="px-6 py-3 text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px]">
                     &larr; {{ t('common.back') }}
                 </button>
-                <button @click="submitItem()" :disabled="submitting"
-                        class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors min-h-[44px]">
-                    <span x-show="!submitting">{{ t('list_item.submit') }}</span>
-                    <span x-show="submitting" x-cloak>{{ t('common.loading') }}</span>
-                </button>
+                <div class="flex gap-2">
+                    <button @click="saveAsDraft = true; submitItem()" :disabled="submitting"
+                            class="px-6 py-3 text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 transition-colors min-h-[44px]">
+                        <span x-show="!submitting || !saveAsDraft">{% if lang == 'it' %}Salva bozza{% else %}Save Draft{% endif %}</span>
+                        <span x-show="submitting && saveAsDraft" x-cloak>{{ t('common.loading') }}</span>
+                    </button>
+                    <button @click="saveAsDraft = false; submitItem()" :disabled="submitting"
+                            class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors min-h-[44px]">
+                        <span x-show="!submitting || saveAsDraft">{{ t('list_item.submit') }}</span>
+                        <span x-show="submitting && !saveAsDraft" x-cloak>{{ t('common.loading') }}</span>
+                    </button>
+                </div>
             </div>
         </div>
 

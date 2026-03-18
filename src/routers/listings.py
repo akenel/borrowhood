@@ -13,11 +13,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import get_user, require_auth, require_badge_tier, user_throttle
+from src.dependencies import get_user, require_auth, require_badge_tier, require_role, user_throttle
 from src.models.item import BHItem
 from src.models.listing import BHListing, ListingStatus, ListingType
 from src.models.user import BHUser
 from src.schemas.listing import ListingCreate, ListingOut, ListingUpdate
+
+# Roles that bypass pending review (listings go straight to active)
+_MODERATOR_ROLES = {"bh-admin", "bh-operator", "bh-moderator"}
 
 router = APIRouter(prefix="/api/v1/listings", tags=["listings"])
 
@@ -104,10 +107,24 @@ async def create_listing(
         from datetime import datetime, timezone
         auction_end_dt = datetime.fromisoformat(data.auction_end.replace("Z", "+00:00"))
 
+    # Determine listing status on create:
+    # - Draft stays draft (user wants to save without publishing)
+    # - Moderators/admins go straight to active
+    # - Everyone else goes to pending (awaiting review)
+    user_roles = set(token.get("realm_access", {}).get("roles", []))
+    is_moderator = bool(user_roles & _MODERATOR_ROLES)
+
+    if data.status == ListingStatus.DRAFT:
+        create_status = ListingStatus.DRAFT
+    elif is_moderator:
+        create_status = ListingStatus.ACTIVE
+    else:
+        create_status = ListingStatus.PENDING
+
     listing = BHListing(
         item_id=data.item_id,
         listing_type=data.listing_type,
-        status=ListingStatus.ACTIVE,
+        status=create_status,
         price=data.price,
         price_unit=data.price_unit,
         currency=data.currency,
@@ -188,3 +205,143 @@ async def delete_listing(
     from datetime import datetime, timezone
     listing.deleted_at = datetime.now(timezone.utc)
     await db.commit()
+
+
+# Valid status transitions for listing owners
+# draft→pending (publish for review), pending→draft (withdraw)
+# active→paused, paused→active (vacation mode)
+_ALLOWED_TRANSITIONS = {
+    ListingStatus.DRAFT: {ListingStatus.PENDING},
+    ListingStatus.PENDING: {ListingStatus.DRAFT},
+    ListingStatus.ACTIVE: {ListingStatus.PAUSED},
+    ListingStatus.PAUSED: {ListingStatus.ACTIVE},
+}
+
+# Moderators can also do these transitions
+_MOD_TRANSITIONS = {
+    ListingStatus.DRAFT: {ListingStatus.PENDING, ListingStatus.ACTIVE},
+    ListingStatus.PENDING: {ListingStatus.ACTIVE, ListingStatus.REMOVED, ListingStatus.DRAFT},
+    ListingStatus.ACTIVE: {ListingStatus.PAUSED, ListingStatus.REMOVED},
+    ListingStatus.PAUSED: {ListingStatus.ACTIVE},
+    ListingStatus.REMOVED: {ListingStatus.ACTIVE},  # Re-approve after removal
+}
+
+
+@router.patch("/{listing_id}/status")
+async def change_listing_status(
+    listing_id: UUID,
+    request: dict,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Change listing status (publish draft, pause, resume). Owner or moderator."""
+    user = await get_user(db, token)
+    new_status_str = request.get("status")
+    if not new_status_str:
+        raise HTTPException(status_code=400, detail="Missing 'status' field")
+
+    try:
+        new_status = ListingStatus(new_status_str)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid status: {new_status_str}")
+
+    result = await db.execute(
+        select(BHListing)
+        .options(selectinload(BHListing.item))
+        .where(BHListing.id == listing_id)
+        .where(BHListing.deleted_at.is_(None))
+    )
+    listing = result.scalars().first()
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found")
+
+    user_roles = set(token.get("realm_access", {}).get("roles", []))
+    is_moderator = bool(user_roles & _MODERATOR_ROLES)
+
+    # Moderators can change any listing; owners can only change their own
+    if not is_moderator and listing.item.owner_id != user.id:
+        raise HTTPException(status_code=403, detail="Not your listing")
+
+    # Use moderator transitions if caller is a mod, else owner transitions
+    transitions = _MOD_TRANSITIONS if is_moderator else _ALLOWED_TRANSITIONS
+    allowed = transitions.get(listing.status, set())
+    if new_status not in allowed:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot change from '{listing.status.value}' to '{new_status.value}'"
+        )
+
+    listing.status = new_status
+    listing.version += 1
+    await db.commit()
+    await db.refresh(listing)
+    return {"status": listing.status.value, "id": str(listing.id)}
+
+
+@router.post("/pause-all")
+async def pause_all_listings(
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Pause all active listings for the current user. Vacation mode."""
+    user = await get_user(db, token)
+
+    result = await db.execute(
+        select(BHListing)
+        .join(BHItem, BHListing.item_id == BHItem.id)
+        .where(BHItem.owner_id == user.id)
+        .where(BHListing.status == ListingStatus.ACTIVE)
+        .where(BHListing.deleted_at.is_(None))
+    )
+    listings = result.scalars().all()
+    count = 0
+    for listing in listings:
+        listing.status = ListingStatus.PAUSED
+        listing.version += 1
+        count += 1
+    await db.commit()
+    return {"paused": count}
+
+
+@router.post("/resume-all")
+async def resume_all_listings(
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Resume all paused listings for the current user."""
+    user = await get_user(db, token)
+
+    result = await db.execute(
+        select(BHListing)
+        .join(BHItem, BHListing.item_id == BHItem.id)
+        .where(BHItem.owner_id == user.id)
+        .where(BHListing.status == ListingStatus.PAUSED)
+        .where(BHListing.deleted_at.is_(None))
+    )
+    listings = result.scalars().all()
+    count = 0
+    for listing in listings:
+        listing.status = ListingStatus.ACTIVE
+        listing.version += 1
+        count += 1
+    await db.commit()
+    return {"resumed": count}
+
+
+@router.get("/moderation/pending", response_model=List[ListingOut])
+async def list_pending_listings(
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    token: dict = Depends(require_role("bh-moderator")),
+    db: AsyncSession = Depends(get_db),
+):
+    """List all pending listings awaiting review. Moderator only."""
+    result = await db.execute(
+        select(BHListing)
+        .where(BHListing.status == ListingStatus.PENDING)
+        .where(BHListing.deleted_at.is_(None))
+        .order_by(BHListing.created_at.asc())
+        .offset(offset)
+        .limit(limit)
+    )
+    return result.scalars().all()

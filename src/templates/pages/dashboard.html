@@ -86,9 +86,75 @@
         <!-- My Items tab -->
         <div x-show="tab === 'items'" x-data="dashboardItems()">
             {% if items %}
+            <!-- Listing status summary + filter + bulk actions -->
+            <div class="flex flex-wrap items-center gap-3 mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200"
+                 x-data="{ pausing: false, resuming: false, statusFilter: '' }"
+                 x-init="$watch('statusFilter', v => {
+                     document.querySelectorAll('[data-listing-status]').forEach(el => {
+                         el.style.display = (!v || el.dataset.listingStatus.includes(v)) ? '' : 'none';
+                     });
+                 })">
+                <div class="flex items-center gap-2 text-sm">
+                    <button @click="statusFilter = statusFilter === '' ? '' : ''"
+                            class="flex items-center gap-1.5 px-2 py-1 rounded-full transition-colors"
+                            :class="statusFilter === '' ? 'bg-white border border-gray-300 shadow-sm' : 'hover:bg-gray-100'">
+                        <span class="text-gray-600">{% if lang == 'it' %}Tutto{% else %}All{% endif %} {{ active_count + pending_count + paused_count + draft_count }}</span>
+                    </button>
+                    {% if active_count > 0 %}
+                    <button @click="statusFilter = statusFilter === 'active' ? '' : 'active'"
+                            class="flex items-center gap-1.5 px-2 py-1 rounded-full transition-colors"
+                            :class="statusFilter === 'active' ? 'bg-emerald-100 border border-emerald-300 shadow-sm' : 'hover:bg-gray-100'">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span class="text-gray-600">{{ active_count }} {% if lang == 'it' %}attive{% else %}active{% endif %}</span>
+                    </button>
+                    {% endif %}
+                    {% if pending_count > 0 %}
+                    <button @click="statusFilter = statusFilter === 'pending' ? '' : 'pending'"
+                            class="flex items-center gap-1.5 px-2 py-1 rounded-full transition-colors"
+                            :class="statusFilter === 'pending' ? 'bg-blue-100 border border-blue-300 shadow-sm' : 'hover:bg-gray-100'">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                        <span class="text-gray-600">{{ pending_count }} {% if lang == 'it' %}in revisione{% else %}pending{% endif %}</span>
+                    </button>
+                    {% endif %}
+                    {% if paused_count > 0 %}
+                    <button @click="statusFilter = statusFilter === 'paused' ? '' : 'paused'"
+                            class="flex items-center gap-1.5 px-2 py-1 rounded-full transition-colors"
+                            :class="statusFilter === 'paused' ? 'bg-amber-100 border border-amber-300 shadow-sm' : 'hover:bg-gray-100'">
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                        <span class="text-gray-600">{{ paused_count }} {% if lang == 'it' %}in pausa{% else %}paused{% endif %}</span>
+                    </button>
+                    {% endif %}
+                    {% if draft_count > 0 %}
+                    <button @click="statusFilter = statusFilter === 'draft' ? '' : 'draft'"
+                            class="flex items-center gap-1.5 px-2 py-1 rounded-full transition-colors"
+                            :class="statusFilter === 'draft' ? 'bg-gray-200 border border-gray-400 shadow-sm' : 'hover:bg-gray-100'">
+                        <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+                        <span class="text-gray-600">{{ draft_count }} {% if lang == 'it' %}bozze{% else %}drafts{% endif %}</span>
+                    </button>
+                    {% endif %}
+                </div>
+                <div class="flex gap-2 ml-auto">
+                    {% if active_count > 0 %}
+                    <button @click="pausing=true; fetch('/api/v1/listings/pause-all',{method:'POST'}).then(r=>r.json()).then(d=>{pausing=false; window.dispatchEvent(new CustomEvent('toast',{detail:{type:'info',message:d.paused+' listings paused'}})); if(d.paused>0) location.reload()}).catch(()=>pausing=false)"
+                            :disabled="pausing"
+                            class="px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors min-h-[36px] disabled:opacity-50">
+                        <span x-show="!pausing">{% if lang == 'it' %}Pausa tutto{% else %}Pause All ({{ active_count }}){% endif %}</span>
+                        <span x-show="pausing" x-cloak>...</span>
+                    </button>
+                    {% endif %}
+                    {% if paused_count > 0 %}
+                    <button @click="resuming=true; fetch('/api/v1/listings/resume-all',{method:'POST'}).then(r=>r.json()).then(d=>{resuming=false; window.dispatchEvent(new CustomEvent('toast',{detail:{type:'success',message:d.resumed+' listings resumed'}})); if(d.resumed>0) location.reload()}).catch(()=>resuming=false)"
+                            :disabled="resuming"
+                            class="px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors min-h-[36px] disabled:opacity-50">
+                        <span x-show="!resuming">{% if lang == 'it' %}Riprendi tutto{% else %}Resume All ({{ paused_count }}){% endif %}</span>
+                        <span x-show="resuming" x-cloak>...</span>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {% for item in items %}
-                <a href="/items/{{ item.slug }}" class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group">
+                <a href="/items/{{ item.slug }}" data-listing-status="{% for l in item.listings %}{{ l.status.value }} {% endfor %}{% if not item.listings %}none{% endif %}" class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group">
                     {% if item.media %}
                     <img src="{{ item.media[0].url }}" alt="{{ item.media[0].alt_text }}" class="w-full h-40 object-cover">
                     {% else %}
@@ -104,6 +170,11 @@
                             <span class="text-xs px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full">{{ t('item_types.' + item.item_type.value) }}</span>
                             <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">{{ t('categories.' + item.category) }}</span>
                         </div>
+                        {% if not item.listings %}
+                        <div class="mt-3 border-t border-gray-100 pt-3">
+                            <span class="text-xs text-gray-400">{% if lang == 'it' %}Nessuna inserzione{% else %}No listing yet{% endif %}</span>
+                        </div>
+                        {% endif %}
                         {% if item.listings %}
                         <div class="mt-2 flex flex-wrap gap-1">
                             {% for listing in item.listings %}
@@ -119,10 +190,32 @@
                             </span>
                             <span class="text-xs px-2 py-0.5 rounded-full
                                 {% if listing.status.value == 'active' %}bg-emerald-50 text-emerald-700
+                                {% elif listing.status.value == 'pending' %}bg-blue-50 text-blue-700
                                 {% elif listing.status.value == 'draft' %}bg-gray-100 text-gray-500
                                 {% else %}bg-amber-50 text-amber-700{% endif %}">
-                                {{ listing.status.value | title }}
+                                {% if listing.status.value == 'pending' %}{% if lang == 'it' %}In Revisione{% else %}Pending Review{% endif %}{% else %}{{ listing.status.value | title }}{% endif %}
                             </span>
+                            {% endfor %}
+                        </div>
+                        <!-- Per-listing action buttons -->
+                        <div class="mt-3 flex flex-wrap gap-2 border-t border-gray-100 pt-3">
+                            {% for listing in item.listings %}
+                            {% if listing.status.value == 'active' %}
+                            <button onclick="event.preventDefault(); event.stopPropagation(); fetch('/api/v1/listings/{{ listing.id }}/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'paused'})}).then(r=>{if(r.ok)location.reload();else r.json().then(e=>alert(e.detail))})"
+                                    class="text-xs px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 font-medium transition-colors min-h-[32px]">
+                                {% if lang == 'it' %}Pausa{% else %}Pause{% endif %}
+                            </button>
+                            {% elif listing.status.value == 'paused' %}
+                            <button onclick="event.preventDefault(); event.stopPropagation(); fetch('/api/v1/listings/{{ listing.id }}/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'active'})}).then(r=>{if(r.ok)location.reload();else r.json().then(e=>alert(e.detail))})"
+                                    class="text-xs px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 font-medium transition-colors min-h-[32px]">
+                                {% if lang == 'it' %}Riprendi{% else %}Resume{% endif %}
+                            </button>
+                            {% elif listing.status.value == 'draft' %}
+                            <button onclick="event.preventDefault(); event.stopPropagation(); fetch('/api/v1/listings/{{ listing.id }}/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'active'})}).then(r=>{if(r.ok)location.reload();else r.json().then(e=>alert(e.detail))})"
+                                    class="text-xs px-3 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-100 font-medium transition-colors min-h-[32px]">
+                                {% if lang == 'it' %}Pubblica{% else %}Publish{% endif %}
+                            </button>
+                            {% endif %}
                             {% endfor %}
                         </div>
                         {% endif %}
@@ -1495,6 +1588,15 @@
                         </svg>
                         <h3 class="text-lg font-semibold text-gray-900">{{ t('telegram.title') }}</h3>
                     </div>
+                    <div class="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-lg text-xs text-blue-800">
+                        <p class="font-semibold mb-1">{% if lang == 'it' %}Perché Telegram?{% else %}Why Telegram?{% endif %}</p>
+                        <ul class="space-y-0.5 text-blue-700">
+                            <li>{% if lang == 'it' %}Notifiche push automatiche (nuovi messaggi, prenotazioni, recensioni){% else %}Automatic push notifications (new messages, bookings, reviews){% endif %}</li>
+                            <li>{% if lang == 'it' %}Non serve condividere il tuo numero di telefono{% else %}No need to share your phone number{% endif %}</li>
+                            <li>{% if lang == 'it' %}Funziona su desktop, mobile e web{% else %}Works on desktop, mobile, and web{% endif %}</li>
+                            <li>{% if lang == 'it' %}Gratuito, nessun limite{% else %}Free, no limits{% endif %}</li>
+                        </ul>
+                    </div>
 
                     <!-- Not linked state -->
                     <template x-if="!linked && !linkUrl">
@@ -1554,6 +1656,67 @@
                             </div>
                         </div>
                     </template>
+                </div>
+
+                <!-- WhatsApp Contact Number -->
+                <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="{
+                    waNumber: '',
+                    saved: false,
+                    saving: false,
+                    loaded: false,
+                    async load() {
+                        try {
+                            const r = await fetch('/api/v1/users/me');
+                            if (r.ok) { const d = await r.json(); this.waNumber = d.whatsapp_number || ''; }
+                        } catch(e) {}
+                        this.loaded = true;
+                    },
+                    async save() {
+                        this.saving = true;
+                        try {
+                            const r = await fetch('/api/v1/users/me/whatsapp', {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ whatsapp_number: this.waNumber.trim() || null })
+                            });
+                            if (r.ok) {
+                                this.saved = true;
+                                setTimeout(() => this.saved = false, 3000);
+                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{% if lang == 'it' %}WhatsApp salvato{% else %}WhatsApp saved{% endif %}' } }));
+                            }
+                        } catch(e) {}
+                        this.saving = false;
+                    }
+                }" x-init="load()">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <svg class="w-6 h-6 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        <h3 class="text-lg font-semibold text-gray-900">WhatsApp</h3>
+                    </div>
+                    <div class="mb-4 p-3 bg-green-50 border border-green-100 rounded-lg text-xs text-green-800">
+                        <p class="font-semibold mb-1">{% if lang == 'it' %}Perché WhatsApp?{% else %}Why WhatsApp?{% endif %}</p>
+                        <ul class="space-y-0.5 text-green-700">
+                            <li>{% if lang == 'it' %}Tutti lo hanno -- i compratori ti contattano con un tocco{% else %}Everyone has it -- buyers contact you with one tap{% endif %}</li>
+                            <li>{% if lang == 'it' %}Diretto e personale -- nessun bot, nessun intermediario{% else %}Direct and personal -- no bot, no middleware{% endif %}</li>
+                            <li>{% if lang == 'it' %}Il tuo numero non viene mai mostrato nella pagina -- solo gli utenti registrati possono richiederlo{% else %}Your number is never shown on the page -- only logged-in users can request it{% endif %}</li>
+                        </ul>
+                        <p class="mt-2 text-green-600 font-medium">{% if lang == 'it' %}Consiglio: usa entrambi! Telegram per le notifiche automatiche, WhatsApp per il contatto diretto.{% else %}Tip: use both! Telegram for automatic notifications, WhatsApp for direct contact.{% endif %}</p>
+                    </div>
+                    <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-800">
+                        <p class="font-semibold mb-1">{% if lang == 'it' %}Avviso importante{% else %}Important warning{% endif %}</p>
+                        <p>{% if lang == 'it' %}Aggiungendo il tuo numero WhatsApp, acconsenti a condividerlo con gli acquirenti registrati che cliccano "Contatta su WhatsApp" sulle tue inserzioni. <strong>Una volta condiviso, non puoi revocare l'accesso al tuo numero.</strong> Puoi bloccare contatti indesiderati su WhatsApp e rimuovere il numero qui per impedire future condivisioni. Per comunicare senza condividere il tuo numero di telefono, usa Telegram o la messaggistica integrata.{% else %}By adding your WhatsApp number, you consent to sharing it with registered buyers who click "Contact on WhatsApp" on your listings. <strong>Once shared, you cannot revoke access to your number.</strong> You can block unwanted contacts in WhatsApp and remove your number here to stop future sharing. To communicate without sharing your phone number, use Telegram or the built-in messaging instead.{% endif %}</p>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">{% if lang == 'it' %}Aggiungi il tuo numero WhatsApp per permettere agli acquirenti di contattarti direttamente.{% else %}Add your WhatsApp number so buyers can contact you directly.{% endif %}</p>
+                    <div class="flex gap-2">
+                        <input type="tel" x-model="waNumber" placeholder="+39 328 123 4567"
+                               class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#25D366] focus:border-[#25D366] min-h-[44px]">
+                        <button @click="save()" :disabled="saving"
+                                class="px-4 py-2 bg-[#25D366] text-white text-sm font-semibold rounded-lg hover:bg-[#1DA851] transition-colors min-h-[44px] disabled:opacity-50">
+                            <span x-show="!saving && !saved">{% if lang == 'it' %}Salva{% else %}Save{% endif %}</span>
+                            <span x-show="saving" x-cloak>...</span>
+                            <svg x-show="saved" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2">{% if lang == 'it' %}Formato internazionale con prefisso paese{% else %}International format with country code{% endif %}</p>
                 </div>
 
                 <!-- Seller Type (BL-069) -->
