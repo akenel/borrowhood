@@ -80,7 +80,7 @@
                         <a href="/browse" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.browse') }}</a>
                         <a href="/helpboard" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.helpboard') }}</a>
                         <a href="/members" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.members') }}</a>
-                        <a href="/chat" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{% if lang == 'it' %}Concierge{% else %}Concierge{% endif %}</a>
+                        <a href="/chat" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.chat') }}</a>
                         {% if user %}
                         <a href="/dashboard" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.dashboard') }}</a>
                         <a href="/testing" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">QA</a>
@@ -199,6 +199,29 @@
                     </a>
                     {% endif %}
 
+                    {% if user %}
+                    <!-- Mobile: notification + messages + orders (visible on small screens) -->
+                    <div class="flex items-center gap-1 md:hidden"
+                         x-data="{ mUnread: 0, nUnread: 0 }"
+                         x-init="
+                            fetch('/api/v1/notifications/summary').then(r=>r.ok?r.json():null).then(d=>{if(d)nUnread=d.unread}).catch(()=>{});
+                            fetch('/api/v1/messages/summary').then(r=>r.ok?r.json():null).then(d=>{if(d)mUnread=d.unread}).catch(()=>{});
+                         ">
+                        <a href="/messages" class="relative min-h-[44px] min-w-[40px] flex items-center justify-center text-gray-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                            <span x-show="mUnread > 0" x-cloak class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-blue-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center" x-text="mUnread > 9 ? '9+' : mUnread"></span>
+                        </a>
+                        <a href="/dashboard" class="relative min-h-[44px] min-w-[40px] flex items-center justify-center text-gray-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                            <span x-show="nUnread > 0" x-cloak class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center" x-text="nUnread > 9 ? '9+' : nUnread"></span>
+                        </a>
+                    </div>
+                    {% endif %}
+
                     <!-- Mobile menu button -->
                     <button @click="mobileMenuOpen = !mobileMenuOpen"
                             class="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 hover:text-gray-700"
@@ -226,10 +249,12 @@
                 <a href="/browse" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.browse') }}</a>
                 <a href="/helpboard" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.helpboard') }}</a>
                 <a href="/members" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.members') }}</a>
-                <a href="/chat" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">Concierge</a>
+                <a href="/chat" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.chat') }}</a>
                 <a href="/list" class="block px-3 py-3 text-base font-semibold text-indigo-600 hover:bg-indigo-50 rounded-lg min-h-[44px]">{{ t('nav.list_item') }}</a>
                 {% if user %}
                 <a href="/dashboard" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.dashboard') }}</a>
+                <a href="/orders" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{% if lang == 'it' %}Ordini{% else %}Orders{% endif %}</a>
+                <a href="/messages" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{% if lang == 'it' %}Messaggi{% else %}Messages{% endif %}</a>
                 <a href="/testing" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">QA Testing</a>
                 <a href="/backlog" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">Backlog</a>
                 {% if debug %}
