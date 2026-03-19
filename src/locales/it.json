@@ -17,7 +17,8 @@
     "list_item": "Pubblica Oggetto",
     "helpboard": "Bacheca Aiuto",
     "members": "Membri",
-    "demo_login": "Demo"
+    "demo_login": "Demo",
+    "chat": "Concierge"
   },
   "home": {
     "hero_title": "Ogni Garage Diventa un Negozio di Noleggio",
@@ -369,7 +370,18 @@
     "section_11_title": "11. Modifiche a Questi Termini",
     "section_11_text": "Potremmo aggiornare questi termini. Le modifiche sostanziali saranno annunciate sulla piattaforma. L'uso continuato dopo le modifiche significa accettazione.",
     "section_12_title": "12. Contatti",
-    "section_12_text": "Domande? Apri una issue su GitHub o contattaci attraverso la piattaforma.",
+    "section_12_text": "Domande? Apri una issue su GitHub o contattaci attraverso la piattaforma. Telegram: @BigKingFisher",
+    "section_13_title": "13. I tuoi diritti sui dati (GDPR)",
+    "section_13_text": "Ai sensi del Regolamento Generale sulla Protezione dei Dati dell'UE, hai il diritto di:",
+    "section_13_items": "Accesso: visualizza tutti i tuoi dati nella dashboard e nel profilo;Rettifica: aggiorna le informazioni del tuo profilo in qualsiasi momento;Cancellazione: elimina il tuo account in Impostazioni > Zona Pericolosa -- questo rimuove permanentemente i tuoi dati personali;Portabilità: contattaci per richiedere un'esportazione dei tuoi dati;Opposizione: rimuovi il tuo numero WhatsApp e scollega Telegram in qualsiasi momento nelle Impostazioni",
+    "section_14_title": "14. Condivisione numero WhatsApp",
+    "section_14_text": "Se aggiungi il tuo numero WhatsApp nelle Impostazioni, gli acquirenti registrati possono richiederlo quando cliccano 'Contatta su WhatsApp' sulle tue inserzioni. Il tuo numero non è mai visibile nel codice della pagina -- viene fornito solo tramite richiesta API autenticata con traccia di audit. Una volta condiviso con un acquirente, non puoi revocare il suo accesso al tuo numero. Puoi rimuovere il numero dalle Impostazioni in qualsiasi momento per interrompere condivisioni future. Per comunicare senza condividere il numero di telefono, usa Telegram o la messaggistica integrata.",
+    "section_15_title": "15. Cookie",
+    "section_15_text": "Utilizziamo un singolo cookie di sessione (bh_session) per mantenerti connesso. Non utilizziamo cookie di tracciamento, cookie pubblicitari o analisi di terze parti. Tutto qui. Un cookie. Nessun trucco.",
+    "section_16_title": "16. Assicurazione e responsabilità",
+    "section_16_text": "BorrowHood non fornisce alcun tipo di assicurazione. I venditori sono responsabili della propria copertura assicurativa. Gli acquirenti sono responsabili degli articoli in loro possesso durante il periodo di noleggio. Raccomandiamo vivamente che gli articoli di alto valore o pericolosi siano coperti dalla polizza assicurativa del venditore prima della pubblicazione. I depositi sono concordati direttamente tra acquirente e venditore -- BorrowHood non detiene, elabora o garantisce depositi.",
+    "section_17_title": "17. Requisito di età",
+    "section_17_text": "Devi avere almeno 18 anni per creare un account e utilizzare la piattaforma. Alcune inserzioni (utensili elettrici, veicoli, attrezzature) possono richiedere la verifica dell'età a discrezione del venditore. I venditori possono rifiutare di completare una transazione se ritengono che l'acquirente sia minorenne.",
     "acceptance": "Creando un account, accetti questi termini e ti impegni a rispettare il nostro codice di condotta della comunità."
   },
   "errors": {

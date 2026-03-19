@@ -80,8 +80,8 @@
     }">
 
         <!-- Search bar -->
-        <form method="GET" action="/browse" class="flex gap-2" @submit="if (aiMode) { $event.preventDefault(); aiSearch(); }">
-            <div class="flex-1 relative">
+        <form method="GET" action="/browse" class="flex flex-wrap sm:flex-nowrap gap-2" @submit="if (aiMode) { $event.preventDefault(); aiSearch(); }">
+            <div class="w-full sm:flex-1 relative">
                 <input type="text" :name="aiMode ? '' : 'q'" x-model="aiQuery"
                        x-init="aiQuery = '{{ q }}'"
                        :placeholder="aiMode ? '{% if lang == 'it' %}Chiedi al concierge AI...{% else %}Ask the AI concierge...{% endif %}' : '{{ t('browse.search_placeholder') }}'"
