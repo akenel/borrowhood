@@ -483,10 +483,11 @@
                         {% if lang == 'it' %}(generata da AI -- modifica liberamente){% else %}(AI generated -- feel free to edit){% endif %}
                     </span>
                 </label>
-                <textarea id="description" x-model="form.description" rows="4"
+                <textarea id="description" x-model="form.description" rows="6"
                           placeholder="{{ t('list_item.description_placeholder') }}"
-                          class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm"
                           :class="aiUsed && form.description ? 'border-purple-300 bg-purple-50/30' : 'border-gray-300'"></textarea>
+                <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Supporta Markdown: **grassetto**, - elenchi puntati, ## titoli{% else %}Supports Markdown: **bold**, - bullet lists, ## headings{% endif %}</p>
             </div>
 
             <!-- Story -->

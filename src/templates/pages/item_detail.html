@@ -203,7 +203,15 @@
                             </button>
                         </div>
                     </div>
-                    <p id="desc-text" class="mt-2 text-gray-700 leading-relaxed whitespace-pre-line" data-translatable data-content-lang="{{ item.content_language or 'en' }}">{{ item.description }}</p>
+                    <div id="desc-text" class="mt-2 text-gray-700 leading-relaxed prose prose-sm max-w-none" data-translatable data-content-lang="{{ item.content_language or 'en' }}" data-raw="{{ item.description | e }}"></div>
+                    <script>
+                        (function() {
+                            var el = document.getElementById('desc-text');
+                            if (el && typeof marked !== 'undefined') {
+                                try { el.innerHTML = marked.parse(el.dataset.raw || ''); } catch(e) { el.textContent = el.dataset.raw || ''; }
+                            } else if (el) { el.textContent = el.dataset.raw || ''; }
+                        })();
+                    </script>
                     <span class="text-xs text-gray-400 mt-1 inline-block">{{ t('item.written_in') }} {{ item.content_language | upper }}</span>
                 </div>
                 {% endif %}
@@ -238,7 +246,8 @@
                             </button>
                         </div>
                     </div>
-                    <p id="story-text" class="mt-2 text-gray-700 leading-relaxed italic" data-translatable data-content-lang="{{ item.content_language or 'en' }}">{{ item.story }}</p>
+                    <div id="story-text" class="mt-2 text-gray-700 leading-relaxed italic prose prose-sm max-w-none" data-translatable data-content-lang="{{ item.content_language or 'en' }}" data-raw="{{ item.story | e }}"></div>
+                    <script>(function(){var el=document.getElementById('story-text');if(el&&typeof marked!=='undefined'){try{el.innerHTML=marked.parse(el.dataset.raw||'')}catch(e){el.textContent=el.dataset.raw||''}}else if(el){el.textContent=el.dataset.raw||''}})();</script>
                 </div>
                 {% endif %}
 
