@@ -226,7 +226,7 @@
                             {% elif listing.status.value == 'draft' %}
                             <button onclick="event.preventDefault(); event.stopPropagation(); fetch('/api/v1/listings/{{ listing.id }}/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'active'})}).then(r=>{if(r.ok)location.reload();else r.json().then(e=>alert(e.detail))})"
                                     class="text-xs px-3 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-100 font-medium transition-colors min-h-[32px]">
-                                {% if lang == 'it' %}Pubblica{% else %}Publish{% endif %}{% if item.listings | length > 1 %} {{ lt_label }}{% endif %}
+                                {% if lang == 'it' %}Invia per Revisione{% else %}Submit for Review{% endif %}{% if item.listings | length > 1 %} {{ lt_label }}{% endif %}
                             </button>
                             {% endif %}
                             {% endfor %}

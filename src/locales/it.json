@@ -91,7 +91,9 @@
     "compatible_with": "Compatibile Con",
     "written_in": "Scritto in",
     "map_note": "Posizione esatta condivisa dopo la conferma della prenotazione.",
-    "report": "Segnala questo oggetto"
+    "report": "Segnala questo oggetto",
+    "pending_review": "In Revisione",
+    "submit_for_review": "Invia per Revisione"
   },
   "purchase": {
     "request_title": "Richiesta di Acquisto",

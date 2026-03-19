@@ -91,7 +91,9 @@
     "compatible_with": "Compatible With",
     "written_in": "Written in",
     "map_note": "Exact location shared after booking confirmed.",
-    "report": "Report this item"
+    "report": "Report this item",
+    "pending_review": "Pending Review",
+    "submit_for_review": "Submit for Review"
   },
   "purchase": {
     "request_title": "Purchase Request",
