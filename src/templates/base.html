@@ -33,6 +33,9 @@
     <!-- Alpine.js (FULL CDN -- Rule 1) -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    <!-- Marked.js -- Markdown rendering (FULL CDN -- Rule 1) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <!-- Google Fonts (CDN -- Rule 1) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,6 +55,11 @@
 
     <style type="text/tailwindcss">
         [x-cloak] { display: none !important; }
+        .prose h1, .prose h2, .prose h3 { color: #111827; }
+        .prose ul { list-style-type: disc; padding-left: 1.5em; }
+        .prose ol { list-style-type: decimal; padding-left: 1.5em; }
+        .prose p { margin-bottom: 0.5em; }
+        .prose strong { font-weight: 600; }
     </style>
 
     {% block head %}{% endblock %}
