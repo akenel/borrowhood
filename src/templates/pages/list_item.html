@@ -31,30 +31,29 @@
             listings: {{ edit_listings_json }},
             itemId: {{ edit_item_id | tojson }}
         };
-        // Pre-fill form after Alpine mounts
-        document.addEventListener('alpine:init', function() {
-            Alpine.effect(function() {
-                var d = window._editData;
-                if (!d) return;
-                var el = document.querySelector('[x-data]');
-                if (!el || !el._x_dataStack) return;
-                var data = el._x_dataStack[0];
-                if (data && data.form && !data.form.name) {
-                    data.form.name = d.name || '';
-                    data.form.description = d.description || '';
-                    data.form.story = d.story || '';
-                    data.form.category = d.category || 'power_tools';
-                    data.form.item_type = d.item_type || 'physical';
-                    data.form.condition = d.condition || 'good';
-                    data.form.brand = d.brand || '';
-                    data.form.age_restricted = d.age_restricted || false;
-                    data.form.safety_notes = d.safety_notes || '';
-                    data.form.tags = d.tags || '';
-                    data.existingMedia = d.media || [];
-                    data.editItemId = d.itemId || '';
-                }
-            });
-        });
+        // Pre-fill form after Alpine mounts (retry until Alpine is ready)
+        function _fillEditForm() {
+            var el = document.querySelector('[x-data]');
+            if (!el || !el._x_dataStack || !el._x_dataStack[0]) {
+                setTimeout(_fillEditForm, 100);
+                return;
+            }
+            var data = el._x_dataStack[0];
+            var d = window._editData;
+            data.form.name = d.name || '';
+            data.form.description = d.description || '';
+            data.form.story = d.story || '';
+            data.form.category = d.category || 'power_tools';
+            data.form.item_type = d.item_type || 'physical';
+            data.form.condition = d.condition || 'good';
+            data.form.brand = d.brand || '';
+            data.form.age_restricted = d.age_restricted || false;
+            data.form.safety_notes = d.safety_notes || '';
+            data.form.tags = d.tags || '';
+            data.existingMedia = d.media || [];
+            data.editItemId = d.itemId || '';
+        }
+        setTimeout(_fillEditForm, 200);
     </script>
     {% endif %}
 
