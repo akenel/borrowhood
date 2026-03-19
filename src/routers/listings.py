@@ -55,6 +55,25 @@ async def list_listings(
     return result.scalars().all()
 
 
+@router.get("/moderation/pending", response_model=List[ListingOut])
+async def list_pending_listings(
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    token: dict = Depends(require_role("bh-moderator")),
+    db: AsyncSession = Depends(get_db),
+):
+    """List all pending listings awaiting review. Moderator only."""
+    result = await db.execute(
+        select(BHListing)
+        .where(BHListing.status == ListingStatus.PENDING)
+        .where(BHListing.deleted_at.is_(None))
+        .order_by(BHListing.created_at.asc())
+        .offset(offset)
+        .limit(limit)
+    )
+    return result.scalars().all()
+
+
 @router.get("/{listing_id}", response_model=ListingOut)
 async def get_listing(listing_id: UUID, db: AsyncSession = Depends(get_db)):
     """Get a single listing by ID. Public endpoint."""
@@ -326,22 +345,3 @@ async def resume_all_listings(
         count += 1
     await db.commit()
     return {"resumed": count}
-
-
-@router.get("/moderation/pending", response_model=List[ListingOut])
-async def list_pending_listings(
-    limit: int = Query(50, ge=1, le=100),
-    offset: int = Query(0, ge=0),
-    token: dict = Depends(require_role("bh-moderator")),
-    db: AsyncSession = Depends(get_db),
-):
-    """List all pending listings awaiting review. Moderator only."""
-    result = await db.execute(
-        select(BHListing)
-        .where(BHListing.status == ListingStatus.PENDING)
-        .where(BHListing.deleted_at.is_(None))
-        .order_by(BHListing.created_at.asc())
-        .offset(offset)
-        .limit(limit)
-    )
-    return result.scalars().all()
