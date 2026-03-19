@@ -268,11 +268,36 @@
                 </button>
             </div>
             {% else %}
-            <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
-                <p class="text-gray-500 mb-4">{{ t('dashboard.no_items') }}</p>
-                <a href="/list" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 min-h-[44px]">
-                    {{ t('dashboard.list_first_item') }}
-                </a>
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-8 text-center">
+                    <h2 class="text-2xl font-bold text-white">{% if lang == 'it' %}Benvenuto nella tua Bottega!{% else %}Welcome to your Workshop!{% endif %}</h2>
+                    <p class="text-indigo-100 mt-2 text-sm">{% if lang == 'it' %}Il tuo spazio per vendere, affittare, insegnare e condividere.{% else %}Your space to sell, rent, teach, and share.{% endif %}</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                        <div class="text-center p-4 bg-gray-50 rounded-lg">
+                            <div class="text-2xl mb-1">📸</div>
+                            <p class="text-sm font-medium text-gray-900">{% if lang == 'it' %}1. Aggiungi foto{% else %}1. Add photos{% endif %}</p>
+                            <p class="text-xs text-gray-500 mt-1">{% if lang == 'it' %}Scatta o scegli fino a 5{% else %}Take or choose up to 5{% endif %}</p>
+                        </div>
+                        <div class="text-center p-4 bg-gray-50 rounded-lg">
+                            <div class="text-2xl mb-1">💰</div>
+                            <p class="text-sm font-medium text-gray-900">{% if lang == 'it' %}2. Imposta il prezzo{% else %}2. Set your price{% endif %}</p>
+                            <p class="text-xs text-gray-500 mt-1">{% if lang == 'it' %}Affitta, vendi o insegna{% else %}Rent, sell, or teach{% endif %}</p>
+                        </div>
+                        <div class="text-center p-4 bg-gray-50 rounded-lg">
+                            <div class="text-2xl mb-1">🚀</div>
+                            <p class="text-sm font-medium text-gray-900">{% if lang == 'it' %}3. Pubblica{% else %}3. Go live{% endif %}</p>
+                            <p class="text-xs text-gray-500 mt-1">{% if lang == 'it' %}Condividi il link con chiunque{% else %}Share the link with anyone{% endif %}</p>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <a href="/list" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px]">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            {% if lang == 'it' %}Crea il tuo primo articolo{% else %}List your first item{% endif %}
+                        </a>
+                    </div>
+                </div>
             </div>
             {% endif %}
         </div>
