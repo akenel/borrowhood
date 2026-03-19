@@ -31,6 +31,30 @@
             listings: {{ edit_listings_json }},
             itemId: {{ edit_item_id | tojson }}
         };
+        // Pre-fill form after Alpine mounts
+        document.addEventListener('alpine:init', function() {
+            Alpine.effect(function() {
+                var d = window._editData;
+                if (!d) return;
+                var el = document.querySelector('[x-data]');
+                if (!el || !el._x_dataStack) return;
+                var data = el._x_dataStack[0];
+                if (data && data.form && !data.form.name) {
+                    data.form.name = d.name || '';
+                    data.form.description = d.description || '';
+                    data.form.story = d.story || '';
+                    data.form.category = d.category || 'power_tools';
+                    data.form.item_type = d.item_type || 'physical';
+                    data.form.condition = d.condition || 'good';
+                    data.form.brand = d.brand || '';
+                    data.form.age_restricted = d.age_restricted || false;
+                    data.form.safety_notes = d.safety_notes || '';
+                    data.form.tags = d.tags || '';
+                    data.existingMedia = d.media || [];
+                    data.editItemId = d.itemId || '';
+                }
+            });
+        });
     </script>
     {% endif %}
 
@@ -40,23 +64,6 @@
         editItemId: (window._editData || {}).itemId || '',
         existingMedia: (window._editData || {}).media || [],
         step: 1,
-        init() {
-            if (window._editData) {
-                var d = window._editData;
-                this.form.name = d.name || '';
-                this.form.description = d.description || '';
-                this.form.story = d.story || '';
-                this.form.category = d.category || 'power_tools';
-                this.form.item_type = d.item_type || 'physical';
-                this.form.condition = d.condition || 'good';
-                this.form.brand = d.brand || '';
-                this.form.age_restricted = d.age_restricted || false;
-                this.form.safety_notes = d.safety_notes || '';
-                this.form.tags = d.tags || '';
-                this.existingMedia = d.media || [];
-                this.editItemId = d.itemId || '';
-            }
-        },
         submitting: false,
         saveAsDraft: false,
         aiGenerating: false,
