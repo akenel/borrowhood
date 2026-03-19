@@ -40,6 +40,23 @@
         editItemId: (window._editData || {}).itemId || '',
         existingMedia: (window._editData || {}).media || [],
         step: 1,
+        init() {
+            if (window._editData) {
+                var d = window._editData;
+                this.form.name = d.name || '';
+                this.form.description = d.description || '';
+                this.form.story = d.story || '';
+                this.form.category = d.category || 'power_tools';
+                this.form.item_type = d.item_type || 'physical';
+                this.form.condition = d.condition || 'good';
+                this.form.brand = d.brand || '';
+                this.form.age_restricted = d.age_restricted || false;
+                this.form.safety_notes = d.safety_notes || '';
+                this.form.tags = d.tags || '';
+                this.existingMedia = d.media || [];
+                this.editItemId = d.itemId || '';
+            }
+        },
         submitting: false,
         saveAsDraft: false,
         aiGenerating: false,
