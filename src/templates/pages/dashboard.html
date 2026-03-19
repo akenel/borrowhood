@@ -212,20 +212,21 @@
                                 {% if lang == 'it' %}Modifica{% else %}Edit{% endif %}
                             </a>
                             {% for listing in item.listings %}
+                            {% set lt_label = listing.listing_type.value | title %}
                             {% if listing.status.value == 'active' %}
                             <button onclick="event.preventDefault(); event.stopPropagation(); fetch('/api/v1/listings/{{ listing.id }}/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'paused'})}).then(r=>{if(r.ok)location.reload();else r.json().then(e=>alert(e.detail))})"
                                     class="text-xs px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 font-medium transition-colors min-h-[32px]">
-                                {% if lang == 'it' %}Pausa{% else %}Pause{% endif %}
+                                {% if lang == 'it' %}Pausa{% else %}Pause{% endif %}{% if item.listings | length > 1 %} {{ lt_label }}{% endif %}
                             </button>
                             {% elif listing.status.value == 'paused' %}
                             <button onclick="event.preventDefault(); event.stopPropagation(); fetch('/api/v1/listings/{{ listing.id }}/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'active'})}).then(r=>{if(r.ok)location.reload();else r.json().then(e=>alert(e.detail))})"
                                     class="text-xs px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 font-medium transition-colors min-h-[32px]">
-                                {% if lang == 'it' %}Riprendi{% else %}Resume{% endif %}
+                                {% if lang == 'it' %}Riprendi{% else %}Resume{% endif %}{% if item.listings | length > 1 %} {{ lt_label }}{% endif %}
                             </button>
                             {% elif listing.status.value == 'draft' %}
                             <button onclick="event.preventDefault(); event.stopPropagation(); fetch('/api/v1/listings/{{ listing.id }}/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'active'})}).then(r=>{if(r.ok)location.reload();else r.json().then(e=>alert(e.detail))})"
                                     class="text-xs px-3 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-100 font-medium transition-colors min-h-[32px]">
-                                {% if lang == 'it' %}Pubblica{% else %}Publish{% endif %}
+                                {% if lang == 'it' %}Pubblica{% else %}Publish{% endif %}{% if item.listings | length > 1 %} {{ lt_label }}{% endif %}
                             </button>
                             {% endif %}
                             {% endfor %}
