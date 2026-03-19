@@ -298,7 +298,7 @@
                                 {% if member.city %}
                                 <span class="text-xs text-gray-400">{{ member.city }}{% if member.country_code %}, {{ member.country_code }}{% endif %}</span>
                                 {% endif %}
-                                {% set seen = member.last_active_at | last_seen %}
+                                {% set seen = member.last_active_at | last_seen(lang) %}
                                 {% if seen %}
                                 <span class="text-xs {% if seen == 'online now' %}text-emerald-500 font-medium{% elif 'h ago' in seen or seen == 'seen yesterday' %}text-blue-400{% else %}text-gray-300{% endif %}">{{ seen }}</span>
                                 {% endif %}

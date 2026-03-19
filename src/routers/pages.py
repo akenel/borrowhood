@@ -32,7 +32,7 @@ from datetime import datetime, timezone
 templates.env.globals["now"] = datetime.now
 
 
-def _last_seen(dt):
+def _last_seen(dt, lang="en"):
     """Human-readable 'last seen' from a datetime."""
     if not dt:
         return None
@@ -42,22 +42,24 @@ def _last_seen(dt):
         dt = dt.replace(tzinfo=tz.utc)
     delta = now - dt
     minutes = int(delta.total_seconds() / 60)
+    it = (lang == "it")
     if minutes < 5:
-        return "online now"
+        return "online ora" if it else "online now"
     if minutes < 60:
-        return f"seen {minutes}m ago"
+        return f"visto {minutes}m fa" if it else f"seen {minutes}m ago"
     hours = minutes // 60
     if hours < 24:
-        return f"seen {hours}h ago"
+        return f"visto {hours}h fa" if it else f"seen {hours}h ago"
     days = delta.days
     if days == 1:
-        return "seen yesterday"
+        return "visto ieri" if it else "seen yesterday"
     if days < 30:
-        return f"seen {days}d ago"
+        return f"visto {days}g fa" if it else f"seen {days}d ago"
     months = days // 30
     if months < 12:
-        return f"seen {months}mo ago"
-    return f"seen {days // 365}y ago"
+        return f"visto {months}m fa" if it else f"seen {months}mo ago"
+    years = days // 365
+    return f"visto {years}a fa" if it else f"seen {years}y ago"
 
 
 templates.env.filters["last_seen"] = _last_seen

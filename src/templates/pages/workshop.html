@@ -61,9 +61,9 @@
                                 {{ t('badges.' + workshop.badge_tier.value) }}
                             </span>
                             <!-- Last seen -->
-                            {% set seen = workshop.last_active_at | last_seen %}
+                            {% set seen = workshop.last_active_at | last_seen(lang) %}
                             {% if seen %}
-                            <span class="text-xs px-2 py-1 rounded-full {% if seen == 'online now' %}bg-emerald-50 text-emerald-600 font-medium{% elif 'h ago' in seen or seen == 'seen yesterday' %}bg-blue-50 text-blue-500{% else %}bg-gray-50 text-gray-400{% endif %}">{{ seen }}</span>
+                            <span class="text-xs px-2 py-1 rounded-full {% if 'online' in seen %}bg-emerald-50 text-emerald-600 font-medium{% elif 'h ' in seen or 'ieri' in seen or 'yesterday' in seen %}bg-blue-50 text-blue-500{% else %}bg-gray-50 text-gray-400{% endif %}">{{ seen }}</span>
                             {% endif %}
                             <!-- Comm channels -->
                             {% if workshop.telegram_username or workshop.notify_email %}
@@ -289,7 +289,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-900">{{ skill.skill_name }}</p>
-                                <p class="text-xs text-gray-500">{{ t('categories.' + skill.category) }}{% if skill.years_experience %} &middot; {{ skill.years_experience }}y{% endif %}</p>
+                                <p class="text-xs text-gray-500">{% set cat_key = t('categories.' + skill.category) %}{% if cat_key.startswith('categories.') %}{{ skill.category | replace('_', ' ') | title }}{% else %}{{ cat_key }}{% endif %}{% if skill.years_experience %} &middot; {{ skill.years_experience }}{% if lang == 'it' %}a{% else %}y{% endif %}{% endif %}</p>
                             </div>
                             <div class="flex items-center space-x-1">
                                 {% for i in range(5) %}
