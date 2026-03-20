@@ -37,7 +37,7 @@ class BadgeCode(str, enum.Enum):
 BADGE_INFO = {
     BadgeCode.FIRST_LISTING: {
         "name": "First Listing",
-        "description": "Listed your first item on BorrowHood",
+        "description": "Listed your first item on La Piazza",
         "icon": "package",
         "color": "emerald",
     },
@@ -97,7 +97,7 @@ BADGE_INFO = {
     },
     BadgeCode.EARLY_ADOPTER: {
         "name": "Early Adopter",
-        "description": "Joined BorrowHood during the beta period",
+        "description": "Joined La Piazza during the beta period",
         "icon": "rocket",
         "color": "rose",
     },
