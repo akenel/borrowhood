@@ -483,22 +483,30 @@ async def dashboard(request: Request,
             db_user = None
 
         if db_user:
-            # User's items (capped at 12 for initial load)
-            item_count = await db.scalar(
-                select(func.count(BHItem.id))
-                .where(BHItem.owner_id == db_user.id)
-                .where(BHItem.deleted_at.is_(None))
-            ) or 0
-
+            # User's items (all -- personal dashboards are small)
             items_result = await db.execute(
                 select(BHItem)
                 .options(selectinload(BHItem.media), selectinload(BHItem.listings))
                 .where(BHItem.owner_id == db_user.id)
                 .where(BHItem.deleted_at.is_(None))
                 .order_by(BHItem.created_at.desc())
-                .limit(12)
             )
-            items = items_result.scalars().unique().all()
+            items = list(items_result.scalars().unique().all())
+            item_count = len(items)
+
+            # Sort: active listings first, then paused, pending, draft, no-listing last
+            def _item_sort_key(it):
+                statuses = {l.status for l in (it.listings or []) if not l.deleted_at}
+                if ListingStatus.ACTIVE in statuses:
+                    return 0
+                if ListingStatus.PAUSED in statuses:
+                    return 1
+                if ListingStatus.PENDING in statuses:
+                    return 2
+                if ListingStatus.DRAFT in statuses:
+                    return 3
+                return 4
+            items.sort(key=_item_sort_key)
 
             # Rentals as renter
             renter_result = await db.execute(

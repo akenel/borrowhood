@@ -303,6 +303,12 @@
     "training_service": "Formazione e Lezioni",
     "custom_orders": "Ordini Personalizzati",
     "crafts": "Artigianato",
+    "services": "Servizi",
+    "education": "Formazione",
+    "outdoor": "Outdoor",
+    "food": "Cibo e Bevande",
+    "science": "Scienza",
+    "engineering": "Ingegneria",
     "other": "Altro"
   },
   "condition": {
