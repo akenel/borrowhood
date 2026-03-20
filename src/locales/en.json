@@ -303,6 +303,12 @@
     "training_service": "Training & Lessons",
     "custom_orders": "Custom Orders",
     "crafts": "Crafts",
+    "services": "Services",
+    "education": "Education",
+    "outdoor": "Outdoor",
+    "food": "Food & Beverage",
+    "science": "Science",
+    "engineering": "Engineering",
     "other": "Other"
   },
   "condition": {

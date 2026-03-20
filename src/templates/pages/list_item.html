@@ -14,8 +14,8 @@
 
     <h1 class="text-2xl font-bold text-gray-900 mb-8">{% if edit_mode %}Edit: {{ edit_item.name }}{% else %}{{ t('list_item.title') }}{% endif %}</h1>
 
-    {% if edit_mode %}
     <script>
+    {% if edit_mode %}
         window._editData = {
             name: {{ edit_item.name | tojson }},
             description: {{ (edit_item.description or '') | tojson }},
@@ -31,37 +31,56 @@
             listings: {{ edit_listings_json }},
             itemId: {{ edit_item_id | tojson }}
         };
-        // Pre-fill form after Alpine mounts (retry until Alpine is ready)
-        function _fillEditForm() {
-            var el = document.querySelector('[x-data]');
-            if (!el || !el._x_dataStack || !el._x_dataStack[0]) {
-                setTimeout(_fillEditForm, 100);
-                return;
-            }
-            var data = el._x_dataStack[0];
-            var d = window._editData;
-            data.form.name = d.name || '';
-            data.form.description = d.description || '';
-            data.form.story = d.story || '';
-            data.form.category = d.category || 'power_tools';
-            data.form.item_type = d.item_type || 'physical';
-            data.form.condition = d.condition || 'good';
-            data.form.brand = d.brand || '';
-            data.form.age_restricted = d.age_restricted || false;
-            data.form.safety_notes = d.safety_notes || '';
-            data.form.tags = d.tags || '';
-            data.existingMedia = d.media || [];
-            data.editItemId = d.itemId || '';
+        // Pre-build form and listing data for Alpine x-data
+        window._editForm = {
+            name: window._editData.name || '',
+            description: window._editData.description || '',
+            story: window._editData.story || '',
+            category: window._editData.category || 'power_tools',
+            item_type: window._editData.item_type || 'physical',
+            condition: window._editData.condition || 'good',
+            brand: window._editData.brand || '',
+            age_restricted: window._editData.age_restricted || false,
+            safety_notes: window._editData.safety_notes || '',
+            tags: window._editData.tags || '',
+            content_language: '{{ lang }}',
+            currency: 'EUR',
+            delivery_available: false,
+            delivery_fee: '',
+            notes: ''
+        };
+        window._editSelectedTypes = window._editData.listings && window._editData.listings.length
+            ? window._editData.listings.map(function(l) { return l.listing_type; })
+            : ['rent'];
+        window._editListingPrices = {
+            rent: { price: '', price_unit: 'per_day', deposit: '' },
+            sell: { price: '', price_unit: 'flat', deposit: '' },
+            commission: { price: '', price_unit: 'flat', deposit: '' },
+            offer: { price: '', price_unit: 'negotiable', deposit: '' },
+            service: { price: '', price_unit: 'per_hour', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '' },
+            training: { price: '', price_unit: 'per_hour', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '' },
+            auction: { price: '', price_unit: 'flat', deposit: '', bid_increment: '1', auction_days: '7' },
+            giveaway: { price: '', price_unit: 'flat', deposit: '' }
+        };
+        if (window._editData.listings) {
+            window._editData.listings.forEach(function(l) {
+                if (window._editListingPrices[l.listing_type]) {
+                    window._editListingPrices[l.listing_type].price = l.price || '';
+                    window._editListingPrices[l.listing_type].price_unit = l.price_unit || 'flat';
+                    window._editListingPrices[l.listing_type].deposit = l.deposit || '';
+                }
+            });
         }
-        setTimeout(_fillEditForm, 200);
-    </script>
+    {% else %}
+        window._editData = null;
     {% endif %}
+    </script>
 
     <!-- Multi-step form powered by Alpine.js -->
     <div x-data="{
-        editMode: !!window._editData,
-        editItemId: (window._editData || {}).itemId || '',
-        existingMedia: (window._editData || {}).media || [],
+        editMode: window._editData ? true : false,
+        editItemId: window._editData ? window._editData.itemId : '',
+        existingMedia: window._editData ? window._editData.media : [],
         step: 1,
         submitting: false,
         saveAsDraft: false,
@@ -78,25 +97,15 @@
         uploadFiles: [],
         uploadPreviews: [],
         dragging: false,
-        form: {
-            name: (window._editData || {}).name || '',
-            description: (window._editData || {}).description || '',
-            story: (window._editData || {}).story || '',
-            category: (window._editData || {}).category || 'power_tools',
-            item_type: (window._editData || {}).item_type || 'physical',
-            condition: (window._editData || {}).condition || 'good',
-            brand: (window._editData || {}).brand || '',
-            age_restricted: (window._editData || {}).age_restricted || false,
-            safety_notes: (window._editData || {}).safety_notes || '',
-            tags: (window._editData || {}).tags || '',
-            content_language: '{{ lang }}',
-            currency: 'EUR',
-            delivery_available: false,
-            delivery_fee: '',
-            notes: ''
+        form: window._editForm || {
+            name: '', description: '', story: '', category: 'power_tools',
+            item_type: 'physical', condition: 'good', brand: '',
+            age_restricted: false, safety_notes: '', tags: '',
+            content_language: '{{ lang }}', currency: 'EUR',
+            delivery_available: false, delivery_fee: '', notes: ''
         },
-        selectedTypes: ['rent'],
-        listingPrices: {
+        selectedTypes: window._editSelectedTypes || ['rent'],
+        listingPrices: window._editListingPrices || {
             rent: { price: '', price_unit: 'per_day', deposit: '' },
             sell: { price: '', price_unit: 'flat', deposit: '' },
             commission: { price: '', price_unit: 'flat', deposit: '' },
