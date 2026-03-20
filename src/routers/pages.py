@@ -283,8 +283,8 @@ async def item_detail(slug: str, request: Request,
         item=item,
         is_owner=is_owner,
         viewer_tier=viewer_tier,
-        og_title=f"{item.name} - BorrowHood",
-        og_description=item.description[:160] if item.description else "Available on BorrowHood",
+        og_title=f"{item.name} - La Piazza",
+        og_description=item.description[:160] if item.description else "Available on La Piazza",
         og_image=item.media[0].url if item.media else None,
     )
     return _render("pages/item_detail.html", ctx)
@@ -411,8 +411,8 @@ async def workshop_profile(slug: str, request: Request,
         workshop_badges=user_badges,
         badge_info=BADGE_INFO,
         viewer_tier=viewer_tier,
-        og_title=f"{workshop_owner.workshop_name or workshop_owner.display_name} - BorrowHood",
-        og_description=workshop_owner.tagline or (f"{workshop_owner.display_name}'s shop on BorrowHood — {len([i for i in workshop_owner.items if not i.deleted_at])} items listed" if workshop_owner.items else f"{workshop_owner.display_name} on BorrowHood"),
+        og_title=f"{workshop_owner.workshop_name or workshop_owner.display_name} - La Piazza",
+        og_description=workshop_owner.tagline or (f"{workshop_owner.display_name}'s shop on La Piazza — {len([i for i in workshop_owner.items if not i.deleted_at])} items listed" if workshop_owner.items else f"{workshop_owner.display_name} on La Piazza"),
         og_image=workshop_owner.banner_url or workshop_owner.avatar_url or None,
     )
     return _render("pages/workshop.html", ctx)
