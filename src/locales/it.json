@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "BorrowHood",
+    "name": "La Piazza",
     "tagline": "Noleggia. Presta. Condividi. Insegna.",
     "description": "La piattaforma di noleggio del tuo quartiere. Senza commissioni. Open source."
   },
@@ -354,12 +354,12 @@
   "terms": {
     "title": "Termini di Servizio e Codice di Condotta della Comunità",
     "last_updated": "Ultimo aggiornamento",
-    "section_1_title": "1. Cos'è BorrowHood",
-    "section_1_text": "BorrowHood è una piattaforma comunitaria gratuita e open-source per noleggiare, prestare, vendere e condividere oggetti e servizi tra vicini. Non addebitiamo commissioni. Non prendiamo percentuali. La piattaforma esiste per connettere le persone, non per trarne profitto.",
+    "section_1_title": "1. Cos'è La Piazza",
+    "section_1_text": "La Piazza è una piattaforma comunitaria gratuita e open-source per noleggiare, prestare, vendere e condividere oggetti e servizi tra vicini. Non addebitiamo commissioni. Non prendiamo percentuali. La piattaforma esiste per connettere le persone, non per trarne profitto.",
     "section_2_title": "2. Il Tuo Account",
     "section_2_text": "Devi avere almeno 18 anni per registrarti. Sei responsabile delle tue credenziali e di tutta l'attività sotto il tuo account. Una persona, un account. Il profilo del tuo laboratorio è la tua vetrina -- mantienilo onesto.",
     "section_3_title": "3. Annunci e Transazioni",
-    "section_3_text": "Quando pubblichi un oggetto, dichiari di possederlo o di avere il diritto di noleggiarlo/venderlo. Prezzi, cauzioni e condizioni sono tra te e l'altra parte. BorrowHood non elabora pagamenti, non trattiene cauzioni e non garantisce le transazioni. Tutti gli accordi finanziari sono tra gli utenti.",
+    "section_3_text": "Quando pubblichi un oggetto, dichiari di possederlo o di avere il diritto di noleggiarlo/venderlo. Prezzi, cauzioni e condizioni sono tra te e l'altra parte. La Piazza non elabora pagamenti, non trattiene cauzioni e non garantisce le transazioni. Tutti gli accordi finanziari sono tra gli utenti.",
     "section_4_title": "4. Recensioni e Reputazione",
     "section_4_text": "Le recensioni devono essere oneste e basate su transazioni reali. Recensioni false, manipolazione delle recensioni e recensioni di ritorsione sono motivo di sospensione. Il tuo livello di badge riflette la fiducia della comunità -- guadagnalo onestamente.",
     "section_5_title": "5. Controversie",
@@ -367,14 +367,14 @@
     "section_6_title": "6. Contenuti e Comportamenti Vietati",
     "section_6_items": "Oggetti o servizi illegali;Armi, droghe o proprietà rubata;Molestie, incitamento all'odio o discriminazione;Spam, truffe o annunci fraudolenti;Impersonificazione di altri utenti;Condivisione di informazioni personali altrui",
     "section_7_title": "7. Codice di Condotta della Comunità",
-    "section_7_text": "BorrowHood è costruito sulla fiducia tra vicini. Ci aspettiamo che ogni membro:",
+    "section_7_text": "La Piazza è costruito sulla fiducia tra vicini. Ci aspettiamo che ogni membro:",
     "section_7_items": "Tratti ogni persona con rispetto indipendentemente da lingua, provenienza o livello di competenza;Onori i propri impegni -- se accetti di noleggiare o restituire, mantieni la parola;Restituisca gli oggetti nelle condizioni in cui li hai ricevuti;Risponda ai messaggi entro un tempo ragionevole;Lasci recensioni oneste dopo ogni transazione;Segnali i problemi invece di vendicarsi;Ricordi che c'è una persona reale dall'altra parte di ogni annuncio",
     "section_8_title": "8. Contenuti e Proprietà Intellettuale",
-    "section_8_text": "Sei proprietario dei contenuti che pubblichi (foto, descrizioni, recensioni). Pubblicando, concedi a BorrowHood una licenza per visualizzarli sulla piattaforma. Puoi eliminare i tuoi contenuti in qualsiasi momento. Non venderemo mai i tuoi dati.",
+    "section_8_text": "Sei proprietario dei contenuti che pubblichi (foto, descrizioni, recensioni). Pubblicando, concedi a La Piazza una licenza per visualizzarli sulla piattaforma. Puoi eliminare i tuoi contenuti in qualsiasi momento. Non venderemo mai i tuoi dati.",
     "section_9_title": "9. Privacy",
     "section_9_text": "Raccogliamo solo ciò che serve per gestire la piattaforma: nome, email, posizione (approssimativa) e cronologia delle transazioni. Il tuo indirizzo esatto non viene mai mostrato pubblicamente. Puoi esportare tutti i tuoi dati in qualsiasi momento. Puoi eliminare il tuo account in qualsiasi momento.",
     "section_10_title": "10. Limitazione di Responsabilità",
-    "section_10_text": "BorrowHood è fornito così com'è. Facciamo del nostro meglio per mantenere la piattaforma funzionante e sicura, ma non possiamo garantire la qualità, la sicurezza o la legalità degli oggetti elencati, la veridicità degli annunci o la capacità degli utenti di completare le transazioni. Usa il buon senso. Incontra in luoghi pubblici per scambi di alto valore.",
+    "section_10_text": "La Piazza è fornito così com'è. Facciamo del nostro meglio per mantenere la piattaforma funzionante e sicura, ma non possiamo garantire la qualità, la sicurezza o la legalità degli oggetti elencati, la veridicità degli annunci o la capacità degli utenti di completare le transazioni. Usa il buon senso. Incontra in luoghi pubblici per scambi di alto valore.",
     "section_11_title": "11. Modifiche a Questi Termini",
     "section_11_text": "Potremmo aggiornare questi termini. Le modifiche sostanziali saranno annunciate sulla piattaforma. L'uso continuato dopo le modifiche significa accettazione.",
     "section_12_title": "12. Contatti",
@@ -387,7 +387,7 @@
     "section_15_title": "15. Cookie",
     "section_15_text": "Utilizziamo un singolo cookie di sessione (bh_session) per mantenerti connesso. Non utilizziamo cookie di tracciamento, cookie pubblicitari o analisi di terze parti. Tutto qui. Un cookie. Nessun trucco.",
     "section_16_title": "16. Assicurazione e responsabilità",
-    "section_16_text": "BorrowHood non fornisce alcun tipo di assicurazione. I venditori sono responsabili della propria copertura assicurativa. Gli acquirenti sono responsabili degli articoli in loro possesso durante il periodo di noleggio. Raccomandiamo vivamente che gli articoli di alto valore o pericolosi siano coperti dalla polizza assicurativa del venditore prima della pubblicazione. I depositi sono concordati direttamente tra acquirente e venditore -- BorrowHood non detiene, elabora o garantisce depositi.",
+    "section_16_text": "La Piazza non fornisce alcun tipo di assicurazione. I venditori sono responsabili della propria copertura assicurativa. Gli acquirenti sono responsabili degli articoli in loro possesso durante il periodo di noleggio. Raccomandiamo vivamente che gli articoli di alto valore o pericolosi siano coperti dalla polizza assicurativa del venditore prima della pubblicazione. I depositi sono concordati direttamente tra acquirente e venditore -- La Piazza non detiene, elabora o garantisce depositi.",
     "section_17_title": "17. Requisito di età",
     "section_17_text": "Devi avere almeno 18 anni per creare un account e utilizzare la piattaforma. Alcune inserzioni (utensili elettrici, veicoli, attrezzature) possono richiedere la verifica dell'età a discrezione del venditore. I venditori possono rifiutare di completare una transazione se ritengono che l'acquirente sia minorenne.",
     "acceptance": "Creando un account, accetti questi termini e ti impegni a rispettare il nostro codice di condotta della comunità."
@@ -445,7 +445,7 @@
     "no_item_favorites": "Nessun oggetto preferito. Esplora gli annunci per trovare oggetti che ti piacciono."
   },
   "onboarding": {
-    "title": "Benvenuto su BorrowHood",
+    "title": "Benvenuto su La Piazza",
     "subtitle": "Configuriamo il tuo laboratorio in 3 passi.",
     "step_1": "Chi Sei",
     "step_2": "Il Tuo Laboratorio",

@@ -1,5 +1,5 @@
 /**
- * BorrowHood Service Worker
+ * La Piazza Service Worker
  *
  * Strategy:
  * - Static assets (CSS, JS, fonts, images): cache-first

@@ -1,4 +1,4 @@
-"""BorrowHood application configuration.
+"""La Piazza application configuration.
 
 All settings loaded from environment variables with BH_ prefix.
 See .env.example for the full list.
@@ -11,7 +11,7 @@ class BHSettings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # App
-    app_name: str = "BorrowHood"
+    app_name: str = "La Piazza"
     app_url: str = "http://localhost:8000"
     secret_key: str = "change-me-in-production"
     debug: bool = False
