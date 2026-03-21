@@ -169,9 +169,23 @@
 
                 <!-- Tags row -->
                 <div class="mt-3 flex flex-wrap gap-2">
+                    {% if item.listings %}
+                    {% for listing in item.listings if not listing.deleted_at %}
+                    <span class="text-xs px-2.5 py-1 rounded-full font-medium
+                        {% if listing.listing_type.value == 'auction' %}bg-amber-50 text-amber-700
+                        {% elif listing.listing_type.value == 'sell' %}bg-purple-50 text-purple-700
+                        {% elif listing.listing_type.value == 'training' %}bg-teal-50 text-teal-700
+                        {% elif listing.listing_type.value == 'service' %}bg-cyan-50 text-cyan-700
+                        {% elif listing.listing_type.value == 'giveaway' %}bg-green-50 text-green-700
+                        {% else %}bg-indigo-50 text-indigo-700{% endif %}">
+                        {{ listing.listing_type.value | title }}
+                    </span>
+                    {% endfor %}
+                    {% else %}
                     <span class="text-xs px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full font-medium">
                         {{ t('item_types.' + item.item_type.value) }}
                     </span>
+                    {% endif %}
                     <span class="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full">
                         {{ t('categories.' + item.category) }}
                     </span>
@@ -279,7 +293,7 @@
                                 <span class="text-sm font-semibold text-gray-900">
                                     {{ t('listing_types.' + listing.listing_type.value) }}
                                 </span>
-                                {% if listing.delivery_available %}
+                                {% if listing.delivery_available and listing.listing_type.value != 'auction' %}
                                 <span class="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full">{{ t('item.delivery_available') }}</span>
                                 {% endif %}
                             </div>
@@ -291,7 +305,9 @@
                             {% if listing.price is not none %}
                             <p class="text-lg font-bold text-gray-900">
                                 &euro;{{ "%.0f"|format(listing.price) }}
-                                {% if listing.price_unit %}
+                                {% if listing.listing_type.value == 'auction' %}
+                                <span class="text-sm font-normal text-gray-500">starting bid</span>
+                                {% elif listing.price_unit and listing.price_unit != 'flat' %}
                                 <span class="text-sm font-normal text-gray-500">{{ t('common.' + listing.price_unit) }}</span>
                                 {% endif %}
                             </p>
@@ -313,24 +329,14 @@
                             {% if listing.bid_increment %}
                             <p class="text-xs text-gray-500">{{ t('i18n.min_bid') }} &euro;{{ "%.0f"|format(listing.bid_increment) }}</p>
                             {% endif %}
-                            {% if listing.auction_end %}
-                            <p class="text-xs text-amber-600" id="auction-end-display">{{ t('i18n.ends') }} <span></span></p>
-                            <script>
-                            (function() {
-                                var d = new Date('{{ listing.auction_end.isoformat() }}');
-                                var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-                                var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-                                var h = d.getHours(), m = d.getMinutes();
-                                var tz = d.toLocaleTimeString(undefined, {timeZoneName:'short'}).split(' ').pop();
-                                var formatted = days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear() + ' @' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ' ' + tz;
-                                document.getElementById('auction-end-display').querySelector('span').textContent = formatted;
-                            })();
-                            </script>
+                            {% if listing.auction_end and listing.listing_type.value != 'auction' %}
+                            <p class="text-xs text-amber-600">{{ t('i18n.ends') }} {{ listing.auction_end.strftime('%b %d, %Y') }}</p>
                             {% endif %}
                             {% else %}
                             <p class="text-lg font-bold text-gray-900">{{ t('common.negotiable') | title }}</p>
                             {% endif %}
-                            <!-- Seasonal tag -->
+                            <!-- Seasonal tag (hide for auctions) -->
+                            {% if listing.listing_type.value != 'auction' %}
                             {% set today = now().strftime('%Y-%m-%d') %}
                             {% if not listing.available_from and not listing.available_to %}
                             <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">{{ t('i18n.yearround') }}</span>
@@ -340,6 +346,7 @@
                             <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-green-50 text-green-700 border border-green-200 rounded-full">{{ t('i18n.available_now') }}</span>
                             {% elif listing.available_from and listing.available_to %}
                             <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-full">{{ t('i18n.seasonal') }}</span>
+                            {% endif %}
                             {% endif %}
                         </div>
                     </div>
@@ -628,6 +635,19 @@
                             <p class="text-xs text-gray-500">{{ t('auction.seconds') }}</p>
                         </div>
                     </div>
+                    {% if listing.auction_end %}
+                    <p class="text-xs text-center text-gray-500 mt-2" id="auction-sidebar-end"></p>
+                    <script>
+                    (function() {
+                        var d = new Date('{{ listing.auction_end.isoformat() }}');
+                        var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+                        var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                        var h = d.getHours(), m = d.getMinutes();
+                        var tz = d.toLocaleTimeString(undefined, {timeZoneName:'short'}).split(' ').pop();
+                        document.getElementById('auction-sidebar-end').textContent = days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear() + ' @' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ' ' + tz;
+                    })();
+                    </script>
+                    {% endif %}
                 </div>
 
                 <!-- Ended state -->
