@@ -55,6 +55,7 @@ class HelpPostOut(BaseModel):
     reply_count: int
     upvote_count: int = 0
     created_at: datetime
+    updated_at: Optional[datetime] = None
     # Enriched fields (set by router)
     author_name: Optional[str] = None
     author_avatar: Optional[str] = None
@@ -90,6 +91,7 @@ class HelpReplyOut(BaseModel):
     parent_reply_id: Optional[UUID] = None
     upvote_count: int = 0
     created_at: datetime
+    updated_at: Optional[datetime] = None
     # Enriched
     author_name: Optional[str] = None
     author_avatar: Optional[str] = None
@@ -97,7 +99,10 @@ class HelpReplyOut(BaseModel):
     children: list["HelpReplyOut"] = []
 
 
-# ── Edit schema ──
+# ── Edit schemas ──
+
+class HelpReplyUpdate(BaseModel):
+    body: str = Field(..., min_length=1, max_length=2000)
 
 class HelpPostUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=5, max_length=200)
