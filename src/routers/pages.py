@@ -379,6 +379,7 @@ async def workshop_profile(slug: str, request: Request,
             selectinload(BHUser.skills),
             selectinload(BHUser.social_links),
             selectinload(BHUser.items).selectinload(BHItem.media),
+            selectinload(BHUser.items).selectinload(BHItem.listings),
             selectinload(BHUser.points),
         )
         .where(BHUser.slug == slug)

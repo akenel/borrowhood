@@ -314,7 +314,18 @@
                             <p class="text-xs text-gray-500">{{ t('i18n.min_bid') }} &euro;{{ "%.0f"|format(listing.bid_increment) }}</p>
                             {% endif %}
                             {% if listing.auction_end %}
-                            <p class="text-xs text-amber-600">{{ t('i18n.ends') }} {{ listing.auction_end.strftime('%b %d, %H:%M') }}</p>
+                            <p class="text-xs text-amber-600" id="auction-end-display">{{ t('i18n.ends') }} <span></span></p>
+                            <script>
+                            (function() {
+                                var d = new Date('{{ listing.auction_end.isoformat() }}');
+                                var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+                                var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                                var h = d.getHours(), m = d.getMinutes();
+                                var tz = d.toLocaleTimeString(undefined, {timeZoneName:'short'}).split(' ').pop();
+                                var formatted = days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear() + ' @' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ' ' + tz;
+                                document.getElementById('auction-end-display').querySelector('span').textContent = formatted;
+                            })();
+                            </script>
                             {% endif %}
                             {% else %}
                             <p class="text-lg font-bold text-gray-900">{{ t('common.negotiable') | title }}</p>
