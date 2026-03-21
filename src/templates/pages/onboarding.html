@@ -57,11 +57,11 @@
 
         detectLocation() {
             if (!navigator.geolocation) {
-                this.locationStatus = '{% if lang == 'it' %}Geolocalizzazione non supportata{% else %}Geolocation not supported{% endif %}';
+                this.locationStatus = '{{ t('i18n.geolocation_not_supported') }}';
                 return;
             }
             this.locating = true;
-            this.locationStatus = '{% if lang == 'it' %}Rilevamento posizione...{% else %}Detecting location...{% endif %}';
+            this.locationStatus = '{{ t('i18n.detecting_location') }}';
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
                     this.profile.latitude = Math.round(pos.coords.latitude * 1000) / 1000;
@@ -69,14 +69,14 @@
                     if (pos.coords.altitude != null) {
                         this.profile.altitude = Math.round(pos.coords.altitude);
                     }
-                    this.locationStatus = '{% if lang == 'it' %}Posizione rilevata{% else %}Location detected{% endif %}';
+                    this.locationStatus = '{{ t('i18n.location_detected') }}';
                     this.locating = false;
                 },
                 (err) => {
                     // Fallback to Trapani centro when browser denies geolocation
                     this.profile.latitude = 38.017;
                     this.profile.longitude = 12.514;
-                    this.locationStatus = '{% if lang == 'it' %}Posizione predefinita: Trapani{% else %}Default location: Trapani{% endif %}';
+                    this.locationStatus = '{{ t('i18n.default_location_trapani') }}';
                     this.locating = false;
                 },
                 { enableHighAccuracy: true, timeout: 10000 }
@@ -191,14 +191,14 @@
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                         </svg>
-                        <span x-text="bioGenerating ? '{% if lang == 'it' %}Generazione...{% else %}Expanding...{% endif %}' : '{% if lang == 'it' %}AI Espandi{% else %}AI Expand{% endif %}'"></span>
+                        <span x-text="bioGenerating ? '{{ t('i18n.expanding') }}' : '{{ t('i18n.ai_expand') }}'"></span>
                     </button>
                 </div>
                 <textarea x-model="profile.bio" rows="3"
                           class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          placeholder="{% if lang == 'it' %}Scrivi qualcosa su di te... es. 'Faccio il pane da 20 anni'{% else %}Tell your neighbors about yourself... e.g. 'I've been baking for 20 years'{% endif %}"></textarea>
+                          placeholder="{{ t('i18n.tell_your_neighbors_about_yourself_eg_ive_been_bak') }}"></textarea>
                 <p class="text-xs text-gray-400 mt-1">
-                    {% if lang == 'it' %}Scrivi qualche parola e clicca "AI Espandi" per un bio completo{% else %}Type a few words and click "AI Expand" for a complete bio{% endif %}
+                    {{ t('i18n.type_a_few_words_and_click_ai_expand_for_a_complet') }}
                 </p>
             </div>
             <div>
@@ -211,7 +211,7 @@
             <!-- Location detection -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {% if lang == 'it' %}La tua posizione{% else %}Your Location{% endif %}
+                    {{ t('i18n.your_location') }}
                 </label>
                 <div class="flex items-center gap-3">
                     <button type="button" @click="detectLocation()" :disabled="locating"
@@ -220,7 +220,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
-                        <span x-text="locating ? '{% if lang == 'it' %}Rilevamento...{% else %}Detecting...{% endif %}' : '{% if lang == 'it' %}Rileva Posizione{% else %}Detect Location{% endif %}'"></span>
+                        <span x-text="locating ? '{{ t('i18n.detecting') }}' : '{{ t('i18n.detect_location') }}'"></span>
                     </button>
                     <span x-show="profile.latitude" class="text-xs text-green-600 font-medium" x-cloak>
                         <span x-text="profile.latitude"></span>, <span x-text="profile.longitude"></span>
@@ -231,7 +231,7 @@
                     <span x-show="locationStatus && !profile.latitude" class="text-xs text-gray-500" x-text="locationStatus" x-cloak></span>
                 </div>
                 <p class="text-xs text-gray-400 mt-1">
-                    {% if lang == 'it' %}Aiuta i vicini a trovarti. La posizione viene arrotondata per privacy.{% else %}Help neighbors find you. Location is rounded for privacy.{% endif %}
+                    {{ t('i18n.help_neighbors_find_you_location_is_rounded_for_pr') }}
                 </p>
             </div>
         </div>
@@ -305,24 +305,24 @@
             <!-- Skills -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                    {% if lang == 'it' %}Le tue competenze{% else %}Your Skills{% endif %}
+                    {{ t('i18n.your_skills') }}
                 </label>
                 <template x-for="(skill, i) in skills" :key="i">
                     <div class="flex items-center gap-2 mb-2">
                         <input x-model="skill.skill_name" type="text"
                                class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                               placeholder="{% if lang == 'it' %}es. Falegnameria{% else %}e.g. Woodworking{% endif %}">
+                               placeholder="{{ t('i18n.eg_woodworking') }}">
                         <select x-model="skill.category"
                                 class="w-28 rounded-lg border border-gray-300 px-2 py-2 text-sm">
-                            <option value="general">{% if lang == 'it' %}Generale{% else %}General{% endif %}</option>
-                            <option value="woodworking">{% if lang == 'it' %}Legno{% else %}Woodworking{% endif %}</option>
-                            <option value="metalworking">{% if lang == 'it' %}Metallo{% else %}Metalworking{% endif %}</option>
-                            <option value="electronics">{% if lang == 'it' %}Elettronica{% else %}Electronics{% endif %}</option>
-                            <option value="cooking">{% if lang == 'it' %}Cucina{% else %}Cooking{% endif %}</option>
-                            <option value="gardening">{% if lang == 'it' %}Giardinaggio{% else %}Gardening{% endif %}</option>
-                            <option value="sewing">{% if lang == 'it' %}Cucito{% else %}Sewing{% endif %}</option>
-                            <option value="repair">{% if lang == 'it' %}Riparazione{% else %}Repair{% endif %}</option>
-                            <option value="art">{% if lang == 'it' %}Arte{% else %}Art{% endif %}</option>
+                            <option value="general">{{ t('i18n.general') }}</option>
+                            <option value="woodworking">{{ t('i18n.woodworking') }}</option>
+                            <option value="metalworking">{{ t('i18n.metalworking') }}</option>
+                            <option value="electronics">{{ t('i18n.electronics') }}</option>
+                            <option value="cooking">{{ t('i18n.cooking') }}</option>
+                            <option value="gardening">{{ t('i18n.gardening') }}</option>
+                            <option value="sewing">{{ t('i18n.sewing') }}</option>
+                            <option value="repair">{{ t('i18n.repair') }}</option>
+                            <option value="art">{{ t('i18n.art') }}</option>
                         </select>
                         <select x-model.number="skill.self_rating"
                                 class="w-16 rounded-lg border border-gray-300 px-2 py-2 text-sm">
@@ -336,35 +336,35 @@
                     </div>
                 </template>
                 <button @click="addSkill()" class="text-sm text-indigo-600 hover:underline mt-1">
-                    + {% if lang == 'it' %}Aggiungi competenza{% else %}Add Skill{% endif %}
+                    + {{ t('i18n.add_skill') }}
                 </button>
             </div>
 
             <!-- Service Offers -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                    {% if lang == 'it' %}I tuoi servizi{% else %}What You Offer{% endif %}
+                    {{ t('i18n.what_you_offer') }}
                 </label>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
                         <input type="checkbox" x-model="offers.offers_pickup" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                        <span class="text-sm text-gray-700">{% if lang == 'it' %}Ritiro disponibile{% else %}Pickup Available{% endif %}</span>
+                        <span class="text-sm text-gray-700">{{ t('i18n.pickup_available') }}</span>
                     </label>
                     <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
                         <input type="checkbox" x-model="offers.offers_delivery" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                        <span class="text-sm text-gray-700">{% if lang == 'it' %}Consegna a domicilio{% else %}Home Delivery{% endif %}</span>
+                        <span class="text-sm text-gray-700">{{ t('i18n.home_delivery') }}</span>
                     </label>
                     <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
                         <input type="checkbox" x-model="offers.offers_training" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                        <span class="text-sm text-gray-700">{% if lang == 'it' %}Formazione / Lezioni{% else %}Training / Lessons{% endif %}</span>
+                        <span class="text-sm text-gray-700">{{ t('i18n.training_lessons') }}</span>
                     </label>
                     <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
                         <input type="checkbox" x-model="offers.offers_custom_orders" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                        <span class="text-sm text-gray-700">{% if lang == 'it' %}Ordini personalizzati{% else %}Custom Orders{% endif %}</span>
+                        <span class="text-sm text-gray-700">{{ t('i18n.custom_orders') }}</span>
                     </label>
                     <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
                         <input type="checkbox" x-model="offers.offers_repair" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                        <span class="text-sm text-gray-700">{% if lang == 'it' %}Servizio riparazione{% else %}Repair Service{% endif %}</span>
+                        <span class="text-sm text-gray-700">{{ t('i18n.repair_service') }}</span>
                     </label>
                 </div>
             </div>
@@ -415,7 +415,7 @@
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
-                    <span x-text="itemAiGenerating ? '{% if lang == 'it' %}Generazione...{% else %}Generating...{% endif %}' : '{% if lang == 'it' %}Genera Descrizione con AI{% else %}Generate Description with AI{% endif %}'"></span>
+                    <span x-text="itemAiGenerating ? '{{ t('i18n.generating') }}' : '{{ t('i18n.generate_description_with_ai') }}'"></span>
                 </button>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('list_item.description') }}</label>
                 <textarea x-model="item.description" rows="3"

@@ -422,10 +422,10 @@
                     </div>
                     <div class="flex-1">
                         <p class="text-sm font-semibold text-purple-900">
-                            {% if lang == 'it' %}Assistente AI Gemini{% else %}Gemini AI Assistant{% endif %}
+                            {{ t('i18n.gemini_ai_assistant') }}
                         </p>
                         <p class="text-xs text-purple-700 mt-0.5">
-                            {% if lang == 'it' %}Scrivi il nome e clicca il bottone. Gemini genera descrizione, prezzo, deposito e storia -- tutto in un colpo.{% else %}Type the name and click the button. Gemini generates description, price, deposit, and story -- all in one shot.{% endif %}
+                            {{ t('i18n.type_the_name_and_click_the_button_gemini_generate') }}
                         </p>
                     </div>
                 </div>
@@ -513,7 +513,7 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                             </svg>
-                            <span>{% if lang == 'it' %}Genera con Gemini AI{% else %}Generate with Gemini AI{% endif %}</span>
+                            <span>{{ t('i18n.generate_with_gemini_ai') }}</span>
                         </span>
                     </template>
                     <template x-if="aiGenerating">
@@ -522,7 +522,7 @@
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            <span>{% if lang == 'it' %}Generazione in corso...{% else %}Generating...{% endif %}</span>
+                            <span>{{ t('i18n.generating') }}</span>
                         </span>
                     </template>
                 </button>
@@ -532,14 +532,14 @@
                 <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
                     {{ t('list_item.description') }}
                     <span x-show="aiUsed" x-cloak class="ml-2 text-xs text-purple-600 font-normal">
-                        {% if lang == 'it' %}(generata da AI -- modifica liberamente){% else %}(AI generated -- feel free to edit){% endif %}
+                        {{ t('i18n.ai_generated_feel_free_to_edit') }}
                     </span>
                 </label>
                 <textarea id="description" x-model="form.description" rows="6"
                           placeholder="{{ t('list_item.description_placeholder') }}"
                           class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm"
                           :class="aiUsed && form.description ? 'border-purple-300 bg-purple-50/30' : 'border-gray-300'"></textarea>
-                <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Supporta Markdown: **grassetto**, - elenchi puntati, ## titoli{% else %}Supports Markdown: **bold**, - bullet lists, ## headings{% endif %}</p>
+                <p class="text-xs text-gray-400 mt-1">{{ t('i18n.supports_markdown_bold_bullet_lists_headings') }}</p>
             </div>
 
             <!-- Story -->
@@ -554,11 +554,11 @@
             <!-- Tags input -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                    {% if lang == 'it' %}Tag (separati da virgola){% else %}Tags (comma-separated){% endif %}
+                    {{ t('i18n.tags_commaseparated') }}
                 </label>
                 <input type="text" x-model="form.tags" placeholder="wool, felt, handmade, Swiss, cosmetic bag"
                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent min-h-[44px]">
-                <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Aiuta le persone a trovare il tuo articolo{% else %}Help people find your item in search{% endif %}</p>
+                <p class="text-xs text-gray-400 mt-1">{{ t('i18n.help_people_find_your_item_in_search') }}</p>
                 <!-- AI-suggested tags (click to add) -->
                 <div x-show="aiTags.length > 0" x-cloak class="flex flex-wrap gap-1.5 mt-2">
                     <span class="text-xs text-purple-600">AI suggestions:</span>
@@ -572,7 +572,7 @@
             <!-- Item Photo -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                    {% if lang == 'it' %}Foto Articolo{% else %}Item Photo{% endif %}
+                    {{ t('i18n.item_photo') }}
                 </label>
 
                 <!-- Existing photos (edit mode) -->
@@ -597,14 +597,14 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
-                            {% if lang == 'it' %}Scatta foto{% else %}Take Photo{% endif %}
+                            {{ t('i18n.take_photo') }}
                         </button>
                         <button type="button" @click="$refs.fileInput.click()"
                                 class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px]">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            {% if lang == 'it' %}Scegli foto{% else %}Choose Photos{% endif %}
+                            {{ t('i18n.choose_photos') }}
                         </button>
                     </div>
                     <input type="file" x-ref="cameraInput" accept="image/*" capture="environment" class="hidden"
@@ -618,15 +618,15 @@
                          :class="dragging ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'"
                          @click="$refs.fileInput.click()">
                         <p class="text-xs text-gray-400">
-                            {% if lang == 'it' %}Trascina immagini qui (max 5){% else %}Drop images here (max 5){% endif %}
+                            {{ t('i18n.drop_images_here_max_5') }}
                         </p>
                     </div>
                 </div>
 
                 <!-- Photo count indicator -->
                 <div x-show="uploadPreviews.length > 0 || existingMedia.length > 0" class="text-xs text-gray-500 mt-1">
-                    <span x-text="uploadPreviews.length + existingMedia.length"></span>/5 {% if lang == 'it' %}foto{% else %}photos{% endif %}
-                    <span x-show="uploadPreviews.length > 0" class="text-gray-400 ml-1">({% if lang == 'it' %}prima = copertina{% else %}first = cover{% endif %})</span>
+                    <span x-text="uploadPreviews.length + existingMedia.length"></span>/5 {{ t('i18n.photos') }}
+                    <span x-show="uploadPreviews.length > 0" class="text-gray-400 ml-1">({{ t('i18n.first_cover') }})</span>
                 </div>
 
                 <!-- Multi-photo preview grid -->
@@ -676,11 +676,11 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                                 </svg>
-                                <span>{% if lang == 'it' %}oppure Genera Immagine con AI{% else %}or Generate Image with AI{% endif %}</span>
+                                <span>{{ t('i18n.or_generate_image_with_ai') }}</span>
                             </span>
                         </button>
                         <p class="text-xs text-gray-400 mt-1">
-                            {% if lang == 'it' %}Nessuna foto? Ne creiamo una automaticamente{% else %}No photo? We'll auto-generate one for you{% endif %}
+                            {{ t('i18n.no_photo_well_autogenerate_one_for_you') }}
                         </p>
                     </div>
 
@@ -774,14 +774,14 @@
                     <input id="age_restricted" type="checkbox" x-model="form.age_restricted"
                            class="mt-0.5 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500">
                     <div>
-                        <label for="age_restricted" class="text-sm font-medium text-gray-700">{% if lang == 'it' %}Solo 18+ (articolo con restrizione d'eta){% else %}18+ only (age-restricted item){% endif %}</label>
-                        <p class="text-xs text-gray-400">{% if lang == 'it' %}Attrezzi pericolosi, veicoli, attrezzature che richiedono esperienza{% else %}Power tools, vehicles, equipment requiring experience{% endif %}</p>
+                        <label for="age_restricted" class="text-sm font-medium text-gray-700">{{ t('i18n.18_only_agerestricted_item_1') }}</label>
+                        <p class="text-xs text-gray-400">{{ t('i18n.power_tools_vehicles_equipment_requiring_experienc') }}</p>
                     </div>
                 </div>
                 <div x-show="form.age_restricted" x-cloak x-transition>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Note di sicurezza (opzionale){% else %}Safety notes (optional){% endif %}</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.safety_notes_optional') }}</label>
                     <textarea x-model="form.safety_notes" rows="2"
-                              placeholder="{% if lang == 'it' %}Es: Indossare occhiali protettivi. Non usare da soli.{% else %}E.g. Wear safety goggles. Never operate alone.{% endif %}"
+                              placeholder="{{ t('i18n.eg_wear_safety_goggles_never_operate_alone') }}"
                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 text-sm"></textarea>
                 </div>
             </div>
@@ -818,12 +818,12 @@
                 </div>
                 <!-- Edit button -->
                 <button @click="step = 1" class="flex-shrink-0 text-xs text-indigo-600 hover:text-indigo-800 font-medium">
-                    {% if lang == 'it' %}Modifica{% else %}Edit{% endif %}
+                    {{ t('i18n.edit') }}
                 </button>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-3">{% if lang == 'it' %}Cosa vuoi fare?{% else %}What do you want to do?{% endif %} *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-3">{{ t('i18n.what_do_you_want_to_do') }} *</label>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <!-- Sell -->
                     <button type="button" @click="selectedTypes = ['sell']"
@@ -832,8 +832,8 @@
                         <svg class="w-7 h-7" :class="selectedTypes.includes('sell') ? 'text-indigo-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <span class="text-sm font-semibold" :class="selectedTypes.includes('sell') ? 'text-indigo-700' : 'text-gray-700'">{% if lang == 'it' %}Vendi{% else %}Sell{% endif %}</span>
-                        <span class="text-[10px] text-gray-400">{% if lang == 'it' %}Prezzo fisso{% else %}Fixed price{% endif %}</span>
+                        <span class="text-sm font-semibold" :class="selectedTypes.includes('sell') ? 'text-indigo-700' : 'text-gray-700'">{{ t('i18n.sell') }}</span>
+                        <span class="text-[10px] text-gray-400">{{ t('i18n.fixed_price') }}</span>
                     </button>
                     <!-- Rent -->
                     <button type="button" @click="selectedTypes = ['rent']"
@@ -842,8 +842,8 @@
                         <svg class="w-7 h-7" :class="selectedTypes.includes('rent') ? 'text-indigo-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                         </svg>
-                        <span class="text-sm font-semibold" :class="selectedTypes.includes('rent') ? 'text-indigo-700' : 'text-gray-700'">{% if lang == 'it' %}Affitta{% else %}Rent{% endif %}</span>
-                        <span class="text-[10px] text-gray-400">{% if lang == 'it' %}Lo riavrai indietro{% else %}You get it back{% endif %}</span>
+                        <span class="text-sm font-semibold" :class="selectedTypes.includes('rent') ? 'text-indigo-700' : 'text-gray-700'">{{ t('i18n.rent') }}</span>
+                        <span class="text-[10px] text-gray-400">{{ t('i18n.you_get_it_back') }}</span>
                     </button>
                     <!-- Service -->
                     <button type="button" @click="selectedTypes = ['service']"
@@ -853,8 +853,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
-                        <span class="text-sm font-semibold" :class="selectedTypes.includes('service') ? 'text-indigo-700' : 'text-gray-700'">{% if lang == 'it' %}Servizio{% else %}Service{% endif %}</span>
-                        <span class="text-[10px] text-gray-400">{% if lang == 'it' %}Tu lo fai per loro{% else %}You do it for them{% endif %}</span>
+                        <span class="text-sm font-semibold" :class="selectedTypes.includes('service') ? 'text-indigo-700' : 'text-gray-700'">{{ t('i18n.service') }}</span>
+                        <span class="text-[10px] text-gray-400">{{ t('i18n.you_do_it_for_them') }}</span>
                     </button>
                     <!-- Teach -->
                     <button type="button" @click="selectedTypes = ['training']"
@@ -863,8 +863,8 @@
                         <svg class="w-7 h-7" :class="selectedTypes.includes('training') ? 'text-indigo-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                         </svg>
-                        <span class="text-sm font-semibold" :class="selectedTypes.includes('training') ? 'text-indigo-700' : 'text-gray-700'">{% if lang == 'it' %}Insegna{% else %}Teach{% endif %}</span>
-                        <span class="text-[10px] text-gray-400">{% if lang == 'it' %}Lezioni e corsi{% else %}Lessons & courses{% endif %}</span>
+                        <span class="text-sm font-semibold" :class="selectedTypes.includes('training') ? 'text-indigo-700' : 'text-gray-700'">{{ t('i18n.teach') }}</span>
+                        <span class="text-[10px] text-gray-400">{{ t('i18n.lessons_courses') }}</span>
                     </button>
                     <!-- Auction -->
                     <button type="button" @click="selectedTypes = ['auction']"
@@ -873,8 +873,8 @@
                         <svg class="w-7 h-7" :class="selectedTypes.includes('auction') ? 'text-indigo-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                         </svg>
-                        <span class="text-sm font-semibold" :class="selectedTypes.includes('auction') ? 'text-indigo-700' : 'text-gray-700'">{% if lang == 'it' %}Asta{% else %}Auction{% endif %}</span>
-                        <span class="text-[10px] text-gray-400">{% if lang == 'it' %}Chi offre di piu{% else %}Highest bid wins{% endif %}</span>
+                        <span class="text-sm font-semibold" :class="selectedTypes.includes('auction') ? 'text-indigo-700' : 'text-gray-700'">{{ t('i18n.auction') }}</span>
+                        <span class="text-[10px] text-gray-400">{{ t('i18n.highest_bid_wins') }}</span>
                     </button>
                     <!-- Give Away -->
                     <button type="button" @click="selectedTypes = ['giveaway']"
@@ -883,8 +883,8 @@
                         <svg class="w-7 h-7" :class="selectedTypes.includes('giveaway') ? 'text-emerald-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
                         </svg>
-                        <span class="text-sm font-semibold" :class="selectedTypes.includes('giveaway') ? 'text-emerald-700' : 'text-gray-700'">{% if lang == 'it' %}Regala{% else %}Give Away{% endif %}</span>
-                        <span class="text-[10px] text-gray-400">{% if lang == 'it' %}Gratis{% else %}Free{% endif %}</span>
+                        <span class="text-sm font-semibold" :class="selectedTypes.includes('giveaway') ? 'text-emerald-700' : 'text-gray-700'">{{ t('i18n.give_away') }}</span>
+                        <span class="text-[10px] text-gray-400">{{ t('i18n.free') }}</span>
                     </button>
                 </div>
             </div>
@@ -907,7 +907,7 @@
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
                                         <label class="block text-xs text-gray-500 mb-1">
-                                            {% if ltype == 'training' %}{% if lang == 'it' %}Tariffa{% else %}Rate{% endif %}{% else %}{{ t('list_item.price') }}{% endif %} (EUR)
+                                            {% if ltype == 'training' %}{{ t('i18n.rate') }}{% else %}{{ t('list_item.price') }}{% endif %} (EUR)
                                         </label>
                                         <input type="number" step="0.01" min="0" placeholder="0.00"
                                                x-model="listingPrices['{{ ltype }}'].price"
@@ -918,7 +918,7 @@
                                         <select x-model="listingPrices['{{ ltype }}'].price_unit"
                                                 class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
                                             <option value="per_hour">{{ t('common.per_hour') }}</option>
-                                            <option value="per_session">{% if lang == 'it' %}Per sessione{% else %}Per session{% endif %}</option>
+                                            <option value="per_session">{{ t('i18n.per_session') }}</option>
                                             <option value="flat">{{ t('common.flat') }}</option>
                                             <option value="negotiable">{{ t('common.negotiable') }}</option>
                                         </select>
@@ -926,62 +926,62 @@
                                 </div>
                                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                     <div>
-                                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Min. EUR{% else %}Min. charge EUR{% endif %}</label>
+                                        <label class="block text-xs text-gray-500 mb-1">{{ t('i18n.min_charge_eur') }}</label>
                                         <input type="number" step="0.01" min="0" placeholder="--"
                                                x-model="listingPrices['{{ ltype }}'].minimum_charge"
                                                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Per persona EUR{% else %}Per person EUR{% endif %}</label>
+                                        <label class="block text-xs text-gray-500 mb-1">{{ t('i18n.per_person_eur') }}</label>
                                         <input type="number" step="0.01" min="0" placeholder="--"
                                                x-model="listingPrices['{{ ltype }}'].per_person_rate"
                                                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Max persone{% else %}Max people{% endif %}</label>
+                                        <label class="block text-xs text-gray-500 mb-1">{{ t('i18n.max_people') }}</label>
                                         <input type="number" step="1" min="1" placeholder="--"
                                                x-model="listingPrices['{{ ltype }}'].max_participants"
                                                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Sconto gruppo %{% else %}Group discount %{% endif %}</label>
+                                        <label class="block text-xs text-gray-500 mb-1">{{ t('i18n.group_discount_') }}</label>
                                         <input type="number" step="1" min="0" max="100" placeholder="--"
                                                x-model="listingPrices['{{ ltype }}'].group_discount_pct"
                                                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                 </div>
-                                <p class="text-xs text-gray-400">{% if lang == 'it' %}Campi opzionali per prezzi di gruppo{% else %}Optional fields for group pricing{% endif %}</p>
+                                <p class="text-xs text-gray-400">{{ t('i18n.optional_fields_for_group_pricing') }}</p>
                             </div>
                             {% elif ltype == 'auction' %}
                             <!-- Auction pricing -->
                             <div class="space-y-3">
                                 <div class="grid grid-cols-3 gap-3">
                                     <div>
-                                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Prezzo partenza EUR{% else %}Starting price EUR{% endif %}</label>
+                                        <label class="block text-xs text-gray-500 mb-1">{{ t('i18n.starting_price_eur') }}</label>
                                         <input type="number" step="0.01" min="0" placeholder="1.00"
                                                x-model="listingPrices['auction'].price"
                                                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Rilancio min. EUR{% else %}Min. bid increment EUR{% endif %}</label>
+                                        <label class="block text-xs text-gray-500 mb-1">{{ t('i18n.min_bid_increment_eur') }}</label>
                                         <input type="number" step="0.01" min="0.01" placeholder="1.00"
                                                x-model="listingPrices['auction'].bid_increment"
                                                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Durata (giorni){% else %}Duration (days){% endif %}</label>
+                                        <label class="block text-xs text-gray-500 mb-1">{{ t('i18n.duration_days') }}</label>
                                         <select x-model="listingPrices['auction'].auction_days"
                                                 class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
-                                            <option value="1">1 {% if lang == 'it' %}giorno{% else %}day{% endif %}</option>
-                                            <option value="3">3 {% if lang == 'it' %}giorni{% else %}days{% endif %}</option>
-                                            <option value="5">5 {% if lang == 'it' %}giorni{% else %}days{% endif %}</option>
-                                            <option value="7">7 {% if lang == 'it' %}giorni{% else %}days{% endif %}</option>
-                                            <option value="14">14 {% if lang == 'it' %}giorni{% else %}days{% endif %}</option>
-                                            <option value="30">30 {% if lang == 'it' %}giorni{% else %}days{% endif %}</option>
+                                            <option value="1">1 {{ t('i18n.day') }}</option>
+                                            <option value="3">3 {{ t('i18n.days') }}</option>
+                                            <option value="5">5 {{ t('i18n.days') }}</option>
+                                            <option value="7">7 {{ t('i18n.days') }}</option>
+                                            <option value="14">14 {{ t('i18n.days') }}</option>
+                                            <option value="30">30 {{ t('i18n.days') }}</option>
                                         </select>
                                     </div>
                                 </div>
-                                <p class="text-xs text-gray-400">{% if lang == 'it' %}L'asta termina automaticamente. L'offerta piu alta vince.{% else %}Auction ends automatically. Highest bid wins.{% endif %}</p>
+                                <p class="text-xs text-gray-400">{{ t('i18n.auction_ends_automatically_highest_bid_wins') }}</p>
                             </div>
                             {% elif ltype == 'sell' %}
                             <!-- Sell pricing (flat price only, no deposit) -->
@@ -1046,12 +1046,12 @@
                      x-transition:enter-end="opacity-100 translate-y-0"
                      class="ml-8 flex items-center gap-3">
                     <div class="w-32">
-                        <label class="block text-xs text-gray-500 mb-1">{% if lang == 'it' %}Costo consegna EUR{% else %}Delivery fee EUR{% endif %}</label>
+                        <label class="block text-xs text-gray-500 mb-1">{{ t('i18n.delivery_fee_eur') }}</label>
                         <input type="number" step="0.01" min="0" placeholder="0.00"
                                x-model="form.delivery_fee"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500">
                     </div>
-                    <p class="text-xs text-gray-400 mt-4">{% if lang == 'it' %}Lascia vuoto per consegna gratuita{% else %}Leave empty for free delivery{% endif %}</p>
+                    <p class="text-xs text-gray-400 mt-4">{{ t('i18n.leave_empty_for_free_delivery') }}</p>
                 </div>
             </div>
 
@@ -1070,7 +1070,7 @@
                 <div class="flex gap-2">
                     <button @click="saveAsDraft = true; submitItem()" :disabled="submitting"
                             class="px-6 py-3 text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 transition-colors min-h-[44px]">
-                        <span x-show="!submitting || !saveAsDraft">{% if lang == 'it' %}Salva bozza{% else %}Save Draft{% endif %}</span>
+                        <span x-show="!submitting || !saveAsDraft">{{ t('i18n.save_draft') }}</span>
                         <span x-show="submitting && saveAsDraft" x-cloak>{{ t('common.loading') }}</span>
                     </button>
                     <button @click="saveAsDraft = false; submitItem()" :disabled="submitting"

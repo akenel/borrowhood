@@ -1,20 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}{% if lang == 'it' %}Messaggi{% else %}Messages{% endif %} - {{ t('app.name') }}{% endblock %}
+{% block title %}{{ t('i18n.messages') }} - {{ t('app.name') }}{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="messagesApp()" x-init="init()">
 
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">{% if lang == 'it' %}Messaggi{% else %}Messages{% endif %}</h1>
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ t('i18n.messages') }}</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Thread list (inbox) -->
         <div class="md:col-span-1 bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div class="p-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-                <p class="text-sm font-semibold text-gray-700">{% if lang == 'it' %}Conversazioni{% else %}Conversations{% endif %}</p>
+                <p class="text-sm font-semibold text-gray-700">{{ t('i18n.conversations') }}</p>
                 <button @click="showNewMessage = !showNewMessage; if(showNewMessage) $nextTick(() => $refs.memberSearch.focus())"
                         class="p-1.5 rounded-full hover:bg-gray-200 transition-colors text-gray-500 hover:text-indigo-600"
-                        title="{% if lang == 'it' %}Nuovo messaggio{% else %}New message{% endif %}">
+                        title="{{ t('i18n.new_message') }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
@@ -27,7 +27,7 @@
                     <input type="text" x-ref="memberSearch" x-model="searchQuery"
                            @input.debounce.300ms="searchMembers()"
                            @keydown.escape="showNewMessage = false; searchQuery = ''; searchResults = []"
-                           placeholder="{% if lang == 'it' %}Cerca membro...{% else %}Search members...{% endif %}"
+                           placeholder="{{ t('i18n.search_members') }}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                     <div x-show="searchResults.length > 0" class="absolute z-10 mt-1 w-full bg-white rounded-lg border border-gray-200 shadow-lg max-h-48 overflow-y-auto">
                         <template x-for="member in searchResults" :key="member.id">
@@ -44,8 +44,8 @@
                             </button>
                         </template>
                     </div>
-                    <p x-show="searchQuery.length >= 2 && searchResults.length === 0 && !searchLoading" class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Nessun risultato{% else %}No members found{% endif %}</p>
-                    <p x-show="searchLoading" class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Cercando...{% else %}Searching...{% endif %}</p>
+                    <p x-show="searchQuery.length >= 2 && searchResults.length === 0 && !searchLoading" class="text-xs text-gray-400 mt-1">{{ t('i18n.no_members_found') }}</p>
+                    <p x-show="searchLoading" class="text-xs text-gray-400 mt-1">{{ t('i18n.searching') }}</p>
                 </div>
             </div>
 
@@ -74,7 +74,7 @@
                         </div>
                     </button>
                 </template>
-                <p x-show="threads.length === 0 && loaded" class="px-4 py-8 text-sm text-gray-400 text-center">{% if lang == 'it' %}Nessuna conversazione{% else %}No conversations yet{% endif %}</p>
+                <p x-show="threads.length === 0 && loaded" class="px-4 py-8 text-sm text-gray-400 text-center">{{ t('i18n.no_conversations_yet') }}</p>
             </div>
         </div>
 
@@ -102,7 +102,7 @@
                             </svg>
                             <span class="text-indigo-700 font-medium" x-text="activeOrderContext ? 'Order: ' + (activeOrderContext.status || '').replace(/_/g, ' ') : ''"></span>
                             <span x-show="activeOrderContext && activeOrderContext.start_date" class="text-indigo-500" x-text="activeOrderContext && activeOrderContext.start_date ? activeOrderContext.start_date.substring(0,10) + ' - ' + (activeOrderContext.end_date || '').substring(0,10) : ''"></span>
-                            <a x-show="activeRentalId" :href="'/orders'" class="ml-auto text-indigo-600 hover:underline">{% if lang == 'it' %}Vedi ordine{% else %}View order{% endif %}</a>
+                            <a x-show="activeRentalId" :href="'/orders'" class="ml-auto text-indigo-600 hover:underline">{{ t('i18n.view_order') }}</a>
                         </div>
                     </div>
 
@@ -134,10 +134,10 @@
                                             <div x-show="openMenuId === msg.id" @click.away="openMenuId = null"
                                                  class="absolute left-0 mt-1 w-28 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
                                                 <button @click="startEdit(msg)" class="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50">
-                                                    {% if lang == 'it' %}Modifica{% else %}Edit{% endif %}
+                                                    {{ t('i18n.edit') }}
                                                 </button>
                                                 <button @click="deleteMessage(msg.id)" class="w-full text-left px-3 py-1.5 text-sm text-red-600 hover:bg-red-50">
-                                                    {% if lang == 'it' %}Elimina{% else %}Delete{% endif %}
+                                                    {{ t('i18n.delete') }}
                                                 </button>
                                             </div>
                                         </div>
@@ -167,7 +167,7 @@
                                                 <p class="text-sm" x-text="msg.body"></p>
                                                 <div class="flex items-center gap-1 mt-1">
                                                     <p class="text-[10px] opacity-60" x-text="formatMsgTime(msg.created_at)"></p>
-                                                    <span x-show="msg.edited_at" class="text-[10px] opacity-50 italic">{% if lang == 'it' %}(modificato){% else %}(edited){% endif %}</span>
+                                                    <span x-show="msg.edited_at" class="text-[10px] opacity-50 italic">{{ t('i18n.edited') }}</span>
                                                     <!-- Read checkmarks (sent messages only) -->
                                                     <template x-if="msg.sender_id === myUserId">
                                                         <span class="ml-1" :title="msg.read_at ? 'Read' : 'Sent'">
@@ -191,7 +191,7 @@
                     <!-- Compose -->
                     <div class="p-3 border-t border-gray-100">
                         <form @submit.prevent="sendMessage()" class="flex gap-2">
-                            <input type="text" x-model="newMessage" placeholder="{% if lang == 'it' %}Scrivi un messaggio...{% else %}Type a message...{% endif %}"
+                            <input type="text" x-model="newMessage" placeholder="{{ t('i18n.type_a_message') }}"
                                    class="flex-1 px-4 py-2 border border-gray-300 rounded-full text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]"
                                    maxlength="5000">
                             <button type="submit" :disabled="!newMessage.trim() || sending"
@@ -206,7 +206,7 @@
             </template>
             <template x-if="!activeThread">
                 <div class="flex-1 flex items-center justify-center text-gray-400 text-sm">
-                    {% if lang == 'it' %}Seleziona una conversazione{% else %}Select a conversation{% endif %}
+                    {{ t('i18n.select_a_conversation') }}
                 </div>
             </template>
         </div>

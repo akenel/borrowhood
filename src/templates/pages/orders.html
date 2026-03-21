@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{% if lang == 'it' %}Cronologia Ordini{% else %}Order History{% endif %} - {{ t('app.name') }}{% endblock %}
+{% block title %}{{ t('i18n.order_history') }} - {{ t('app.name') }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -8,14 +8,14 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">{% if lang == 'it' %}Cronologia Ordini{% else %}Order History{% endif %}</h1>
+            <h1 class="text-2xl font-bold text-gray-900">{{ t('i18n.order_history') }}</h1>
             <p class="text-sm text-gray-500 mt-1">
-                {% if lang == 'it' %}Tutti i tuoi acquisti, noleggi e vendite{% else %}All your purchases, rentals, and sales{% endif %}
+                {{ t('i18n.all_your_purchases_rentals_and_sales') }}
             </p>
         </div>
         {% if earnings_total > 0 %}
         <div class="mt-3 sm:mt-0 text-right">
-            <p class="text-sm text-gray-500">{% if lang == 'it' %}Guadagni totali{% else %}Lifetime Earnings{% endif %}</p>
+            <p class="text-sm text-gray-500">{{ t('i18n.lifetime_earnings') }}</p>
             <p class="text-2xl font-bold text-emerald-600">EUR {{ "%.2f"|format(earnings_total) }}</p>
         </div>
         {% endif %}
@@ -26,19 +26,19 @@
         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <!-- Role -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Ruolo{% else %}Role{% endif %}</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.role') }}</label>
                 <select name="role" class="w-full border border-gray-300 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]">
-                    <option value="">{% if lang == 'it' %}Tutti{% else %}All{% endif %}</option>
-                    <option value="buyer" {% if selected_role == 'buyer' %}selected{% endif %}>{% if lang == 'it' %}Acquisti{% else %}As Buyer{% endif %}</option>
-                    <option value="seller" {% if selected_role == 'seller' %}selected{% endif %}>{% if lang == 'it' %}Vendite{% else %}As Seller{% endif %}</option>
+                    <option value="">{{ t('i18n.all') }}</option>
+                    <option value="buyer" {% if selected_role == 'buyer' %}selected{% endif %}>{{ t('i18n.as_buyer') }}</option>
+                    <option value="seller" {% if selected_role == 'seller' %}selected{% endif %}>{{ t('i18n.as_seller') }}</option>
                 </select>
             </div>
 
             <!-- Status -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Stato{% else %}Status{% endif %}</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.status') }}</label>
                 <select name="status" class="w-full border border-gray-300 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]">
-                    <option value="">{% if lang == 'it' %}Tutti{% else %}All{% endif %}</option>
+                    <option value="">{{ t('i18n.all') }}</option>
                     <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending</option>
                     <option value="approved" {% if selected_status == 'approved' %}selected{% endif %}>Approved</option>
                     <option value="picked_up" {% if selected_status == 'picked_up' %}selected{% endif %}>Picked Up</option>
@@ -50,10 +50,10 @@
 
             <!-- Sort -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Ordina{% else %}Sort{% endif %}</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.sort') }}</label>
                 <select name="sort" class="w-full border border-gray-300 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]">
-                    <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>{% if lang == 'it' %}Piu recenti{% else %}Newest first{% endif %}</option>
-                    <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>{% if lang == 'it' %}Meno recenti{% else %}Oldest first{% endif %}</option>
+                    <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>{{ t('i18n.newest_first') }}</option>
+                    <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>{{ t('i18n.oldest_first') }}</option>
                 </select>
             </div>
 
@@ -111,7 +111,7 @@
                         <span>EUR {{ "%.2f"|format(order.listing.price) }}</span>
                         {% endif %}
                         {% if item and item.owner %}
-                        <span>{% if viewer_user_id and item.owner.id == viewer_user_id %}{% if lang == 'it' %}Venduto da te{% else %}You sold{% endif %}{% else %}From <a href="/workshop/{{ item.owner.slug }}" class="text-indigo-600 hover:underline">{{ item.owner.display_name }}</a>{% endif %}</span>
+                        <span>{% if viewer_user_id and item.owner.id == viewer_user_id %}{{ t('i18n.you_sold') }}{% else %}From <a href="/workshop/{{ item.owner.slug }}" class="text-indigo-600 hover:underline">{{ item.owner.display_name }}</a>{% endif %}</span>
                         {% endif %}
                     </div>
                     {% if order.renter_message %}
@@ -129,11 +129,11 @@
                         <!-- Message about this order -->
                         {% if item and item.owner %}
                         {% set other_id = item.owner.id if (viewer_user_id and item.owner.id != viewer_user_id) else order.renter_id %}
-                        <a href="/messages?rental={{ order.id }}&to={{ other_id }}" class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-indigo-600 transition-colors" title="{% if lang == 'it' %}Messaggia{% else %}Message{% endif %}">
+                        <a href="/messages?rental={{ order.id }}&to={{ other_id }}" class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-indigo-600 transition-colors" title="{{ t('i18n.message') }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                             </svg>
-                            <span>{% if lang == 'it' %}Messaggio{% else %}Message{% endif %}</span>
+                            <span>{{ t('i18n.message') }}</span>
                         </a>
                         {% endif %}
                         {% if order.status.value == 'completed' and item %}
@@ -142,11 +142,11 @@
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
-                            {% if lang == 'it' %}Modifica recensione{% else %}Edit Review{% endif %}
+                            {{ t('i18n.edit_review') }}
                         </a>
                         {% else %}
                         <a href="/items/{{ item.slug }}#reviews" class="inline-flex items-center text-xs text-indigo-600 hover:underline">
-                            {% if lang == 'it' %}Lascia recensione{% else %}Leave review{% endif %}
+                            {{ t('i18n.leave_review') }}
                         </a>
                         {% endif %}
                         {% endif %}
@@ -156,7 +156,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
                             </svg>
-                            <span>{% if lang == 'it' %}Segnala problema{% else %}Report Issue{% endif %}</span>
+                            <span>{{ t('i18n.report_issue') }}</span>
                         </button>
                         {% endif %}
                         {% if order.status.value == 'disputed' %}
@@ -164,7 +164,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            {% if lang == 'it' %}Disputa in corso{% else %}Dispute in progress{% endif %}
+                            {{ t('i18n.dispute_in_progress') }}
                         </span>
                         {% endif %}
                     </div>
@@ -179,15 +179,15 @@
     {% set total_pages = ((total_count - 1) // selected_limit) + 1 if total_count > 0 else 1 %}
     {% if total_pages > 1 %}
     <div class="mt-6 flex items-center justify-between">
-        <p class="text-sm text-gray-500">{{ total_count }} {% if lang == 'it' %}ordini{% else %}orders{% endif %} ({% if lang == 'it' %}pagina{% else %}page{% endif %} {{ current_page }}/{{ total_pages }})</p>
+        <p class="text-sm text-gray-500">{{ total_count }} {{ t('i18n.orders') }} ({{ t('i18n.page') }} {{ current_page }}/{{ total_pages }})</p>
         <nav class="flex items-center gap-1">
             {% if current_page > 1 %}
             <a href="/orders?{% if selected_role %}role={{ selected_role }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}sort={{ selected_sort }}&limit={{ selected_limit }}&offset={{ (current_page - 2) * selected_limit }}"
-               class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">{% if lang == 'it' %}Prec{% else %}Prev{% endif %}</a>
+               class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">{{ t('i18n.prev') }}</a>
             {% endif %}
             {% if current_page < total_pages %}
             <a href="/orders?{% if selected_role %}role={{ selected_role }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}sort={{ selected_sort }}&limit={{ selected_limit }}&offset={{ current_page * selected_limit }}"
-               class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">{% if lang == 'it' %}Succ{% else %}Next{% endif %}</a>
+               class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">{{ t('i18n.next') }}</a>
             {% endif %}
         </nav>
     </div>
@@ -199,8 +199,8 @@
         <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
         </svg>
-        <h3 class="mt-4 text-lg font-semibold text-gray-900">{% if lang == 'it' %}Nessun ordine{% else %}No orders yet{% endif %}</h3>
-        <p class="mt-2 text-sm text-gray-500">{% if lang == 'it' %}Inizia a esplorare il marketplace{% else %}Start browsing the marketplace{% endif %}</p>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">{{ t('i18n.no_orders_yet') }}</h3>
+        <p class="mt-2 text-sm text-gray-500">{{ t('i18n.start_browsing_the_marketplace') }}</p>
         <a href="/browse" class="mt-6 inline-flex px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
             {{ t('nav.browse') }}
         </a>
@@ -218,7 +218,7 @@
         submitting: false,
         error: '',
         async submit() {
-            if (this.description.length < 10) { this.error = '{% if lang == 'it' %}Minimo 10 caratteri{% else %}Minimum 10 characters{% endif %}'; return; }
+            if (this.description.length < 10) { this.error = '{{ t('i18n.minimum_10_characters') }}'; return; }
             this.submitting = true;
             this.error = '';
             try {
@@ -232,12 +232,12 @@
                     })
                 });
                 if (resp.ok) {
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{% if lang == 'it' %}Disputa inviata{% else %}Dispute filed successfully{% endif %}' } }));
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{{ t('i18n.dispute_filed_successfully') }}' } }));
                     closeDisputeModal();
                     setTimeout(() => location.reload(), 1000);
                 } else {
                     var err = await resp.json();
-                    this.error = err.detail || '{% if lang == 'it' %}Errore{% else %}Failed to file dispute{% endif %}';
+                    this.error = err.detail || '{{ t('i18n.failed_to_file_dispute') }}';
                 }
             } catch(e) { this.error = e.message; }
             this.submitting = false;
@@ -250,7 +250,7 @@
                 <svg class="w-5 h-5 text-red-500 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
                 </svg>
-                {% if lang == 'it' %}Segnala un problema{% else %}Report an Issue{% endif %}
+                {{ t('i18n.report_an_issue') }}
             </h2>
             <button onclick="closeDisputeModal()" class="text-gray-400 hover:text-gray-600">&times;</button>
         </div>
@@ -259,24 +259,24 @@
 
         <!-- Reason -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Motivo{% else %}Reason{% endif %} *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.reason') }} *</label>
             <select x-model="reason" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 min-h-[40px]">
-                <option value="item_not_as_described">{% if lang == 'it' %}Articolo non conforme alla descrizione{% else %}Item not as described{% endif %}</option>
-                <option value="item_damaged">{% if lang == 'it' %}Articolo danneggiato{% else %}Item damaged{% endif %}</option>
-                <option value="item_not_returned">{% if lang == 'it' %}Articolo non restituito{% else %}Item not returned{% endif %}</option>
-                <option value="late_return">{% if lang == 'it' %}Restituzione in ritardo{% else %}Late return{% endif %}</option>
-                <option value="no_show">{% if lang == 'it' %}Nessuna presentazione{% else %}No show{% endif %}</option>
-                <option value="payment_issue">{% if lang == 'it' %}Problema di pagamento{% else %}Payment issue{% endif %}</option>
-                <option value="safety_concern">{% if lang == 'it' %}Problema di sicurezza{% else %}Safety concern{% endif %}</option>
-                <option value="other">{% if lang == 'it' %}Altro{% else %}Other{% endif %}</option>
+                <option value="item_not_as_described">{{ t('i18n.item_not_as_described') }}</option>
+                <option value="item_damaged">{{ t('i18n.item_damaged') }}</option>
+                <option value="item_not_returned">{{ t('i18n.item_not_returned') }}</option>
+                <option value="late_return">{{ t('i18n.late_return') }}</option>
+                <option value="no_show">{{ t('i18n.no_show') }}</option>
+                <option value="payment_issue">{{ t('i18n.payment_issue') }}</option>
+                <option value="safety_concern">{{ t('i18n.safety_concern') }}</option>
+                <option value="other">{{ t('i18n.other') }}</option>
             </select>
         </div>
 
         <!-- Description -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Descrizione{% else %}Description{% endif %} *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.description') }} *</label>
             <textarea x-model="description" rows="4" maxlength="2000"
-                      placeholder="{% if lang == 'it' %}Descrivi il problema in dettaglio (min 10 caratteri){% else %}Describe the issue in detail (min 10 characters){% endif %}"
+                      placeholder="{{ t('i18n.describe_the_issue_in_detail_min_10_characters') }}"
                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500"></textarea>
             <p class="text-xs text-gray-400 mt-1" x-text="description.length + '/2000'"></p>
         </div>
@@ -286,22 +286,22 @@
 
         <!-- Info box -->
         <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700">
-            <p class="font-semibold mb-1">{% if lang == 'it' %}Cosa succede dopo?{% else %}What happens next?{% endif %}</p>
+            <p class="font-semibold mb-1">{{ t('i18n.what_happens_next') }}</p>
             <ol class="list-decimal ml-4 space-y-0.5">
-                <li>{% if lang == 'it' %}L'altra parte viene notificata e puo rispondere{% else %}The other party is notified and can respond{% endif %}</li>
-                <li>{% if lang == 'it' %}Entrambe le parti possono presentare prove{% else %}Both parties can present their case{% endif %}</li>
-                <li>{% if lang == 'it' %}La disputa viene risolta con una decisione sul deposito{% else %}The dispute is resolved with a decision on the deposit{% endif %}</li>
+                <li>{{ t('i18n.the_other_party_is_notified_and_can_respond') }}</li>
+                <li>{{ t('i18n.both_parties_can_present_their_case') }}</li>
+                <li>{{ t('i18n.the_dispute_is_resolved_with_a_decision_on_the_dep') }}</li>
             </ol>
         </div>
 
         <!-- Actions -->
         <div class="flex justify-end gap-3 pt-2">
             <button onclick="closeDisputeModal()" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium">
-                {% if lang == 'it' %}Annulla{% else %}Cancel{% endif %}
+                {{ t('i18n.cancel') }}
             </button>
             <button @click="submit()" :disabled="submitting || description.length < 10"
                     class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors min-h-[40px]">
-                <span x-show="!submitting">{% if lang == 'it' %}Invia segnalazione{% else %}File Dispute{% endif %}</span>
+                <span x-show="!submitting">{{ t('i18n.file_dispute') }}</span>
                 <span x-show="submitting" x-cloak>...</span>
             </button>
         </div>

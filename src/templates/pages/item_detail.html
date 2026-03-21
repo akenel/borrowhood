@@ -224,7 +224,7 @@
                         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
-                        <span class="text-sm font-semibold text-red-700">{% if lang == 'it' %}Solo 18+ -- Articolo con restrizione d'eta{% else %}18+ Only -- Age-Restricted Item{% endif %}</span>
+                        <span class="text-sm font-semibold text-red-700">{{ t('i18n.18_only_agerestricted_item') }}</span>
                     </div>
                     {% endif %}
                     {% if item.safety_notes %}
@@ -299,22 +299,22 @@
                             <p class="text-xs text-gray-400">(+&euro;{{ "%.0f"|format(listing.deposit) }} {{ t('item.deposit') }})</p>
                             {% endif %}
                             {% if listing.minimum_charge %}
-                            <p class="text-xs text-gray-500">{% if lang == 'it' %}Min.{% else %}Min. charge{% endif %} &euro;{{ "%.0f"|format(listing.minimum_charge) }}</p>
+                            <p class="text-xs text-gray-500">{{ t('i18n.min_charge') }} &euro;{{ "%.0f"|format(listing.minimum_charge) }}</p>
                             {% endif %}
                             {% if listing.per_person_rate %}
-                            <p class="text-xs text-gray-500">&euro;{{ "%.0f"|format(listing.per_person_rate) }} {% if lang == 'it' %}per persona{% else %}per person{% endif %}</p>
+                            <p class="text-xs text-gray-500">&euro;{{ "%.0f"|format(listing.per_person_rate) }} {{ t('i18n.per_person') }}</p>
                             {% endif %}
                             {% if listing.max_participants %}
-                            <p class="text-xs text-gray-500">{% if lang == 'it' %}Max{% else %}Max{% endif %} {{ listing.max_participants }} {% if lang == 'it' %}persone{% else %}people{% endif %}</p>
+                            <p class="text-xs text-gray-500">{{ t('i18n.max') }} {{ listing.max_participants }} {{ t('i18n.people') }}</p>
                             {% endif %}
                             {% if listing.group_discount_pct %}
-                            <p class="text-xs text-emerald-600">{{ "%.0f"|format(listing.group_discount_pct) }}% {% if lang == 'it' %}sconto gruppo{% else %}group discount{% endif %}</p>
+                            <p class="text-xs text-emerald-600">{{ "%.0f"|format(listing.group_discount_pct) }}% {{ t('i18n.group_discount') }}</p>
                             {% endif %}
                             {% if listing.bid_increment %}
-                            <p class="text-xs text-gray-500">{% if lang == 'it' %}Rilancio min.{% else %}Min. bid{% endif %} &euro;{{ "%.0f"|format(listing.bid_increment) }}</p>
+                            <p class="text-xs text-gray-500">{{ t('i18n.min_bid') }} &euro;{{ "%.0f"|format(listing.bid_increment) }}</p>
                             {% endif %}
                             {% if listing.auction_end %}
-                            <p class="text-xs text-amber-600">{% if lang == 'it' %}Scade{% else %}Ends{% endif %} {{ listing.auction_end.strftime('%b %d, %H:%M') }}</p>
+                            <p class="text-xs text-amber-600">{{ t('i18n.ends') }} {{ listing.auction_end.strftime('%b %d, %H:%M') }}</p>
                             {% endif %}
                             {% else %}
                             <p class="text-lg font-bold text-gray-900">{{ t('common.negotiable') | title }}</p>
@@ -322,13 +322,13 @@
                             <!-- Seasonal tag -->
                             {% set today = now().strftime('%Y-%m-%d') %}
                             {% if not listing.available_from and not listing.available_to %}
-                            <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">{% if lang == 'it' %}Tutto l'anno{% else %}Year-Round{% endif %}</span>
+                            <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">{{ t('i18n.yearround') }}</span>
                             {% elif listing.available_from and listing.available_from > today %}
-                            <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full">{% if lang == 'it' %}Dal{% else %}From{% endif %} {{ listing.available_from }}</span>
+                            <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full">{{ t('i18n.from') }} {{ listing.available_from }}</span>
                             {% elif listing.available_from and listing.available_to and listing.available_from <= today and listing.available_to >= today %}
-                            <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-green-50 text-green-700 border border-green-200 rounded-full">{% if lang == 'it' %}Disponibile{% else %}Available Now{% endif %}</span>
+                            <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-green-50 text-green-700 border border-green-200 rounded-full">{{ t('i18n.available_now') }}</span>
                             {% elif listing.available_from and listing.available_to %}
-                            <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-full">{% if lang == 'it' %}Stagionale{% else %}Seasonal{% endif %}</span>
+                            <span class="inline-block mt-1 text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-full">{{ t('i18n.seasonal') }}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -508,16 +508,16 @@
                                 <div class="mt-3 ml-4" x-data="{ responding: false, responseText: '', submitting: false }">
                                     <button x-show="!responding" @click="responding = true"
                                             class="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
-                                        {% if lang == 'it' %}Rispondi{% else %}Respond{% endif %}
+                                        {{ t('i18n.respond') }}
                                     </button>
                                     <div x-show="responding" x-cloak class="space-y-2">
                                         <textarea x-model="responseText" rows="3"
-                                                  placeholder="{% if lang == 'it' %}Scrivi la tua risposta...{% else %}Write your response...{% endif %}"
+                                                  placeholder="{{ t('i18n.write_your_response') }}"
                                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
                                         <div class="flex gap-2 justify-end">
                                             <button @click="responding = false; responseText = ''"
                                                     class="px-3 py-1.5 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">
-                                                {% if lang == 'it' %}Annulla{% else %}Cancel{% endif %}
+                                                {{ t('i18n.cancel') }}
                                             </button>
                                             <button @click="
                                                 if (!responseText.trim()) return;
@@ -533,7 +533,7 @@
                                                 }).catch(() => {}).finally(() => { submitting = false; });
                                             " :disabled="submitting || !responseText.trim()"
                                                     class="px-4 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50">
-                                                {% if lang == 'it' %}Invia Risposta{% else %}Submit Response{% endif %}
+                                                {{ t('i18n.submit_response') }}
                                             </button>
                                         </div>
                                     </div>
@@ -659,8 +659,8 @@
                 {% else %}
                 <div x-show="!ended" class="p-4 bg-gray-50 rounded-lg text-center">
                     <svg class="w-6 h-6 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                    <p class="text-sm text-gray-500 font-medium">{% if lang == 'it' %}Livello Fidato richiesto per fare offerte{% else %}Trusted tier required to place bids{% endif %}</p>
-                    <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Guadagna punti prestando e recensendo{% else %}Earn points by lending and reviewing{% endif %}</p>
+                    <p class="text-sm text-gray-500 font-medium">{{ t('i18n.trusted_tier_required_to_place_bids') }}</p>
+                    <p class="text-xs text-gray-400 mt-1">{{ t('i18n.earn_points_by_lending_and_reviewing') }}</p>
                 </div>
                 {% endif %}
 
@@ -751,14 +751,14 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                     </svg>
-                    {% if lang == 'it' %}Contatta il venditore{% else %}Message Seller{% endif %}
+                    {{ t('i18n.message_seller') }}
                 </a>
                 {% endif %}
                 {% if item.owner and item.owner.whatsapp_number %}
-                <button onclick="(async()=>{const r=await fetch('/api/v1/items/by-slug/{{ item.slug }}/whatsapp-connect',{method:'POST',headers:{'Content-Type':'application/json'}});if(r.status===401){window.dispatchEvent(new CustomEvent('toast',{detail:{type:'info',message:'{% if lang == 'it' %}Accedi per contattare il venditore{% else %}Log in to contact the seller{% endif %}'}}));return}if(r.ok){const d=await r.json();window.open(d.url,'_blank')}else{const e=await r.json().catch(()=>({}));window.dispatchEvent(new CustomEvent('toast',{detail:{type:'error',message:e.detail||'Error'}}))}})()"
+                <button onclick="(async()=>{const r=await fetch('/api/v1/items/by-slug/{{ item.slug }}/whatsapp-connect',{method:'POST',headers:{'Content-Type':'application/json'}});if(r.status===401){window.dispatchEvent(new CustomEvent('toast',{detail:{type:'info',message:'{{ t('i18n.log_in_to_contact_the_seller') }}'}}));return}if(r.ok){const d=await r.json();window.open(d.url,'_blank')}else{const e=await r.json().catch(()=>({}));window.dispatchEvent(new CustomEvent('toast',{detail:{type:'error',message:e.detail||'Error'}}))}})()"
                    class="w-full flex items-center justify-center gap-2 px-6 py-3 mt-3 bg-[#25D366] text-white font-semibold rounded-lg hover:bg-[#1DA851] transition-colors min-h-[44px] cursor-pointer">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                    {% if lang == 'it' %}Contatta su WhatsApp{% else %}Contact on WhatsApp{% endif %}
+                    {{ t('i18n.contact_on_whatsapp') }}
                 </button>
                 {% endif %}
                 {% if item.owner and item.owner.telegram_username %}
@@ -776,7 +776,7 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
                         </svg>
-                        {% if lang == 'it' %}Condividi{% else %}Share{% endif %}
+                        {{ t('i18n.share') }}
                     </button>
                     <!-- WhatsApp direct -->
                     <a href="https://wa.me/?text={{ (item.name + ' -- ' + request.url|string) | urlencode }}"
@@ -829,8 +829,8 @@
                         {% if active_listing and active_listing.deposit %}
                         <template x-if="listingType === 'rent'">
                             <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
-                                <p class="font-semibold">{% if lang == 'it' %}Deposito: EUR {{ "%.0f"|format(active_listing.deposit) }}{% else %}Deposit: EUR {{ "%.0f"|format(active_listing.deposit) }}{% endif %}</p>
-                                <p class="mt-1">{% if lang == 'it' %}Il deposito viene concordato direttamente con il proprietario. La piattaforma non gestisce depositi o pagamenti.{% else %}The deposit is arranged directly with the owner. The platform does not hold or process deposits or payments.{% endif %}</p>
+                                <p class="font-semibold">{{ t('i18n.deposit_eur_0fformatactivelistingdeposit_') }}</p>
+                                <p class="mt-1">{{ t('i18n.the_deposit_is_arranged_directly_with_the_owner_th') }}</p>
                             </div>
                         </template>
                         {% endif %}
@@ -919,12 +919,12 @@
                 }
             }">
                 <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">
-                    {% if lang == 'it' %}Codice QR{% else %}QR Code{% endif %}
+                    {{ t('i18n.qr_code') }}
                 </h3>
                 <div class="flex flex-col items-center">
                     <img :src="qrUrl" alt="QR Code" class="w-40 h-40 rounded">
                     <p class="text-xs text-gray-400 mt-2 text-center">
-                        {% if lang == 'it' %}Scansiona per vedere questo oggetto{% else %}Scan to view this item{% endif %}
+                        {{ t('i18n.scan_to_view_this_item') }}
                     </p>
                     <button @click="
                         let a = document.createElement('a');
@@ -935,7 +935,7 @@
                         <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        {% if lang == 'it' %}Scarica PNG{% else %}Download PNG{% endif %}
+                        {{ t('i18n.download_png') }}
                     </button>
                 </div>
             </div>
@@ -951,24 +951,24 @@
 
             <!-- Q&A Section -->
             <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="listingQA()">
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">{% if lang == 'it' %}Domande e Risposte{% else %}Questions & Answers{% endif %}</h3>
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">{{ t('i18n.questions_answers') }}</h3>
 
                 <!-- Ask a question -->
                 {% if user %}
                 <form @submit.prevent="askQuestion()" class="mb-4">
                     <div class="flex gap-2">
                         <input type="text" x-model="newQuestion"
-                               placeholder="{% if lang == 'it' %}Fai una domanda...{% else %}Ask a question...{% endif %}"
+                               placeholder="{{ t('i18n.ask_a_question') }}"
                                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]"
                                maxlength="2000" minlength="5">
                         <button type="submit" :disabled="asking || newQuestion.length < 5"
                                 class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors min-h-[40px]">
-                            {% if lang == 'it' %}Chiedi{% else %}Ask{% endif %}
+                            {{ t('i18n.ask') }}
                         </button>
                     </div>
                 </form>
                 {% else %}
-                <p class="text-sm text-gray-400 mb-4"><a href="/login" class="text-indigo-600 hover:underline">{% if lang == 'it' %}Accedi{% else %}Log in{% endif %}</a> {% if lang == 'it' %}per fare una domanda{% else %}to ask a question{% endif %}</p>
+                <p class="text-sm text-gray-400 mb-4"><a href="/login" class="text-indigo-600 hover:underline">{{ t('i18n.log_in') }}</a> {{ t('i18n.to_ask_a_question') }}</p>
                 {% endif %}
 
                 <!-- Q&A list -->
@@ -981,14 +981,14 @@
                             </template>
                             <template x-if="!qa.answer && isOwner">
                                 <div class="mt-1 flex gap-2">
-                                    <input type="text" x-model="qa._draft" placeholder="{% if lang == 'it' %}Rispondi...{% else %}Answer...{% endif %}" class="flex-1 px-2 py-1 border border-gray-200 rounded text-sm">
-                                    <button @click="answerQuestion(qa)" class="px-2 py-1 bg-emerald-600 text-white text-xs rounded hover:bg-emerald-700">{% if lang == 'it' %}Rispondi{% else %}Reply{% endif %}</button>
+                                    <input type="text" x-model="qa._draft" placeholder="{{ t('i18n.answer') }}" class="flex-1 px-2 py-1 border border-gray-200 rounded text-sm">
+                                    <button @click="answerQuestion(qa)" class="px-2 py-1 bg-emerald-600 text-white text-xs rounded hover:bg-emerald-700">{{ t('i18n.reply') }}</button>
                                 </div>
                             </template>
                             <p class="text-xs text-gray-300 mt-0.5" x-text="formatDate(qa.created_at)"></p>
                         </div>
                     </template>
-                    <p x-show="questions.length === 0 && loaded" class="text-sm text-gray-400">{% if lang == 'it' %}Nessuna domanda ancora{% else %}No questions yet{% endif %}</p>
+                    <p x-show="questions.length === 0 && loaded" class="text-sm text-gray-400">{{ t('i18n.no_questions_yet') }}</p>
                 </div>
             </div>
 
@@ -1002,18 +1002,18 @@
                         <div class="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6">
                             <h3 class="text-lg font-bold text-gray-900 mb-4">{{ t('item.report') }}</h3>
                             <select x-model="reason" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-3">
-                                <option value="spam">{% if lang == 'it' %}Spam{% else %}Spam{% endif %}</option>
-                                <option value="inappropriate">{% if lang == 'it' %}Inappropriato{% else %}Inappropriate{% endif %}</option>
-                                <option value="scam">{% if lang == 'it' %}Truffa{% else %}Scam{% endif %}</option>
-                                <option value="harassment">{% if lang == 'it' %}Molestia{% else %}Harassment{% endif %}</option>
-                                <option value="other">{% if lang == 'it' %}Altro{% else %}Other{% endif %}</option>
+                                <option value="spam">{{ t('i18n.spam') }}</option>
+                                <option value="inappropriate">{{ t('i18n.inappropriate') }}</option>
+                                <option value="scam">{{ t('i18n.scam') }}</option>
+                                <option value="harassment">{{ t('i18n.harassment') }}</option>
+                                <option value="other">{{ t('i18n.other') }}</option>
                             </select>
-                            <textarea x-model="detail" rows="2" placeholder="{% if lang == 'it' %}Dettagli (opzionale){% else %}Details (optional){% endif %}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4"></textarea>
+                            <textarea x-model="detail" rows="2" placeholder="{{ t('i18n.details_optional') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4"></textarea>
                             <div class="flex justify-end space-x-2">
-                                <button @click="showModal = false" class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">{% if lang == 'it' %}Annulla{% else %}Cancel{% endif %}</button>
-                                <button @click="submit()" :disabled="submitting" class="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 min-h-[44px]">{% if lang == 'it' %}Segnala{% else %}Report{% endif %}</button>
+                                <button @click="showModal = false" class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">{{ t('i18n.cancel') }}</button>
+                                <button @click="submit()" :disabled="submitting" class="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 min-h-[44px]">{{ t('i18n.report') }}</button>
                             </div>
-                            <p x-show="success" class="text-xs text-emerald-600 mt-2">{% if lang == 'it' %}Segnalazione inviata. Grazie.{% else %}Report submitted. Thank you.{% endif %}</p>
+                            <p x-show="success" class="text-xs text-emerald-600 mt-2">{{ t('i18n.report_submitted_thank_you') }}</p>
                             <p x-show="error" class="text-xs text-red-600 mt-2" x-text="error"></p>
                         </div>
                     </div>
@@ -1030,7 +1030,7 @@
         <div class="border-t border-gray-200 pt-8">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                 <h2 class="text-2xl font-bold text-gray-900">
-                    {% if lang == 'it' %}Recensioni del Proprietario{% else %}Owner Reviews{% endif %}
+                    {{ t('i18n.owner_reviews') }}
                 </h2>
                 {% if user and not is_owner %}
                 <button @click="openReviewModal()"
@@ -1038,7 +1038,7 @@
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
-                    {% if lang == 'it' %}Lascia una Recensione{% else %}Leave a Review{% endif %}
+                    {{ t('i18n.leave_a_review') }}
                 </button>
                 {% endif %}
             </div>
@@ -1061,7 +1061,7 @@
                             <p class="text-sm text-gray-500 mt-1" x-text="summary.count + ' review' + (summary.count !== 1 ? 's' : '')"></p>
                             <template x-if="summary.weighted_average && summary.weighted_average !== summary.average">
                                 <p class="text-xs text-gray-400 mt-1">
-                                    {% if lang == 'it' %}Media ponderata:{% else %}Weighted avg:{% endif %}
+                                    {{ t('i18n.weighted_avg') }}
                                     <span class="font-medium" x-text="summary.weighted_average"></span>
                                 </p>
                             </template>
@@ -1071,7 +1071,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
                                     </svg>
                                     <span x-text="summary.recommend_rate + '%'"></span>
-                                    {% if lang == 'it' %}raccomanderebbe{% else %}would recommend{% endif %}
+                                    {{ t('i18n.would_recommend') }}
                                 </div>
                             </template>
                         </div>
@@ -1095,7 +1095,7 @@
                             </template>
                             <template x-if="starFilter">
                                 <button @click="starFilter = null; fetchReviews()" class="text-xs text-indigo-600 hover:text-indigo-800 mt-1">
-                                    {% if lang == 'it' %}Cancella filtro{% else %}Clear filter{% endif %}
+                                    {{ t('i18n.clear_filter') }}
                                 </button>
                             </template>
                         </div>
@@ -1104,7 +1104,7 @@
                         <template x-if="summary.subcategory_averages">
                             <div class="space-y-3">
                                 <h4 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                                    {% if lang == 'it' %}Dettaglio{% else %}Breakdown{% endif %}
+                                    {{ t('i18n.breakdown') }}
                                 </h4>
                                 <template x-for="[key, val] in Object.entries(summary.subcategory_averages).filter(function(e) { return e[1] !== null; })" :key="'sub-'+key">
                                     <div class="flex items-center justify-between">
@@ -1129,8 +1129,8 @@
                     <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
                     </svg>
-                    <p class="text-gray-500">{% if lang == 'it' %}Nessuna recensione ancora{% else %}No reviews yet{% endif %}</p>
-                    <p class="text-sm text-gray-400 mt-1">{% if lang == 'it' %}Sii il primo a lasciare una recensione{% else %}Be the first to leave a review{% endif %}</p>
+                    <p class="text-gray-500">{{ t('i18n.no_reviews_yet') }}</p>
+                    <p class="text-sm text-gray-400 mt-1">{{ t('i18n.be_the_first_to_leave_a_review') }}</p>
                 </div>
             </template>
 
@@ -1139,21 +1139,21 @@
                 <div class="flex items-center justify-between mb-6">
                     <p class="text-sm text-gray-500">
                         <span x-text="reviews.length"></span>
-                        {% if lang == 'it' %}recensioni{% else %}reviews{% endif %}
+                        {{ t('i18n.reviews') }}
                         <template x-if="starFilter">
                             <span>
-                                ({% if lang == 'it' %}filtro:{% else %}filter:{% endif %}
+                                ({{ t('i18n.filter') }}
                                 <span x-text="starFilter"></span>
-                                {% if lang == 'it' %}stelle{% else %}stars{% endif %})
+                                {{ t('i18n.stars') }})
                             </span>
                         </template>
                     </p>
                     <select x-model="sortBy" @change="fetchReviews()"
                             class="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-indigo-500 bg-white">
-                        <option value="recent">{% if lang == 'it' %}Recenti{% else %}Most Recent{% endif %}</option>
-                        <option value="helpful">{% if lang == 'it' %}Utili{% else %}Most Helpful{% endif %}</option>
-                        <option value="highest">{% if lang == 'it' %}Migliori{% else %}Highest Rated{% endif %}</option>
-                        <option value="lowest">{% if lang == 'it' %}Peggiori{% else %}Lowest Rated{% endif %}</option>
+                        <option value="recent">{{ t('i18n.most_recent') }}</option>
+                        <option value="helpful">{{ t('i18n.most_helpful') }}</option>
+                        <option value="highest">{{ t('i18n.highest_rated') }}</option>
+                        <option value="lowest">{{ t('i18n.lowest_rated') }}</option>
                     </select>
                 </div>
             </template>
@@ -1192,14 +1192,14 @@
                                         <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
                                         </svg>
-                                        {% if lang == 'it' %}Raccomandato{% else %}Recommends{% endif %}
+                                        {{ t('i18n.recommends') }}
                                     </span>
                                     <span x-show="!review.would_recommend"
                                           class="inline-flex items-center px-2.5 py-1 bg-red-50 text-red-600 rounded-full text-xs font-medium">
                                         <svg class="w-3.5 h-3.5 mr-1 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
                                         </svg>
-                                        {% if lang == 'it' %}Non raccomandato{% else %}Doesn't recommend{% endif %}
+                                        {{ t('i18n.doesnt_recommend') }}
                                     </span>
                                 </div>
                             </template>
@@ -1220,22 +1220,22 @@
                             <div class="flex flex-wrap gap-2 mt-3">
                                 <template x-if="review.rating_accuracy">
                                     <span class="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full">
-                                        {% if lang == 'it' %}Accuratezza{% else %}Accuracy{% endif %}: <span class="font-medium" x-text="review.rating_accuracy"></span>
+                                        {{ t('i18n.accuracy') }}: <span class="font-medium" x-text="review.rating_accuracy"></span>
                                     </span>
                                 </template>
                                 <template x-if="review.rating_communication">
                                     <span class="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full">
-                                        {% if lang == 'it' %}Comunicazione{% else %}Communication{% endif %}: <span class="font-medium" x-text="review.rating_communication"></span>
+                                        {{ t('i18n.communication') }}: <span class="font-medium" x-text="review.rating_communication"></span>
                                     </span>
                                 </template>
                                 <template x-if="review.rating_value">
                                     <span class="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full">
-                                        {% if lang == 'it' %}Valore{% else %}Value{% endif %}: <span class="font-medium" x-text="review.rating_value"></span>
+                                        {{ t('i18n.value') }}: <span class="font-medium" x-text="review.rating_value"></span>
                                     </span>
                                 </template>
                                 <template x-if="review.rating_timeliness">
                                     <span class="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full">
-                                        {% if lang == 'it' %}Puntualità{% else %}Timeliness{% endif %}: <span class="font-medium" x-text="review.rating_timeliness"></span>
+                                        {{ t('i18n.timeliness') }}: <span class="font-medium" x-text="review.rating_timeliness"></span>
                                     </span>
                                 </template>
                             </div>
@@ -1258,7 +1258,7 @@
                             <div class="mt-4 ml-6 pl-4 border-l-2 border-indigo-200 bg-indigo-50/50 rounded-r-lg p-4">
                                 <div class="flex items-center gap-2 mb-2">
                                     <span class="text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                        {% if lang == 'it' %}Risposta del proprietario{% else %}Owner Response{% endif %}
+                                        {{ t('i18n.owner_response') }}
                                     </span>
                                     <template x-if="review.owner_response_at">
                                         <span class="text-xs text-gray-400" x-text="formatDate(review.owner_response_at)"></span>
@@ -1274,16 +1274,16 @@
                             <div class="mt-4 ml-6" x-data="{ responding: false, responseText: '', submitting: false }">
                                 <button x-show="!responding" @click="responding = true"
                                         class="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
-                                    {% if lang == 'it' %}Rispondi{% else %}Respond{% endif %}
+                                    {{ t('i18n.respond') }}
                                 </button>
                                 <div x-show="responding" x-cloak class="space-y-2">
                                     <textarea x-model="responseText" rows="3"
-                                              placeholder="{% if lang == 'it' %}Scrivi la tua risposta...{% else %}Write your response...{% endif %}"
+                                              placeholder="{{ t('i18n.write_your_response') }}"
                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
                                     <div class="flex gap-2 justify-end">
                                         <button @click="responding = false; responseText = ''"
                                                 class="px-3 py-1.5 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">
-                                            {% if lang == 'it' %}Annulla{% else %}Cancel{% endif %}
+                                            {{ t('i18n.cancel') }}
                                         </button>
                                         <button @click="
                                             if (!responseText.trim()) return;
@@ -1303,7 +1303,7 @@
                                             }).finally(function() { submitting = false; });
                                         " :disabled="submitting || !responseText.trim()"
                                                 class="px-4 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50">
-                                            {% if lang == 'it' %}Invia Risposta{% else %}Submit Response{% endif %}
+                                            {{ t('i18n.submit_response') }}
                                         </button>
                                     </div>
                                 </div>
@@ -1313,7 +1313,7 @@
 
                         <!-- Helpful voting -->
                         <div class="mt-4 pt-3 border-t border-gray-100 flex items-center gap-4">
-                            <span class="text-xs text-gray-400">{% if lang == 'it' %}Utile?{% else %}Helpful?{% endif %}</span>
+                            <span class="text-xs text-gray-400">{{ t('i18n.helpful') }}</span>
                             <button @click="voteReview(review.id, true)"
                                     class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-emerald-600 transition-colors min-h-[32px] px-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1357,7 +1357,7 @@
                     <div class="p-6">
                         <div class="flex items-center justify-between mb-6">
                             <h3 class="text-xl font-bold text-gray-900">
-                                {% if lang == 'it' %}Scrivi una Recensione{% else %}Write a Review{% endif %}
+                                {{ t('i18n.write_a_review') }}
                             </h3>
                             <button @click="showReviewModal = false" class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1369,17 +1369,17 @@
                         <!-- Select rental -->
                         <div class="mb-5">
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                {% if lang == 'it' %}Seleziona il noleggio{% else %}Select Rental{% endif %} *
+                                {{ t('i18n.select_rental') }} *
                             </label>
                             <template x-if="completedRentals.length === 0 && rentalsLoaded">
                                 <p class="text-sm text-gray-500 italic">
-                                    {% if lang == 'it' %}Nessun noleggio completato trovato con questo proprietario.{% else %}No completed rentals found with this owner.{% endif %}
+                                    {{ t('i18n.no_completed_rentals_found_with_this_owner') }}
                                 </p>
                             </template>
                             <template x-if="completedRentals.length > 0">
                                 <select x-model="newReview.rental_id"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
-                                    <option value="">{% if lang == 'it' %}Scegli...{% else %}Choose...{% endif %}</option>
+                                    <option value="">{{ t('i18n.choose') }}</option>
                                     <template x-for="rental in completedRentals" :key="rental.id">
                                         <option :value="rental.id" x-text="'Rental #' + rental.id.substring(0, 8) + ' (' + formatDate(rental.created_at) + ')'"></option>
                                     </template>
@@ -1390,7 +1390,7 @@
                         <!-- Overall rating -->
                         <div class="mb-5">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                {% if lang == 'it' %}Valutazione complessiva{% else %}Overall Rating{% endif %} *
+                                {{ t('i18n.overall_rating') }} *
                             </label>
                             <div class="flex gap-1">
                                 <template x-for="s in 5" :key="'new-star-'+s">
@@ -1409,7 +1409,7 @@
                         <!-- Subcategory ratings -->
                         <div class="mb-5 space-y-3">
                             <label class="block text-sm font-medium text-gray-700">
-                                {% if lang == 'it' %}Valutazioni dettagliate{% else %}Detailed Ratings{% endif %}
+                                {{ t('i18n.detailed_ratings') }}
                             </label>
                             <template x-for="cat in [{key: 'rating_accuracy', label: '{{ "Accuratezza" if lang == "it" else "Accuracy" }}'}, {key: 'rating_communication', label: '{{ "Comunicazione" if lang == "it" else "Communication" }}'}, {key: 'rating_value', label: '{{ "Valore" if lang == "it" else "Value" }}'}, {key: 'rating_timeliness', label: '{{ "Puntualità" if lang == "it" else "Timeliness" }}'}]" :key="cat.key">
                                 <div class="flex items-center justify-between">
@@ -1433,7 +1433,7 @@
                         <!-- Would recommend toggle -->
                         <div class="mb-5">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                {% if lang == 'it' %}Raccomanderesti questo proprietario?{% else %}Would you recommend this owner?{% endif %}
+                                {{ t('i18n.would_you_recommend_this_owner') }}
                             </label>
                             <div class="flex gap-3">
                                 <button @click="newReview.would_recommend = true" type="button"
@@ -1442,7 +1442,7 @@
                                     <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
                                     </svg>
-                                    {% if lang == 'it' %}Si{% else %}Yes{% endif %}
+                                    {{ t('i18n.yes') }}
                                 </button>
                                 <button @click="newReview.would_recommend = false" type="button"
                                         class="flex-1 py-2.5 rounded-lg border-2 text-sm font-medium transition-all"
@@ -1450,7 +1450,7 @@
                                     <svg class="w-5 h-5 inline mr-1 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
                                     </svg>
-                                    {% if lang == 'it' %}No{% else %}No{% endif %}
+                                    {{ t('i18n.no') }}
                                 </button>
                             </div>
                         </div>
@@ -1458,27 +1458,27 @@
                         <!-- Title -->
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                {% if lang == 'it' %}Titolo{% else %}Title{% endif %}
+                                {{ t('i18n.title') }}
                             </label>
                             <input type="text" x-model="newReview.title" maxlength="200"
-                                   placeholder="{% if lang == 'it' %}Riassumi la tua esperienza{% else %}Summarize your experience{% endif %}"
+                                   placeholder="{{ t('i18n.summarize_your_experience') }}"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
                         </div>
 
                         <!-- Body -->
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                {% if lang == 'it' %}La tua recensione{% else %}Your Review{% endif %}
+                                {{ t('i18n.your_review') }}
                             </label>
                             <textarea x-model="newReview.body" rows="4"
-                                      placeholder="{% if lang == 'it' %}Racconta la tua esperienza...{% else %}Tell us about your experience...{% endif %}"
+                                      placeholder="{{ t('i18n.tell_us_about_your_experience') }}"
                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
                         </div>
 
                         <!-- Photo upload -->
                         <div class="mb-5">
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                {% if lang == 'it' %}Foto (max 3){% else %}Photos (max 3){% endif %}
+                                {{ t('i18n.photos_max_3') }}
                             </label>
                             <div class="flex items-center gap-2">
                                 <template x-for="(photo, i) in reviewPhotos" :key="'upload-photo-'+i">
@@ -1517,7 +1517,7 @@
                                 <input type="checkbox" x-model="reviewConsent"
                                        class="mt-0.5 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                                 <span class="text-xs text-gray-500">
-                                    {% if lang == 'it' %}Confermo che questa recensione è basata sulla mia esperienza personale e rispetta le linee guida della community.{% else %}I confirm this review is based on my personal experience and complies with community guidelines.{% endif %}
+                                    {{ t('i18n.i_confirm_this_review_is_based_on_my_personal_expe') }}
                                 </span>
                             </label>
                         </div>
@@ -1531,7 +1531,7 @@
                         <div class="flex justify-end gap-3">
                             <button @click="showReviewModal = false"
                                     class="px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">
-                                {% if lang == 'it' %}Annulla{% else %}Cancel{% endif %}
+                                {{ t('i18n.cancel') }}
                             </button>
                             <button @click="submitReview()"
                                     :disabled="submittingReview || !reviewConsent || !newReview.rating || !newReview.rental_id"
@@ -1542,7 +1542,7 @@
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                                     </svg>
                                 </template>
-                                {% if lang == 'it' %}Pubblica Recensione{% else %}Publish Review{% endif %}
+                                {{ t('i18n.publish_review') }}
                             </button>
                         </div>
                     </div>
@@ -1553,7 +1553,7 @@
 
     <!-- Recently Viewed Strip -->
     <div class="mt-8" style="display: none;">
-        <h3 class="text-lg font-semibold text-gray-900 mb-3">{% if lang == 'it' %}Visti di recente{% else %}Recently Viewed{% endif %}</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ t('i18n.recently_viewed') }}</h3>
         <div id="recently-viewed-strip" class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin"></div>
     </div>
 </div>
