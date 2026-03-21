@@ -97,15 +97,43 @@
         uploadFiles: [],
         uploadPreviews: [],
         dragging: false,
-        form: window._editForm || {
+        form: {
             name: '', description: '', story: '', category: 'power_tools',
             item_type: 'physical', condition: 'good', brand: '',
             age_restricted: false, safety_notes: '', tags: '',
             content_language: '{{ lang }}', currency: 'EUR',
             delivery_available: false, delivery_fee: '', notes: ''
         },
-        selectedTypes: window._editSelectedTypes || ['rent'],
-        listingPrices: window._editListingPrices || {
+        selectedTypes: ['rent'],
+        init() {
+            if (window._editData) {
+                var d = window._editData;
+                this.form.name = d.name || '';
+                this.form.description = d.description || '';
+                this.form.story = d.story || '';
+                this.form.category = d.category || 'power_tools';
+                this.form.item_type = d.item_type || 'physical';
+                this.form.condition = d.condition || 'good';
+                this.form.brand = d.brand || '';
+                this.form.age_restricted = d.age_restricted || false;
+                this.form.safety_notes = d.safety_notes || '';
+                this.form.tags = d.tags || '';
+                this.existingMedia = d.media || [];
+                this.editItemId = d.itemId || '';
+                if (d.listings && d.listings.length) {
+                    this.selectedTypes = d.listings.map(function(l) { return l.listing_type; });
+                    var self = this;
+                    d.listings.forEach(function(l) {
+                        if (self.listingPrices[l.listing_type]) {
+                            self.listingPrices[l.listing_type].price = l.price || '';
+                            self.listingPrices[l.listing_type].price_unit = l.price_unit || 'flat';
+                            self.listingPrices[l.listing_type].deposit = l.deposit || '';
+                        }
+                    });
+                }
+            }
+        },
+        listingPrices: {
             rent: { price: '', price_unit: 'per_day', deposit: '' },
             sell: { price: '', price_unit: 'flat', deposit: '' },
             commission: { price: '', price_unit: 'flat', deposit: '' },
