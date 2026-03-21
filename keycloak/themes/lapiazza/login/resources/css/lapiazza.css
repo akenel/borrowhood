@@ -1,0 +1,110 @@
+/* La Piazza Keycloak Login Theme */
+
+/* ===== LAYOUT: center everything vertically and horizontally ===== */
+.pf-v5-c-login {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    min-height: 100vh !important;
+    padding-top: 0 !important;
+}
+
+.pf-v5-c-login__container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    padding: 0 20px !important;
+}
+
+.pf-v5-c-login__main {
+    width: 100% !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    grid-template-columns: 1fr !important;
+}
+
+/* ===== HEADER: wolf logo + La Piazza text ===== */
+#kc-header {
+    width: 100% !important;
+    text-align: center !important;
+}
+
+#kc-header-wrapper {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding-top: 40px;
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+.kc-logo-text {
+    background-image: none !important;
+    font-size: 0 !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.kc-logo-text::before {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 12px;
+    background: url('../img/lapiazza-logo.png') center/contain no-repeat;
+    border-radius: 50%;
+}
+
+.kc-logo-text::after {
+    content: 'La Piazza';
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+#kc-header-wrapper::after {
+    content: 'Community Marketplace';
+    display: block;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    margin-top: 4px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* ===== BACKGROUND ===== */
+.login-pf body, body.login-pf {
+    background: linear-gradient(135deg, #312e81 0%, #4f46e5 50%, #6366f1 100%) !important;
+}
+
+/* ===== CARD ===== */
+.pf-v5-c-login__main {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15) !important;
+    margin-top: 20px !important;
+}
+
+/* ===== BUTTONS ===== */
+.pf-v5-c-button.pf-m-primary {
+    background-color: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    padding: 10px 16px !important;
+}
+
+.pf-v5-c-button.pf-m-primary:hover {
+    background-color: #4338ca !important;
+    border-color: #4338ca !important;
+}
+
+#kc-social-providers a {
+    border-radius: 8px !important;
+}
