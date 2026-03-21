@@ -385,7 +385,7 @@
                     <div class="space-y-2">
                         <template x-if="summary.subcategory_averages">
                             <div class="space-y-1.5">
-                                <template x-for="[label, key] in [['Accuracy','accuracy'],['Communication','communication'],['Value','value'],['Timeliness','timeliness']]" :key="key">
+                                <template x-for="[label, key] in [['{{ t('i18n.accuracy') }}','accuracy'],['{{ t('i18n.communication') }}','communication'],['{{ t('i18n.value') }}','value'],['{{ t('i18n.timeliness') }}','timeliness']]" :key="key">
                                     <div x-show="summary.subcategory_averages[key]" class="flex items-center justify-between text-xs">
                                         <span class="text-gray-500" x-text="label"></span>
                                         <div class="flex items-center space-x-1">
@@ -465,7 +465,7 @@
                             <!-- Subcategory mini-bars (if any exist) -->
                             <div x-show="review.rating_accuracy || review.rating_communication || review.rating_value || review.rating_timeliness"
                                  class="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-                                <template x-for="[label, key] in [['Accuracy','rating_accuracy'],['Communication','rating_communication'],['Value','rating_value'],['Timeliness','rating_timeliness']]" :key="key">
+                                <template x-for="[label, key] in [['{{ t('i18n.accuracy') }}','rating_accuracy'],['{{ t('i18n.communication') }}','rating_communication'],['{{ t('i18n.value') }}','rating_value'],['{{ t('i18n.timeliness') }}','rating_timeliness']]" :key="key">
                                     <span x-show="review[key]" class="text-xs text-gray-400">
                                         <span x-text="label"></span>: <span class="font-medium text-gray-600" x-text="review[key]"></span>/5
                                     </span>
@@ -1411,7 +1411,7 @@
                             <label class="block text-sm font-medium text-gray-700">
                                 {{ t('i18n.detailed_ratings') }}
                             </label>
-                            <template x-for="cat in [{key: 'rating_accuracy', label: '{{ "Accuratezza" if lang == "it" else "Accuracy" }}'}, {key: 'rating_communication', label: '{{ "Comunicazione" if lang == "it" else "Communication" }}'}, {key: 'rating_value', label: '{{ "Valore" if lang == "it" else "Value" }}'}, {key: 'rating_timeliness', label: '{{ "Puntualità" if lang == "it" else "Timeliness" }}'}]" :key="cat.key">
+                            <template x-for="cat in [{key: 'rating_accuracy', label: '{{ t('i18n.accuracy') }}'}, {key: 'rating_communication', label: '{{ t('i18n.communication') }}'}, {key: 'rating_value', label: '{{ t('i18n.value') }}'}, {key: 'rating_timeliness', label: '{{ t('i18n.timeliness') }}'}]" :key="cat.key">
                                 <div class="flex items-center justify-between">
                                     <span class="text-sm text-gray-600" x-text="cat.label"></span>
                                     <div class="flex gap-0.5">
