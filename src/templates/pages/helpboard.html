@@ -187,7 +187,10 @@
                         </div>
                     </div>
                     <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
-                        <span x-text="formatDate(post.created_at)"></span>
+                        <span>
+                            <span x-text="formatDate(post.created_at)"></span>
+                            <span x-show="post.updated_at && post.updated_at !== post.created_at" class="italic text-gray-400">(edited)</span>
+                        </span>
                         <div class="flex items-center gap-4">
                             <!-- Upvote count -->
                             <span class="flex items-center gap-1" :class="post.user_upvoted ? 'text-indigo-600' : ''">
@@ -275,6 +278,7 @@
                             <p class="text-sm text-gray-500 mt-1">
                                 by <span x-text="activePost.author_name" class="font-medium text-gray-700"></span>
                                 <span x-text="formatDate(activePost.created_at)" class="ml-2"></span>
+                                <span x-show="activePost.updated_at && activePost.updated_at !== activePost.created_at" class="ml-1 text-gray-400 italic">(edited)</span>
                                 <span x-show="activePost.neighborhood" class="ml-2">in <span x-text="activePost.neighborhood"></span></span>
                             </p>
                             <!-- Tagged item -->
@@ -366,18 +370,18 @@
 
                     <!-- Resolve controls (author only, if still open) -->
                     <div x-show="isPostAuthor && activePost.status !== 'resolved' && activePost.status !== 'closed'"
-                         class="mt-4 border-t pt-4" x-data="{ showPicker: false }">
-                        <div x-show="!showPicker">
+                         class="mt-4 border-t pt-4" x-data="{ showPicker: false, showConfirm: false, selectedHelper: null, selectedHelperName: '', thankYouNote: '' }">
+                        <div x-show="!showPicker && !showConfirm">
                             <button @click="showPicker = true" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 min-h-[44px]">
                                 Mark as Resolved
                             </button>
                         </div>
-                        <div x-show="showPicker" x-cloak class="space-y-3">
+                        <!-- Step 1: Who helped? -->
+                        <div x-show="showPicker && !showConfirm" x-cloak class="space-y-3">
                             <p class="text-sm font-medium text-gray-700">Who helped you?</p>
-                            <!-- Repliers as picker buttons -->
                             <div class="space-y-2">
                                 <template x-for="r in replies.filter(r => r.author_id !== activePost.author_id)" :key="r.id">
-                                    <button @click="resolvePost(r.author_id)"
+                                    <button @click="selectedHelper = r.author_id; selectedHelperName = r.author_name; showConfirm = true"
                                             class="w-full flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors text-left">
                                         <img :src="r.author_avatar || '/static/img/default-avatar.svg'" class="w-8 h-8 rounded-full object-cover">
                                         <div>
@@ -388,10 +392,37 @@
                                 </template>
                             </div>
                             <div class="flex gap-2 pt-2 border-t border-gray-100">
-                                <button @click="resolvePost()" class="px-3 py-2 text-xs text-gray-500 hover:text-gray-700">I solved it myself</button>
+                                <button @click="selectedHelper = null; selectedHelperName = 'myself'; showConfirm = true" class="px-3 py-2 text-xs text-gray-500 hover:text-gray-700">I solved it myself</button>
                                 <button @click="showPicker = false" class="px-3 py-2 text-xs text-gray-500 hover:text-gray-700">Cancel</button>
                             </div>
                         </div>
+                        <!-- Step 2: Confirm + thank you note -->
+                        <div x-show="showConfirm" x-cloak class="space-y-3 bg-green-50 border border-green-200 rounded-lg p-4">
+                            <p class="text-sm font-medium text-green-800">
+                                <span x-show="selectedHelper">Resolve and credit <strong x-text="selectedHelperName"></strong> as the helper?</span>
+                                <span x-show="!selectedHelper">Mark as resolved (solved it yourself)?</span>
+                            </p>
+                            <div x-show="selectedHelper">
+                                <label class="text-xs text-green-700 font-medium">Thank you note (optional)</label>
+                                <textarea x-model="thankYouNote" rows="2" placeholder="Thanks for the help! Your advice was spot on..."
+                                          class="w-full mt-1 px-3 py-2 border border-green-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"></textarea>
+                            </div>
+                            <div class="flex gap-2">
+                                <button @click="resolvePost(selectedHelper, thankYouNote)"
+                                        class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">
+                                    Confirm &amp; Resolve
+                                </button>
+                                <button @click="showConfirm = false; showPicker = true" class="px-3 py-2 text-xs text-gray-500 hover:text-gray-700">Back</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resolved banner -->
+                    <div x-show="activePost.status === 'resolved'" class="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
+                        <p class="text-sm text-green-800 font-medium">
+                            Resolved
+                            <span x-show="activePost.resolved_by_name"> -- helped by <strong x-text="activePost.resolved_by_name"></strong></span>
+                        </p>
                     </div>
                 </div>
 
@@ -406,16 +437,39 @@
                         <template x-for="reply in replies" :key="reply.id">
                             <div>
                                 <!-- Top-level reply -->
-                                <div class="bg-white rounded-lg border border-gray-200 p-4">
+                                <div class="rounded-lg border p-4"
+                                     :class="activePost.resolved_by_id && reply.author_id === activePost.resolved_by_id ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200'">
                                     <div class="flex items-start gap-3">
                                         <img :src="reply.author_avatar || '/static/img/default-avatar.svg'" :alt="reply.author_name"
                                              class="w-8 h-8 rounded-full object-cover flex-shrink-0">
                                         <div class="flex-1 min-w-0">
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex items-center gap-2 flex-wrap">
                                                 <span class="text-sm font-medium text-gray-900" x-text="reply.author_name"></span>
+                                                <span x-show="activePost.resolved_by_id && reply.author_id === activePost.resolved_by_id" class="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">Accepted Answer</span>
                                                 <span class="text-xs text-gray-400" x-text="formatDate(reply.created_at)"></span>
+                                                <span x-show="reply.updated_at && reply.updated_at !== reply.created_at" class="text-xs text-gray-400 italic">(edited)</span>
                                             </div>
-                                            <p class="mt-1 text-sm text-gray-700 whitespace-pre-wrap" x-text="reply.body"></p>
+                                            <template x-if="!reply._editing">
+                                                <p class="mt-1 text-sm text-gray-700 whitespace-pre-wrap" x-text="reply.body"></p>
+                                            </template>
+                                            <template x-if="reply._editing">
+                                                <div class="mt-1">
+                                                    <textarea x-model="reply._editBody" rows="3" class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+                                                    <div class="mt-1 flex gap-2">
+                                                        <button @click="
+                                                            fetch('/api/v1/helpboard/replies/' + reply.id, {method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({body: reply._editBody})})
+                                                            .then(r => { if(r.ok) return r.json(); throw r; })
+                                                            .then(d => { reply.body = d.body; reply.updated_at = d.updated_at; reply._editing = false; })
+                                                            .catch(() => window.dispatchEvent(new CustomEvent('toast', {detail:{type:'error',message:'Failed to save'}})))
+                                                        " class="text-xs px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700">Save</button>
+                                                        <button @click="reply._editing = false" class="text-xs px-3 py-1 text-gray-600 hover:text-gray-800">Cancel</button>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                            <div x-show="!reply._editing" class="mt-1 flex items-center gap-3">
+                                                <button x-show="reply.author_id === userId" @click="reply._editing = true; reply._editBody = reply.body" class="text-xs text-gray-400 hover:text-indigo-600">Edit</button>
+                                                <button x-show="reply.author_id === userId" @click="deleteReply(reply.id)" class="text-xs text-gray-400 hover:text-red-600">Delete</button>
+                                            </div>
                                             <!-- Reply media -->
                                             <div x-show="reply.media && reply.media.length > 0" class="mt-2 flex gap-2 flex-wrap">
                                                 <template x-for="m in (reply.media || [])" :key="m.id">
@@ -462,8 +516,26 @@
                                                         <div class="flex items-center gap-2">
                                                             <span class="text-sm font-medium text-gray-900" x-text="child.author_name"></span>
                                                             <span class="text-xs text-gray-400" x-text="formatDate(child.created_at)"></span>
+                                                            <span x-show="child.updated_at && child.updated_at !== child.created_at" class="text-xs text-gray-400 italic">(edited)</span>
                                                         </div>
-                                                        <p class="mt-0.5 text-sm text-gray-700 whitespace-pre-wrap" x-text="child.body"></p>
+                                                        <template x-if="!child._editing">
+                                                            <p class="mt-0.5 text-sm text-gray-700 whitespace-pre-wrap" x-text="child.body"></p>
+                                                        </template>
+                                                        <template x-if="child._editing">
+                                                            <div class="mt-1">
+                                                                <textarea x-model="child._editBody" rows="2" class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+                                                                <div class="mt-1 flex gap-2">
+                                                                    <button @click="
+                                                                        fetch('/api/v1/helpboard/replies/' + child.id, {method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({body: child._editBody})})
+                                                                        .then(r => { if(r.ok) return r.json(); throw r; })
+                                                                        .then(d => { child.body = d.body; child.updated_at = d.updated_at; child._editing = false; })
+                                                                        .catch(() => window.dispatchEvent(new CustomEvent('toast', {detail:{type:'error',message:'Failed to save'}})))
+                                                                    " class="text-xs px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700">Save</button>
+                                                                    <button @click="child._editing = false" class="text-xs px-3 py-1 text-gray-600 hover:text-gray-800">Cancel</button>
+                                                                </div>
+                                                            </div>
+                                                        </template>
+                                                        <button x-show="child.author_id === userId && !child._editing" @click="child._editing = true; child._editBody = child.body" class="text-xs text-gray-400 hover:text-indigo-600 mt-1">Edit</button>
                                                         <!-- Child media -->
                                                         <div x-show="child.media && child.media.length > 0" class="mt-1 flex gap-2 flex-wrap">
                                                             <template x-for="m in (child.media || [])" :key="m.id">
@@ -498,7 +570,7 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
                                 </svg>
-                                Attach file
+                                Add photo or video (max 10MB)
                                 <input type="file" class="hidden" accept="image/*,video/mp4,video/webm,video/quicktime"
                                        x-ref="replyFileInput" @change="replyFileSelected = $event.target.files[0]">
                             </label>
@@ -675,6 +747,7 @@ function helpBoard() {
         activePost: null,
         replies: [],
         isPostAuthor: false,
+        userId: null,
         replyingTo: null,
         threadReplyBody: '',
         newReplyBody: '',
@@ -892,6 +965,7 @@ function helpBoard() {
                 var me = await fetch('/api/v1/users/me');
                 if (me.ok) {
                     var user = await me.json();
+                    this.userId = user.id;
                     this.isPostAuthor = user.id === this.activePost.author_id;
                 }
             } catch(e) {}
@@ -926,7 +1000,7 @@ function helpBoard() {
 
         // ── Resolve ──
 
-        async resolvePost(helperId) {
+        async resolvePost(helperId, thankYouNote) {
             if (!this.activePost) return;
             var body = helperId ? { resolved_by_id: helperId } : {};
             var resp = await fetch('/api/v1/helpboard/posts/' + this.activePost.id + '/resolve', {
@@ -935,8 +1009,24 @@ function helpBoard() {
                 body: JSON.stringify(body)
             });
             if (resp.ok) {
+                // Post thank-you note as a reply if provided
+                if (thankYouNote && thankYouNote.trim()) {
+                    await fetch('/api/v1/helpboard/posts/' + this.activePost.id + '/replies', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ body: thankYouNote.trim() })
+                    });
+                }
                 await this.openPost(this.activePost.id);
-                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Post marked as resolved!' } }));
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Post resolved! Thank you for using the Help Board.' } }));
+            }
+        },
+        async deleteReply(replyId) {
+            if (!confirm('Delete this reply?')) return;
+            var resp = await fetch('/api/v1/helpboard/replies/' + replyId, { method: 'DELETE' });
+            if (resp.ok) {
+                await this.loadReplies();
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: 'Reply deleted' } }));
             }
         },
 

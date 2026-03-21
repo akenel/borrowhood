@@ -26,7 +26,7 @@ from src.models.item import BHItem
 from src.models.user import BHUser
 from src.schemas.helpboard import (
     HelpPostCreate, HelpPostOut, HelpPostUpdate, HelpMediaOut,
-    HelpReplyCreate, HelpReplyOut, PaginatedPosts, ResolvePost,
+    HelpReplyCreate, HelpReplyOut, HelpReplyUpdate, PaginatedPosts, ResolvePost,
     HelpDraftRequest, HelpDraftResponse,
 )
 
@@ -55,6 +55,7 @@ def _enrich_post(post: BHHelpPost, user_upvoted: bool = False) -> dict:
         "reply_count": post.reply_count,
         "upvote_count": post.upvote_count,
         "created_at": post.created_at,
+        "updated_at": post.updated_at,
         "author_name": post.author.display_name if post.author else None,
         "author_avatar": post.author.avatar_url if post.author else None,
         "resolved_by_name": post.resolved_by.display_name if post.resolved_by else None,
@@ -76,6 +77,7 @@ def _enrich_reply(reply: BHHelpReply) -> dict:
         "parent_reply_id": reply.parent_reply_id,
         "upvote_count": reply.upvote_count,
         "created_at": reply.created_at,
+        "updated_at": reply.updated_at,
         "author_name": reply.author.display_name if reply.author else None,
         "author_avatar": reply.author.avatar_url if reply.author else None,
         "media": reply.media if reply.media else [],
@@ -598,6 +600,57 @@ async def upload_post_media(
 
     media = await _save_media(file, user.id, db, post_id=post_id)
     return media
+
+
+@router.patch("/replies/{reply_id}", response_model=HelpReplyOut)
+async def update_reply(
+    reply_id: UUID,
+    data: HelpReplyUpdate,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Edit a reply. Author only."""
+    user = await get_user(db, token)
+    result = await db.execute(
+        select(BHHelpReply)
+        .options(selectinload(BHHelpReply.author), selectinload(BHHelpReply.media))
+        .where(BHHelpReply.id == reply_id, BHHelpReply.deleted_at.is_(None))
+    )
+    reply = result.scalars().first()
+    if not reply:
+        raise HTTPException(status_code=404, detail="Reply not found")
+    if reply.author_id != user.id:
+        raise HTTPException(status_code=403, detail="Only the author can edit")
+    reply.body = data.body
+    await db.commit()
+    await db.refresh(reply)
+    return _enrich_reply(reply)
+
+
+@router.delete("/replies/{reply_id}", status_code=204)
+async def delete_reply(
+    reply_id: UUID,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Soft-delete a reply. Author only."""
+    user = await get_user(db, token)
+    result = await db.execute(
+        select(BHHelpReply).where(BHHelpReply.id == reply_id, BHHelpReply.deleted_at.is_(None))
+    )
+    reply = result.scalars().first()
+    if not reply:
+        raise HTTPException(status_code=404, detail="Reply not found")
+    if reply.author_id != user.id:
+        raise HTTPException(status_code=403, detail="Only the author can delete")
+    from datetime import datetime, timezone
+    reply.deleted_at = datetime.now(timezone.utc)
+    # Decrement reply count on post
+    post_result = await db.execute(select(BHHelpPost).where(BHHelpPost.id == reply.post_id))
+    post = post_result.scalars().first()
+    if post and post.reply_count > 0:
+        post.reply_count -= 1
+    await db.commit()
 
 
 @router.post("/replies/{reply_id}/media", response_model=HelpMediaOut, status_code=status.HTTP_201_CREATED)
