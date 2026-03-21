@@ -6,6 +6,7 @@ Every response includes t() translator and current lang in context.
 
 from typing import Optional
 
+from markupsafe import Markup
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -339,8 +340,8 @@ async def edit_item_page(slug: str, request: Request,
         edit_mode=True,
         edit_item=item,
         edit_item_id=str(item.id),
-        edit_media_json=json.dumps(existing_media),
-        edit_listings_json=json.dumps(existing_listings),
+        edit_media_json=Markup(json.dumps(existing_media)),
+        edit_listings_json=Markup(json.dumps(existing_listings)),
         category_groups=CATEGORY_GROUPS,
     )
     return _render("pages/list_item.html", ctx)
