@@ -326,6 +326,14 @@
                             {% if listing.group_discount_pct %}
                             <p class="text-xs text-emerald-600">{{ "%.0f"|format(listing.group_discount_pct) }}% {{ t('i18n.group_discount') }}</p>
                             {% endif %}
+                            {% if listing.return_policy %}
+                            <div class="mt-2 flex items-start gap-1.5">
+                                <svg class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
+                                </svg>
+                                <p class="text-xs text-gray-500">{{ listing.return_policy }}</p>
+                            </div>
+                            {% endif %}
                             {% if listing.bid_increment and listing.listing_type.value == 'auction' %}
                             <p class="text-xs text-gray-500">{{ t('i18n.min_bid') }} &euro;{{ "%.0f"|format(listing.bid_increment) }}</p>
                             {% endif %}

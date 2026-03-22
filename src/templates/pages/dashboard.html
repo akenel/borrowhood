@@ -1727,6 +1727,47 @@
                     </template>
                 </div>
 
+                <!-- Email Notifications Card -->
+                <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="{
+                    emailEnabled: true,
+                    toggling: false,
+                    async load() {
+                        try {
+                            const r = await fetch('/api/v1/users/me');
+                            if (r.ok) { const d = await r.json(); this.emailEnabled = d.notify_email !== false; }
+                        } catch(e) {}
+                    },
+                    async toggle() {
+                        this.toggling = true;
+                        try {
+                            const r = await fetch('/api/v1/users/me', {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ notify_email: !this.emailEnabled })
+                            });
+                            if (r.ok) { this.emailEnabled = !this.emailEnabled; }
+                        } catch(e) {}
+                        this.toggling = false;
+                    }
+                }" x-init="load()">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ t('i18n.email_notifications') }}</h3>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-4">{{ t('i18n.email_notif_desc') }}</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-700" x-text="emailEnabled ? '{{ t('i18n.enabled') }}' : '{{ t('i18n.disabled') }}'"></span>
+                        <button @click="toggle()" :disabled="toggling"
+                                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+                                :class="emailEnabled ? 'bg-indigo-600' : 'bg-gray-200'">
+                            <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+                                  :class="emailEnabled ? 'translate-x-6' : 'translate-x-1'"></span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- WhatsApp Contact Number -->
                 <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="{
                     waNumber: '',

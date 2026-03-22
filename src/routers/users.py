@@ -74,6 +74,8 @@ async def get_current_user(
         "seller_type": user.seller_type or "personal",
         "business_name": user.business_name,
         "vat_number": user.vat_number,
+        "notify_email": user.notify_email,
+        "notify_telegram": user.notify_telegram,
     }
 
 

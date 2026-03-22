@@ -23,6 +23,7 @@ class ListingOut(BaseModel):
     delivery_available: bool
     pickup_only: bool
     notes: Optional[str] = None
+    return_policy: Optional[str] = None
     auction_end: Optional[datetime] = None
     starting_bid: Optional[float] = None
     bid_increment: Optional[float] = None
@@ -48,6 +49,7 @@ class ListingCreate(BaseModel):
     delivery_available: bool = False
     pickup_only: bool = True
     notes: Optional[str] = None
+    return_policy: Optional[str] = Field(None, max_length=500)
     auction_end: Optional[str] = None  # ISO datetime for auction listings
     starting_bid: Optional[float] = Field(None, ge=0)
     reserve_price: Optional[float] = Field(None, ge=0)
@@ -66,6 +68,7 @@ class ListingUpdate(BaseModel):
     delivery_available: Optional[bool] = None
     pickup_only: Optional[bool] = None
     notes: Optional[str] = None
+    return_policy: Optional[str] = Field(None, max_length=500)
     auction_end: Optional[str] = None
     starting_bid: Optional[float] = Field(None, ge=0)
     reserve_price: Optional[float] = Field(None, ge=0)
