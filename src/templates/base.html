@@ -14,12 +14,12 @@
     <meta property="og:site_name" content="{{ t('app.name') }}">
     <meta property="og:type" content="{{ og_type | default('website') }}">
     <meta property="og:title" content="{{ og_title | default(t('app.name')) }}">
-    <meta property="og:description" content="{{ og_description | default(t('app.tagline')) }}">
-    <meta property="og:image" content="{{ og_image | default('/static/images/og-default.svg') }}">
-    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:description" content="{{ og_description | default(t('home.hero_subtitle')) }}">
+    <meta property="og:image" content="{{ og_image | default('https://lapiazza.app/static/images/icon-192.png') }}">
+    <meta property="og:url" content="{{ request.url | replace('http://', 'https://') }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ og_title | default(t('app.name')) }}">
-    <meta name="twitter:description" content="{{ og_description | default(t('app.tagline')) }}">
+    <meta name="twitter:description" content="{{ og_description | default(t('home.hero_subtitle')) }}">
 
     <!-- PWA -->
     <link rel="manifest" href="/static/manifest.json">

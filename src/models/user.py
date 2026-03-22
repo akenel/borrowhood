@@ -120,6 +120,9 @@ class BHUser(BHBase, Base):
     offers_custom_orders: Mapped[bool] = mapped_column(default=False)
     offers_repair: Mapped[bool] = mapped_column(default=False)
 
+    # Accepted payment methods (comma-separated: cash,satispay,iban,paypal,twint,revolut,card)
+    accepted_payments: Mapped[Optional[str]] = mapped_column(Text, default="")
+
     # Seller type (BL-069: tax/VAT compliance)
     seller_type: Mapped[Optional[str]] = mapped_column(String(20), default="personal")  # personal | business
     business_name: Mapped[Optional[str]] = mapped_column(String(200), default=None)

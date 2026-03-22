@@ -296,6 +296,23 @@
     </div>
     {% endif %}
 
+    <!-- Accepted Payments -->
+    {% if profile_user %}
+    <div class="mt-4 bg-white rounded-lg border border-gray-200 p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-2">{% if lang == 'it' %}Pagamenti Accettati{% else %}Accepted Payments{% endif %}</h2>
+        {% if profile_user.accepted_payments %}
+        <div class="flex flex-wrap gap-1.5">
+            {% set pay_labels = {'cash': '💶 Cash', 'iban': '🏦 IBAN', 'paypal': '🅿️ PayPal', 'card': '💳 Card', 'satispay': '📱 Satispay', 'twint': '🇨🇭 Twint', 'revolut': '💜 Revolut', 'bizum': '📲 Bizum', 'venmo': '🇺🇸 Venmo'} %}
+            {% for pm in profile_user.accepted_payments.split(',') if pm %}
+            <span class="text-xs px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full">{{ pay_labels.get(pm, pm) }}</span>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-xs text-gray-400">{% if lang == 'it' %}Nessun metodo di pagamento impostato. Vai su Dashboard &rarr; Impostazioni per aggiungere.{% else %}No payment methods set. Go to Dashboard &rarr; Settings to add.{% endif %}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
     {% endif %}
 </div>
 {% endblock %}

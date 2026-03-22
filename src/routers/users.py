@@ -70,7 +70,45 @@ async def get_current_user(
         "slug": user.slug,
         "avatar_url": user.avatar_url,
         "whatsapp_number": user.whatsapp_number,
+        "accepted_payments": user.accepted_payments or "",
+        "seller_type": user.seller_type or "personal",
+        "business_name": user.business_name,
+        "vat_number": user.vat_number,
     }
+
+
+# ── Profile update ──
+
+
+@router.patch("/me", status_code=200)
+async def update_me(
+    request: Request,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update current user profile fields."""
+    user = await get_user(db, token)
+    data = await request.json()
+
+    # Allowed fields
+    allowed = {
+        "display_name", "tagline", "bio", "city", "country_code",
+        "workshop_name", "workshop_type",
+        "latitude", "longitude",
+        "seller_type", "business_name", "vat_number",
+        "accepted_payments",
+        "offers_delivery", "offers_pickup", "offers_training",
+        "offers_custom_orders", "offers_repair",
+        "notify_telegram", "notify_email",
+    }
+
+    for field, value in data.items():
+        if field in allowed:
+            setattr(user, field, value)
+
+    await db.commit()
+    await db.refresh(user)
+    return {"status": "ok"}
 
 
 # ── Avatar upload ──
