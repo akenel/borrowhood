@@ -1019,3 +1019,69 @@ async def terms(request: Request,
     """Terms of Service and Community Code of Conduct."""
     ctx = _ctx(request, token)
     return _render("pages/terms.html", ctx)
+
+
+@router.get("/googled3f2ccce2b1f34d3.html", response_class=Response)
+async def google_verification():
+    """Google Search Console verification file."""
+    return Response(content="google-site-verification: googled3f2ccce2b1f34d3.html", media_type="text/html")
+
+
+@router.get("/robots.txt", response_class=Response)
+async def robots_txt():
+    """Robots.txt for search engine crawlers."""
+    content = """User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /auth/
+Disallow: /admin/
+Disallow: /demo-login
+
+Sitemap: https://lapiazza.app/sitemap.xml
+"""
+    return Response(content=content, media_type="text/plain")
+
+
+@router.get("/sitemap.xml", response_class=Response)
+async def sitemap_xml(db: AsyncSession = Depends(get_db)):
+    """Dynamic sitemap for search engines."""
+    from datetime import datetime
+
+    urls = []
+    # Static pages
+    urls.append(("https://lapiazza.app/", "daily", "1.0"))
+    urls.append(("https://lapiazza.app/browse", "daily", "0.9"))
+    urls.append(("https://lapiazza.app/members", "daily", "0.8"))
+    urls.append(("https://lapiazza.app/helpboard", "daily", "0.7"))
+    urls.append(("https://lapiazza.app/terms", "monthly", "0.3"))
+
+    # Items
+    result = await db.execute(
+        select(BHItem.slug, BHItem.updated_at)
+        .where(BHItem.deleted_at.is_(None))
+        .order_by(BHItem.updated_at.desc())
+        .limit(500)
+    )
+    for slug, updated in result:
+        lastmod = updated.strftime("%Y-%m-%d") if updated else ""
+        urls.append((f"https://lapiazza.app/items/{slug}", "weekly", "0.7"))
+
+    # Workshops
+    result = await db.execute(
+        select(BHUser.slug, BHUser.updated_at)
+        .where(BHUser.deleted_at.is_(None))
+        .where(BHUser.slug.isnot(None))
+        .order_by(BHUser.updated_at.desc())
+        .limit(500)
+    )
+    for slug, updated in result:
+        lastmod = updated.strftime("%Y-%m-%d") if updated else ""
+        urls.append((f"https://lapiazza.app/workshop/{slug}", "weekly", "0.6"))
+
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    for url, freq, priority in urls:
+        xml += f'  <url><loc>{url}</loc><changefreq>{freq}</changefreq><priority>{priority}</priority></url>\n'
+    xml += '</urlset>'
+
+    return Response(content=xml, media_type="application/xml")
