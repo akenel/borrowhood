@@ -61,6 +61,14 @@
         .prose ol { list-style-type: decimal; padding-left: 1.5em; }
         .prose p { margin-bottom: 0.5em; }
         .prose strong { font-weight: 600; }
+
+        /* Mobile-first: bigger base font for readability */
+        @media (max-width: 1023px) {
+            html { font-size: 18px; }
+        }
+        @media (max-width: 640px) {
+            html { font-size: 20px; }
+        }
     </style>
 
     {% block head %}{% endblock %}
@@ -247,33 +255,33 @@
              x-transition:leave-end="opacity-0 -translate-y-1"
              class="lg:hidden border-t border-gray-200 bg-white">
             <div class="px-4 py-3 space-y-1" @click="mobileMenuOpen = false">
-                <a href="/" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.home') }}</a>
-                <a href="/browse" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.browse') }}</a>
-                <a href="/helpboard" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.helpboard') }}</a>
-                <a href="/members" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.members') }}</a>
-                <a href="/chat" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.chat') }}</a>
+                <a href="/" class="block px-4 py-4 text-lg font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[52px]">{{ t('nav.home') }}</a>
+                <a href="/browse" class="block px-4 py-4 text-lg font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[52px]">{{ t('nav.browse') }}</a>
+                <a href="/helpboard" class="block px-4 py-4 text-lg font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[52px]">{{ t('nav.helpboard') }}</a>
+                <a href="/members" class="block px-4 py-4 text-lg font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[52px]">{{ t('nav.members') }}</a>
+                <a href="/chat" class="block px-4 py-4 text-lg font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[52px]">{{ t('nav.chat') }}</a>
                 <div class="border-t border-gray-100 my-2"></div>
-                <a href="/list" class="block px-3 py-3 text-base font-semibold text-indigo-600 hover:bg-indigo-50 rounded-lg min-h-[44px]">{{ t('nav.list_item') }}</a>
+                <a href="/list" class="block px-4 py-4 text-lg font-bold text-indigo-600 hover:bg-indigo-50 rounded-lg min-h-[52px]">{{ t('nav.list_item') }}</a>
                 {% if user %}
-                <a href="/dashboard" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.dashboard') }}</a>
-                <a href="/orders" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.orders') }}</a>
-                <a href="/messages" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.messages') }}</a>
+                <a href="/dashboard" class="block px-4 py-4 text-lg font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[52px]">{{ t('nav.dashboard') }}</a>
+                <a href="/orders" class="block px-4 py-4 text-lg font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[52px]">{{ t('nav.orders') }}</a>
+                <a href="/messages" class="block px-4 py-4 text-lg font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[52px]">{{ t('nav.messages') }}</a>
                 <div class="border-t border-gray-100 my-2"></div>
-                <a href="/profile" class="block px-3 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[44px]">{{ t('nav.profile') }}</a>
+                <a href="/profile" class="block px-4 py-4 text-lg font-medium text-gray-700 hover:bg-gray-50 rounded-lg min-h-[52px]">{{ t('nav.profile') }}</a>
                 {% if debug %}
-                <a href="/testing" class="block px-3 py-3 text-base font-medium text-gray-400 hover:bg-gray-50 rounded-lg min-h-[44px]">QA</a>
-                <a href="/backlog" class="block px-3 py-3 text-base font-medium text-gray-400 hover:bg-gray-50 rounded-lg min-h-[44px]">Backlog</a>
-                <a href="/demo-login" class="block px-3 py-3 text-base font-medium text-amber-600 hover:bg-amber-50 rounded-lg min-h-[44px]">{{ t('nav.demo_login') }}</a>
+                <a href="/testing" class="block px-4 py-4 text-lg font-medium text-gray-400 hover:bg-gray-50 rounded-lg min-h-[52px]">QA</a>
+                <a href="/backlog" class="block px-4 py-4 text-lg font-medium text-gray-400 hover:bg-gray-50 rounded-lg min-h-[52px]">Backlog</a>
+                <a href="/demo-login" class="block px-4 py-4 text-lg font-medium text-amber-600 hover:bg-amber-50 rounded-lg min-h-[52px]">{{ t('nav.demo_login') }}</a>
                 {% endif %}
-                <a href="/logout" class="block px-3 py-3 text-base font-medium text-red-600 hover:bg-red-50 rounded-lg min-h-[44px]">{{ t('nav.logout') }}</a>
+                <a href="/logout" class="block px-4 py-4 text-lg font-medium text-red-600 hover:bg-red-50 rounded-lg min-h-[52px]">{{ t('nav.logout') }}</a>
                 {% else %}
-                <a href="/login" class="block px-3 py-3 text-base font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg min-h-[44px] text-center">{{ t('nav.login') }}</a>
+                <a href="/login" class="block px-4 py-4 text-lg font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg min-h-[52px] text-center">{{ t('nav.login') }}</a>
                 {% endif %}
                 <!-- Mobile language switch with flags -->
-                <div class="flex space-x-2 px-3 py-3">
+                <div class="flex space-x-3 px-4 py-4" @click.stop>
                     {% for supported_lang in supported_languages %}
                     <a href="?lang={{ supported_lang }}"
-                       class="px-4 py-2 text-sm font-medium rounded-lg min-h-[44px] flex items-center space-x-2
+                       class="px-5 py-3 text-base font-medium rounded-lg min-h-[52px] flex items-center space-x-2
                               {% if supported_lang == lang %}bg-indigo-100 text-indigo-700{% else %}text-gray-500 hover:bg-gray-50{% endif %}">
                         <span class="text-base leading-none">{% if supported_lang == 'it' %}&#127470;&#127481;{% elif supported_lang == 'en' %}&#127468;&#127463;{% endif %}</span>
                         <span>{% if supported_lang == 'en' %}English{% elif supported_lang == 'it' %}Italiano{% else %}{{ supported_lang | upper }}{% endif %}</span>
