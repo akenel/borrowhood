@@ -160,7 +160,7 @@
                             <h3 class="text-lg font-semibold text-gray-900" x-text="post.title"
                                 data-translatable :data-content-lang="post.content_language || 'en'"></h3>
                             <p class="text-xs text-gray-500 mt-0.5">
-                                by <span x-text="post.author_name" class="font-medium"></span>
+                                by <a :href="'/workshop/' + post.author_slug" x-text="post.author_name" class="font-medium text-indigo-600 hover:underline"></a>
                                 <span x-show="post.neighborhood"> in <span x-text="post.neighborhood"></span></span>
                             </p>
                             <p class="mt-1 text-sm text-gray-600 line-clamp-2" x-text="post.body" x-show="post.body"
@@ -276,7 +276,7 @@
                             </div>
                             <h1 class="text-xl font-bold text-gray-900" x-text="activePost.title"></h1>
                             <p class="text-sm text-gray-500 mt-1">
-                                by <span x-text="activePost.author_name" class="font-medium text-gray-700"></span>
+                                by <a :href="'/workshop/' + activePost.author_slug" x-text="activePost.author_name" class="font-medium text-indigo-600 hover:underline"></a>
                                 <span x-text="formatDate(activePost.created_at)" class="ml-2"></span>
                                 <span x-show="activePost.updated_at && activePost.updated_at !== activePost.created_at" class="ml-1 text-gray-400 italic">(edited)</span>
                                 <span x-show="activePost.neighborhood" class="ml-2">in <span x-text="activePost.neighborhood"></span></span>
@@ -444,7 +444,7 @@
                                              class="w-8 h-8 rounded-full object-cover flex-shrink-0">
                                         <div class="flex-1 min-w-0">
                                             <div class="flex items-center gap-2 flex-wrap">
-                                                <span class="text-sm font-medium text-gray-900" x-text="reply.author_name"></span>
+                                                <a :href="'/workshop/' + reply.author_slug" class="text-sm font-medium text-gray-900 hover:text-indigo-600" x-text="reply.author_name"></a>
                                                 <span x-show="activePost.resolved_by_id && reply.author_id === activePost.resolved_by_id" class="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">Accepted Answer</span>
                                                 <span class="text-xs text-gray-400" x-text="formatDate(reply.created_at)"></span>
                                                 <span x-show="reply.updated_at && reply.updated_at !== reply.created_at" class="text-xs text-gray-400 italic">(edited)</span>
@@ -514,7 +514,7 @@
                                                          class="w-7 h-7 rounded-full object-cover flex-shrink-0">
                                                     <div class="flex-1 min-w-0">
                                                         <div class="flex items-center gap-2">
-                                                            <span class="text-sm font-medium text-gray-900" x-text="child.author_name"></span>
+                                                            <a :href="'/workshop/' + child.author_slug" class="text-sm font-medium text-gray-900 hover:text-indigo-600" x-text="child.author_name"></a>
                                                             <span class="text-xs text-gray-400" x-text="formatDate(child.created_at)"></span>
                                                             <span x-show="child.updated_at && child.updated_at !== child.created_at" class="text-xs text-gray-400 italic">(edited)</span>
                                                         </div>
