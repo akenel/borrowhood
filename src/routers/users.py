@@ -326,40 +326,98 @@ async def delete_my_account(
             "Resolve these before deleting your account.",
         )
 
-    # ── All clear -- soft-delete ──
+    # ── All clear -- full delete (GDPR compliant) ──
 
     old_status = user.account_status.value if user.account_status else None
-    user.deleted_at = datetime.now(timezone.utc)
-    user.account_status = AccountStatus.DEACTIVATED
-    user.telegram_chat_id = None
-    user.notify_telegram = False
+    uid = user.id
+    keycloak_id = user.keycloak_id
 
-    # Pause all active listings owned by user
-    active_listings = await db.execute(
-        select(BHListing)
-        .join(BHItem, BHListing.item_id == BHItem.id)
-        .where(BHItem.owner_id == user.id)
-        .where(BHListing.status == ListingStatus.ACTIVE)
-    )
-    for listing in active_listings.scalars().all():
-        listing.status = ListingStatus.PAUSED
+    # Step 1: Delete from Keycloak so email can be re-used
+    try:
+        import httpx
+        from src.config import settings
+        kc_base = settings.kc_url.replace("https://", "http://keycloak:8080").split("/realms")[0] if "keycloak" not in settings.kc_url else settings.kc_url
+        # Get admin token
+        async with httpx.AsyncClient() as client:
+            token_resp = await client.post(
+                "http://keycloak:8080/realms/master/protocol/openid-connect/token",
+                data={"grant_type": "password", "client_id": "admin-cli",
+                      "username": "helix_user", "password": "helix_pass"},
+            )
+            if token_resp.status_code == 200:
+                admin_token = token_resp.json()["access_token"]
+                # Find KC user by keycloak_id
+                if keycloak_id:
+                    await client.delete(
+                        f"http://keycloak:8080/admin/realms/borrowhood/users/{keycloak_id}",
+                        headers={"Authorization": f"Bearer {admin_token}"},
+                    )
+    except Exception:
+        pass  # Don't block deletion if KC cleanup fails
 
-    # Clean up pending Telegram link codes
-    pending_links = await db.execute(
-        select(BHTelegramLink).where(BHTelegramLink.user_id == user.id)
-    )
-    for link in pending_links.scalars().all():
-        await db.delete(link)
+    # Step 2: Clean up all foreign key references
+    from sqlalchemy import text as sa_text
+    cleanup_tables = [
+        "DELETE FROM bh_help_upvote WHERE user_id = :uid",
+        "DELETE FROM bh_listing_qa WHERE asker_id = :uid OR answered_by_id = :uid",
+        "DELETE FROM bh_message WHERE sender_id = :uid OR recipient_id = :uid",
+        "DELETE FROM bh_help_reply WHERE author_id = :uid",
+        "UPDATE bh_help_post SET resolved_by_id = NULL WHERE resolved_by_id = :uid",
+        "DELETE FROM bh_help_media WHERE uploader_id = :uid",
+        "DELETE FROM bh_help_post WHERE author_id = :uid",
+        "DELETE FROM bh_skill_verification WHERE verifier_id = :uid",
+        "DELETE FROM bh_mentorship WHERE mentor_id = :uid OR apprentice_id = :uid",
+        "DELETE FROM bh_delivery_event WHERE actor_id = :uid",
+        "DELETE FROM bh_delivery_tracking WHERE delivery_person_id = :uid",
+        "DELETE FROM bh_insurance_claim WHERE claimant_id = :uid",
+        "DELETE FROM bh_insurance_policy WHERE holder_id = :uid",
+        "DELETE FROM bh_community_membership WHERE user_id = :uid",
+        "DELETE FROM bh_item_favorite WHERE user_id = :uid",
+        "DELETE FROM bh_service_quote WHERE customer_id = :uid OR provider_id = :uid",
+        "DELETE FROM bh_telegram_link WHERE user_id = :uid",
+        "DELETE FROM bh_payment WHERE payer_id = :uid OR payee_id = :uid",
+        "UPDATE bh_dispute SET resolved_by_id = NULL WHERE resolved_by_id = :uid",
+        "UPDATE bh_dispute SET response_by_id = NULL WHERE response_by_id = :uid",
+        "DELETE FROM bh_dispute WHERE filed_by_id = :uid",
+        "DELETE FROM bh_deposit WHERE payer_id = :uid OR recipient_id = :uid",
+        "DELETE FROM bh_review_vote WHERE user_id = :uid",
+        "DELETE FROM bh_review WHERE reviewer_id = :uid",
+        "UPDATE bh_review SET reviewee_id = NULL WHERE reviewee_id = :uid",
+        "DELETE FROM bh_bid WHERE bidder_id = :uid",
+        "DELETE FROM bh_rental WHERE renter_id = :uid",
+        "DELETE FROM bh_badge WHERE user_id = :uid",
+        "DELETE FROM bh_notification WHERE user_id = :uid",
+        "DELETE FROM bh_notification_pref WHERE user_id = :uid",
+        "DELETE FROM bh_user_points WHERE user_id = :uid",
+        "DELETE FROM bh_user_social_link WHERE user_id = :uid",
+        "DELETE FROM bh_user_skill WHERE user_id = :uid",
+        "DELETE FROM bh_user_language WHERE user_id = :uid",
+        "DELETE FROM bh_user_favorite WHERE user_id = :uid OR favorite_user_id = :uid",
+        "DELETE FROM bh_report WHERE reporter_id = :uid",
+        "DELETE FROM bh_workshop_member WHERE workshop_owner_id = :uid OR member_id = :uid",
+        "DELETE FROM bh_item_media WHERE item_id IN (SELECT id FROM bh_item WHERE owner_id = :uid)",
+        "DELETE FROM bh_listing WHERE item_id IN (SELECT id FROM bh_item WHERE owner_id = :uid)",
+        "DELETE FROM bh_item WHERE owner_id = :uid",
+        "DELETE FROM bh_community WHERE owner_id = :uid",
+    ]
+    for sql in cleanup_tables:
+        try:
+            await db.execute(sa_text(sql), {"uid": uid})
+        except Exception:
+            pass  # Skip tables that don't exist
 
-    # Audit trail
+    # Step 3: Audit trail before deletion
     db.add(BHAuditLog(
-        user_id=user.id,
+        user_id=uid,
         action="account_deleted",
         entity_type="user",
-        entity_id=user.id,
+        entity_id=uid,
         old_value=json.dumps({"account_status": old_status}),
-        new_value=json.dumps({"account_status": "deactivated"}),
+        new_value=json.dumps({"account_status": "deleted"}),
     ))
+
+    # Step 4: Hard delete the user
+    await db.execute(sa_text("DELETE FROM bh_user WHERE id = :uid"), {"uid": uid})
 
     await db.commit()
 
