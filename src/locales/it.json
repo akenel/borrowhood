@@ -24,8 +24,8 @@
     "orders": "Ordini"
   },
   "home": {
-    "hero_title": "Ogni Garage Diventa un Negozio di Noleggio",
-    "hero_subtitle": "Noleggia attrezzi, condividi competenze, costruisci comunità. Senza commissioni.",
+    "hero_title": "La Piazza è Aperta",
+    "hero_subtitle": "Il tuo quartiere ha tutto ciò di cui hai bisogno. Ogni vicino ha qualcosa da condividere. Noleggia. Impara. Crea. Fai un'offerta. Senza commissioni.",
     "cta_browse": "Esplora Oggetti",
     "cta_list": "Pubblica i Tuoi Oggetti",
     "stats_listings": "Annunci Attivi",
@@ -35,11 +35,14 @@
     "featured_title": "Aggiunti di Recente",
     "how_it_works": "Come Funziona",
     "step_1_title": "Pubblica i Tuoi Oggetti",
-    "step_1_desc": "Attrezzi, utensili da cucina, attrezzature -- tutto ciò che prende polvere.",
+    "step_1_desc": "Attrezzi, arte, stanze, competenze -- se ce l'hai, qualcuno ne ha bisogno.",
+    "step_1_cta": "Inizia a Pubblicare",
     "step_2_title": "Stabilisci le Tue Condizioni",
-    "step_2_desc": "Noleggia, vendi, fai un'offerta o scambia servizi.",
+    "step_2_desc": "Noleggia, vendi, insegna, metti all'asta. Tu decidi il prezzo. Zero commissioni.",
+    "step_2_cta": "Esplora Esempi",
     "step_3_title": "Connettiti",
-    "step_3_desc": "Trova vicini che hanno bisogno di ciò che hai. Costruisci relazioni."
+    "step_3_desc": "Trova vicini che hanno bisogno di ciò che hai. Costruisci relazioni.",
+    "step_3_cta": "Trova un Artigiano"
   },
   "browse": {
     "title": "Esplora Oggetti",
@@ -936,8 +939,8 @@
     "search_by_skill_workshop_type_or_service_offered": "Cerca per competenza, tipo di laboratorio o servizio offerto.",
     "explore_all_makers": "Esplora tutti i Maker",
     "the_story": "La Storia",
-    "my_father_was_a_handshovel_landscaper_for_60_years": "Mio padre era un giardiniere con la pala a mano per 60 anni in Svizzera. Il suo garage era leggendario -- 500 attrezzi, ognuno con una storia. Quando è mancato nel 2020, quegli attrezzi sono rimasti lì. Ogni quartiere ha un garage come il suo. Ogni quartiere ha persone che hanno bisogno di quello che c'è dentro. La Piazza li connette.",
-    "built_from_a_camper_van_in_trapani_sicily_2026": "Costruito da un camper a Trapani, Sicilia, 2026.",
+    "my_father_was_a_handshovel_landscaper_for_60_years": "Mio padre era un giardiniere con la pala a mano per 60 anni in Svizzera. 500 attrezzi nel suo garage, ognuno con una storia. Quando è mancato nel 2020, quegli attrezzi sono rimasti lì. Ogni quartiere ha un garage come il suo. Ogni quartiere ha un artista che insegna, un marinaio che dà lezioni, uno chef che condivide ricette, un artigiano che ripara le cose. Semplicemente non si sono ancora incontrati. La Piazza è la piazza del paese dove si trovano. Nessuna commissione. Nessun algoritmo. Solo persone che aiutano persone.",
+    "built_from_a_camper_van_in_trapani_sicily_2026": "Costruito da un camper a Trapani, Sicilia. 2026.",
     "ask_the_ai_concierge": "Chiedi al concierge AI...",
     "coming": "Disponibile dal",
     "ai_concierge": "Concierge AI",

@@ -6,7 +6,6 @@
     <title>{% block title %}{{ t('app.name') }}{% endblock %}</title>
     <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/static/images/icon-192.png" type="image/png" sizes="192x192">
-    <link rel="icon" href="/static/images/icon-192.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/static/images/icon-192.png">
 
     <!-- SEO & Open Graph (Rule 30) -->
@@ -319,7 +318,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                 <div class="text-center md:text-left">
-                    <p class="text-sm font-semibold text-gray-900">{{ t('app.name') }}</p>
+                    <p class="text-sm font-semibold text-gray-900">&copy; {{ now().year }} {{ t('app.name') }}</p>
                     <p class="text-xs text-gray-500 mt-1">{{ t('footer.tagline') }}</p>
                 </div>
                 <div class="flex space-x-6 text-sm text-gray-500">
