@@ -326,7 +326,7 @@
                             {% if listing.group_discount_pct %}
                             <p class="text-xs text-emerald-600">{{ "%.0f"|format(listing.group_discount_pct) }}% {{ t('i18n.group_discount') }}</p>
                             {% endif %}
-                            {% if listing.bid_increment %}
+                            {% if listing.bid_increment and listing.listing_type.value == 'auction' %}
                             <p class="text-xs text-gray-500">{{ t('i18n.min_bid') }} &euro;{{ "%.0f"|format(listing.bid_increment) }}</p>
                             {% endif %}
                             {% if listing.auction_end and listing.listing_type.value != 'auction' %}
@@ -982,14 +982,15 @@
 
             <!-- Q&A Section -->
             <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="listingQA()">
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">{{ t('i18n.questions_answers') }}</h3>
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">{{ t('i18n.questions_answers') }}</h3>
+                <p class="text-xs text-gray-400 mb-4">{% if lang == 'it' %}Chiedi disponibilità, dettagli, o qualsiasi cosa prima di prenotare.{% else %}Ask about availability, details, or anything before you book.{% endif %}</p>
 
                 <!-- Ask a question -->
                 {% if user %}
                 <form @submit.prevent="askQuestion()" class="mb-4">
                     <div class="flex gap-2">
                         <input type="text" x-model="newQuestion"
-                               placeholder="{{ t('i18n.ask_a_question') }}"
+                               placeholder="{% if lang == 'it' %}Es. È disponibile questo weekend?{% else %}E.g. Is this available this weekend?{% endif %}"
                                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]"
                                maxlength="2000" minlength="5">
                         <button type="submit" :disabled="asking || newQuestion.length < 5"
@@ -1019,7 +1020,7 @@
                             <p class="text-xs text-gray-300 mt-0.5" x-text="formatDate(qa.created_at)"></p>
                         </div>
                     </template>
-                    <p x-show="questions.length === 0 && loaded" class="text-sm text-gray-400">{{ t('i18n.no_questions_yet') }}</p>
+                    <p x-show="questions.length === 0 && loaded" class="text-sm text-gray-400">{% if lang == 'it' %}Nessuna domanda ancora. Sei il primo a chiedere!{% else %}No questions yet. Be the first to ask!{% endif %}</p>
                 </div>
             </div>
 
