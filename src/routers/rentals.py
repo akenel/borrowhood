@@ -132,6 +132,15 @@ async def create_rental(
         }.get(listing.listing_type, "rent")
         raise HTTPException(status_code=400, detail=f"Cannot {verb} your own item")
 
+    # Safety acknowledgment check (BL-102)
+    item = listing.item
+    has_safety_info = item.age_restricted or item.safety_notes or item.needs_equipment
+    if has_safety_info and not data.safety_acknowledged:
+        raise HTTPException(
+            status_code=400,
+            detail="This item has safety requirements. You must acknowledge them before booking."
+        )
+
     # Giveaway shortcut: auto-set dates to now (no date picking needed)
     from datetime import datetime, timezone
     is_giveaway = listing.listing_type == ListingType.GIVEAWAY
@@ -144,6 +153,7 @@ async def create_rental(
         requested_start=now if is_giveaway else data.requested_start,
         requested_end=now if is_giveaway else data.requested_end,
         renter_message=data.renter_message,
+        safety_acknowledged=data.safety_acknowledged or False,
         idempotency_key=data.idempotency_key,
     )
     db.add(rental)

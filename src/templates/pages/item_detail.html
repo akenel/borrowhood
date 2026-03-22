@@ -161,6 +161,33 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
                     </svg>
                 </button>
+                <!-- Upvote button -->
+                <div x-data="{ voted: false, count: 0, loading: false,
+                    async load() {
+                        try {
+                            const r = await fetch('/api/v1/items/by-slug/{{ item.slug }}/vote');
+                            if (r.ok) { const d = await r.json(); this.voted = d.voted; this.count = d.count; }
+                        } catch(e) {}
+                    },
+                    async toggle() {
+                        this.loading = true;
+                        try {
+                            const r = await fetch('/api/v1/items/by-slug/{{ item.slug }}/vote', { method: 'POST' });
+                            if (r.ok) { const d = await r.json(); this.voted = d.voted; this.count = d.count; }
+                            else if (r.status === 401) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: '{{ t('i18n.login_to_vote') }}' } })); }
+                        } catch(e) {}
+                        this.loading = false;
+                    }
+                }">
+                    <button @click="toggle()" :disabled="loading"
+                            class="flex items-center gap-1 px-3 py-2 rounded-full hover:bg-gray-100 transition-colors"
+                            :class="voted ? 'text-indigo-600' : 'text-gray-400'" title="Upvote">
+                        <svg class="w-5 h-5" fill="none" :stroke="voted ? 'currentColor' : 'currentColor'" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" :fill="voted ? 'currentColor' : 'none'"/>
+                        </svg>
+                        <span class="text-sm font-medium" x-text="count" x-show="count > 0"></span>
+                    </button>
+                </div>
             </div>
 
             <!-- Item details -->
@@ -743,6 +770,8 @@
                            listingId: '{{ active_listing_id.val }}',
                            listingType: '{{ listing_type_val.val }}',
                            isGiveaway: {{ 'true' if is_giveaway.val else 'false' }},
+                           hasSafety: {{ 'true' if (item.age_restricted or item.safety_notes or item.needs_equipment) else 'false' }},
+                           safetyAck: false,
                            rentalForm: { start: '', end: '', message: '' },
                            async submitRental() {
                                this.submitting = true;
@@ -756,6 +785,7 @@
                                            requested_start: this.isGiveaway ? null : (this.rentalForm.start ? new Date(this.rentalForm.start).toISOString() : null),
                                            requested_end: this.isGiveaway ? null : (this.rentalForm.end ? new Date(this.rentalForm.end).toISOString() : null),
                                            renter_message: this.rentalForm.message || null,
+                                           safety_acknowledged: this.safetyAck,
                                            idempotency_key: crypto.randomUUID()
                                        })
                                    });
@@ -923,12 +953,33 @@
                         </template>
                         {% endif %}
 
+                        <!-- Safety waiver (BL-102) -->
+                        <template x-if="hasSafety">
+                            <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
+                                <p class="text-sm font-semibold text-red-800 mb-2">{{ t('i18n.safety_notice') }}</p>
+                                {% if item.safety_notes %}
+                                <p class="text-xs text-red-700 mb-1">{{ item.safety_notes }}</p>
+                                {% endif %}
+                                {% if item.needs_equipment %}
+                                <p class="text-xs text-red-700 mb-1">{{ t('i18n.required_equipment') }}: {{ item.needs_equipment }}</p>
+                                {% endif %}
+                                {% if item.age_restricted %}
+                                <p class="text-xs text-red-700 mb-1">{{ t('i18n.age_restricted_18') }}</p>
+                                {% endif %}
+                                <label class="flex items-start gap-2 mt-3 cursor-pointer">
+                                    <input type="checkbox" x-model="safetyAck"
+                                           class="mt-0.5 rounded border-red-300 text-red-600 focus:ring-red-500">
+                                    <span class="text-xs text-red-800 font-medium">{{ t('i18n.safety_acknowledgment') }}</span>
+                                </label>
+                            </div>
+                        </template>
+
                         <div class="flex justify-end space-x-3 pt-2">
                             <button @click="showRentalModal = false"
                                     class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 min-h-[44px]">
                                 {{ t('common.cancel') }}
                             </button>
-                            <button @click="submitRental()" :disabled="submitting"
+                            <button @click="submitRental()" :disabled="submitting || (hasSafety && !safetyAck)"
                                     :class="isGiveaway ? 'bg-green-600 hover:bg-green-700' : 'bg-indigo-600 hover:bg-indigo-700'"
                                     class="px-4 py-2 text-white font-semibold rounded-lg disabled:opacity-50 min-h-[44px]">
                                 <span x-show="!submitting" x-text="isGiveaway ? '{{ t('giveaway.claim') }}' : listingType === 'sell' ? '{{ t('purchase.submit') }}' : listingType === 'service' || listingType === 'training' ? '{{ t('booking.submit') }}' : '{{ t('rental.submit') }}'"></span>

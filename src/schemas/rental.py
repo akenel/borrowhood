@@ -31,6 +31,7 @@ class RentalCreate(BaseModel):
     requested_start: Optional[datetime] = None
     requested_end: Optional[datetime] = None
     renter_message: Optional[str] = Field(None, max_length=1000)
+    safety_acknowledged: Optional[bool] = False
     idempotency_key: Optional[str] = Field(None, max_length=36)
 
 

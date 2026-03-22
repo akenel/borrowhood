@@ -188,3 +188,19 @@ class BHItemFavorite(BHBase, Base):
 
     user: Mapped["BHUser"] = relationship()
     item: Mapped["BHItem"] = relationship()
+
+
+class BHItemVote(BHBase, Base):
+    """Upvote on an item. One per user per item. Toggle on/off."""
+
+    __tablename__ = "bh_item_vote"
+    __table_args__ = (
+        UniqueConstraint("user_id", "item_id", name="uq_item_vote"),
+    )
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_user.id"), nullable=False, index=True
+    )
+    item_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_item.id"), nullable=False, index=True
+    )

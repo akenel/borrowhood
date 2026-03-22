@@ -68,6 +68,9 @@ class BHRental(BHBase, Base):
     cancel_reason: Mapped[Optional[str]] = mapped_column(Text)
     decline_reason: Mapped[Optional[str]] = mapped_column(Text)
 
+    # Safety acknowledgment (BL-102)
+    safety_acknowledged: Mapped[bool] = mapped_column(default=False)
+
     # Idempotency (Rule 28 -- prevent double submit)
     idempotency_key: Mapped[Optional[str]] = mapped_column(String(36), unique=True)
 
