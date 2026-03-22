@@ -23,8 +23,13 @@ class MessageOut(BaseModel):
     sender_id: UUID
     recipient_id: UUID
     body: str
+    message_type: str = "text"
     listing_id: Optional[UUID] = None
     rental_id: Optional[UUID] = None
+    offered_price: Optional[float] = None
+    offer_status: Optional[str] = None
+    offer_round: Optional[int] = None
+    expires_at: Optional[datetime] = None
     read_at: Optional[datetime] = None
     edited_at: Optional[datetime] = None
     created_at: datetime
@@ -48,3 +53,17 @@ class ThreadSummary(BaseModel):
 
 class MessageSummary(BaseModel):
     unread: int
+
+
+# ── Offer schemas ──
+
+
+class OfferCreate(BaseModel):
+    listing_id: UUID
+    offered_price: float = Field(..., gt=0, le=100000)
+    message: str = Field("", max_length=500)
+
+
+class CounterOffer(BaseModel):
+    offered_price: float = Field(..., gt=0, le=100000)
+    message: str = Field("", max_length=500)

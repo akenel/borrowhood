@@ -1,17 +1,36 @@
 """In-app messaging between users.
 
 Threaded conversations tied to listings or rentals.
+Supports structured offers (make offer, counter, accept, decline).
 """
 
 import uuid
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import DateTime, ForeignKey, Text
+from sqlalchemy import DateTime, Enum, ForeignKey, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base, BHBase
+
+import enum
+
+
+class MessageType(str, enum.Enum):
+    TEXT = "text"
+    OFFER = "offer"
+    COUNTER = "counter"
+    ACCEPT = "accept"
+    DECLINE = "decline"
+
+
+class OfferStatus(str, enum.Enum):
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    COUNTERED = "countered"
+    DECLINED = "declined"
+    EXPIRED = "expired"
 
 
 class BHMessage(BHBase, Base):
@@ -35,6 +54,19 @@ class BHMessage(BHBase, Base):
     )
 
     body: Mapped[str] = mapped_column(Text, nullable=False)
+
+    # Message type: text (default), offer, counter, accept, decline
+    message_type: Mapped[str] = mapped_column(
+        String(20), default="text", server_default="text", nullable=False
+    )
+
+    # Offer fields (only populated for offer/counter/accept messages)
+    offered_price: Mapped[Optional[float]] = mapped_column(Numeric(10, 2), nullable=True)
+    offer_status: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    offer_round: Mapped[Optional[int]] = mapped_column(default=None, nullable=True)
+    expires_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), default=None
+    )
 
     # Read tracking
     read_at: Mapped[Optional[datetime]] = mapped_column(
