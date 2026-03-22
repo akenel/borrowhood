@@ -45,6 +45,9 @@ async def get_user(db: AsyncSession, token: dict) -> BHUser:
         kc_username = token.get("preferred_username", "")
         if kc_username and user.username != kc_username:
             user.username = kc_username
+        # Pull avatar from social login if not already set
+        if not user.avatar_url and token.get("picture"):
+            user.avatar_url = token.get("picture")
         await db.commit()
         return user
 
@@ -88,12 +91,16 @@ async def get_user(db: AsyncSession, token: dict) -> BHUser:
         slug = f"{base_slug}-{suffix}"
         suffix += 1
 
+    # Pull avatar from social login (Google/Facebook provide 'picture' claim)
+    avatar_url = token.get("picture") or None
+
     new_user = BHUser(
         keycloak_id=kc_id,
         username=username or None,
         email=email,
         display_name=display_name,
         slug=slug,
+        avatar_url=avatar_url,
         last_active_at=datetime.now(timezone.utc),
     )
     db.add(new_user)
