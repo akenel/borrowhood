@@ -945,7 +945,7 @@
                     {% if item.owner.accepted_payments %}
                     <div class="flex flex-wrap gap-1.5">
                         {% set pay_labels = {'cash': '💶 Cash', 'iban': '🏦 IBAN', 'paypal': '🅿️ PayPal', 'card': '💳 Card', 'satispay': '📱 Satispay', 'twint': '🇨🇭 Twint', 'revolut': '💜 Revolut', 'bizum': '📲 Bizum', 'venmo': '🇺🇸 Venmo'} %}
-                        {% for pm in item.owner.accepted_payments.split(',') if pm %}
+                        {% for pm in (item.owner.accepted_payments or '').split(',') if pm %}
                         <span class="text-xs px-2 py-1 bg-emerald-50 text-emerald-700 rounded">{{ pay_labels.get(pm, pm) }}</span>
                         {% endfor %}
                     </div>

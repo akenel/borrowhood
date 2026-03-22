@@ -50,9 +50,9 @@
                             bannerUploading = true;
                             var fd = new FormData();
                             fd.append('file', $event.target.files[0]);
-                            fetch('/api/v1/users/me/banner', { method: 'POST', body: fd })
-                                .then(r => { if (r.ok) location.reload(); else { bannerUploading = false; window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Upload failed (max 10 MB)' } })); } })
-                                .catch(() => { bannerUploading = false; });
+                            fetch('/api/v1/users/me/banner', { method: 'POST', body: fd, credentials: 'same-origin' })
+                                .then(r => { if (r.ok) location.reload(); else return r.json().then(j => { throw new Error(j.detail || 'Upload failed'); }); })
+                                .catch(e => { bannerUploading = false; window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message || 'Upload failed' } })); });
                        ">
             </label>
             {% endif %}
@@ -72,6 +72,7 @@
                         {{ profile_user.display_name[0] | upper if profile_user else user.get('given_name', '?')[0] | upper }}
                     </div>
                     {% endif %}
+                    {% if is_owner %}
                     <!-- Upload avatar overlay -->
                     <label class="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/40 flex items-center justify-center cursor-pointer transition-colors"
                            :class="uploading ? 'bg-black/40' : ''">
@@ -85,11 +86,12 @@
                                     uploading = true;
                                     var fd = new FormData();
                                     fd.append('file', $event.target.files[0]);
-                                    fetch('/api/v1/users/me/avatar', { method: 'POST', body: fd })
-                                        .then(r => { if (r.ok) location.reload(); else { uploading = false; window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Upload failed' } })); } })
-                                        .catch(() => { uploading = false; });
+                                    fetch('/api/v1/users/me/avatar', { method: 'POST', body: fd, credentials: 'same-origin' })
+                                        .then(r => { if (r.ok) location.reload(); else return r.json().then(j => { throw new Error(j.detail || 'Upload failed'); }); })
+                                        .catch(e => { uploading = false; window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message || 'Upload failed' } })); });
                                ">
                     </label>
+                    {% endif %}
                 </div>
                 <div class="flex-1"></div>
                 <button @click="bhShare('{{ (profile_user.display_name if profile_user else user.get('preferred_username', 'User')) | e }}', window.location.href)" class="mt-12 p-2 rounded-full hover:bg-gray-100 transition-colors" title="Share profile">
@@ -303,7 +305,7 @@
         {% if profile_user.accepted_payments %}
         <div class="flex flex-wrap gap-1.5">
             {% set pay_labels = {'cash': '💶 Cash', 'iban': '🏦 IBAN', 'paypal': '🅿️ PayPal', 'card': '💳 Card', 'satispay': '📱 Satispay', 'twint': '🇨🇭 Twint', 'revolut': '💜 Revolut', 'bizum': '📲 Bizum', 'venmo': '🇺🇸 Venmo'} %}
-            {% for pm in profile_user.accepted_payments.split(',') if pm %}
+            {% for pm in (profile_user.accepted_payments or '').split(',') if pm %}
             <span class="text-xs px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full">{{ pay_labels.get(pm, pm) }}</span>
             {% endfor %}
         </div>
