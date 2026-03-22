@@ -33,17 +33,14 @@
             </div>
             {% endif %}
             {% if is_owner %}
-            <!-- Banner upload overlay -->
-            <label class="absolute inset-0 bg-black/0 group-hover/banner:bg-black/30 flex items-center justify-center cursor-pointer transition-colors"
-                   :class="bannerUploading ? 'bg-black/30' : ''">
-                <div class="opacity-0 group-hover/banner:opacity-100 transition-opacity flex items-center gap-2 text-white text-sm font-medium"
-                     :class="bannerUploading ? 'opacity-100' : ''">
-                    <svg class="w-5 h-5" :class="bannerUploading ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    <span x-text="bannerUploading ? 'Uploading...' : 'Change Banner'"></span>
-                </div>
+            <!-- Banner upload -->
+            <label class="absolute bottom-2 left-2 bg-black/40 hover:bg-black/60 text-white text-xs font-medium px-3 py-1.5 rounded-full cursor-pointer flex items-center gap-1.5 transition-colors"
+                   :class="bannerUploading ? 'opacity-75' : ''">
+                <svg class="w-4 h-4" :class="bannerUploading ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span x-text="bannerUploading ? 'Uploading...' : '{{ t('i18n.change_banner') }}'"></span>
                 <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden"
                        @change="
                             if (!$event.target.files[0]) return;
@@ -73,10 +70,10 @@
                     </div>
                     {% endif %}
                     {% if is_owner %}
-                    <!-- Upload avatar overlay -->
-                    <label class="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/40 flex items-center justify-center cursor-pointer transition-colors"
-                           :class="uploading ? 'bg-black/40' : ''">
-                        <svg class="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" :class="uploading ? 'animate-spin opacity-100' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Upload avatar button (always visible, works on touch) -->
+                    <label class="absolute -bottom-1 -right-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-1.5 cursor-pointer shadow-md transition-colors"
+                           :class="uploading ? 'opacity-75' : ''">
+                        <svg class="w-4 h-4" :class="uploading ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>

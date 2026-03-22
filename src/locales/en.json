@@ -783,6 +783,7 @@
     "age_restricted_18": "This item is restricted to users aged 18 and over.",
     "safety_acknowledgment": "I understand the safety requirements and accept full responsibility for safe use of this item.",
     "login_to_vote": "Log in to upvote this item",
+    "change_banner": "Change Banner",
     "gemini_ai_assistant": "Gemini AI Assistant",
     "type_the_name_and_click_the_button_gemini_generate": "Type the name and click the button. Gemini generates description, price, deposit, and story -- all in one shot.",
     "generate_with_gemini_ai": "Generate with Gemini AI",
