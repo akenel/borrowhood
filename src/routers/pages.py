@@ -286,10 +286,23 @@ async def item_detail(slug: str, request: Request,
     # Compute ownership server-side so keycloak_id never reaches the template
     is_owner = bool(token and item.owner and item.owner.keycloak_id == token.get("sub", ""))
 
+    # Similar items: same category, different item, limit 4
+    similar_result = await db.execute(
+        select(BHItem)
+        .options(selectinload(BHItem.media))
+        .where(BHItem.category == item.category)
+        .where(BHItem.id != item.id)
+        .where(BHItem.deleted_at.is_(None))
+        .order_by(func.random())
+        .limit(4)
+    )
+    similar_items = similar_result.scalars().all()
+
     ctx = _ctx(request, token,
         item=item,
         is_owner=is_owner,
         viewer_tier=viewer_tier,
+        similar_items=similar_items,
         og_title=f"{item.name} - La Piazza",
         og_description=item.description[:160] if item.description else "Available on La Piazza",
         og_image=item.media[0].url if item.media else None,

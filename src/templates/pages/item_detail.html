@@ -1598,6 +1598,34 @@
         </template>
     </div>
 
+    <!-- Similar Items -->
+    {% if similar_items %}
+    <div class="mt-12 border-t border-gray-200 pt-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">{{ t('i18n.similar_items') }}</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {% for si in similar_items %}
+            <a href="/items/{{ si.slug }}" class="group block bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                <div class="aspect-square bg-gray-100 overflow-hidden">
+                    {% if si.media %}
+                    <img src="{{ si.media[0].url }}" alt="{{ si.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-gray-300">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="p-2">
+                    <p class="text-sm font-medium text-gray-900 truncate">{{ si.name }}</p>
+                    {% if si.daily_price %}
+                    <p class="text-xs text-indigo-600 font-semibold mt-0.5">&euro;{{ "%.2f"|format(si.daily_price) }}/{{ t('i18n.day') }}</p>
+                    {% endif %}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Recently Viewed Strip -->
     <div class="mt-8" style="display: none;">
         <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ t('i18n.recently_viewed') }}</h3>

@@ -497,12 +497,41 @@
     });
     </script>
 
-    <!-- Service Worker registration -->
+    <!-- PWA: Service Worker + Install Prompt -->
     <script>
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/static/sw.js').catch(function() {});
     }
+    // Capture install prompt for later use
+    var _deferredInstall = null;
+    window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        _deferredInstall = e;
+        var banner = document.getElementById('pwa-install-banner');
+        if (banner) banner.style.display = 'flex';
+    });
+    window.addEventListener('appinstalled', function() {
+        _deferredInstall = null;
+        var banner = document.getElementById('pwa-install-banner');
+        if (banner) banner.style.display = 'none';
+    });
+    function pwaInstall() {
+        if (!_deferredInstall) return;
+        _deferredInstall.prompt();
+        _deferredInstall.userChoice.then(function() { _deferredInstall = null; });
+    }
     </script>
+
+    <!-- PWA Install Banner (hidden until beforeinstallprompt fires) -->
+    <div id="pwa-install-banner" style="display:none" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 bg-indigo-600 text-white rounded-xl shadow-xl p-4 flex items-center gap-3 z-50">
+        <img src="/static/images/icon-192.png" alt="La Piazza" class="w-10 h-10 rounded-lg flex-shrink-0">
+        <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold">Install La Piazza</p>
+            <p class="text-xs text-indigo-200">Add to home screen for quick access</p>
+        </div>
+        <button onclick="pwaInstall()" class="px-3 py-1.5 bg-white text-indigo-600 text-sm font-semibold rounded-lg hover:bg-indigo-50 flex-shrink-0">Install</button>
+        <button onclick="this.parentElement.style.display='none'" class="text-indigo-200 hover:text-white flex-shrink-0">&times;</button>
+    </div>
 
     {% block scripts %}{% endblock %}
 </body>
