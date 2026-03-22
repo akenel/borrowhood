@@ -27,14 +27,14 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/static/images/icon-192.svg">
 
-    <!-- Tailwind CSS (FULL CDN -- Rule 1: NEVER a bundled subset) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS (self-hosted -- no CDN dependency) -->
+    <script src="/static/js/tailwind.min.js"></script>
 
-    <!-- Alpine.js (FULL CDN -- Rule 1) -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Alpine.js (self-hosted) -->
+    <script defer src="/static/js/alpine.min.js"></script>
 
-    <!-- Marked.js -- Markdown rendering (FULL CDN -- Rule 1) -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Marked.js -- Markdown rendering (self-hosted) -->
+    <script src="/static/js/marked.min.js"></script>
 
     <!-- Google Fonts (CDN -- Rule 1) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
