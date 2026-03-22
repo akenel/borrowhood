@@ -196,7 +196,10 @@ async def browse(request: Request,
     if q:
         search_term = f"%{q}%"
         query = query.where(
-            BHItem.name.ilike(search_term) | BHItem.description.ilike(search_term)
+            BHItem.name.ilike(search_term)
+            | BHItem.description.ilike(search_term)
+            | (func.similarity(BHItem.name, q) > 0.2)
+            | (func.similarity(BHItem.description, q) > 0.15)
         )
     if category:
         query = query.where(BHItem.category == category)
@@ -218,7 +221,10 @@ async def browse(request: Request,
     )
     if q:
         count_q = count_q.where(
-            BHItem.name.ilike(f"%{q}%") | BHItem.description.ilike(f"%{q}%")
+            BHItem.name.ilike(f"%{q}%")
+            | BHItem.description.ilike(f"%{q}%")
+            | (func.similarity(BHItem.name, q) > 0.2)
+            | (func.similarity(BHItem.description, q) > 0.15)
         )
     if category:
         count_q = count_q.where(BHItem.category == category)
