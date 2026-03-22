@@ -65,12 +65,12 @@
 
         /* Mobile-first: bigger base font for readability
            24px on phones = 50% bigger than default 16px
-           Sweet spot: readable without glasses, doesn't break layouts */
+           !important needed because Tailwind JS injects styles that override static CSS */
         @media (max-width: 1023px) {
-            html { font-size: 20px; }
+            html { font-size: 20px !important; }
         }
         @media (max-width: 640px) {
-            html { font-size: 24px; }
+            html { font-size: 24px !important; }
         }
     </style>
 
