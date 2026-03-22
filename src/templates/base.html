@@ -63,12 +63,14 @@
         .prose p { margin-bottom: 0.5em; }
         .prose strong { font-weight: 600; }
 
-        /* Mobile-first: bigger base font for readability */
+        /* Mobile-first: bigger base font for readability
+           24px on phones = 50% bigger than default 16px
+           Sweet spot: readable without glasses, doesn't break layouts */
         @media (max-width: 1023px) {
-            html { font-size: 22px; }
+            html { font-size: 20px; }
         }
         @media (max-width: 640px) {
-            html { font-size: 28px; }
+            html { font-size: 24px; }
         }
     </style>
 
