@@ -24,8 +24,8 @@
     "orders": "Orders"
   },
   "home": {
-    "hero_title": "Every Garage Becomes a Rental Shop",
-    "hero_subtitle": "Rent tools, share skills, build community. No fees. No middlemen.",
+    "hero_title": "The Town Square is Open",
+    "hero_subtitle": "Your neighborhood has everything you need. Every neighbor has something to share. Rent it. Learn it. Make it. Bid on it. No fees. No middlemen.",
     "cta_browse": "Browse Items",
     "cta_list": "List Your Stuff",
     "stats_listings": "Active Listings",
@@ -35,11 +35,14 @@
     "featured_title": "Recently Listed",
     "how_it_works": "How It Works",
     "step_1_title": "List Your Stuff",
-    "step_1_desc": "Tools, kitchen gear, equipment -- anything collecting dust.",
+    "step_1_desc": "Tools, art, rooms, skills -- if you have it, someone needs it.",
+    "step_1_cta": "Start Listing",
     "step_2_title": "Set Your Terms",
-    "step_2_desc": "Rent, sell, make an offer, or trade services.",
+    "step_2_desc": "Rent, sell, teach, auction. You set the price. Zero commission.",
+    "step_2_cta": "Browse Examples",
     "step_3_title": "Connect",
-    "step_3_desc": "Find neighbors who need what you have. Build relationships."
+    "step_3_desc": "Find neighbors who need what you have. Build relationships.",
+    "step_3_cta": "Find a Maker"
   },
   "browse": {
     "title": "Browse Items",
@@ -936,8 +939,8 @@
     "search_by_skill_workshop_type_or_service_offered": "Search by skill, workshop type, or service offered.",
     "explore_all_makers": "Explore All Makers",
     "the_story": "The Story",
-    "my_father_was_a_handshovel_landscaper_for_60_years": "My father was a hand-shovel landscaper for 60 years in Switzerland. His garage was legendary -- 500 tools, every one with a story. When he passed in 2020, those tools sat there. Every neighborhood has a garage like his. Every neighborhood has people who need what's in it. La Piazza connects them.",
-    "built_from_a_camper_van_in_trapani_sicily_2026": "Built from a camper van in Trapani, Sicily, 2026.",
+    "my_father_was_a_handshovel_landscaper_for_60_years": "My father was a hand-shovel landscaper for 60 years in Switzerland. 500 tools in his garage, every one with a story. When he passed in 2020, those tools sat there. Every neighborhood has a garage like his. Every neighborhood has an artist who teaches, a sailor who gives lessons, a chef who shares recipes, a maker who fixes things. They just haven't met yet. La Piazza is the town square where they find each other. No commissions. No algorithms. Just people helping people.",
+    "built_from_a_camper_van_in_trapani_sicily_2026": "Built from a camper van in Trapani, Sicily. 2026.",
     "ask_the_ai_concierge": "Ask the AI concierge...",
     "coming": "Coming",
     "ai_concierge": "AI Concierge",
