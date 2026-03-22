@@ -297,8 +297,8 @@
                         </button>
                     </div>
 
-                    <!-- Body (view mode) -->
-                    <div x-show="!editMode" class="mt-4 text-gray-700 whitespace-pre-wrap" x-text="activePost.body"></div>
+                    <!-- Body (view mode) -- rendered as Markdown -->
+                    <div x-show="!editMode" class="mt-4 text-gray-700 prose prose-sm max-w-none" x-html="typeof marked !== 'undefined' ? marked.parse(activePost.body || '') : (activePost.body || '')"></div>
 
                     <!-- Edit mode -->
                     <div x-show="editMode" class="mt-4 space-y-3" x-cloak>
@@ -450,7 +450,7 @@
                                                 <span x-show="reply.updated_at && reply.updated_at !== reply.created_at" class="text-xs text-gray-400 italic">(edited)</span>
                                             </div>
                                             <template x-if="!reply._editing">
-                                                <p class="mt-1 text-sm text-gray-700 whitespace-pre-wrap" x-text="reply.body"></p>
+                                                <div class="mt-1 text-sm text-gray-700 prose prose-sm max-w-none" x-html="typeof marked !== 'undefined' ? marked.parse(reply.body || '') : (reply.body || '')"></div>
                                             </template>
                                             <template x-if="reply._editing">
                                                 <div class="mt-1">
@@ -519,7 +519,7 @@
                                                             <span x-show="child.updated_at && child.updated_at !== child.created_at" class="text-xs text-gray-400 italic">(edited)</span>
                                                         </div>
                                                         <template x-if="!child._editing">
-                                                            <p class="mt-0.5 text-sm text-gray-700 whitespace-pre-wrap" x-text="child.body"></p>
+                                                            <div class="mt-0.5 text-sm text-gray-700 prose prose-sm max-w-none" x-html="typeof marked !== 'undefined' ? marked.parse(child.body || '') : (child.body || '')"></div>
                                                         </template>
                                                         <template x-if="child._editing">
                                                             <div class="mt-1">
