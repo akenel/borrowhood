@@ -69,6 +69,7 @@ class UserOut(BaseModel):
     seller_type: Optional[str] = "personal"
     business_name: Optional[str] = None
     vat_number: Optional[str] = None
+    accepted_payments: Optional[str] = None
     languages: List[UserLanguageOut] = []
     skills: List[UserSkillOut] = []
     social_links: List[UserSocialLinkOut] = []
@@ -139,6 +140,7 @@ class UserProfileUpdate(BaseModel):
     seller_type: Optional[str] = Field(None, pattern="^(personal|business)$")
     business_name: Optional[str] = Field(None, max_length=200)
     vat_number: Optional[str] = Field(None, max_length=50)
+    accepted_payments: Optional[str] = Field(None, max_length=200)
 
     @field_validator("latitude", mode="before")
     @classmethod

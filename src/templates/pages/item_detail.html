@@ -938,6 +938,21 @@
                     <p class="text-sm text-gray-700">{{ item.owner.city }}{% if item.owner.country_code %}, {{ item.owner.country_code }}{% endif %}</p>
                 </div>
                 {% endif %}
+
+                <!-- Accepted Payments -->
+                <div class="mt-4">
+                    <p class="text-xs font-medium text-gray-500 mb-2">{% if lang == 'it' %}Pagamenti{% else %}Payment{% endif %}</p>
+                    {% if item.owner.accepted_payments %}
+                    <div class="flex flex-wrap gap-1.5">
+                        {% set pay_labels = {'cash': '💶 Cash', 'iban': '🏦 IBAN', 'paypal': '🅿️ PayPal', 'card': '💳 Card', 'satispay': '📱 Satispay', 'twint': '🇨🇭 Twint', 'revolut': '💜 Revolut', 'bizum': '📲 Bizum', 'venmo': '🇺🇸 Venmo'} %}
+                        {% for pm in item.owner.accepted_payments.split(',') if pm %}
+                        <span class="text-xs px-2 py-1 bg-emerald-50 text-emerald-700 rounded">{{ pay_labels.get(pm, pm) }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-xs text-gray-400">{% if lang == 'it' %}Contatta il venditore per i metodi di pagamento{% else %}Contact seller to arrange payment{% endif %}</p>
+                    {% endif %}
+                </div>
             </div>
             {% endif %}
 

@@ -1889,6 +1889,82 @@
                     </div>
                 </div>
 
+                <!-- Accepted Payment Methods -->
+                <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="{
+                    payments: [],
+                    saved: false,
+                    saving: false,
+                    allMethods: [
+                        { id: 'cash', label: 'Cash', icon: '💶', region: 'Global' },
+                        { id: 'iban', label: 'IBAN / Bank Transfer', icon: '🏦', region: 'Global' },
+                        { id: 'paypal', label: 'PayPal', icon: '🅿️', region: 'Global' },
+                        { id: 'card', label: 'Credit / Debit Card', icon: '💳', region: 'Global' },
+                        { id: 'satispay', label: 'Satispay', icon: '📱', region: 'Italy' },
+                        { id: 'twint', label: 'Twint', icon: '🇨🇭', region: 'Switzerland' },
+                        { id: 'revolut', label: 'Revolut', icon: '💜', region: 'Europe' },
+                        { id: 'bizum', label: 'Bizum', icon: '📲', region: 'Spain' },
+                        { id: 'venmo', label: 'Venmo', icon: '🇺🇸', region: 'USA' },
+                    ],
+                    toggle(id) {
+                        var idx = this.payments.indexOf(id);
+                        if (idx >= 0) this.payments.splice(idx, 1);
+                        else this.payments.push(id);
+                    },
+                    async load() {
+                        try {
+                            var r = await fetch('/api/v1/users/me');
+                            if (r.ok) {
+                                var d = await r.json();
+                                this.payments = d.accepted_payments ? d.accepted_payments.split(',').filter(Boolean) : [];
+                            }
+                        } catch(e) {}
+                    },
+                    async save() {
+                        this.saving = true;
+                        try {
+                            var resp = await fetch('/api/v1/users/me', {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ accepted_payments: this.payments.join(',') })
+                            });
+                            if (resp.ok) { this.saved = true; setTimeout(() => this.saved = false, 3000); }
+                        } catch(e) {}
+                        this.saving = false;
+                    }
+                }" x-init="load()">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-900">{% if lang == 'it' %}Metodi di Pagamento Accettati{% else %}Accepted Payment Methods{% endif %}</h3>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-4">{% if lang == 'it' %}Seleziona come i clienti possono pagarti. Questo viene mostrato sulle tue inserzioni.{% else %}Select how customers can pay you. This is shown on your listings.{% endif %}</p>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+                        <template x-for="m in allMethods" :key="m.id">
+                            <button type="button" @click="toggle(m.id)"
+                                    class="flex items-center gap-2 px-3 py-2.5 rounded-lg border text-sm font-medium transition-colors text-left"
+                                    :class="payments.includes(m.id) ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'">
+                                <span x-text="m.icon" class="text-lg"></span>
+                                <div>
+                                    <span x-text="m.label" class="block"></span>
+                                    <span x-text="m.region" class="text-[10px] text-gray-400"></span>
+                                </div>
+                            </button>
+                        </template>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <button @click="save()" :disabled="saving"
+                                class="px-4 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition-colors min-h-[40px]">
+                            <span x-show="!saving">{{ t('i18n.save') }}</span>
+                            <span x-show="saving" x-cloak>...</span>
+                        </button>
+                        <span x-show="saved" x-cloak x-transition class="text-sm text-emerald-600 font-medium">{{ t('i18n.saved') }}</span>
+                        <span x-show="payments.length > 0" class="text-xs text-gray-400" x-text="payments.length + ' selected'"></span>
+                    </div>
+                </div>
+
                 <!-- Danger Zone: Account Deletion -->
                 <div x-data="accountDelete()" class="bg-red-50 rounded-lg border border-red-200 p-6">
                     <div class="flex items-center space-x-3 mb-4">
