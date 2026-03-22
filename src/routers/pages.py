@@ -1021,6 +1021,12 @@ async def terms(request: Request,
     return _render("pages/terms.html", ctx)
 
 
+@router.get("/googled3f2ccce2b1f34d3.html", response_class=Response)
+async def google_verification():
+    """Google Search Console verification file."""
+    return Response(content="google-site-verification: googled3f2ccce2b1f34d3.html", media_type="text/html")
+
+
 @router.get("/robots.txt", response_class=Response)
 async def robots_txt():
     """Robots.txt for search engine crawlers."""
