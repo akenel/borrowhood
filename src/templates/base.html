@@ -279,6 +279,9 @@
                 <a href="/logout" class="block px-4 py-4 text-lg font-medium text-red-600 hover:bg-red-50 rounded-lg min-h-[52px]">{{ t('nav.logout') }}</a>
                 {% else %}
                 <a href="/login" class="block px-4 py-4 text-lg font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg min-h-[52px] text-center">{{ t('nav.login') }}</a>
+                {% if debug %}
+                <a href="/demo-login" class="block px-4 py-4 text-lg font-medium text-amber-600 hover:bg-amber-50 rounded-lg min-h-[52px]">{{ t('nav.demo_login') }}</a>
+                {% endif %}
                 {% endif %}
                 <!-- Mobile language switch with flags -->
                 <div class="flex space-x-3 px-4 py-4" @click.stop>
