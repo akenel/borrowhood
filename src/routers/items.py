@@ -65,8 +65,13 @@ async def list_items(
 
     if q:
         search_term = f"%{q}%"
+        # Fuzzy search: trigram similarity OR substring match
+        from sqlalchemy import text as sa_text
         query = query.where(
-            BHItem.name.ilike(search_term) | BHItem.description.ilike(search_term)
+            BHItem.name.ilike(search_term)
+            | BHItem.description.ilike(search_term)
+            | (func.similarity(BHItem.name, q) > 0.2)
+            | (func.similarity(BHItem.description, q) > 0.15)
         )
     if category:
         query = query.where(BHItem.category == category)
