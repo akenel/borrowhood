@@ -138,7 +138,7 @@
                     <button @click="pausing=true; fetch('/api/v1/listings/pause-all',{method:'POST'}).then(r=>r.json()).then(d=>{pausing=false; window.dispatchEvent(new CustomEvent('toast',{detail:{type:'info',message:d.paused+' listings paused'}})); if(d.paused>0) location.reload()}).catch(()=>pausing=false)"
                             :disabled="pausing"
                             class="px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors min-h-[36px] disabled:opacity-50">
-                        <span x-show="!pausing">{{ t('i18n.pause_all_activecount_') }}</span>
+                        <span x-show="!pausing">{{ t('i18n.pause_all') }} ({{ active_count }})</span>
                         <span x-show="pausing" x-cloak>...</span>
                     </button>
                     {% endif %}
@@ -146,7 +146,7 @@
                     <button @click="resuming=true; fetch('/api/v1/listings/resume-all',{method:'POST'}).then(r=>r.json()).then(d=>{resuming=false; window.dispatchEvent(new CustomEvent('toast',{detail:{type:'success',message:d.resumed+' listings resumed'}})); if(d.resumed>0) location.reload()}).catch(()=>resuming=false)"
                             :disabled="resuming"
                             class="px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors min-h-[36px] disabled:opacity-50">
-                        <span x-show="!resuming">{{ t('i18n.resume_all_pausedcount_') }}</span>
+                        <span x-show="!resuming">{{ t('i18n.resume_all') }} ({{ paused_count }})</span>
                         <span x-show="resuming" x-cloak>...</span>
                     </button>
                     {% endif %}
