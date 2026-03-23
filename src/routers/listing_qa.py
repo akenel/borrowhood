@@ -197,6 +197,9 @@ async def answer_question(
 
 # ── Edit & Delete Q&A ──
 
+from pydantic import BaseModel, Field
+
+
 class QAEditQuestion(BaseModel):
     question: str = Field(..., min_length=5, max_length=1000)
 
