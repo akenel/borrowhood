@@ -746,6 +746,7 @@ async def profile(request: Request,
                     selectinload(BHUser.languages),
                     selectinload(BHUser.skills),
                     selectinload(BHUser.points),
+                    selectinload(BHUser.social_links),
                 )
                 .where(BHUser.id == linked_user.id)
             )

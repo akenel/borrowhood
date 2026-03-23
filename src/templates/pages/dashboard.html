@@ -1852,6 +1852,72 @@
                     </template>
                 </div>
 
+                <!-- Social Links Card -->
+                <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="{
+                    links: [],
+                    saving: false,
+                    platforms: ['instagram','linkedin','twitter','tiktok','youtube','facebook','github','website','telegram'],
+                    platformLabels: { instagram:'Instagram', linkedin:'LinkedIn', twitter:'X / Twitter', tiktok:'TikTok', youtube:'YouTube', facebook:'Facebook', github:'GitHub', website:'Website', telegram:'Telegram' },
+                    async load() {
+                        try {
+                            const r = await fetch('/api/v1/users/me/social-links');
+                            if (r.ok) this.links = await r.json();
+                        } catch(e) {}
+                        if (this.links.length === 0) this.links.push({ platform: 'instagram', url: '' });
+                    },
+                    addLink() { if (this.links.length < 10) this.links.push({ platform: 'website', url: '' }); },
+                    removeLink(i) { this.links.splice(i, 1); },
+                    async save() {
+                        this.saving = true;
+                        try {
+                            const valid = this.links.filter(l => l.url && l.url.trim());
+                            const r = await fetch('/api/v1/users/me/social-links', {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(valid)
+                            });
+                            if (r.ok) window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{{ t('i18n.links_saved') }}' } }));
+                        } catch(e) {}
+                        this.saving = false;
+                    }
+                }" x-init="load()">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ t('i18n.social_links') }}</h3>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-4">{{ t('i18n.social_links_desc') }}</p>
+
+                    <div class="space-y-3">
+                        <template x-for="(link, i) in links" :key="i">
+                            <div class="flex items-center gap-2">
+                                <select x-model="link.platform" class="px-2 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 w-32">
+                                    <template x-for="p in platforms" :key="p">
+                                        <option :value="p" x-text="platformLabels[p]"></option>
+                                    </template>
+                                </select>
+                                <input x-model="link.url" type="url" placeholder="https://..."
+                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                                <button @click="removeLink(i)" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Remove">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="flex items-center gap-3 mt-4">
+                        <button @click="addLink()" x-show="links.length < 10"
+                                class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">+ {{ t('i18n.add_link') }}</button>
+                        <div class="flex-1"></div>
+                        <button @click="save()" :disabled="saving"
+                                class="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 min-h-[44px]">
+                            <span x-show="!saving">{{ t('i18n.save_links') }}</span>
+                            <span x-show="saving" x-cloak>{{ t('common.loading') }}</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Email Notifications Card -->
                 <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="{
                     emailEnabled: true,

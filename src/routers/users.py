@@ -124,6 +124,74 @@ async def update_me(
     return {"status": "ok"}
 
 
+# ── Social Links ──
+
+from src.models.user import BHUserSocialLink
+
+ALLOWED_PLATFORMS = {
+    "instagram", "linkedin", "twitter", "tiktok", "youtube",
+    "facebook", "github", "website", "telegram", "whatsapp",
+}
+
+
+@router.get("/me/social-links")
+async def get_social_links(
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get current user's social links."""
+    user = await get_user(db, token)
+    result = await db.execute(
+        select(BHUserSocialLink).where(BHUserSocialLink.user_id == user.id)
+    )
+    links = result.scalars().all()
+    return [{"platform": l.platform, "url": l.url, "label": l.label} for l in links]
+
+
+@router.put("/me/social-links")
+async def update_social_links(
+    request: Request,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Replace all social links. Send array of {platform, url, label?}."""
+    user = await get_user(db, token)
+    data = await request.json()
+
+    if not isinstance(data, list):
+        raise HTTPException(status_code=400, detail="Expected array of links")
+    if len(data) > 10:
+        raise HTTPException(status_code=400, detail="Maximum 10 social links")
+
+    # Delete existing
+    existing = await db.execute(
+        select(BHUserSocialLink).where(BHUserSocialLink.user_id == user.id)
+    )
+    for link in existing.scalars().all():
+        await db.delete(link)
+
+    # Add new
+    for item in data:
+        platform = (item.get("platform") or "").lower().strip()
+        url = (item.get("url") or "").strip()
+        if not platform or not url:
+            continue
+        if platform not in ALLOWED_PLATFORMS:
+            continue
+        # Basic URL validation
+        if not url.startswith("http://") and not url.startswith("https://") and platform != "whatsapp" and platform != "telegram":
+            url = "https://" + url
+        db.add(BHUserSocialLink(
+            user_id=user.id,
+            platform=platform,
+            url=url,
+            label=item.get("label"),
+        ))
+
+    await db.commit()
+    return {"status": "ok"}
+
+
 # ── Avatar upload ──
 
 
