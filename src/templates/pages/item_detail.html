@@ -513,7 +513,7 @@
 
                             <!-- Title + body -->
                             <p x-show="review.title" class="text-sm font-semibold text-gray-900 mt-2" x-text="review.title"></p>
-                            <p x-show="review.body" class="text-sm text-gray-600 mt-1 leading-relaxed" x-text="review.body"></p>
+                            <div x-show="review.body" class="text-sm text-gray-600 mt-1 leading-relaxed prose prose-sm max-w-none" x-html="typeof marked !== 'undefined' ? marked.parse(review.body || '') : (review.body || '')"></div>
 
                             <!-- Subcategory mini-bars (if any exist) -->
                             <div x-show="review.rating_accuracy || review.rating_communication || review.rating_value || review.rating_timeliness"
@@ -1366,7 +1366,7 @@
                                 <h4 class="font-semibold text-gray-900" x-text="review.title"></h4>
                             </template>
                             <template x-if="review.body">
-                                <p class="text-gray-700 text-sm mt-1 whitespace-pre-line" x-text="review.body"></p>
+                                <div class="text-gray-700 text-sm mt-1 prose prose-sm max-w-none" x-html="typeof marked !== 'undefined' ? marked.parse(review.body || '') : (review.body || '')"></div>
                             </template>
                         </div>
 

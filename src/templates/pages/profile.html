@@ -291,7 +291,8 @@
     {% if profile_user and profile_user.bio %}
     <div class="mt-4 bg-white rounded-lg border border-gray-200 p-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-2">{{ t('profile.about') }}</h2>
-        <p class="text-gray-600 text-sm leading-relaxed">{{ profile_user.bio }}</p>
+        <div id="bio-text" class="text-gray-600 text-sm leading-relaxed prose prose-sm max-w-none" data-raw="{{ profile_user.bio | e }}"></div>
+        <script>(function(){var el=document.getElementById('bio-text');if(el&&typeof marked!=='undefined'){try{el.innerHTML=marked.parse(el.dataset.raw||'')}catch(e){el.textContent=el.dataset.raw||''}}else if(el){el.textContent=el.dataset.raw||''}})()</script>
     </div>
     {% endif %}
 

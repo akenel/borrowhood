@@ -164,7 +164,7 @@
                                         <!-- Normal display -->
                                         <template x-if="editingMsgId !== msg.id">
                                             <div>
-                                                <p class="text-sm" x-text="msg.body"></p>
+                                                <div class="text-sm prose prose-sm max-w-none" x-html="typeof marked !== 'undefined' ? marked.parse(msg.body || '') : (msg.body || '')"></div>
                                                 <div class="flex items-center gap-1 mt-1">
                                                     <p class="text-[10px] opacity-60" x-text="formatMsgTime(msg.created_at)"></p>
                                                     <span x-show="msg.edited_at" class="text-[10px] opacity-50 italic">{{ t('i18n.edited') }}</span>
