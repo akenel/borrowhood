@@ -1130,9 +1130,9 @@
                 <div class="space-y-4">
                     <template x-for="qa in questions" :key="qa.id">
                         <div class="border-l-2 border-gray-200 pl-3">
-                            <p class="text-sm text-gray-800"><span class="font-medium" x-text="qa.asker_name || 'Member'"></span>: <span x-text="qa.question"></span></p>
+                            <div class="text-sm text-gray-800"><span class="font-medium" x-text="qa.asker_name || 'Member'"></span>: <span class="prose prose-sm inline max-w-none" x-html="typeof marked !== 'undefined' ? marked.parse(qa.question || '') : (qa.question || '')"></span></div>
                             <template x-if="qa.answer">
-                                <p class="text-sm text-emerald-700 mt-1"><span class="font-medium" x-text="qa.answerer_name || 'Owner'"></span>: <span x-text="qa.answer"></span></p>
+                                <div class="text-sm text-emerald-700 mt-1"><span class="font-medium" x-text="qa.answerer_name || 'Owner'"></span>: <span class="prose prose-sm inline max-w-none" x-html="typeof marked !== 'undefined' ? marked.parse(qa.answer || '') : (qa.answer || '')"></span></div>
                             </template>
                             <template x-if="!qa.answer && isOwner">
                                 <div class="mt-1 flex gap-2">

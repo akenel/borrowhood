@@ -193,3 +193,62 @@ async def answer_question(
     )
     qa = result.scalars().first()
     return _qa_to_out(qa)
+
+
+# ── Edit & Delete Q&A ──
+
+class QAEditQuestion(BaseModel):
+    question: str = Field(..., min_length=5, max_length=1000)
+
+
+@router.patch("/{qa_id}/edit")
+async def edit_question(
+    qa_id: UUID,
+    data: QAEditQuestion,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Edit a question. Only the asker can edit, within 24 hours. Supports markdown."""
+    user = await get_user(db, token)
+    qa = await db.get(BHListingQA, qa_id)
+    if not qa or qa.deleted_at is not None:
+        raise HTTPException(status_code=404, detail="Question not found")
+    if qa.asker_id != user.id:
+        raise HTTPException(status_code=403, detail="You can only edit your own questions")
+
+    age = (datetime.now(timezone.utc) - qa.created_at).total_seconds()
+    if age > 86400:
+        raise HTTPException(status_code=403, detail="Questions can only be edited within 24 hours")
+
+    qa.question = data.question
+    await db.commit()
+    return {"status": "ok"}
+
+
+@router.delete("/{qa_id}")
+async def delete_question(
+    qa_id: UUID,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a question. Only the asker or item owner can delete."""
+    user = await get_user(db, token)
+    qa = await db.get(BHListingQA, qa_id)
+    if not qa or qa.deleted_at is not None:
+        raise HTTPException(status_code=404, detail="Question not found")
+
+    is_asker = qa.asker_id == user.id
+    is_owner = False
+    if not is_asker:
+        from src.models.listing import BHListing
+        listing = await db.get(BHListing, qa.listing_id)
+        if listing:
+            item = await db.get(BHItem, listing.item_id)
+            is_owner = item and item.owner_id == user.id
+
+    if not is_asker and not is_owner:
+        raise HTTPException(status_code=403, detail="Only the asker or item owner can delete questions")
+
+    qa.deleted_at = datetime.now(timezone.utc)
+    await db.commit()
+    return {"status": "deleted"}
