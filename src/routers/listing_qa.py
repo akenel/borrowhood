@@ -100,7 +100,7 @@ async def ask_question(
             notification_type=NotificationType.SYSTEM,
             title=f"{user.display_name} asked a question on your listing",
             body=data.question[:200],
-            link=f"/listings/{data.listing_id}",
+            link=f"/items/{item.slug}",
             entity_type="listing_qa",
         )
 
@@ -163,13 +163,19 @@ async def answer_question(
     from src.models.notification import NotificationType
     from src.services.notify import create_notification
 
+    # Get item slug for the link
+    from src.models.listing import BHListing
+    _listing = await db.get(BHListing, qa.listing_id)
+    _item = await db.get(BHItem, _listing.item_id) if _listing else None
+    _link = f"/items/{_item.slug}" if _item else "/dashboard"
+
     await create_notification(
         db=db,
         user_id=qa.asker_id,
         notification_type=NotificationType.SYSTEM,
         title=f"{user.display_name} answered your question",
         body=data.answer[:200],
-        link=f"/listings/{qa.listing_id}",
+        link=_link,
         entity_type="listing_qa",
         entity_id=qa.id,
     )
