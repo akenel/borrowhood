@@ -146,6 +146,9 @@ class BHUser(BHBase, Base):
     notify_telegram: Mapped[bool] = mapped_column(default=True)
     notify_email: Mapped[bool] = mapped_column(default=True)
 
+    # Referral tracking
+    referred_by: Mapped[Optional[str]] = mapped_column(String(80))  # slug of the referrer
+
     # Relationships
     languages: Mapped[List["BHUserLanguage"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     skills: Mapped[List["BHUserSkill"]] = relationship(back_populates="user", cascade="all, delete-orphan")

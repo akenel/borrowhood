@@ -90,6 +90,43 @@ async def auth_callback(request: Request, code: str = "", state: str = "/"):
         samesite="lax",
         secure=not settings.debug,
     )
+
+    # Process referral cookie (if present)
+    ref_slug = request.cookies.get("bh_ref")
+    if ref_slug:
+        response.delete_cookie("bh_ref")  # One-time use
+        try:
+            from jose import jwt as _jwt
+            decoded = _jwt.decode(access_token, options={"verify_signature": False})
+            from sqlalchemy.ext.asyncio import AsyncSession
+            from src.database import async_session as async_session_factory
+            from src.models.user import BHUser, BHUserPoints
+            from sqlalchemy import select
+            async with async_session_factory() as db:
+                # Find the new user
+                kc_id = decoded.get("sub", "")
+                result = await db.execute(select(BHUser).where(BHUser.keycloak_id == kc_id))
+                new_user = result.scalars().first()
+                if new_user and not new_user.referred_by:
+                    # Find referrer
+                    ref_result = await db.execute(select(BHUser).where(BHUser.slug == ref_slug))
+                    referrer = ref_result.scalars().first()
+                    if referrer and referrer.id != new_user.id:
+                        new_user.referred_by = ref_slug
+                        # Award points: 10 to new user, 20 to referrer
+                        new_pts = await db.execute(select(BHUserPoints).where(BHUserPoints.user_id == new_user.id))
+                        new_pts_obj = new_pts.scalars().first()
+                        if new_pts_obj:
+                            new_pts_obj.total_points += 10
+                        ref_pts = await db.execute(select(BHUserPoints).where(BHUserPoints.user_id == referrer.id))
+                        ref_pts_obj = ref_pts.scalars().first()
+                        if ref_pts_obj:
+                            ref_pts_obj.total_points += 20
+                        await db.commit()
+                        logger.info("Referral: %s referred %s (slug=%s)", ref_slug, new_user.display_name, new_user.slug)
+        except Exception as e:
+            logger.warning("Referral processing failed: %s", e)
+
     return response
 
 
@@ -106,4 +143,25 @@ async def logout(request: Request):
 
     response = RedirectResponse(url=logout_url, status_code=302)
     response.delete_cookie("bh_session")
+    return response
+
+
+@router.get("/join")
+async def join_referral(request: Request):
+    """Referral link: /join?ref=akenel -- sets cookie and redirects to signup."""
+    ref = request.query_params.get("ref", "").strip()
+    # Redirect to Keycloak registration page
+    register_url = (
+        f"{_kc_base()}/registrations"
+        f"?client_id={settings.kc_client_id}"
+        f"&redirect_uri={quote(settings.app_url + '/auth/callback', safe='')}"
+        f"&response_type=code"
+        f"&scope=openid+email+profile"
+    )
+    response = RedirectResponse(url=register_url, status_code=302)
+    if ref:
+        response.set_cookie(
+            "bh_ref", ref, max_age=30 * 24 * 3600,  # 30 days
+            httponly=True, samesite="lax",
+        )
     return response

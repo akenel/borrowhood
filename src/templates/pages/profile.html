@@ -92,7 +92,13 @@
                 </div>
                 <div class="flex-1"></div>
                 {% if is_owner %}
-                <a href="/dashboard?tab=settings" class="mt-12 px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors">{{ t('i18n.edit_profile') }}</a>
+                <div class="mt-12 flex items-center gap-2">
+                    <a href="/dashboard?tab=settings" class="px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors">{{ t('i18n.edit_profile') }}</a>
+                    <button @click="navigator.clipboard.writeText('https://lapiazza.app/join?ref={{ profile_user.slug }}'); window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{{ t('i18n.referral_link_copied') }}' } }))"
+                            class="px-3 py-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors" title="{{ t('i18n.invite_friends') }}">
+                        {{ t('i18n.invite_friends') }}
+                    </button>
+                </div>
                 {% endif %}
                 <button @click="bhShare('{{ (profile_user.display_name if profile_user else user.get('preferred_username', 'User')) | e }}', window.location.href)" class="mt-12 p-2 rounded-full hover:bg-gray-100 transition-colors" title="Share profile">
                     <svg class="w-5 h-5 text-gray-400 hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
