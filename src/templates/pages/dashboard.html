@@ -1858,6 +1858,7 @@
                     saving: false,
                     platforms: ['instagram','linkedin','twitter','tiktok','youtube','facebook','github','website','telegram'],
                     platformLabels: { instagram:'Instagram', linkedin:'LinkedIn', twitter:'X / Twitter', tiktok:'TikTok', youtube:'YouTube', facebook:'Facebook', github:'GitHub', website:'Website', telegram:'Telegram' },
+                    platformHints: { instagram:'https://instagram.com/yourname', linkedin:'https://linkedin.com/in/yourname', twitter:'https://x.com/yourname', tiktok:'https://tiktok.com/@yourname', youtube:'https://youtube.com/@yourchannel', facebook:'https://facebook.com/yourpage', github:'https://github.com/yourname', website:'https://yoursite.com', telegram:'https://t.me/yourname' },
                     async load() {
                         try {
                             const r = await fetch('/api/v1/users/me/social-links');
@@ -1897,7 +1898,7 @@
                                         <option :value="p" x-text="platformLabels[p]"></option>
                                     </template>
                                 </select>
-                                <input x-model="link.url" type="url" placeholder="https://..."
+                                <input x-model="link.url" type="url" :placeholder="platformHints[link.platform] || 'https://...'"
                                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
                                 <button @click="removeLink(i)" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Remove">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
