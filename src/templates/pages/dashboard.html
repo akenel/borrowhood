@@ -1649,6 +1649,131 @@
         <!-- Settings tab -->
         <div x-show="tab === 'settings'" x-cloak x-data="telegramLink()">
             <div class="max-w-lg space-y-6">
+
+                <!-- Edit Profile Card -->
+                <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="{
+                    profileLoaded: false,
+                    saving: false,
+                    saved: false,
+                    p: { display_name: '', tagline: '', bio: '', city: '', country_code: '', workshop_name: '', workshop_type: '' },
+                    services: { offers_delivery: false, offers_pickup: false, offers_training: false, offers_custom_orders: false, offers_repair: false },
+                    async load() {
+                        try {
+                            const r = await fetch('/api/v1/users/me');
+                            if (r.ok) {
+                                const d = await r.json();
+                                this.p.display_name = d.display_name || '';
+                                this.p.tagline = d.tagline || '';
+                                this.p.bio = d.bio || '';
+                                this.p.city = d.city || '';
+                                this.p.country_code = d.country_code || '';
+                                this.p.workshop_name = d.workshop_name || '';
+                                this.p.workshop_type = d.workshop_type || '';
+                                this.services.offers_delivery = d.offers_delivery || false;
+                                this.services.offers_pickup = d.offers_pickup || false;
+                                this.services.offers_training = d.offers_training || false;
+                                this.services.offers_custom_orders = d.offers_custom_orders || false;
+                                this.services.offers_repair = d.offers_repair || false;
+                            }
+                        } catch(e) {}
+                        this.profileLoaded = true;
+                    },
+                    async save() {
+                        this.saving = true;
+                        try {
+                            const r = await fetch('/api/v1/users/me', {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ ...this.p, ...this.services })
+                            });
+                            if (r.ok) {
+                                this.saved = true;
+                                setTimeout(() => this.saved = false, 3000);
+                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{{ t('i18n.profile_saved') }}' } }));
+                            }
+                        } catch(e) {}
+                        this.saving = false;
+                    }
+                }" x-init="load()">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ t('i18n.edit_profile') }}</h3>
+                    </div>
+
+                    <div class="space-y-4" x-show="profileLoaded" x-cloak>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.display_name') }}</label>
+                            <input x-model="p.display_name" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.tagline') }}</label>
+                            <input x-model="p.tagline" type="text" maxlength="120" placeholder="{{ t('i18n.tagline_placeholder') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.about_bio') }}</label>
+                            <textarea x-model="p.bio" rows="4" maxlength="2000" placeholder="{{ t('i18n.bio_placeholder') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                            <p class="text-xs text-gray-400 mt-1">{{ t('i18n.supports_markdown') }}</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.city') }}</label>
+                                <input x-model="p.city" type="text" placeholder="Trapani" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.country') }}</label>
+                                <input x-model="p.country_code" type="text" maxlength="2" placeholder="IT" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.workshop_name') }}</label>
+                            <input x-model="p.workshop_name" type="text" placeholder="{{ t('i18n.workshop_name_placeholder') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.workshop_type') }}</label>
+                            <select x-model="p.workshop_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">{{ t('i18n.select_type') }}</option>
+                                <option value="garage">Garage / Workshop</option>
+                                <option value="studio">Studio</option>
+                                <option value="kitchen">Kitchen</option>
+                                <option value="outdoor">Outdoor / Garden</option>
+                                <option value="mobile">Mobile / On-site</option>
+                                <option value="digital">Digital / Online</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Services offered -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('i18n.services_offered') }}</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                                    <input type="checkbox" x-model="services.offers_repair" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.repair') }}
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                                    <input type="checkbox" x-model="services.offers_custom_orders" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.custom') }}
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                                    <input type="checkbox" x-model="services.offers_training" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.training') }}
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                                    <input type="checkbox" x-model="services.offers_delivery" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.delivery') }}
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                                    <input type="checkbox" x-model="services.offers_pickup" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.pickup') }}
+                                </label>
+                            </div>
+                        </div>
+
+                        <button @click="save()" :disabled="saving"
+                                class="w-full px-4 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors min-h-[44px]">
+                            <span x-show="!saving">{{ t('i18n.save_profile') }}</span>
+                            <span x-show="saving" x-cloak>{{ t('common.loading') }}</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Telegram Notifications Card -->
                 <div class="bg-white rounded-lg border border-gray-200 p-6">
                     <div class="flex items-center space-x-3 mb-4">
