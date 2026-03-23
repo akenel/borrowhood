@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>LaPiazza Member Card -- Corrado Sassi (PoC v3)</title>
+<style>
+    @page { size: A4 landscape; margin: 0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    .page {
+        width: 297mm; height: 210mm;
+        position: relative;
+        page-break-after: always;
+        overflow: hidden;
+    }
+    .page:last-child { page-break-after: avoid; }
+
+    .card { position: absolute; width: 142.5mm; height: 99mm; overflow: hidden; }
+    .card-1 { top: 3mm; left: 3mm; }
+    .card-2 { top: 3mm; left: 151.5mm; }
+    .card-3 { top: 108mm; left: 3mm; }
+    .card-4 { top: 108mm; left: 151.5mm; }
+
+    /* ═══════ FRONT: full bleed image, no text ═══════ */
+    .front-card { background: #000; }
+    .front-card img {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+    }
+
+    /* ═══════ BACK: two zones ═══════ */
+    .back-card {
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* TOP ZONE: Member info */
+    .member-zone {
+        padding: 5mm 6mm 4mm;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .member-header {
+        display: flex;
+        gap: 5mm;
+        align-items: flex-start;
+    }
+    .qr-box {
+        width: 28mm; height: 28mm;
+        flex-shrink: 0;
+        border: 0.3mm solid #e5e7eb;
+        border-radius: 2mm;
+        padding: 1mm;
+    }
+    .qr-box img { width: 100%; height: 100%; }
+    .member-text { flex: 1; }
+    .back-person { font-size: 18pt; font-weight: 700; color: #111827; line-height: 1.1; }
+    .back-studio { font-size: 12pt; font-weight: 600; color: #4f46e5; margin-top: 1.5mm; }
+    .back-category { font-size: 10pt; color: #9ca3af; margin-top: 1mm; }
+    .contact-lines { margin-top: 4mm; font-size: 11pt; color: #374151; line-height: 2; }
+    .ci { display: inline-block; width: 5mm; text-align: center; margin-right: 1.5mm; }
+
+    /* DIVIDER */
+    .back-divider {
+        border: none;
+        border-top: 0.4mm solid #e5e7eb;
+        margin: 0;
+    }
+
+    /* BOTTOM ZONE: LaPiazza pitch */
+    .lp-zone {
+        background: #f8fafc;
+        padding: 5mm 6mm;
+        flex-shrink: 0;
+    }
+    .lp-header {
+        display: flex;
+        align-items: center;
+        gap: 3mm;
+    }
+    .wolf-logo { width: 10mm; height: 10mm; flex-shrink: 0; }
+    .lp-brand { font-size: 16pt; font-weight: 700; color: #4f46e5; }
+    .lp-tagline {
+        font-size: 12pt;
+        font-weight: 600;
+        color: #1f2937;
+        margin-top: 1.5mm;
+        line-height: 1.3;
+    }
+    .lp-cta {
+        font-size: 11pt;
+        font-weight: 700;
+        color: #059669;
+        margin-top: 1.5mm;
+    }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: FRONTS -- 4 unique full-bleed images -->
+<div class="page">
+    <div class="card card-1 front-card"><img src="images/pick-1.jpg" alt="Corrado Sassi"></div>
+    <div class="card card-2 front-card"><img src="images/pick-2.jpg" alt="Brooklyn Museum"></div>
+    <div class="card card-3 front-card"><img src="images/pick-3.jpg" alt="Hayward Gallery"></div>
+    <div class="card card-4 front-card"><img src="images/pick-4.jpg" alt="Corrado Sassi"></div>
+</div>
+
+<!-- PAGE 2: BACKS -->
+<div class="page">
+
+    <div class="card card-1 back-card">
+        <div class="member-zone">
+            <div class="member-header">
+                <div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Flapiazza.app%2Fworkshop%2Fartemisthinking-gmail-com" alt="QR"></div>
+                <div class="member-text">
+                    <div class="back-person">Corrado Sassi</div>
+                    <div class="back-studio">Sassi Studio Trapani</div>
+                    <div class="back-category">Art &amp; Photography &middot; Trapani, IT</div>
+                </div>
+            </div>
+            <div class="contact-lines">
+                <div><span class="ci">&#9742;</span>+39 335 806 0169</div>
+                <div><span class="ci">&#9993;</span>corrado.sassi@gmail.com</div>
+                <div><span class="ci">&#127760;</span>corradosassi.com</div>
+                <div><span class="ci">IG</span>instagram.com/corradosassistudio</div>
+            </div>
+        </div>
+        <hr class="back-divider">
+        <div class="lp-zone">
+            <div class="lp-header">
+                <img class="wolf-logo" src="images/wolf-logo.png" alt="La Piazza">
+                <div class="lp-brand">LaPiazza.app</div>
+            </div>
+            <div class="lp-tagline">Your neighbors are already here.<br>I tuoi vicini sono gia qui.</div>
+            <div class="lp-cta">Zero fees. Zero catches. &middot; Zero costi. Zero fregature.</div>
+        </div>
+    </div>
+
+    <div class="card card-2 back-card">
+        <div class="member-zone">
+            <div class="member-header">
+                <div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Flapiazza.app%2Fworkshop%2Fartemisthinking-gmail-com" alt="QR"></div>
+                <div class="member-text">
+                    <div class="back-person">Corrado Sassi</div>
+                    <div class="back-studio">Sassi Studio Trapani</div>
+                    <div class="back-category">Art &amp; Photography &middot; Trapani, IT</div>
+                </div>
+            </div>
+            <div class="contact-lines">
+                <div><span class="ci">&#9742;</span>+39 335 806 0169</div>
+                <div><span class="ci">&#9993;</span>corrado.sassi@gmail.com</div>
+                <div><span class="ci">&#127760;</span>corradosassi.com</div>
+                <div><span class="ci">IG</span>instagram.com/corradosassistudio</div>
+            </div>
+        </div>
+        <hr class="back-divider">
+        <div class="lp-zone">
+            <div class="lp-header">
+                <img class="wolf-logo" src="images/wolf-logo.png" alt="La Piazza">
+                <div class="lp-brand">LaPiazza.app</div>
+            </div>
+            <div class="lp-tagline">Your neighbors are already here.<br>I tuoi vicini sono gia qui.</div>
+            <div class="lp-cta">Zero fees. Zero catches. &middot; Zero costi. Zero fregature.</div>
+        </div>
+    </div>
+
+    <div class="card card-3 back-card">
+        <div class="member-zone">
+            <div class="member-header">
+                <div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Flapiazza.app%2Fworkshop%2Fartemisthinking-gmail-com" alt="QR"></div>
+                <div class="member-text">
+                    <div class="back-person">Corrado Sassi</div>
+                    <div class="back-studio">Sassi Studio Trapani</div>
+                    <div class="back-category">Art &amp; Photography &middot; Trapani, IT</div>
+                </div>
+            </div>
+            <div class="contact-lines">
+                <div><span class="ci">&#9742;</span>+39 335 806 0169</div>
+                <div><span class="ci">&#9993;</span>corrado.sassi@gmail.com</div>
+                <div><span class="ci">&#127760;</span>corradosassi.com</div>
+                <div><span class="ci">IG</span>instagram.com/corradosassistudio</div>
+            </div>
+        </div>
+        <hr class="back-divider">
+        <div class="lp-zone">
+            <div class="lp-header">
+                <img class="wolf-logo" src="images/wolf-logo.png" alt="La Piazza">
+                <div class="lp-brand">LaPiazza.app</div>
+            </div>
+            <div class="lp-tagline">Your neighbors are already here.<br>I tuoi vicini sono gia qui.</div>
+            <div class="lp-cta">Zero fees. Zero catches. &middot; Zero costi. Zero fregature.</div>
+        </div>
+    </div>
+
+    <div class="card card-4 back-card">
+        <div class="member-zone">
+            <div class="member-header">
+                <div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Flapiazza.app%2Fworkshop%2Fartemisthinking-gmail-com" alt="QR"></div>
+                <div class="member-text">
+                    <div class="back-person">Corrado Sassi</div>
+                    <div class="back-studio">Sassi Studio Trapani</div>
+                    <div class="back-category">Art &amp; Photography &middot; Trapani, IT</div>
+                </div>
+            </div>
+            <div class="contact-lines">
+                <div><span class="ci">&#9742;</span>+39 335 806 0169</div>
+                <div><span class="ci">&#9993;</span>corrado.sassi@gmail.com</div>
+                <div><span class="ci">&#127760;</span>corradosassi.com</div>
+                <div><span class="ci">IG</span>instagram.com/corradosassistudio</div>
+            </div>
+        </div>
+        <hr class="back-divider">
+        <div class="lp-zone">
+            <div class="lp-header">
+                <img class="wolf-logo" src="images/wolf-logo.png" alt="La Piazza">
+                <div class="lp-brand">LaPiazza.app</div>
+            </div>
+            <div class="lp-tagline">Your neighbors are already here.<br>I tuoi vicini sono gia qui.</div>
+            <div class="lp-cta">Zero fees. Zero catches. &middot; Zero costi. Zero fregature.</div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
