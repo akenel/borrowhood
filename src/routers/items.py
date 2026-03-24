@@ -268,6 +268,11 @@ async def upload_item_image(
     db: AsyncSession = Depends(get_db),
 ):
     """Upload an image or video file for an item. Only the owner can upload."""
+    import logging
+    _upload_log = logging.getLogger("upload")
+
+    _upload_log.info("Upload attempt: content_type=%s filename=%s", file.content_type, file.filename)
+
     if file.content_type not in ALLOWED_TYPES:
         raise HTTPException(status_code=400, detail="Supported: JPEG, PNG, WebP, GIF, MP4, WebM")
 
@@ -319,9 +324,14 @@ async def upload_item_image(
         sort_order=next_order,
     )
     db.add(media)
-    await db.commit()
-    await db.refresh(media)
-    return media
+    try:
+        await db.commit()
+        await db.refresh(media)
+        _upload_log.info("Upload success: id=%s type=%s", media.id, media.media_type)
+        return media
+    except Exception as e:
+        _upload_log.error("Upload DB error: %s", e, exc_info=True)
+        raise
 
 
 @router.delete("/{item_id}/media/{media_id}", status_code=204)
