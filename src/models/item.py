@@ -94,6 +94,7 @@ CATEGORY_GROUPS = {
 
 class MediaType(str, enum.Enum):
     PHOTO = "photo"
+    VIDEO = "video"                 # Uploaded video file (MP4, WebM)
     VIDEO_EMBED = "video_embed"     # YouTube URL
     DIGITAL_DOWNLOAD = "digital_download"
 
