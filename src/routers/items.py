@@ -304,12 +304,11 @@ async def upload_item_image(
     filepath.write_bytes(contents)
 
     # Get next sort order (append after existing media)
-    from sqlalchemy import func as _func
     max_order = await db.scalar(
-        select(_func.coalesce(_func.max(BHItemMedia.sort_order), -1))
+        select(func.coalesce(func.max(BHItemMedia.sort_order), -1))
         .where(BHItemMedia.item_id == item.id)
     )
-    next_order = (max_order or 0) + 1
+    next_order = (max_order if max_order is not None else -1) + 1
 
     # Create media record
     media = BHItemMedia(
