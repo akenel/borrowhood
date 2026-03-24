@@ -1063,7 +1063,7 @@
                     <p class="text-xs font-medium text-gray-500 mb-2">{% if lang == 'it' %}Pagamenti{% else %}Payment{% endif %}</p>
                     {% if item.owner.accepted_payments %}
                     <div class="flex flex-wrap gap-1.5">
-                        {% set pay_labels = {'cash': '💶 Cash', 'iban': '🏦 IBAN', 'swift': '🏛️ SWIFT', 'paypal': '🅿️ PayPal', 'card': '💳 Card', 'satispay': '📱 Satispay', 'twint': '🇨🇭 Twint', 'revolut': '💜 Revolut', 'sendwave': '🌊 Sendwave', 'wise': '🟢 Wise', 'klarna': '🩷 Klarna', 'bizum': '📲 Bizum', 'venmo': '🇺🇸 Venmo'} %}
+                        {% set pay_labels = {'cash': '💶 Cash', 'iban': '🏦 IBAN', 'swift': '🏛️ SWIFT', 'ach': '🏦 ACH', 'paypal': '🅿️ PayPal', 'card': '💳 Card', 'satispay': '📱 Satispay', 'twint': '🇨🇭 Twint', 'revolut': '💜 Revolut', 'sendwave': '🌊 Sendwave', 'wise': '🟢 Wise', 'klarna': '🩷 Klarna', 'bizum': '📲 Bizum', 'venmo': '🇺🇸 Venmo', 'zelle': '⚡ Zelle', 'cashapp': '💲 Cash App', 'applepay': '🍎 Apple Pay', 'googlepay': '🔵 Google Pay'} %}
                         {% for pm in (item.owner.accepted_payments or '').split(',') if pm %}
                         <span class="text-xs px-2 py-1 bg-emerald-50 text-emerald-700 rounded">{{ pay_labels.get(pm, pm) }}</span>
                         {% endfor %}
