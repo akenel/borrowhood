@@ -679,9 +679,9 @@
                             {{ t('i18n.choose_photos') }}
                         </button>
                     </div>
-                    <input type="file" x-ref="cameraInput" accept="image/*" capture="environment" class="hidden"
+                    <input type="file" x-ref="cameraInput" accept="image/*,video/mp4,video/webm" capture="environment" class="hidden"
                            @change="handleFiles($event.target.files)">
-                    <input type="file" x-ref="fileInput" accept="image/*" multiple class="hidden"
+                    <input type="file" x-ref="fileInput" accept="image/*,video/mp4,video/webm" multiple class="hidden"
                            @change="handleFiles($event.target.files)">
                     <div @dragover.prevent="dragging = true"
                          @dragleave.prevent="dragging = false"

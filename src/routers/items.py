@@ -25,8 +25,11 @@ from src.models.user import BHUser
 from src.schemas.item import ItemCreate, ItemOut, ItemUpdate
 
 UPLOAD_DIR = Path(__file__).resolve().parent.parent / "static" / "uploads"
-ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+ALLOWED_VIDEO_TYPES = {"video/mp4", "video/webm", "video/quicktime"}
+ALLOWED_TYPES = ALLOWED_IMAGE_TYPES | ALLOWED_VIDEO_TYPES
+MAX_IMAGE_SIZE = 10 * 1024 * 1024   # 10 MB
+MAX_VIDEO_SIZE = 50 * 1024 * 1024   # 50 MB
 
 router = APIRouter(prefix="/api/v1/items", tags=["items"])
 
@@ -264,9 +267,11 @@ async def upload_item_image(
     token: dict = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
-    """Upload an image file for an item. Only the owner can upload."""
+    """Upload an image or video file for an item. Only the owner can upload."""
     if file.content_type not in ALLOWED_TYPES:
-        raise HTTPException(status_code=400, detail="File must be JPEG, PNG, WebP, or GIF")
+        raise HTTPException(status_code=400, detail="Supported: JPEG, PNG, WebP, GIF, MP4, WebM")
+
+    is_video = file.content_type in ALLOWED_VIDEO_TYPES
 
     user = await get_user(db, token)
 
@@ -283,13 +288,16 @@ async def upload_item_image(
 
     # Read and validate file size
     contents = await file.read()
-    if len(contents) > MAX_FILE_SIZE:
-        raise HTTPException(status_code=400, detail="File too large (max 10 MB)")
+    max_size = MAX_VIDEO_SIZE if is_video else MAX_IMAGE_SIZE
+    size_label = "50 MB" if is_video else "10 MB"
+    if len(contents) > max_size:
+        raise HTTPException(status_code=400, detail=f"File too large (max {size_label})")
 
     # Save to disk
-    ext = file.filename.rsplit(".", 1)[-1].lower() if file.filename and "." in file.filename else "jpg"
-    if ext not in ("jpg", "jpeg", "png", "webp", "gif"):
-        ext = "jpg"
+    ext = file.filename.rsplit(".", 1)[-1].lower() if file.filename and "." in file.filename else ("mp4" if is_video else "jpg")
+    allowed_ext = ("jpg", "jpeg", "png", "webp", "gif", "mp4", "webm", "mov")
+    if ext not in allowed_ext:
+        ext = "mp4" if is_video else "jpg"
     filename = f"{uuid_mod.uuid4().hex}.{ext}"
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     filepath = UPLOAD_DIR / filename
@@ -299,8 +307,8 @@ async def upload_item_image(
     media = BHItemMedia(
         item_id=item.id,
         url=f"/static/uploads/{filename}",
-        alt_text=f"{item.name} photo",
-        media_type=MediaType.PHOTO,
+        alt_text=f"{item.name} {'video' if is_video else 'photo'}",
+        media_type=MediaType.VIDEO if is_video else MediaType.PHOTO,
         sort_order=0,
     )
     db.add(media)
