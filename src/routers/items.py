@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFile, File
 from pydantic import BaseModel, Field
 from slugify import slugify
 from sqlalchemy import select, func
@@ -337,6 +337,57 @@ async def delete_item_media(
 
     await db.delete(media)
     await db.commit()
+
+
+@router.put("/{item_id}/media/reorder", status_code=200)
+async def reorder_media(
+    item_id: UUID,
+    request: Request,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Reorder media. Send array of media IDs in desired order.
+    First position (index 0) becomes the cover image.
+    Videos cannot be in position 0.
+    """
+    user = await get_user(db, token)
+
+    result = await db.execute(
+        select(BHItem).where(BHItem.id == item_id).where(BHItem.deleted_at.is_(None))
+    )
+    item = result.scalars().first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    if item.owner_id != user.id:
+        raise HTTPException(status_code=403, detail="Not your item")
+
+    data = await request.json()
+    media_ids = data.get("media_ids", [])
+    if not media_ids:
+        raise HTTPException(status_code=400, detail="media_ids required")
+
+    # Fetch all media for this item
+    media_result = await db.execute(
+        select(BHItemMedia).where(BHItemMedia.item_id == item_id)
+    )
+    media_map = {str(m.id): m for m in media_result.scalars().all()}
+
+    # Validate all IDs belong to this item
+    for mid in media_ids:
+        if mid not in media_map:
+            raise HTTPException(status_code=400, detail=f"Media {mid} not found on this item")
+
+    # Video can't be cover (position 0)
+    first_media = media_map.get(media_ids[0])
+    if first_media and first_media.media_type.value == "video":
+        raise HTTPException(status_code=400, detail="Cover image cannot be a video")
+
+    # Apply sort order
+    for i, mid in enumerate(media_ids):
+        media_map[mid].sort_order = i
+
+    await db.commit()
+    return {"status": "ok", "order": media_ids}
 
 
 # ── Item Favorites ──

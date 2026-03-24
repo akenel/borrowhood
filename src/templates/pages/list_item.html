@@ -614,17 +614,50 @@
                     {{ t('i18n.item_photo') }}
                 </label>
 
-                <!-- Existing photos (edit mode) -->
-                <div x-show="existingMedia.length > 0" class="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-3">
-                    <template x-for="(m, midx) in existingMedia" :key="m.id">
-                        <div class="relative group">
-                            <img :src="m.url" :alt="m.alt_text" class="w-full h-24 object-cover rounded-lg border border-gray-200"
-                                 :class="midx === 0 && uploadPreviews.length === 0 ? 'ring-2 ring-indigo-500' : ''">
-                            <span x-show="midx === 0 && uploadPreviews.length === 0" class="absolute top-1 left-1 text-[10px] px-1.5 py-0.5 bg-indigo-600 text-white rounded-full">Cover</span>
-                            <button type="button" @click="fetch('/api/v1/items/' + editItemId + '/media/' + m.id, {method:'DELETE'}).then(r=>{if(r.ok){existingMedia.splice(midx,1)}else{alert('Failed to delete')}})"
-                                    class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">&times;</button>
-                        </div>
-                    </template>
+                <!-- Existing photos (edit mode) -- drag to reorder -->
+                <div x-show="existingMedia.length > 0" class="mb-3">
+                    <p class="text-xs text-gray-500 mb-2" x-show="existingMedia.length > 1">{{ t('i18n.drag_to_reorder') }}</p>
+                    <div class="grid grid-cols-3 sm:grid-cols-5 gap-2"
+                         x-data="{ dragIdx: null, dragOverIdx: null }">
+                        <template x-for="(m, midx) in existingMedia" :key="m.id">
+                            <div class="relative group cursor-grab active:cursor-grabbing"
+                                 draggable="true"
+                                 @dragstart="dragIdx = midx; $event.dataTransfer.effectAllowed = 'move'"
+                                 @dragover.prevent="dragOverIdx = midx; $event.dataTransfer.dropEffect = 'move'"
+                                 @dragleave="if(dragOverIdx === midx) dragOverIdx = null"
+                                 @drop.prevent="
+                                    if(dragIdx !== null && dragIdx !== midx) {
+                                        var moved = existingMedia.splice(dragIdx, 1)[0];
+                                        existingMedia.splice(midx, 0, moved);
+                                        // Check video not in cover position
+                                        if(existingMedia[0].url && (existingMedia[0].url.endsWith('.mp4') || existingMedia[0].url.includes('video'))) {
+                                            // Swap back
+                                            existingMedia.splice(midx, 0, existingMedia.splice(dragIdx > midx ? dragIdx : dragIdx, 1)[0]);
+                                            window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Cover image cannot be a video' } }));
+                                        } else {
+                                            // Save new order to server
+                                            fetch('/api/v1/items/' + editItemId + '/media/reorder', {
+                                                method: 'PUT',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ media_ids: existingMedia.map(function(x){ return x.id; }) })
+                                            }).then(function(r) {
+                                                if(r.ok) window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{{ t('i18n.order_saved') }}' } }));
+                                            });
+                                        }
+                                    }
+                                    dragIdx = null; dragOverIdx = null;
+                                 "
+                                 @dragend="dragIdx = null; dragOverIdx = null"
+                                 :class="dragOverIdx === midx ? 'ring-2 ring-amber-400 scale-105' : ''">
+                                <img :src="m.url" :alt="m.alt_text" class="w-full h-24 object-cover rounded-lg border border-gray-200 transition-transform"
+                                     :class="midx === 0 && uploadPreviews.length === 0 ? 'ring-2 ring-indigo-500' : ''">
+                                <span x-show="midx === 0 && uploadPreviews.length === 0" class="absolute top-1 left-1 text-[10px] px-1.5 py-0.5 bg-indigo-600 text-white rounded-full font-semibold">Cover</span>
+                                <button type="button" @click="fetch('/api/v1/items/' + editItemId + '/media/' + m.id, {method:'DELETE'}).then(r=>{if(r.ok){existingMedia.splice(midx,1)}else{alert('Failed to delete')}})"
+                                        class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">&times;</button>
+                                <span class="absolute bottom-1 left-1 text-[9px] px-1 py-0.5 bg-black/50 text-white rounded" x-text="(midx+1) + '/' + existingMedia.length"></span>
+                            </div>
+                        </template>
+                    </div>
                 </div>
 
                 <!-- Photo upload buttons (always visible when under 5 photos) -->

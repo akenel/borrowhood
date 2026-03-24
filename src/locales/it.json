@@ -774,6 +774,8 @@
     "return_policy": "Politica di Reso",
     "return_policy_placeholder": "es. Resi accettati entro 7 giorni, articolo in condizioni originali",
     "return_policy_hint": "Comunica le tue condizioni di reso. Nessuna politica = nessun reso.",
+    "drag_to_reorder": "Trascina le foto per riordinarle. La prima foto e la copertina.",
+    "order_saved": "Ordine foto salvato!",
     "email_notifications": "Notifiche Email",
     "email_notif_desc": "Ricevi avvisi email per nuovi messaggi, prenotazioni e offerte.",
     "enabled": "Attivato",
