@@ -303,8 +303,8 @@
                         })
                     });
                     if (!itemResp.ok) {
-                        const err = await itemResp.json();
-                        throw new Error(err.detail || 'Failed to update item');
+                        try { const err = await itemResp.json(); throw new Error(err.detail || 'Failed to update item'); }
+                        catch(e) { throw new Error('Failed to update item (status ' + itemResp.status + ')'); }
                     }
                     item = await itemResp.json();
                 } else {
@@ -347,8 +347,12 @@
                         if (upResp.ok) {
                             hasImage = true;
                         } else {
-                            var err = await upResp.json();
-                            window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'warning', message: 'Photo ' + (pi+1) + ' upload failed: ' + (err.detail || 'unknown error') } }));
+                            try {
+                                var err = await upResp.json();
+                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'warning', message: 'Upload ' + (pi+1) + ' failed: ' + (err.detail || 'unknown error') } }));
+                            } catch(parseErr) {
+                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'warning', message: 'Upload ' + (pi+1) + ' failed (status ' + upResp.status + ')' } }));
+                            }
                         }
                     }
                 } else if (this.aiImageUrl) {
