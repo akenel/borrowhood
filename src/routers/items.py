@@ -303,13 +303,21 @@ async def upload_item_image(
     filepath = UPLOAD_DIR / filename
     filepath.write_bytes(contents)
 
+    # Get next sort order (append after existing media)
+    from sqlalchemy import func as _func
+    max_order = await db.scalar(
+        select(_func.coalesce(_func.max(BHItemMedia.sort_order), -1))
+        .where(BHItemMedia.item_id == item.id)
+    )
+    next_order = (max_order or 0) + 1
+
     # Create media record
     media = BHItemMedia(
         item_id=item.id,
         url=f"/static/uploads/{filename}",
         alt_text=f"{item.name} {'video' if is_video else 'photo'}",
         media_type=MediaType.VIDEO if is_video else MediaType.PHOTO,
-        sort_order=0,
+        sort_order=next_order,
     )
     db.add(media)
     await db.commit()

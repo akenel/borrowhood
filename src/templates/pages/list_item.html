@@ -161,17 +161,30 @@
             if (!files || !files.length) return;
             for (var i = 0; i < files.length; i++) {
                 if ((this.uploadFiles.length + this.existingMedia.length) >= 5) {
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'warning', message: 'Maximum 5 photos per item' } }));
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'warning', message: 'Maximum 5 files per item' } }));
                     break;
                 }
                 var file = files[i];
-                if (!file.type.startsWith('image/')) continue;
-                if (file.size > 10 * 1024 * 1024) {
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: file.name + ' too large (max 10 MB)' } }));
+                var isImage = file.type.startsWith('image/');
+                var isVideo = file.type.startsWith('video/');
+                if (!isImage && !isVideo) {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: file.name + ': only images and videos allowed' } }));
+                    continue;
+                }
+                var maxSize = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+                var sizeLabel = isVideo ? '50 MB' : '10 MB';
+                if (file.size > maxSize) {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: file.name + ' too large (max ' + sizeLabel + ')' } }));
                     continue;
                 }
                 this.aiImageUrl = '';
-                this.resizeAndStore(file);
+                if (isVideo) {
+                    // Video: store as-is, use video icon as preview
+                    this.uploadFiles.push(file);
+                    this.uploadPreviews.push('__video__');
+                } else {
+                    this.resizeAndStore(file);
+                }
             }
         },
         async resizeAndStore(file) {
@@ -736,8 +749,16 @@
                 <div x-show="uploadPreviews.length > 0" x-cloak class="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-2">
                     <template x-for="(preview, idx) in uploadPreviews" :key="idx">
                         <div class="relative group">
-                            <img :src="preview" alt="Upload preview" class="w-full h-24 object-cover rounded-lg border border-gray-200"
-                                 :class="idx === 0 ? 'ring-2 ring-indigo-500' : ''">
+                            <template x-if="preview === '__video__'">
+                                <div class="w-full h-24 bg-gray-800 rounded-lg border border-gray-200 flex items-center justify-center"
+                                     :class="idx === 0 ? 'ring-2 ring-indigo-500' : ''">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                </div>
+                            </template>
+                            <template x-if="preview !== '__video__'">
+                                <img :src="preview" alt="Upload preview" class="w-full h-24 object-cover rounded-lg border border-gray-200"
+                                     :class="idx === 0 ? 'ring-2 ring-indigo-500' : ''">
+                            </template>
                             <span x-show="idx === 0" class="absolute top-1 left-1 text-[10px] px-1.5 py-0.5 bg-indigo-600 text-white rounded-full">Cover</span>
                             <button @click="removeImage(idx)" class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">&times;</button>
                         </div>
