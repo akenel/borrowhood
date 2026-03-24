@@ -74,11 +74,17 @@
             <!-- Image Gallery -->
             {% if item.media %}
             <div x-data="imageGallery()" x-init="init()">
-                <!-- Main image -->
+                <!-- Main image/video -->
                 <div class="rounded-lg overflow-hidden bg-gray-100 relative group">
-                    <img :src="images[active]" :alt="alts[active] || ''"
-                         @click="zoomOpen = true"
-                         class="w-full h-64 md:h-96 object-cover cursor-zoom-in">
+                    <template x-if="!isVideo(active)">
+                        <img :src="images[active]" :alt="alts[active] || ''"
+                             @click="zoomOpen = true"
+                             class="w-full h-64 md:h-96 object-cover cursor-zoom-in">
+                    </template>
+                    <template x-if="isVideo(active)">
+                        <video :src="images[active]" controls
+                               class="w-full h-64 md:h-96 object-contain bg-black"></video>
+                    </template>
                     {% if item.media | length > 1 %}
                     <!-- Left arrow -->
                     <button @click="prev()"
@@ -100,10 +106,15 @@
                 <div class="flex gap-2 mt-2 overflow-x-auto pb-1">
                     {% for media in item.media %}
                     <button @click="active = {{ loop.index0 }}"
-                            class="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-md overflow-hidden border-2 transition-all"
+                            class="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-md overflow-hidden border-2 transition-all relative"
                             :class="active === {{ loop.index0 }} ? 'border-indigo-500 ring-1 ring-indigo-500' : 'border-transparent hover:border-gray-300'">
-                        <img src="{{ media.url }}" alt="{{ media.alt_text }}"
-                             class="w-full h-full object-cover">
+                        {% if media.media_type.value in ('VIDEO', 'video') %}
+                        <div class="w-full h-full bg-gray-800 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                        {% else %}
+                        <img src="{{ media.url }}" alt="{{ media.alt_text }}" class="w-full h-full object-cover">
+                        {% endif %}
                     </button>
                     {% endfor %}
                 </div>
@@ -1766,6 +1777,8 @@
             zoomOpen: false,
             images: {{ item.media | map(attribute='url') | list | tojson }},
             alts: {{ item.media | map(attribute='alt_text') | list | tojson }},
+            types: {{ item.media | map(attribute='media_type') | list | map('string') | list | tojson }},
+            isVideo(idx) { return this.types[idx] && (this.types[idx].includes('VIDEO') || this.types[idx].includes('video')); },
             init() {
                 // Keyboard navigation
                 this.$el.addEventListener('keydown', (e) => {
