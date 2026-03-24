@@ -125,11 +125,21 @@
                     var self = this;
                     d.listings.forEach(function(l) {
                         if (self.listingPrices[l.listing_type]) {
-                            self.listingPrices[l.listing_type].price = l.price || '';
-                            self.listingPrices[l.listing_type].price_unit = l.price_unit || 'flat';
-                            self.listingPrices[l.listing_type].deposit = l.deposit || '';
+                            var lp = self.listingPrices[l.listing_type];
+                            lp.price = l.price || '';
+                            lp.price_unit = l.price_unit || 'flat';
+                            lp.deposit = l.deposit || '';
+                            if (l.minimum_charge) lp.minimum_charge = l.minimum_charge;
+                            if (l.per_person_rate) lp.per_person_rate = l.per_person_rate;
+                            if (l.max_participants) lp.max_participants = l.max_participants;
+                            if (l.group_discount_pct) lp.group_discount_pct = l.group_discount_pct;
                         }
                     });
+                    // Pre-fill shared fields from first listing
+                    var first = d.listings[0];
+                    this.form.notes = first.notes || '';
+                    this.form.return_policy = first.return_policy || '';
+                    this.form.delivery_available = first.delivery_available || false;
                 }
             }
         },
