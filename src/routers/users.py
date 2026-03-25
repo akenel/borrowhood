@@ -680,3 +680,110 @@ async def remove_favorite(
     await db.delete(fav)
     await db.commit()
     return {"status": "removed", "favorite_user_id": str(user_id)}
+
+
+# ── GDPR Data Export (Article 20) ──
+
+
+@router.get("/me/export")
+async def export_my_data(
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Download all personal data as JSON. GDPR Article 20 -- right to data portability."""
+    user = await get_user(db, token)
+
+    # Profile
+    profile = {
+        "id": str(user.id),
+        "username": user.username,
+        "email": user.email,
+        "display_name": user.display_name,
+        "slug": user.slug,
+        "tagline": user.tagline,
+        "bio": user.bio,
+        "city": user.city,
+        "country_code": user.country_code,
+        "workshop_name": user.workshop_name,
+        "workshop_type": user.workshop_type.value if user.workshop_type else None,
+        "seller_type": user.seller_type,
+        "business_name": user.business_name,
+        "vat_number": user.vat_number,
+        "avatar_url": user.avatar_url,
+        "banner_url": user.banner_url,
+        "whatsapp_number": user.whatsapp_number,
+        "accepted_payments": user.accepted_payments,
+        "badge_tier": user.badge_tier.value if user.badge_tier else None,
+        "trust_score": user.trust_score,
+        "created_at": user.created_at.isoformat() if user.created_at else None,
+    }
+
+    # Items
+    item_result = await db.execute(
+        select(BHItem).where(BHItem.owner_id == user.id).where(BHItem.deleted_at.is_(None))
+    )
+    items = [
+        {"id": str(i.id), "name": i.name, "slug": i.slug, "description": i.description,
+         "category": i.category, "condition": i.condition, "created_at": i.created_at.isoformat() if i.created_at else None}
+        for i in item_result.scalars().all()
+    ]
+
+    # Rentals (as buyer)
+    from src.models.rental import BHRental
+    rental_result = await db.execute(
+        select(BHRental).where(BHRental.renter_id == user.id)
+    )
+    rentals = [
+        {"id": str(r.id), "status": r.status.value, "renter_message": r.renter_message,
+         "payment_method": r.payment_method_used,
+         "created_at": r.created_at.isoformat() if r.created_at else None}
+        for r in rental_result.scalars().all()
+    ]
+
+    # Messages (sent)
+    from src.models.message import BHMessage
+    msg_result = await db.execute(
+        select(BHMessage).where(BHMessage.sender_id == user.id).where(BHMessage.deleted_at.is_(None))
+    )
+    messages = [
+        {"id": str(m.id), "body": m.body, "message_type": m.message_type,
+         "created_at": m.created_at.isoformat() if m.created_at else None}
+        for m in msg_result.scalars().all()
+    ]
+
+    # Reviews (written)
+    from src.models.review import BHReview
+    review_result = await db.execute(
+        select(BHReview).where(BHReview.reviewer_id == user.id)
+    )
+    reviews = [
+        {"id": str(rv.id), "rating": rv.rating, "title": rv.title, "body": rv.body,
+         "created_at": rv.created_at.isoformat() if rv.created_at else None}
+        for rv in review_result.scalars().all()
+    ]
+
+    # Social links
+    social_result = await db.execute(
+        select(BHUserSocialLink).where(BHUserSocialLink.user_id == user.id)
+    )
+    social_links = [
+        {"platform": s.platform, "url": s.url, "label": s.label}
+        for s in social_result.scalars().all()
+    ]
+
+    export = {
+        "exported_at": datetime.now(timezone.utc).isoformat(),
+        "platform": "LaPiazza.app",
+        "profile": profile,
+        "items_listed": items,
+        "orders": rentals,
+        "messages_sent": messages,
+        "reviews_written": reviews,
+        "social_links": social_links,
+    }
+
+    from fastapi.responses import JSONResponse
+    return JSONResponse(
+        content=export,
+        headers={"Content-Disposition": "attachment; filename=lapiazza-my-data.json"},
+    )

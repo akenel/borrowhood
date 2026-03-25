@@ -1051,6 +1051,14 @@ async def terms(request: Request,
     return _render("pages/terms.html", ctx)
 
 
+@router.get("/legal", response_class=HTMLResponse)
+async def legal_notice(request: Request,
+                       token: Optional[dict] = Depends(get_current_user_token)):
+    """Legal notice / Imprint (required by Italian and EU law)."""
+    ctx = _ctx(request, token)
+    return _render("pages/legal.html", ctx)
+
+
 @router.get("/googled3f2ccce2b1f34d3.html", response_class=Response)
 async def google_verification():
     """Google Search Console verification file."""

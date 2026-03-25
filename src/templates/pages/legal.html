@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}{% if lang == 'it' %}Note Legali{% else %}Legal Notice{% endif %} - {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">
+        {% if lang == 'it' %}Note Legali / Impressum{% else %}Legal Notice / Imprint{% endif %}
+    </h1>
+
+    <div class="bg-white rounded-lg border border-gray-200 p-6 space-y-6 text-gray-700 leading-relaxed">
+
+        <!-- Operator -->
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-2">
+                {% if lang == 'it' %}Titolare del Servizio{% else %}Service Operator{% endif %}
+            </h2>
+            <p class="text-sm">
+                Angelo Kenel (Albert-Daniel Kenel)<br>
+                {% if lang == 'it' %}Sviluppatore indipendente{% else %}Independent Developer{% endif %}<br>
+                Trapani, Sicily, Italy<br>
+                {% if lang == 'it' %}Cittadinanza{% else %}Citizenship{% endif %}: Swiss-Canadian
+            </p>
+        </div>
+
+        <!-- Contact -->
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-2">
+                {% if lang == 'it' %}Contatti{% else %}Contact{% endif %}
+            </h2>
+            <p class="text-sm">
+                Email: angel.kenel@gmail.com<br>
+                Telegram: <a href="https://t.me/bigKingFisher" class="text-indigo-600 hover:underline">@bigKingFisher</a><br>
+                Web: <a href="https://lapiazza.app" class="text-indigo-600 hover:underline">LaPiazza.app</a>
+            </p>
+        </div>
+
+        <!-- Platform -->
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-2">
+                {% if lang == 'it' %}Informazioni sulla Piattaforma{% else %}Platform Information{% endif %}
+            </h2>
+            <p class="text-sm">
+                {% if lang == 'it' %}
+                La Piazza e una piattaforma comunitaria gratuita per noleggio, vendita, insegnamento e condivisione tra vicini. Non addebitiamo commissioni sulle transazioni. I pagamenti avvengono direttamente tra acquirente e venditore.
+                {% else %}
+                La Piazza is a free community platform for renting, selling, teaching, and sharing between neighbors. We charge zero platform fees. Payments happen directly between buyer and seller.
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Hosting -->
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-2">
+                {% if lang == 'it' %}Hosting{% else %}Hosting Provider{% endif %}
+            </h2>
+            <p class="text-sm">
+                Hetzner Online GmbH<br>
+                Industriestr. 25, 91710 Gunzenhausen, Germany<br>
+                {% if lang == 'it' %}Tutti i dati sono conservati nell'Unione Europea (Germania).{% else %}All data is stored within the European Union (Germany).{% endif %}
+            </p>
+        </div>
+
+        <!-- Authentication -->
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-2">
+                {% if lang == 'it' %}Autenticazione{% else %}Authentication{% endif %}
+            </h2>
+            <p class="text-sm">
+                {% if lang == 'it' %}
+                L'autenticazione e gestita da Keycloak (self-hosted). Supportiamo login tramite email/password, Google, GitHub e Facebook. Le password non sono mai accessibili a La Piazza.
+                {% else %}
+                Authentication is handled by Keycloak (self-hosted). We support login via email/password, Google, GitHub, and Facebook. Passwords are never accessible to La Piazza.
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Liability -->
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-2">
+                {% if lang == 'it' %}Responsabilita{% else %}Liability{% endif %}
+            </h2>
+            <p class="text-sm">
+                {% if lang == 'it' %}
+                La Piazza facilita le connessioni tra utenti ma non e parte delle transazioni. Non siamo responsabili per la qualita degli articoli, il rispetto degli accordi tra utenti, o i pagamenti. Le controversie tra utenti vengono mediate tramite il nostro sistema di dispute, ma la responsabilita finale resta delle parti coinvolte.
+                {% else %}
+                La Piazza facilitates connections between users but is not a party to any transaction. We are not responsible for the quality of items, fulfillment of agreements between users, or payments. Disputes between users are mediated through our dispute system, but final responsibility lies with the parties involved.
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Open Source -->
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-2">
+                {% if lang == 'it' %}Open Source{% else %}Open Source{% endif %}
+            </h2>
+            <p class="text-sm">
+                {% if lang == 'it' %}
+                La Piazza e sviluppata come progetto open source. Il codice sorgente e disponibile su <a href="https://github.com/akenel/borrowhood" class="text-indigo-600 hover:underline">GitHub</a>.
+                {% else %}
+                La Piazza is developed as an open source project. Source code is available on <a href="https://github.com/akenel/borrowhood" class="text-indigo-600 hover:underline">GitHub</a>.
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Links -->
+        <div class="border-t border-gray-200 pt-4">
+            <div class="flex flex-wrap gap-4 text-sm">
+                <a href="/terms" class="text-indigo-600 hover:underline">{% if lang == 'it' %}Termini di Servizio{% else %}Terms of Service{% endif %}</a>
+                <a href="/terms#privacy" class="text-indigo-600 hover:underline">{% if lang == 'it' %}Privacy Policy{% else %}Privacy Policy{% endif %}</a>
+            </div>
+        </div>
+    </div>
+
+    <p class="text-xs text-gray-400 text-center mt-8">
+        {% if lang == 'it' %}Ultimo aggiornamento: 25 marzo 2026{% else %}Last updated: March 25, 2026{% endif %}
+    </p>
+</div>
+{% endblock %}
