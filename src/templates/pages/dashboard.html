@@ -1732,15 +1732,17 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.display_name') }}</label>
                             <input x-model="p.display_name" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Il nome che gli altri utenti vedranno. Usa il tuo vero nome o un nome d'arte.{% else %}The name other users will see. Use your real name or a creative alias.{% endif %}</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.tagline') }}</label>
                             <input x-model="p.tagline" type="text" maxlength="120" placeholder="{{ t('i18n.tagline_placeholder') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Una frase breve che appare sotto il tuo nome. Es: "Artista e velista" o "Riparazioni biciclette dal 2010"{% else %}A short phrase shown under your name. E.g. "Artist & sailor" or "Bike repairs since 2010"{% endif %}</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.about_bio') }}</label>
                             <textarea x-model="p.bio" rows="4" maxlength="2000" placeholder="{{ t('i18n.bio_placeholder') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-                            <p class="text-xs text-gray-400 mt-1">{{ t('i18n.supports_markdown') }}</p>
+                            <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Racconta la tua storia, le tue competenze, cosa offri. Supporta **grassetto** e - elenchi.{% else %}Tell your story, your skills, what you offer. Supports **bold** and - bullet lists.{% endif %}</p>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
@@ -1750,11 +1752,13 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.country') }}</label>
                                 <input x-model="p.country_code" type="text" maxlength="2" placeholder="IT" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Codice a 2 lettere: IT, CH, US, DE{% else %}2-letter code: IT, CH, US, DE{% endif %}</p>
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.workshop_name') }}</label>
                             <input x-model="p.workshop_name" type="text" placeholder="{{ t('i18n.workshop_name_placeholder') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Il nome del tuo spazio o attivita. Appare sulla tua pagina pubblica.{% else %}The name of your space or business. Shown on your public workshop page.{% endif %}</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.workshop_type') }}</label>
@@ -1768,11 +1772,13 @@
                                 <option value="digital">Digital / Online</option>
                                 <option value="other">Other</option>
                             </select>
+                            <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Che tipo di spazio hai? Aiuta gli altri a trovarti nella ricerca.{% else %}What kind of space do you have? Helps others find you in search.{% endif %}</p>
                         </div>
 
                         <!-- Services offered -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('i18n.services_offered') }}</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.services_offered') }}</label>
+                            <p class="text-xs text-gray-400 mb-2">{% if lang == 'it' %}Seleziona cosa offri. Appare sul tuo profilo e nei risultati di ricerca.{% else %}Select what you offer. Shows on your profile and in search results.{% endif %}</p>
                             <div class="space-y-2">
                                 <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                                     <input type="checkbox" x-model="services.offers_repair" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.repair') }}
