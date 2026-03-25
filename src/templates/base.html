@@ -506,6 +506,34 @@
     });
     </script>
 
+    <!-- Cookie Consent Banner (EU ePrivacy / GDPR) -->
+    <div id="cookie-consent" style="display:none"
+         class="fixed bottom-0 left-0 right-0 bg-gray-900 text-white z-[60] shadow-2xl">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div class="flex-1">
+                <p class="text-sm font-medium">{% if lang == 'it' %}Questo sito utilizza cookie essenziali per l'autenticazione e le preferenze lingua. Nessun cookie di tracciamento o pubblicitario.{% else %}This site uses essential cookies for authentication and language preferences. No tracking or advertising cookies.{% endif %}</p>
+                <p class="text-xs text-gray-400 mt-1">
+                    {% if lang == 'it' %}Vedi la nostra <a href="/terms" class="underline text-indigo-300 hover:text-indigo-200">Privacy Policy</a> per i dettagli.{% else %}See our <a href="/terms" class="underline text-indigo-300 hover:text-indigo-200">Privacy Policy</a> for details.{% endif %}
+                </p>
+            </div>
+            <div class="flex gap-2 flex-shrink-0">
+                <button onclick="document.getElementById('cookie-consent').style.display='none'; localStorage.setItem('cookie_consent','accepted')"
+                        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg min-h-[44px] transition-colors">
+                    {% if lang == 'it' %}Accetto{% else %}Accept{% endif %}
+                </button>
+                <button onclick="document.getElementById('cookie-consent').style.display='none'; localStorage.setItem('cookie_consent','essential_only')"
+                        class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-lg min-h-[44px] transition-colors">
+                    {% if lang == 'it' %}Solo essenziali{% else %}Essential Only{% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+    if (!localStorage.getItem('cookie_consent')) {
+        document.getElementById('cookie-consent').style.display = 'block';
+    }
+    </script>
+
     <!-- PWA: Service Worker + Install Prompt -->
     <script>
     if ('serviceWorker' in navigator) {
