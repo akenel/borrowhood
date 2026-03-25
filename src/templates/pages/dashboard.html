@@ -1772,7 +1772,14 @@
                                 <option value="digital">Digital / Online</option>
                                 <option value="other">Other</option>
                             </select>
-                            <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Che tipo di spazio hai? Aiuta gli altri a trovarti nella ricerca.{% else %}What kind of space do you have? Helps others find you in search.{% endif %}</p>
+                            <p class="text-xs text-gray-400 mt-1" x-show="!p.workshop_type">{% if lang == 'it' %}Che tipo di spazio hai? Aiuta gli altri a trovarti nella ricerca.{% else %}What kind of space do you have? Helps others find you in search.{% endif %}</p>
+                            <p class="text-xs text-indigo-500 mt-1" x-show="p.workshop_type === 'garage'" x-cloak>{% if lang == 'it' %}Spazio per riparazioni, falegnameria, saldatura, meccanica.{% else %}Repairs, woodworking, welding, mechanics. Got tools? This is you.{% endif %}</p>
+                            <p class="text-xs text-indigo-500 mt-1" x-show="p.workshop_type === 'studio'" x-cloak>{% if lang == 'it' %}Arte, fotografia, musica, design. Spazio creativo.{% else %}Art, photography, music, design. A creative space.{% endif %}</p>
+                            <p class="text-xs text-indigo-500 mt-1" x-show="p.workshop_type === 'kitchen'" x-cloak>{% if lang == 'it' %}Cucina, pasticceria, catering. Se cucini per gli altri.{% else %}Cooking, baking, catering. If you feed people, this is yours.{% endif %}</p>
+                            <p class="text-xs text-indigo-500 mt-1" x-show="p.workshop_type === 'outdoor'" x-cloak>{% if lang == 'it' %}Giardinaggio, agricoltura, attivita all'aperto.{% else %}Gardening, farming, outdoor activities. Nature is your workshop.{% endif %}</p>
+                            <p class="text-xs text-indigo-500 mt-1" x-show="p.workshop_type === 'mobile'" x-cloak>{% if lang == 'it' %}Lavori a domicilio o in trasferta. Nessuno spazio fisso.{% else %}You come to them. No fixed location -- you are the workshop.{% endif %}</p>
+                            <p class="text-xs text-indigo-500 mt-1" x-show="p.workshop_type === 'digital'" x-cloak>{% if lang == 'it' %}Servizi online, corsi virtuali, lavoro da remoto.{% else %}Online services, virtual classes, remote work. Location doesn't matter.{% endif %}</p>
+                            <p class="text-xs text-indigo-500 mt-1" x-show="p.workshop_type === 'other'" x-cloak>{% if lang == 'it' %}Nessuna delle precedenti? Va bene anche cosi.{% else %}None of the above? That's fine too -- you're unique.{% endif %}</p>
                         </div>
 
                         <!-- Services offered -->
