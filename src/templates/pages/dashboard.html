@@ -1922,6 +1922,28 @@
                     addLink() { if (this.links.length < 10) this.links.push({ platform: 'website', url: '' }); },
                     removeLink(i) { this.links.splice(i, 1); },
                     async save() {
+                        // Auto-fix and validate URLs before saving
+                        var hasError = false;
+                        for (var li of this.links) {
+                            if (!li.url || !li.url.trim()) continue;
+                            li.url = li.url.trim();
+                            // Auto-prepend https:// if missing
+                            if (li.url && !li.url.startsWith('http://') && !li.url.startsWith('https://')) {
+                                li.url = 'https://' + li.url;
+                            }
+                            // Basic URL validation
+                            try {
+                                new URL(li.url);
+                                li._invalid = false;
+                            } catch(e) {
+                                li._invalid = true;
+                                hasError = true;
+                            }
+                        }
+                        if (hasError) {
+                            window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: '{% if lang == "it" %}Alcuni link non sono URL validi. Controlla i campi evidenziati.{% else %}Some links are not valid URLs. Check the highlighted fields.{% endif %}' } }));
+                            return;
+                        }
                         this.saving = true;
                         try {
                             const valid = this.links.filter(l => l.url && l.url.trim());
@@ -1952,7 +1974,9 @@
                                     </template>
                                 </select>
                                 <input x-model="link.url" type="url" :placeholder="platformHints[link.platform] || 'https://...'"
-                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                                       class="flex-1 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+                                       :class="link._invalid ? 'border-red-400 bg-red-50' : 'border-gray-300'"
+                                       @input="link._invalid = false">
                                 <button @click="removeLink(i)" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Remove">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
