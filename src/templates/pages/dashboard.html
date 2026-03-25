@@ -1977,6 +1977,8 @@
                                        class="flex-1 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
                                        :class="link._invalid ? 'border-red-400 bg-red-50' : 'border-gray-300'"
                                        @input="link._invalid = false">
+                                <a x-show="link.url && link.url.length > 5" :href="link.url.startsWith('http') ? link.url : 'https://' + link.url" target="_blank" rel="noopener"
+                                   class="px-2 py-1 text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded font-medium whitespace-nowrap transition-colors" title="Test this link">Test</a>
                                 <button @click="removeLink(i)" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Remove">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
