@@ -1286,15 +1286,28 @@
                         </div>
                         <div class="mt-2 sm:mt-0 flex items-center space-x-2">
                             <span class="text-xs px-3 py-1 rounded-full font-medium
-                                {% if rental.status.value == 'completed' %}bg-emerald-50 text-emerald-700
+                                {% if rental.status.value == 'completed' or rental.status.value == 'payment_confirmed' %}bg-emerald-50 text-emerald-700
+                                {% elif rental.status.value == 'committed' %}bg-amber-50 text-amber-700
+                                {% elif rental.status.value == 'buyer_paid' %}bg-blue-50 text-blue-700
                                 {% elif rental.status.value == 'pending' %}bg-amber-50 text-amber-700
                                 {% elif rental.status.value == 'approved' %}bg-blue-50 text-blue-700
                                 {% elif rental.status.value == 'disputed' %}bg-orange-50 text-orange-700
                                 {% elif rental.status.value == 'returned' %}bg-purple-50 text-purple-700
+                                {% elif rental.status.value in ['expired','declined','cancelled'] %}bg-red-50 text-red-700
                                 {% else %}bg-gray-100 text-gray-700{% endif %}">
-                                {{ t('rental.status.' + rental.status.value) }}
+                                {% if rental.status.value == 'committed' %}Awaiting Payment
+                                {% elif rental.status.value == 'buyer_paid' %}Payment Sent
+                                {% elif rental.status.value == 'payment_confirmed' %}Payment Confirmed
+                                {% elif rental.status.value == 'expired' %}Expired
+                                {% else %}{{ t('rental.status.' + rental.status.value) }}{% endif %}
                             </span>
-                            {% if rental.status.value == 'pending' %}
+                            {% if rental.status.value == 'buyer_paid' %}
+                            <button onclick="fetch('/api/v1/rentals/{{ rental.id }}/confirm-payment', { method: 'POST' }).then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Payment confirmed!' } })); setTimeout(() => location.reload(), 1500); } else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); })"
+                                    class="text-xs px-3 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 min-h-[32px]">Confirm Payment</button>
+                            {% elif rental.status.value == 'payment_confirmed' %}
+                            <button onclick="fetch('/api/v1/rentals/{{ rental.id }}/complete', { method: 'POST' }).then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Order completed!' } })); setTimeout(() => location.reload(), 1500); } })"
+                                    class="text-xs px-3 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 min-h-[32px]">Mark Complete</button>
+                            {% elif rental.status.value == 'pending' %}
                             <button @click="updateStatus('approved')" :disabled="processing"
                                     class="text-xs px-3 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 min-h-[32px]">Approve</button>
                             <button @click="updateStatus('declined', 'Declined by owner')" :disabled="processing"
