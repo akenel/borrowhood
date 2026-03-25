@@ -288,14 +288,27 @@
                         </div>
                         <div class="mt-2 sm:mt-0 flex items-center space-x-3">
                             <span class="text-xs px-3 py-1 rounded-full font-medium
-                                {% if rental.status.value == 'completed' %}bg-emerald-50 text-emerald-700
+                                {% if rental.status.value == 'completed' or rental.status.value == 'payment_confirmed' %}bg-emerald-50 text-emerald-700
+                                {% elif rental.status.value == 'committed' %}bg-amber-50 text-amber-700
+                                {% elif rental.status.value == 'buyer_paid' %}bg-blue-50 text-blue-700
                                 {% elif rental.status.value == 'pending' %}bg-amber-50 text-amber-700
                                 {% elif rental.status.value == 'approved' %}bg-blue-50 text-blue-700
                                 {% elif rental.status.value == 'disputed' %}bg-orange-50 text-orange-700
-                                {% elif rental.status.value in ['declined','cancelled'] %}bg-red-50 text-red-700
+                                {% elif rental.status.value in ['declined','cancelled','expired'] %}bg-red-50 text-red-700
                                 {% else %}bg-gray-100 text-gray-700{% endif %}">
-                                {{ t('rental.status.' + rental.status.value) }}
+                                {% if rental.status.value == 'committed' %}Awaiting Payment
+                                {% elif rental.status.value == 'buyer_paid' %}Payment Sent
+                                {% elif rental.status.value == 'payment_confirmed' %}Payment Confirmed
+                                {% elif rental.status.value == 'expired' %}Expired
+                                {% else %}{{ t('rental.status.' + rental.status.value) }}{% endif %}
                             </span>
+                            {% if rental.status.value == 'committed' %}
+                            <a href="/orders" class="text-xs px-3 py-1 bg-indigo-600 text-white rounded-full font-semibold hover:bg-indigo-700 transition-colors">I Paid</a>
+                            {% endif %}
+                            {% if rental.status.value == 'buyer_paid' and viewer_user_id == rental.listing.item.owner_id %}
+                            <button onclick="fetch('/api/v1/rentals/{{ rental.id }}/confirm-payment', { method: 'POST' }).then(r => { if (r.ok) location.reload(); })"
+                                    class="text-xs px-3 py-1 bg-emerald-600 text-white rounded-full font-semibold hover:bg-emerald-700 transition-colors">Confirm Payment</button>
+                            {% endif %}
                             <span class="text-xs text-gray-400">{{ rental.created_at.strftime('%A, %B %d, %Y at %H:%M') }}</span>
                         </div>
                     </div>
