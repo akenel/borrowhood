@@ -1969,9 +1969,15 @@
                         <template x-for="(link, i) in links" :key="i">
                             <div class="flex items-center gap-2">
                                 <select x-model="link.platform" class="px-2 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 w-32">
-                                    <template x-for="p in platforms" :key="p">
-                                        <option :value="p" x-text="platformLabels[p]"></option>
-                                    </template>
+                                    <option value="instagram">Instagram</option>
+                                    <option value="linkedin">LinkedIn</option>
+                                    <option value="twitter">X / Twitter</option>
+                                    <option value="tiktok">TikTok</option>
+                                    <option value="youtube">YouTube</option>
+                                    <option value="facebook">Facebook</option>
+                                    <option value="github">GitHub</option>
+                                    <option value="website">Website</option>
+                                    <option value="telegram">Telegram</option>
                                 </select>
                                 <input x-model="link.url" type="url" :placeholder="platformHints[link.platform] || 'https://...'"
                                        class="flex-1 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
