@@ -143,9 +143,18 @@ def create_app() -> FastAPI:
         elif settings.telegram_enabled:
             logger.warning("Telegram enabled but bot token not configured -- bot not started")
 
+        # Start commitment expiry background task
+        from src.services.commitment_expiry import run_expiry_loop
+        app.state.expiry_task = asyncio.create_task(run_expiry_loop())
+        logger.info("Commitment expiry loop started")
+
     @app.on_event("shutdown")
     async def shutdown():
         logger.info("BorrowHood shutting down...")
+        # Stop expiry loop
+        if hasattr(app.state, "expiry_task"):
+            app.state.expiry_task.cancel()
+            logger.info("Commitment expiry loop stopped")
         # Stop Telegram bot if running
         if hasattr(app.state, "telegram_bot_task"):
             from src.services.telegram_bot import bot
