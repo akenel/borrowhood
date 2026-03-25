@@ -495,7 +495,7 @@ async def mark_as_paid(
     await notify_rental_event(
         db=db,
         user_id=item.owner_id,
-        notification_type=NotificationType.RENTAL_STATUS_CHANGE,
+        notification_type=NotificationType.SYSTEM,
         item_name=item.name,
         other_party_name=user.display_name,
         rental_id=rental.id,
@@ -542,7 +542,7 @@ async def confirm_payment(
     await notify_rental_event(
         db=db,
         user_id=rental.renter_id,
-        notification_type=NotificationType.RENTAL_STATUS_CHANGE,
+        notification_type=NotificationType.SYSTEM,
         item_name=item.name,
         other_party_name=user.display_name,
         rental_id=rental.id,
@@ -591,7 +591,7 @@ async def complete_order(
     await notify_rental_event(
         db=db,
         user_id=other_id,
-        notification_type=NotificationType.RENTAL_STATUS_CHANGE,
+        notification_type=NotificationType.SYSTEM,
         item_name=item.name,
         other_party_name=user.display_name,
         rental_id=rental.id,
