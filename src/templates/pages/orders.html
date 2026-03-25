@@ -177,7 +177,7 @@
 
                         <!-- Commitment flow: "I Paid" button (buyer only, committed status) -->
                         {% if order.status.value == 'committed' and viewer_user_id == order.renter_id %}
-                        <div x-data="{ showPay: false, payMethod: 'iban', payNote: '', paying: false }">
+                        <div x-data="{ showPay: false, payMethod: 'iban', payNote: '', proofFile: null, paying: false }">
                             <button @click="showPay = true" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg min-h-[36px]">
                                 I Paid
                             </button>
@@ -201,7 +201,12 @@
                                     </select>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Note (optional)</label>
                                     <input x-model="payNote" type="text" maxlength="500" placeholder="e.g. Transaction reference..."
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4">
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-3">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Payment proof (optional)</label>
+                                    <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf"
+                                           @change="proofFile = $event.target.files[0]"
+                                           class="w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 mb-1">
+                                    <p class="text-xs text-gray-400 mb-4">Screenshot or receipt (JPEG, PNG, PDF, max 10 MB)</p>
                                     <div class="flex gap-3">
                                         <button @click="showPay = false" class="flex-1 px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">Cancel</button>
                                         <button @click="
@@ -210,10 +215,18 @@
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json' },
                                                 body: JSON.stringify({ payment_method: payMethod, note: payNote })
-                                            }).then(r => {
-                                                if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Payment marked! Seller notified.' } })); setTimeout(() => location.reload(), 1500); }
-                                                else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); });
-                                            }).catch(() => {}).finally(() => { paying = false; });
+                                            }).then(async r => {
+                                                if (!r.ok) { var e = await r.json(); throw new Error(e.detail || 'Failed'); }
+                                                // Upload proof if attached
+                                                if (proofFile) {
+                                                    var fd = new FormData();
+                                                    fd.append('file', proofFile);
+                                                    await fetch('/api/v1/rentals/{{ order.id }}/payment-proof', { method: 'POST', body: fd });
+                                                }
+                                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Payment marked! Seller notified.' } }));
+                                                setTimeout(() => location.reload(), 1500);
+                                            }).catch(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } })); })
+                                            .finally(() => { paying = false; });
                                         " :disabled="paying" class="flex-1 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 min-h-[44px]">
                                             <span x-text="paying ? 'Sending...' : 'Confirm I Paid'"></span>
                                         </button>
@@ -258,6 +271,11 @@
                         <span class="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full">
                             Paid via {{ order.payment_method_used | replace('_', ' ') | title }}
                         </span>
+                        {% endif %}
+                        {% if order.payment_proof_url %}
+                        <a href="{{ order.payment_proof_url }}" target="_blank" class="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-full hover:bg-emerald-100 transition-colors">
+                            View Receipt
+                        </a>
                         {% endif %}
                     </div>
                 </div>

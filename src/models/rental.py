@@ -88,6 +88,7 @@ class BHRental(BHBase, Base):
     # Commitment flow
     commitment_expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     payment_method_used: Mapped[Optional[str]] = mapped_column(String(30))  # "paypal", "iban", "cash", etc.
+    payment_proof_url: Mapped[Optional[str]] = mapped_column(String(500))  # screenshot/receipt upload
     buyer_paid_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     payment_confirmed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
 

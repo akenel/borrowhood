@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from fastapi.responses import PlainTextResponse
 
 from sqlalchemy import select, or_
@@ -509,6 +509,50 @@ async def mark_as_paid(
         "payment_method": data.payment_method,
         "message": "Payment marked! The seller has been notified to confirm."
     }
+
+
+@router.post("/{rental_id}/payment-proof", status_code=200)
+async def upload_payment_proof(
+    rental_id: UUID,
+    file: UploadFile = File(...),
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Upload a payment receipt/screenshot. Buyer only, after marking as paid."""
+    import uuid as uuid_mod
+    from pathlib import Path
+
+    RECEIPT_DIR = Path(__file__).resolve().parent.parent / "static" / "uploads" / "receipts"
+    ALLOWED = {"image/jpeg", "image/png", "image/webp", "application/pdf"}
+    MAX_SIZE = 10 * 1024 * 1024
+
+    if file.content_type not in ALLOWED:
+        raise HTTPException(status_code=400, detail="Supported: JPEG, PNG, WebP, PDF")
+
+    user = await get_user(db, token)
+    rental = await db.get(BHRental, rental_id)
+    if not rental:
+        raise HTTPException(status_code=404, detail="Order not found")
+    if rental.renter_id != user.id:
+        raise HTTPException(status_code=403, detail="Only the buyer can upload proof")
+    if rental.status not in (RentalStatus.BUYER_PAID, RentalStatus.COMMITTED):
+        raise HTTPException(status_code=400, detail="Can only upload proof during payment")
+
+    contents = await file.read()
+    if len(contents) > MAX_SIZE:
+        raise HTTPException(status_code=400, detail="File too large (max 10 MB)")
+
+    ext = file.filename.rsplit(".", 1)[-1].lower() if file.filename and "." in file.filename else "jpg"
+    if ext not in ("jpg", "jpeg", "png", "webp", "pdf"):
+        ext = "jpg"
+    filename = f"{uuid_mod.uuid4().hex}.{ext}"
+    RECEIPT_DIR.mkdir(parents=True, exist_ok=True)
+    (RECEIPT_DIR / filename).write_bytes(contents)
+
+    rental.payment_proof_url = f"/static/uploads/receipts/{filename}"
+    await db.commit()
+
+    return {"status": "ok", "proof_url": rental.payment_proof_url}
 
 
 @router.post("/{rental_id}/confirm-payment", status_code=200)
