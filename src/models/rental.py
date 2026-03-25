@@ -16,6 +16,13 @@ from src.database import Base, BHBase
 
 
 class RentalStatus(str, enum.Enum):
+    # Commitment flow (new)
+    COMMITTED = "committed"          # Buyer expressed intent, timer started
+    BUYER_PAID = "buyer_paid"        # Buyer clicked "I Paid"
+    PAYMENT_CONFIRMED = "payment_confirmed"  # Seller confirmed payment received
+    EXPIRED = "expired"              # Commitment timer ran out
+
+    # Legacy flow (still valid for giveaways, services, etc.)
     PENDING = "pending"
     APPROVED = "approved"
     DECLINED = "declined"
@@ -26,8 +33,15 @@ class RentalStatus(str, enum.Enum):
     DISPUTED = "disputed"
 
 
-# Valid state transitions (Section 22)
+# Valid state transitions
 VALID_RENTAL_TRANSITIONS = {
+    # Commitment flow
+    RentalStatus.COMMITTED: [RentalStatus.BUYER_PAID, RentalStatus.CANCELLED, RentalStatus.EXPIRED],
+    RentalStatus.BUYER_PAID: [RentalStatus.PAYMENT_CONFIRMED, RentalStatus.DISPUTED, RentalStatus.CANCELLED],
+    RentalStatus.PAYMENT_CONFIRMED: [RentalStatus.PICKED_UP, RentalStatus.COMPLETED, RentalStatus.DISPUTED],
+    RentalStatus.EXPIRED: [],
+
+    # Legacy flow
     RentalStatus.PENDING: [RentalStatus.APPROVED, RentalStatus.DECLINED, RentalStatus.CANCELLED],
     RentalStatus.APPROVED: [RentalStatus.PICKED_UP, RentalStatus.CANCELLED, RentalStatus.DISPUTED],
     RentalStatus.PICKED_UP: [RentalStatus.RETURNED, RentalStatus.DISPUTED],
@@ -70,6 +84,12 @@ class BHRental(BHBase, Base):
 
     # Safety acknowledgment (BL-102)
     safety_acknowledged: Mapped[bool] = mapped_column(default=False)
+
+    # Commitment flow
+    commitment_expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    payment_method_used: Mapped[Optional[str]] = mapped_column(String(30))  # "paypal", "iban", "cash", etc.
+    buyer_paid_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    payment_confirmed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
 
     # Idempotency (Rule 28 -- prevent double submit)
     idempotency_key: Mapped[Optional[str]] = mapped_column(String(36), unique=True)
