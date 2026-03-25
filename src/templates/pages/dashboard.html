@@ -1786,22 +1786,36 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.services_offered') }}</label>
                             <p class="text-xs text-gray-400 mb-2">{% if lang == 'it' %}Seleziona cosa offri. Appare sul tuo profilo e nei risultati di ricerca.{% else %}Select what you offer. Shows on your profile and in search results.{% endif %}</p>
-                            <div class="space-y-2">
-                                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                                    <input type="checkbox" x-model="services.offers_repair" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.repair') }}
-                                </label>
-                                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                                    <input type="checkbox" x-model="services.offers_custom_orders" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.custom') }}
-                                </label>
-                                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                                    <input type="checkbox" x-model="services.offers_training" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.training') }}
-                                </label>
-                                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                                    <input type="checkbox" x-model="services.offers_delivery" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.delivery') }}
-                                </label>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                                        <input type="checkbox" x-model="services.offers_repair" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.repair') }}
+                                    </label>
+                                    <p class="text-xs text-gray-400 ml-6">{% if lang == 'it' %}Ripari oggetti? Bici, elettronica, vestiti, mobili...{% else %}You fix things -- bikes, electronics, clothes, furniture...{% endif %}</p>
+                                </div>
+                                <div>
+                                    <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                                        <input type="checkbox" x-model="services.offers_custom_orders" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.custom') }}
+                                    </label>
+                                    <p class="text-xs text-gray-400 ml-6">{% if lang == 'it' %}Crei cose su ordinazione? Arte, gioielli, mobili su misura...{% else %}You make things to order -- art, jewelry, custom furniture...{% endif %}</p>
+                                </div>
+                                <div>
+                                    <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                                        <input type="checkbox" x-model="services.offers_training" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.training') }}
+                                    </label>
+                                    <p class="text-xs text-gray-400 ml-6">{% if lang == 'it' %}Insegni o fai corsi? Lezioni, workshop, tutoring...{% else %}You teach -- lessons, workshops, tutoring, mentoring...{% endif %}</p>
+                                </div>
+                                <div>
+                                    <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                                        <input type="checkbox" x-model="services.offers_delivery" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.delivery') }}
+                                    </label>
+                                    <p class="text-xs text-gray-400 ml-6">{% if lang == 'it' %}Puoi consegnare gli articoli al compratore?{% else %}You can bring items to the buyer's location.{% endif %}</p>
+                                </div>
                                 <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                                     <input type="checkbox" x-model="services.offers_pickup" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"> {{ t('i18n.pickup') }}
                                 </label>
+                                    <p class="text-xs text-gray-400 ml-6">{% if lang == 'it' %}Il compratore puo venire a ritirare da te.{% else %}Buyers can come to your location to collect items.{% endif %}</p>
+                                </div>
                             </div>
                         </div>
 
