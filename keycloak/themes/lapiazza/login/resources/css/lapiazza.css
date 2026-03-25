@@ -15,16 +15,49 @@
     flex-direction: column !important;
     align-items: center !important;
     width: 100% !important;
-    max-width: 480px !important;
+    max-width: 600px !important;
     margin: 0 auto !important;
     padding: 0 20px !important;
 }
 
 .pf-v5-c-login__main {
     width: 100% !important;
-    max-width: 480px !important;
+    max-width: 600px !important;
     margin: 0 auto !important;
     grid-template-columns: 1fr !important;
+}
+
+/* Bigger fonts for readability */
+.pf-v5-c-login__main-header .pf-v5-c-title {
+    font-size: 28px !important;
+    font-weight: 700 !important;
+}
+
+.pf-v5-c-form__label-text {
+    font-size: 16px !important;
+    font-weight: 500 !important;
+}
+
+.pf-v5-c-form-control {
+    font-size: 16px !important;
+    padding: 12px 14px !important;
+    min-height: 48px !important;
+}
+
+.pf-v5-c-button.pf-m-primary {
+    font-size: 16px !important;
+    min-height: 48px !important;
+}
+
+.pf-v5-c-login__main-footer-links a,
+#kc-social-providers a {
+    font-size: 15px !important;
+    min-height: 44px !important;
+    padding: 10px 16px !important;
+}
+
+#kc-registration span, #kc-registration a {
+    font-size: 15px !important;
 }
 
 /* ===== HEADER: wolf logo + La Piazza text ===== */
@@ -50,9 +83,9 @@
 .kc-logo-text::before {
     content: '';
     display: block;
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 12px;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 14px;
     background: url('../img/lapiazza-logo.png') center/contain no-repeat;
     border-radius: 50%;
 }
@@ -60,7 +93,7 @@
 .kc-logo-text::after {
     content: 'La Piazza';
     display: block;
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 700;
     color: #fff;
     text-align: center;
