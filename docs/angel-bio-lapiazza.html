@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angelo Kenel -- From Punch Cards to Electric Dreams</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: #1a1a1a;
+    background: #fafaf8;
+    line-height: 1.7;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    min-height: 500px;
+    overflow: hidden;
+  }
+  .hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 60px 40px 40px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    color: white;
+  }
+  .hero-overlay h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .hero-overlay .subtitle {
+    font-size: 1.15rem;
+    font-weight: 300;
+    opacity: 0.9;
+  }
+
+  /* CONTENT */
+  .content {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 60px 24px;
+  }
+
+  .section {
+    margin-bottom: 64px;
+  }
+
+  .section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #111;
+  }
+
+  .section p {
+    font-size: 1.05rem;
+    margin-bottom: 16px;
+    color: #333;
+  }
+
+  .section p strong {
+    color: #111;
+  }
+
+  .section p em {
+    font-style: italic;
+    color: #555;
+  }
+
+  /* SECTION IMAGES */
+  .section-img {
+    width: 100%;
+    border-radius: 8px;
+    margin: 24px 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  /* TIMELINE */
+  .timeline {
+    border-left: 3px solid #c0392b;
+    padding-left: 28px;
+    margin: 24px 0;
+  }
+  .timeline-item {
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -34px;
+    top: 8px;
+    width: 12px;
+    height: 12px;
+    background: #c0392b;
+    border-radius: 50%;
+    border: 3px solid #fafaf8;
+  }
+  .timeline-item .decade {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #c0392b;
+  }
+  .timeline-item .desc {
+    font-size: 0.98rem;
+    color: #444;
+  }
+
+  /* STACK LIST */
+  .stack-list {
+    list-style: none;
+    margin: 20px 0;
+  }
+  .stack-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 1rem;
+  }
+  .stack-list li strong {
+    color: #c0392b;
+  }
+
+  /* QUOTE BLOCK */
+  .quote-block {
+    border-left: 4px solid #c0392b;
+    padding: 20px 24px;
+    margin: 32px 0;
+    background: #f5f0eb;
+    border-radius: 0 8px 8px 0;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.25rem;
+    color: #333;
+  }
+
+  /* PUNCHLINE */
+  .punchline {
+    text-align: center;
+    padding: 48px 24px;
+    background: #111;
+    color: #fff;
+    border-radius: 12px;
+    margin: 48px 0;
+  }
+  .punchline h2 {
+    color: #fff;
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  .punchline p {
+    color: #ccc;
+    font-size: 1.05rem;
+    margin-bottom: 14px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .punchline .kicker {
+    color: #c0392b;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-top: 24px;
+  }
+
+  /* TAGS */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 24px 0;
+  }
+  .tag {
+    background: #f0ece6;
+    color: #555;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+
+  /* LINKS */
+  .links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .link-card {
+    background: #fff;
+    border: 1px solid #e5e0d8;
+    border-radius: 8px;
+    padding: 20px;
+    text-decoration: none;
+    color: #333;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .link-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+  }
+  .link-card .platform {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #111;
+    margin-bottom: 4px;
+  }
+  .link-card .what {
+    font-size: 0.85rem;
+    color: #777;
+  }
+
+  /* FOOTER */
+  .bio-footer {
+    text-align: center;
+    padding: 40px 24px;
+    color: #999;
+    font-size: 0.9rem;
+  }
+  .bio-footer strong {
+    color: #333;
+    display: block;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+  }
+
+  /* PHOTO PLACEHOLDERS */
+  .photo-placeholder {
+    width: 100%;
+    border-radius: 8px;
+    margin: 24px 0;
+    background: #e8e4de;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    border: 2px dashed #c0392b;
+    color: #999;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 20px;
+  }
+
+  @media (max-width: 600px) {
+    .hero { height: 60vh; min-height: 350px; }
+    .hero-overlay h1 { font-size: 2rem; }
+    .content { padding: 40px 16px; }
+    .section h2 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<div class="hero">
+  <!-- AI-generated: Sicilian coastline + camper van, golden hour -->
+  <img src="https://image.pollinations.ai/prompt/A%20vintage%20white%20camper%20van%20parked%20on%20a%20clifftop%20overlooking%20the%20turquoise%20Mediterranean%20Sea%20near%20Trapani%20Sicily%2C%20golden%20hour%20sunlight%2C%20salt%20pans%20in%20the%20distance%2C%20wild%20herbs%20and%20dry%20stone%20walls%2C%20cinematic%20wide%20shot%2C%20warm%20tones%2C%20photorealistic%2C%20no%20people%2C%20no%20text?width=1400&height=800&seed=42&nologo=true"
+       alt="Camper van overlooking the Mediterranean near Trapani, Sicily"
+       loading="lazy">
+  <div class="hero-overlay">
+    <h1>From Punch Cards to Electric Dreams</h1>
+    <p class="subtitle">The story of Angelo Kenel -- 40 years of building things that work.</p>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- ============ ORIGIN ============ -->
+  <div class="section">
+    <p>I started with punch cards.</p>
+    <p>1983. A kid from a Swiss landscaping family -- son of Albert Kenel, a man who moved earth with a hand shovel and never once complained about the weather. At 16, I had a choice: mud or machines. I chose the machines.</p>
+    <p>Back then, a program lived on a stack of cardboard rectangles. You didn't "run" code -- you <em>submitted</em> it. Then you waited. If you dropped the deck on the way to the reader, God help you. That was debugging in the early 80s: pick up the cards, put them back in order, and try again.</p>
+    <p>I learned patience from punch cards. I learned precision from my father.</p>
+  </div>
+
+  <!-- ============ VINTAGE TECH IMAGE ============ -->
+  <div class="section">
+    <!-- AI-generated: 1983 mainframe room -->
+    <img class="section-img"
+         src="https://image.pollinations.ai/prompt/1983%20mainframe%20computer%20room%2C%20IBM%20punch%20card%20reader%20machine%2C%20stacks%20of%20punch%20cards%20on%20a%20metal%20desk%2C%20fluorescent%20lighting%2C%20beige%20and%20brown%20tones%2C%20cable%20bundles%2C%20reel-to-reel%20tape%20drives%20in%20background%2C%20photorealistic%20retro%20photography%20style%2C%201980s%20computer%20lab%2C%20no%20text%2C%20no%20people?width=1200&height=600&seed=1983&nologo=true"
+         alt="1983 mainframe computer room with punch card reader"
+         loading="lazy">
+  </div>
+
+  <!-- ============ THE LONG ROAD ============ -->
+  <div class="section">
+    <h2>The Long Road</h2>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="decade">The 80s</div>
+        <div class="desc">Punch cards, mainframes, batch jobs. Learning that computers don't forgive sloppy thinking.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="decade">The 90s</div>
+        <div class="desc">PCs, networks, the first taste of the internet. The world got smaller overnight.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="decade">The 2000s</div>
+        <div class="desc">Enterprise systems, databases, the machinery behind the businesses nobody sees but everybody depends on.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="decade">The 2010s</div>
+        <div class="desc">Cloud, containers, the shift from "where does this run" to "does it matter where this runs."</div>
+      </div>
+      <div class="timeline-item">
+        <div class="decade">The 2020s</div>
+        <div class="desc">AI pair programming, infrastructure as code, and the realization that 40 years of muscle memory still matters more than any shortcut.</div>
+      </div>
+    </div>
+    <p>Every era killed the last one's tools and kept its lessons.</p>
+  </div>
+
+  <!-- ============ THE PHILOSOPHY ============ -->
+  <div class="section">
+    <h2>The Philosophy</h2>
+    <!-- AI-generated: Hands building stone wall -->
+    <img class="section-img"
+         src="https://image.pollinations.ai/prompt/Close-up%20of%20weathered%20hands%20building%20a%20stone%20retaining%20wall%2C%20rough-cut%20limestone%20blocks%2C%20dark%20rich%20earth%2C%20morning%20light%2C%20Swiss%20alpine%20meadow%20in%20soft%20background%20blur%2C%20photorealistic%2C%20warm%20natural%20tones%2C%20craftsmanship%2C%20manual%20labour%2C%20no%20text?width=1200&height=600&seed=83&nologo=true"
+         alt="Weathered hands building a stone retaining wall"
+         loading="lazy">
+    <p>My father built retaining walls by hand. Stone by stone, level by level. No shortcuts. If the foundation was wrong, you ripped it out and started over -- you didn't stack more stones on top and hope.</p>
+    <p>Software is the same. I've watched teams duct-tape systems together for decades. Ship it, patch it, pray. That's not engineering. That's gambling.</p>
+    <p><strong>I build things that work.</strong> Not things that demo well. Not things that pass the first test and fall apart under load. Things that <em>work</em> -- in production, at midnight, when nobody's watching.</p>
+  </div>
+
+  <!-- ============ WHAT I BUILD NOW ============ -->
+  <div class="section">
+    <h2>What I Build Now</h2>
+    <p>Today I build <strong>La Piazza</strong> -- a neighbourhood sharing platform where people lend, borrow, teach, and help each other. The way villages used to work, before algorithms decided who your neighbours were.</p>
+
+    <ul class="stack-list">
+      <li><strong>Python & FastAPI</strong> -- the application brain</li>
+      <li><strong>Docker containers</strong> -- ship the whole kitchen, not just the recipe</li>
+      <li><strong>GitHub</strong> -- every change tracked, every decision reversible</li>
+      <li><strong>Keycloak</strong> -- identity and access, because trust has to be engineered</li>
+      <li><strong>Claude CLI</strong> -- an AI co-pilot that writes code at lightning speed while I steer</li>
+    </ul>
+
+    <!-- REAL SCREENSHOT PLACEHOLDER -->
+    <div class="photo-placeholder">
+      YOUR SCREENSHOT HERE<br>
+      Terminal with Claude CLI + Docker ps + code flowing<br>
+      <em>Replace this div with an &lt;img&gt; tag pointing to your screenshot</em>
+    </div>
+
+    <p>I went from feeding punch cards into a reader to pair-programming with an AI that lives in my terminal. The gap between those two realities is 40 years, and I carry every one of them.</p>
+  </div>
+
+  <!-- ============ WHY LA PIAZZA ============ -->
+  <div class="section">
+    <h2>Why La Piazza</h2>
+    <p>Because technology should bring people closer, not further apart.</p>
+    <p>Because a kid who needs a drill for one afternoon shouldn't have to buy one. Because a retired welder with 30 years of skill shouldn't sit idle while someone struggles with a broken bike frame. Because the best marketplace is the one where your neighbour already has what you need.</p>
+    <p>La Piazza is the town square, digitized. No algorithms deciding what you see. No engagement metrics optimizing for addiction. Just people, in a neighbourhood, helping each other out.</p>
+
+    <!-- REAL APP SCREENSHOT PLACEHOLDER -->
+    <div class="photo-placeholder">
+      APP SCREENSHOT HERE<br>
+      La Piazza browse page on mobile or laptop<br>
+      <em>Replace this div with an &lt;img&gt; tag pointing to your app screenshot</em>
+    </div>
+  </div>
+
+  <!-- ============ THE TRIBE ============ -->
+  <div class="section">
+    <h2>The Tribe</h2>
+
+    <!-- REAL PHOTO PLACEHOLDER -->
+    <div class="photo-placeholder">
+      REAL PHOTO HERE<br>
+      The Sicily crew -- Sebastino's shop, Pizza Planet, coffee with the tribe<br>
+      <em>Replace this div with an &lt;img&gt; tag pointing to your real photo</em>
+    </div>
+  </div>
+
+  <!-- ============ THE PUNCH LINE ============ -->
+  <div class="punchline">
+    <h2>The Punch Line</h2>
+    <p>Forty years ago, I fed instructions to a machine one card at a time and waited for it to tell me I got it wrong.</p>
+    <p>Today, I describe what I want to build, and an AI writes the first draft in seconds. I still have to tell it when it gets it wrong -- some things never change.</p>
+    <p>But the dream is the same dream it always was: <strong style="color:#fff;">build something useful, build it right, and make sure it still works tomorrow.</strong></p>
+    <p class="kicker">From punch cards to electric dreams. The tools changed. The standard didn't.</p>
+  </div>
+
+  <!-- ============ TAGS ============ -->
+  <div class="section">
+    <div class="tags">
+      <span class="tag">#PunchCards</span>
+      <span class="tag">#Mainframe</span>
+      <span class="tag">#OldSchool</span>
+      <span class="tag">#40YearsOfCode</span>
+      <span class="tag">#FromCardsToCloud</span>
+      <span class="tag">#Python</span>
+      <span class="tag">#FastAPI</span>
+      <span class="tag">#Docker</span>
+      <span class="tag">#GitHub</span>
+      <span class="tag">#Keycloak</span>
+      <span class="tag">#ClaudeCLI</span>
+      <span class="tag">#AIPairProgramming</span>
+      <span class="tag">#FullStack</span>
+      <span class="tag">#DevOps</span>
+      <span class="tag">#InfrastructureAsCode</span>
+      <span class="tag">#ContainerizedEverything</span>
+      <span class="tag">#LaPiazza</span>
+      <span class="tag">#CommunityTech</span>
+      <span class="tag">#NeighbourhoodSharing</span>
+      <span class="tag">#BuildThingsRight</span>
+      <span class="tag">#SwissMade</span>
+      <span class="tag">#SicilyBased</span>
+      <span class="tag">#BlackWolf</span>
+      <span class="tag">#ElectricDreams</span>
+      <span class="tag">#NoShortcuts</span>
+      <span class="tag">#ProductionGrade</span>
+      <span class="tag">#OpenSource</span>
+      <span class="tag">#IndieBuilder</span>
+      <span class="tag">#VeteranDev</span>
+      <span class="tag">#PunchCardSurvivor</span>
+      <span class="tag">#StillShipping</span>
+    </div>
+  </div>
+
+  <!-- ============ LINKS ============ -->
+  <div class="section">
+    <h2>Find Me</h2>
+    <div class="links-grid">
+      <a class="link-card" href="https://lapiazza.app" target="_blank">
+        <div class="platform">La Piazza</div>
+        <div class="what">The live product -- browse, borrow, lend, help</div>
+      </a>
+      <a class="link-card" href="#" target="_blank">
+        <div class="platform">YouTube</div>
+        <div class="what">BorrowHood series -- real app, real users, real story</div>
+      </a>
+      <a class="link-card" href="#" target="_blank">
+        <div class="platform">LinkedIn</div>
+        <div class="what">Professional profile + infra deep-dive posts</div>
+      </a>
+      <a class="link-card" href="#" target="_blank">
+        <div class="platform">GitHub</div>
+        <div class="what">44 models, FastAPI, Docker -- the whole engine</div>
+      </a>
+      <a class="link-card" href="#" target="_blank">
+        <div class="platform">dev.to</div>
+        <div class="what">Technical articles + hackathon entries</div>
+      </a>
+      <a class="link-card" href="https://t.me/BigKingFisher" target="_blank">
+        <div class="platform">Telegram</div>
+        <div class="what">@BigKingFisher -- say hello</div>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ FOOTER ============ -->
+<div class="bio-footer">
+  <strong>Angelo Kenel -- Builder, Navigator, Black Wolf</strong>
+  La Piazza -- lapiazza.app
+</div>
+
+</body>
+</html>
