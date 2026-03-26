@@ -577,6 +577,7 @@
             <template x-effect="
                 const svcCats = ['repairs', 'training_service', 'custom_orders', 'education', 'tool_library'];
                 const communityCats = ['skill_exchange', 'neighborhood_help', 'local_food', 'rides'];
+                const propertyCats = ['apartment', 'room', 'house', 'vacation_rental', 'commercial_space', 'land'];
                 const spaceCats = ['workshops', 'kitchens', 'garages', 'studios'];
                 if (svcCats.includes(form.category)) {
                     form.item_type = 'service';
@@ -595,6 +596,11 @@
                     else if (form.category === 'local_food') selectedTypes = ['sell'];
                     else if (form.category === 'rides') selectedTypes = ['service'];
                     else if (form.category === 'neighborhood_help') selectedTypes = ['offer'];
+                } else if (propertyCats.includes(form.category)) {
+                    form.item_type = 'space';
+                    if (form.category === 'vacation_rental') selectedTypes = ['rent'];
+                    else if (form.category === 'land') selectedTypes = ['sell'];
+                    else selectedTypes = ['rent'];
                 } else if (spaceCats.includes(form.category)) {
                     form.item_type = 'space';
                 }

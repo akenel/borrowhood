@@ -270,6 +270,7 @@
     "all_statuses": "Tutti gli Stati"
   },
   "cat_groups": {
+    "property": "Immobili e Affitti",
     "community": "Comunita",
     "tools_workshop": "Attrezzi e Officina",
     "home_living": "Casa e Vita",
@@ -321,7 +322,13 @@
     "neighborhood_help": "Aiuto tra Vicini",
     "local_food": "Cibo Locale e Prodotti",
     "rides": "Passaggi e Carpooling",
-    "tool_library": "Biblioteca Attrezzi"
+    "tool_library": "Biblioteca Attrezzi",
+    "apartment": "Appartamento",
+    "room": "Stanza / Condiviso",
+    "house": "Casa / Villa",
+    "vacation_rental": "Casa Vacanza",
+    "commercial_space": "Commerciale / Ufficio",
+    "land": "Terreno"
   },
   "condition": {
     "new": "Nuovo",

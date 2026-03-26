@@ -270,6 +270,7 @@
     "all_statuses": "All Statuses"
   },
   "cat_groups": {
+    "property": "Property & Rentals",
     "community": "Community",
     "tools_workshop": "Tools & Workshop",
     "home_living": "Home & Living",
@@ -321,7 +322,13 @@
     "neighborhood_help": "Neighborhood Help",
     "local_food": "Local Food & Produce",
     "rides": "Rides & Carpooling",
-    "tool_library": "Tool Library"
+    "tool_library": "Tool Library",
+    "apartment": "Apartment",
+    "room": "Room / Shared",
+    "house": "House / Villa",
+    "vacation_rental": "Vacation Rental",
+    "commercial_space": "Commercial / Office",
+    "land": "Land / Terrain"
   },
   "condition": {
     "new": "New",

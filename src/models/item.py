@@ -80,6 +80,7 @@ class ItemCategory(str, enum.Enum):
 
 
 CATEGORY_GROUPS = {
+    "property": ["apartment", "room", "house", "vacation_rental", "commercial_space", "land"],
     "community": ["skill_exchange", "neighborhood_help", "local_food", "rides"],
     "tools_workshop": ["power_tools", "hand_tools", "automotive", "welding", "woodworking", "3d_printing", "tool_library"],
     "home_living": ["kitchen", "cleaning", "garden", "furniture", "home_improvement"],
