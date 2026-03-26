@@ -43,7 +43,7 @@ async def _get_rental_with_auth(
         raise HTTPException(status_code=404, detail="Rental not found")
 
     is_renter = rental.renter_id == user.id
-    is_owner = rental.listing.item.owner_id == user.id
+    is_owner = rental.listing and rental.listing.item and rental.listing.item.owner_id == user.id
     if not (is_renter or is_owner):
         raise HTTPException(status_code=403, detail="Not your rental")
 
