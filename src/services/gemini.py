@@ -1,4 +1,4 @@
-"""Multi-provider AI service for BorrowHood.
+"""Multi-provider AI service for La Piazza.
 
 Provider cascade (configurable via BH_AI_PROVIDER):
   auto     -> gemini -> ollama -> pollinations -> template fallback
@@ -204,7 +204,7 @@ def _build_listing_prompt(
 
     categories_str = ", ".join(CATEGORIES)
 
-    return f"""You are the Smart Listing Assistant for BorrowHood, a neighborhood sharing platform
+    return f"""You are the Smart Listing Assistant for La Piazza, a neighborhood sharing platform
 in {community}. Generate a complete listing from the item info below.
 
 Item name: {name}
@@ -482,7 +482,7 @@ def _build_concierge_prompt(
                 f"languages: {lang_str})\n"
             )
 
-    return f"""You are the AI Concierge for BorrowHood, a neighborhood sharing platform
+    return f"""You are the AI Concierge for La Piazza, a neighborhood sharing platform
 in {community}. A user searched for: "{query}"
 
 {items_text}
@@ -585,7 +585,7 @@ def _build_helpboard_prompt(description: str, help_type: str, language: str, sim
 
     lang_instruction = f"Write the title and body in {language}." if language != "en" else ""
 
-    return f"""You are the AI assistant for BorrowHood, a community sharing platform.
+    return f"""You are the AI assistant for La Piazza, a community sharing platform.
 
 A user wants to create a {"help request (I need help)" if help_type == "need" else "help offer (I can help)"} post.
 
