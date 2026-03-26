@@ -28,9 +28,9 @@ async def create_report(
     db: AsyncSession = Depends(get_db),
 ):
     """File a content moderation report. Max 10/hour per user."""
-    reporter_id = token.get("sub")
-    if not reporter_id:
-        raise HTTPException(status_code=401, detail="Missing user identity")
+    from src.dependencies import get_user as _get_user
+    user = await _get_user(db, token)
+    reporter_id = user.id
 
     # Prevent duplicate reports from same user on same entity
     existing = await db.scalar(
