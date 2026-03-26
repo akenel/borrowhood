@@ -522,9 +522,13 @@
                                 </div>
                             </div>
 
-                            <!-- Title + body -->
-                            <p x-show="review.title" class="text-sm font-semibold text-gray-900 mt-2" x-text="review.title"></p>
-                            <div x-show="review.body" class="text-sm text-gray-600 mt-1 leading-relaxed prose prose-sm max-w-none" x-html="typeof marked !== 'undefined' ? marked.parse(review.body || '') : (review.body || '')"></div>
+                            <!-- Story title + body -->
+                            <div class="mt-2" x-show="review.title || review.body">
+                                <p x-show="review.title" class="text-sm font-bold text-gray-900" x-text="review.title"></p>
+                                <div x-show="review.body" class="mt-1 pl-3 border-l-2 border-indigo-200">
+                                    <div class="text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none italic" x-html="typeof marked !== 'undefined' ? marked.parse(review.body || '') : (review.body || '')"></div>
+                                </div>
+                            </div>
 
                             <!-- Subcategory mini-bars (if any exist) -->
                             <div x-show="review.rating_accuracy || review.rating_communication || review.rating_value || review.rating_timeliness"
@@ -1647,24 +1651,41 @@
                             </div>
                         </div>
 
-                        <!-- Title -->
+                        <!-- Who you're reviewing -->
+                        {% if item.owner %}
+                        <div class="mb-4 p-3 bg-gray-50 rounded-lg flex items-center gap-3">
+                            {% if item.owner.avatar_url %}
+                            <img src="{{ item.owner.avatar_url }}" alt="{{ item.owner.display_name }}" class="w-10 h-10 rounded-full object-cover">
+                            {% else %}
+                            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">{{ item.owner.display_name[0] | upper }}</div>
+                            {% endif %}
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">{{ item.owner.display_name }}</p>
+                                <p class="text-xs text-gray-500">{{ item.owner.workshop_name or item.owner.tagline or '' }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Story Title -->
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                {{ t('i18n.title') }}
+                                {% if lang == 'it' %}In una frase, com'e andata?{% else %}In one sentence, how did it go?{% endif %}
                             </label>
                             <input type="text" x-model="newReview.title" maxlength="200"
-                                   placeholder="{{ t('i18n.summarize_your_experience') }}"
+                                   placeholder="{% if lang == 'it' %}es. Ha riparato la mia bici in 20 minuti -- incredibile!{% else %}e.g. Fixed my bike in 20 minutes -- incredible!{% endif %}"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
                         </div>
 
-                        <!-- Body -->
+                        <!-- Story Body -->
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                {{ t('i18n.your_review') }}
+                                {% if lang == 'it' %}Racconta la tua esperienza{% else %}Tell the story of what happened{% endif %}
                             </label>
-                            <textarea x-model="newReview.body" rows="4"
-                                      placeholder="{{ t('i18n.tell_us_about_your_experience') }}"
+                            <p class="text-xs text-gray-400 mb-2">{% if lang == 'it' %}Com'e stato il contatto? L'articolo era come descritto? Lo consiglieresti a un amico?{% else %}How was the first contact? Was the item as described? Would you recommend them to a friend?{% endif %}</p>
+                            <textarea x-model="newReview.body" rows="5"
+                                      placeholder="{% if lang == 'it' %}es. Ho trovato Maria tramite La Piazza quando il mio frigorifero si e rotto di sabato sera...{% else %}e.g. I found Maria on La Piazza when my fridge broke on a Saturday night...{% endif %}"
                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+                            <p class="text-xs text-gray-400 mt-1">{{ t('i18n.supports_markdown') }}</p>
                         </div>
 
                         <!-- Photo upload -->
