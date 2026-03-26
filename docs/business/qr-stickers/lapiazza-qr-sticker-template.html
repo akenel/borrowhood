@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>LaPiazza QR Sticker Template</title>
+<style>
+    @page { size: A4 portrait; margin: 0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    .page {
+        width: 210mm;
+        height: 297mm;
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        padding: 10mm;
+        gap: 8mm;
+    }
+
+    /* Each sticker: ~90mm x 90mm = 4 per A4 page (2x2 with gaps) */
+    .sticker {
+        width: 90mm;
+        height: 90mm;
+        border: 0.3mm dashed #d1d5db;
+        border-radius: 4mm;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 5mm;
+        background: white;
+    }
+
+    .wolf-logo {
+        width: 14mm;
+        height: 14mm;
+        margin-bottom: 2mm;
+    }
+
+    .brand {
+        font-size: 16pt;
+        font-weight: 700;
+        color: #4f46e5;
+        margin-bottom: 1mm;
+    }
+
+    .tagline {
+        font-size: 7pt;
+        color: #6b7280;
+        text-align: center;
+        margin-bottom: 4mm;
+        line-height: 1.3;
+    }
+
+    .qr-box {
+        width: 40mm;
+        height: 40mm;
+        margin-bottom: 3mm;
+    }
+    .qr-box img {
+        width: 100%;
+        height: 100%;
+    }
+
+    .scan-text {
+        font-size: 9pt;
+        font-weight: 600;
+        color: #1f2937;
+        text-align: center;
+        margin-bottom: 1mm;
+    }
+
+    .shop-name {
+        font-size: 8pt;
+        font-weight: 600;
+        color: #4f46e5;
+        text-align: center;
+    }
+
+    .cta {
+        font-size: 6.5pt;
+        color: #059669;
+        font-weight: 600;
+        margin-top: 2mm;
+    }
+</style>
+</head>
+<body>
+
+<!--
+    LaPiazza Walk-in QR Sticker Template
+    ====================================
+    How to use:
+    1. Replace WORKSHOP_SLUG with the shop's workshop slug
+    2. Replace SHOP_NAME with the shop's name
+    3. Generate PDF with Puppeteer
+    4. Print on sticker paper or regular paper + tape
+    5. Stick on shop door/window/counter
+
+    To customize: change the QR URL data parameter
+-->
+
+<div class="page">
+
+    <!-- Sticker 1 -->
+    <div class="sticker">
+        <img class="wolf-logo" src="../../BorrowHood/docs/business/postcards/lapiazza-member-card/images/wolf-logo.png" alt="La Piazza">
+        <div class="brand">LaPiazza.app</div>
+        <div class="tagline">Your neighbors are already here<br>I tuoi vicini sono gia qui</div>
+        <div class="qr-box">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https%3A%2F%2Flapiazza.app%2Fworkshop%2FWORKSHOP_SLUG" alt="QR">
+        </div>
+        <div class="scan-text">Scan to browse &middot; Scansiona</div>
+        <div class="shop-name">SHOP_NAME</div>
+        <div class="cta">Zero fees &middot; Zero costi</div>
+    </div>
+
+    <!-- Sticker 2 -->
+    <div class="sticker">
+        <img class="wolf-logo" src="../../BorrowHood/docs/business/postcards/lapiazza-member-card/images/wolf-logo.png" alt="La Piazza">
+        <div class="brand">LaPiazza.app</div>
+        <div class="tagline">Your neighbors are already here<br>I tuoi vicini sono gia qui</div>
+        <div class="qr-box">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https%3A%2F%2Flapiazza.app%2Fworkshop%2FWORKSHOP_SLUG" alt="QR">
+        </div>
+        <div class="scan-text">Scan to browse &middot; Scansiona</div>
+        <div class="shop-name">SHOP_NAME</div>
+        <div class="cta">Zero fees &middot; Zero costi</div>
+    </div>
+
+    <!-- Sticker 3 -->
+    <div class="sticker">
+        <img class="wolf-logo" src="../../BorrowHood/docs/business/postcards/lapiazza-member-card/images/wolf-logo.png" alt="La Piazza">
+        <div class="brand">LaPiazza.app</div>
+        <div class="tagline">Your neighbors are already here<br>I tuoi vicini sono gia qui</div>
+        <div class="qr-box">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https%3A%2F%2Flapiazza.app%2Fworkshop%2FWORKSHOP_SLUG" alt="QR">
+        </div>
+        <div class="scan-text">Scan to browse &middot; Scansiona</div>
+        <div class="shop-name">SHOP_NAME</div>
+        <div class="cta">Zero fees &middot; Zero costi</div>
+    </div>
+
+    <!-- Sticker 4 -->
+    <div class="sticker">
+        <img class="wolf-logo" src="../../BorrowHood/docs/business/postcards/lapiazza-member-card/images/wolf-logo.png" alt="La Piazza">
+        <div class="brand">LaPiazza.app</div>
+        <div class="tagline">Your neighbors are already here<br>I tuoi vicini sono gia qui</div>
+        <div class="qr-box">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https%3A%2F%2Flapiazza.app%2Fworkshop%2FWORKSHOP_SLUG" alt="QR">
+        </div>
+        <div class="scan-text">Scan to browse &middot; Scansiona</div>
+        <div class="shop-name">SHOP_NAME</div>
+        <div class="cta">Zero fees &middot; Zero costi</div>
+    </div>
+
+</div>
+
+</body>
+</html>

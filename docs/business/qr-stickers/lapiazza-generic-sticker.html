@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>LaPiazza Generic QR Sticker -- 4 per A4</title>
+<style>
+    @page { size: A4 portrait; margin: 0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    .page {
+        width: 210mm;
+        height: 297mm;
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        padding: 10mm;
+        gap: 8mm;
+    }
+
+    .sticker {
+        width: 90mm;
+        height: 90mm;
+        border: 0.3mm dashed #d1d5db;
+        border-radius: 4mm;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 5mm;
+        background: white;
+    }
+
+    .wolf-logo { width: 16mm; height: 16mm; margin-bottom: 2mm; }
+    .brand { font-size: 18pt; font-weight: 700; color: #4f46e5; margin-bottom: 2mm; }
+    .tagline { font-size: 8pt; color: #1f2937; text-align: center; margin-bottom: 4mm; line-height: 1.4; font-weight: 600; }
+    .qr-box { width: 38mm; height: 38mm; margin-bottom: 3mm; }
+    .qr-box img { width: 100%; height: 100%; }
+    .features { font-size: 7pt; color: #6b7280; text-align: center; margin-bottom: 2mm; }
+    .cta { font-size: 9pt; color: #059669; font-weight: 700; text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- Generic LaPiazza sticker -- links to lapiazza.app home page -->
+<!-- Print on sticker paper or regular paper. Cut along dashed lines. -->
+
+<div class="page">
+
+    <div class="sticker">
+        <img class="wolf-logo" src="wolf-logo.png" alt="La Piazza">
+        <div class="brand">LaPiazza.app</div>
+        <div class="tagline">The Town Square is Open<br>La Piazza del Paese e Aperta</div>
+        <div class="qr-box">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https%3A%2F%2Flapiazza.app" alt="QR">
+        </div>
+        <div class="features">Rent &middot; Sell &middot; Teach &middot; Auction &middot; Share</div>
+        <div class="cta">Zero fees. Join free.</div>
+    </div>
+
+    <div class="sticker">
+        <img class="wolf-logo" src="wolf-logo.png" alt="La Piazza">
+        <div class="brand">LaPiazza.app</div>
+        <div class="tagline">The Town Square is Open<br>La Piazza del Paese e Aperta</div>
+        <div class="qr-box">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https%3A%2F%2Flapiazza.app" alt="QR">
+        </div>
+        <div class="features">Rent &middot; Sell &middot; Teach &middot; Auction &middot; Share</div>
+        <div class="cta">Zero fees. Join free.</div>
+    </div>
+
+    <div class="sticker">
+        <img class="wolf-logo" src="wolf-logo.png" alt="La Piazza">
+        <div class="brand">LaPiazza.app</div>
+        <div class="tagline">The Town Square is Open<br>La Piazza del Paese e Aperta</div>
+        <div class="qr-box">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https%3A%2F%2Flapiazza.app" alt="QR">
+        </div>
+        <div class="features">Rent &middot; Sell &middot; Teach &middot; Auction &middot; Share</div>
+        <div class="cta">Zero fees. Join free.</div>
+    </div>
+
+    <div class="sticker">
+        <img class="wolf-logo" src="wolf-logo.png" alt="La Piazza">
+        <div class="brand">LaPiazza.app</div>
+        <div class="tagline">The Town Square is Open<br>La Piazza del Paese e Aperta</div>
+        <div class="qr-box">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https%3A%2F%2Flapiazza.app" alt="QR">
+        </div>
+        <div class="features">Rent &middot; Sell &middot; Teach &middot; Auction &middot; Share</div>
+        <div class="cta">Zero fees. Join free.</div>
+    </div>
+
+</div>
+
+</body>
+</html>
