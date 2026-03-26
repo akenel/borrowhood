@@ -423,8 +423,8 @@
                         </div>
                     </template>
 
-                    <!-- Delivery Tracking Timeline -->
-                    <template x-if="['approved','picked_up'].includes(status)">
+                    <!-- Delivery Tracking Timeline (only for approved/picked_up, not commitment flow) -->
+                    <template x-if="['approved','picked_up'].includes(status) && !['committed','buyer_paid','payment_confirmed'].includes(status)">
                         <div class="mt-3 border-t border-gray-100 pt-3"
                              x-data="deliveryTimeline('{{ rental.id }}')" x-init="load()">
                             <div x-show="tracking" x-cloak>
@@ -489,7 +489,7 @@
                                 </div>
 
                                 <!-- Confirm delivery button (for renter, when status is delivered) -->
-                                <div x-show="tracking.status === 'delivered' || tracking.status === 'picked_up'" class="mt-3 flex space-x-2">
+                                <div x-show="tracking?.status === 'delivered' || tracking?.status === 'picked_up'" class="mt-3 flex space-x-2">
                                     <button @click="updateStatus('confirmed', 'Looks good -- thank you!')"
                                             class="text-xs px-3 py-1.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 min-h-[32px]">
                                         Confirm Receipt
