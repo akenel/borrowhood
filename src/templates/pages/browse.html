@@ -121,6 +121,50 @@
             </button>
         </form>
 
+        <!-- Category quick-pick cards -->
+        {% if not selected_category %}
+        <div class="mt-4">
+            <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2">
+                {% set cat_icons = {
+                    'community': '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>',
+                    'tools_workshop': '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>',
+                    'home_living': '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>',
+                    'sports_outdoors': '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>',
+                    'creative': '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>',
+                    'tech': '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>',
+                    'spaces_transport': '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>',
+                    'services': '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>',
+                    'other': '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"/></svg>'
+                } %}
+                {% set cat_colors = {
+                    'community': 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border-emerald-200',
+                    'tools_workshop': 'text-orange-600 bg-orange-50 hover:bg-orange-100 border-orange-200',
+                    'home_living': 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-200',
+                    'sports_outdoors': 'text-yellow-600 bg-yellow-50 hover:bg-yellow-100 border-yellow-200',
+                    'creative': 'text-purple-600 bg-purple-50 hover:bg-purple-100 border-purple-200',
+                    'tech': 'text-gray-600 bg-gray-50 hover:bg-gray-100 border-gray-200',
+                    'spaces_transport': 'text-cyan-600 bg-cyan-50 hover:bg-cyan-100 border-cyan-200',
+                    'services': 'text-pink-600 bg-pink-50 hover:bg-pink-100 border-pink-200',
+                    'other': 'text-gray-500 bg-gray-50 hover:bg-gray-100 border-gray-200'
+                } %}
+                {% for group_key in category_groups.keys() %}
+                <a href="/browse?category={{ category_groups[group_key][0] }}"
+                   class="flex flex-col items-center p-3 rounded-xl border transition-all {{ cat_colors.get(group_key, 'text-gray-600 bg-gray-50 border-gray-200') }}">
+                    {{ cat_icons.get(group_key, cat_icons.other) | safe }}
+                    <span class="text-xs font-medium mt-1.5 text-center leading-tight">{{ t('cat_groups.' + group_key) }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="mt-3">
+            <a href="/browse" class="inline-flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-800">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                {% if lang == 'it' %}Rimuovi filtro: {{ t('categories.' + selected_category) }}{% else %}Clear filter: {{ t('categories.' + selected_category) }}{% endif %}
+            </a>
+        </div>
+        {% endif %}
+
         <!-- Filter panel (Rule 3: collapsible on mobile, visible on desktop) -->
         <div class="mt-4 p-4 bg-white rounded-lg border border-gray-200"
              :class="{ 'hidden md:block': !filtersOpen, 'block': filtersOpen }">

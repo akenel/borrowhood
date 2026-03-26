@@ -270,6 +270,7 @@
     "all_statuses": "All Statuses"
   },
   "cat_groups": {
+    "community": "Community",
     "tools_workshop": "Tools & Workshop",
     "home_living": "Home & Living",
     "sports_outdoors": "Sports & Outdoors",
@@ -315,7 +316,12 @@
     "food": "Food & Beverage",
     "science": "Science",
     "engineering": "Engineering",
-    "other": "Other"
+    "other": "Other",
+    "skill_exchange": "Skill Exchange",
+    "neighborhood_help": "Neighborhood Help",
+    "local_food": "Local Food & Produce",
+    "rides": "Rides & Carpooling",
+    "tool_library": "Tool Library"
   },
   "condition": {
     "new": "New",

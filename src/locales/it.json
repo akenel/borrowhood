@@ -270,10 +270,11 @@
     "all_statuses": "Tutti gli Stati"
   },
   "cat_groups": {
+    "community": "Comunita",
     "tools_workshop": "Attrezzi e Officina",
     "home_living": "Casa e Vita",
     "sports_outdoors": "Sport e Aria Aperta",
-    "creative": "Creatività",
+    "creative": "Creativita",
     "tech": "Tecnologia",
     "spaces_transport": "Spazi e Trasporti",
     "services": "Servizi",
@@ -315,7 +316,12 @@
     "food": "Cibo e Bevande",
     "science": "Scienza",
     "engineering": "Ingegneria",
-    "other": "Altro"
+    "other": "Altro",
+    "skill_exchange": "Scambio Competenze",
+    "neighborhood_help": "Aiuto tra Vicini",
+    "local_food": "Cibo Locale e Prodotti",
+    "rides": "Passaggi e Carpooling",
+    "tool_library": "Biblioteca Attrezzi"
   },
   "condition": {
     "new": "Nuovo",

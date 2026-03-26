@@ -575,17 +575,26 @@
 
             <!-- Auto-select item_type + listing type based on category -->
             <template x-effect="
-                const svcCats = ['repairs', 'training_service', 'custom_orders', 'education'];
+                const svcCats = ['repairs', 'training_service', 'custom_orders', 'education', 'tool_library'];
+                const communityCats = ['skill_exchange', 'neighborhood_help', 'local_food', 'rides'];
                 const spaceCats = ['workshops', 'kitchens', 'garages', 'studios'];
                 if (svcCats.includes(form.category)) {
                     form.item_type = 'service';
                     if (!selectedTypes.includes('service') && !selectedTypes.includes('training')) {
-                        if (form.category === 'training_service' || form.category === 'education') {
+                        if (form.category === 'training_service' || form.category === 'education' || form.category === 'skill_exchange') {
                             selectedTypes = ['training'];
+                        } else if (form.category === 'tool_library') {
+                            selectedTypes = ['rent'];
                         } else {
                             selectedTypes = ['service'];
                         }
                     }
+                } else if (communityCats.includes(form.category)) {
+                    form.item_type = 'service';
+                    if (form.category === 'skill_exchange') selectedTypes = ['training'];
+                    else if (form.category === 'local_food') selectedTypes = ['sell'];
+                    else if (form.category === 'rides') selectedTypes = ['service'];
+                    else if (form.category === 'neighborhood_help') selectedTypes = ['offer'];
                 } else if (spaceCats.includes(form.category)) {
                     form.item_type = 'space';
                 }

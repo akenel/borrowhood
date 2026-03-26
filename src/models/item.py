@@ -80,15 +80,15 @@ class ItemCategory(str, enum.Enum):
 
 
 CATEGORY_GROUPS = {
-    "tools_workshop": ["power_tools", "hand_tools", "automotive", "welding", "woodworking", "3d_printing"],
+    "community": ["skill_exchange", "neighborhood_help", "local_food", "rides"],
+    "tools_workshop": ["power_tools", "hand_tools", "automotive", "welding", "woodworking", "3d_printing", "tool_library"],
     "home_living": ["kitchen", "cleaning", "garden", "furniture", "home_improvement"],
     "sports_outdoors": ["sports", "camping", "water_sports", "cycling"],
     "creative": ["art", "music", "photography", "sewing"],
     "tech": ["electronics", "computers", "drones"],
     "spaces_transport": ["spaces", "vehicles"],
     "services": ["repairs", "training_service", "custom_orders", "education"],
-    "science_engineering": ["science", "engineering"],
-    "other": ["other", "crafts", "food", "outdoor", "tools"],
+    "other": ["other", "crafts", "food", "outdoor", "tools", "science", "engineering"],
 }
 
 
