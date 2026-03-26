@@ -806,6 +806,7 @@
     "workshop_type": "Tipo Laboratorio",
     "select_type": "Seleziona tipo...",
     "services_offered": "Servizi Offerti",
+    "edit_listing": "Modifica Annuncio",
     "download_my_data": "Scarica i Miei Dati",
     "gdpr_export_desc": "Scarica una copia di tutti i tuoi dati personali (profilo, articoli, ordini, messaggi, recensioni) in formato JSON. Il tuo diritto ai sensi dell'articolo 20 del GDPR.",
     "download_json": "Scarica JSON",

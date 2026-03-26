@@ -806,6 +806,7 @@
     "workshop_type": "Workshop Type",
     "select_type": "Select type...",
     "services_offered": "Services Offered",
+    "edit_listing": "Edit Listing",
     "download_my_data": "Download My Data",
     "gdpr_export_desc": "Download a copy of all your personal data (profile, items, orders, messages, reviews) as a JSON file. Your right under GDPR Article 20.",
     "download_json": "Download JSON",
