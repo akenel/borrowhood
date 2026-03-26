@@ -435,46 +435,46 @@
                                     <span class="text-sm font-semibold text-gray-900">Delivery Tracking</span>
                                     <span class="text-xs px-2 py-0.5 rounded-full"
                                           :class="{
-                                              'bg-yellow-100 text-yellow-700': tracking.status === 'preparing',
-                                              'bg-blue-100 text-blue-700': ['dispatched','in_transit'].includes(tracking.status),
-                                              'bg-emerald-100 text-emerald-700': ['delivered','ready_for_pickup','confirmed','picked_up'].includes(tracking.status),
-                                              'bg-red-100 text-red-700': ['failed','damaged','returned_to_sender'].includes(tracking.status)
+                                              'bg-yellow-100 text-yellow-700': tracking?.status === 'preparing',
+                                              'bg-blue-100 text-blue-700': ['dispatched','in_transit'].includes(tracking?.status),
+                                              'bg-emerald-100 text-emerald-700': ['delivered','ready_for_pickup','confirmed','picked_up'].includes(tracking?.status),
+                                              'bg-red-100 text-red-700': ['failed','damaged','returned_to_sender'].includes(tracking?.status)
                                           }"
-                                          x-text="tracking.status.replace(/_/g, ' ')"></span>
+                                          x-text="tracking?.status?.replace(/_/g, ' ') || ''"></span>
                                 </div>
 
                                 <!-- Delivery method badge -->
                                 <div class="mb-3 flex items-center space-x-2">
-                                    <template x-if="tracking.delivery_method === 'human'">
+                                    <template x-if="tracking?.delivery_method === 'human'">
                                         <span class="text-xs px-2 py-1 bg-indigo-50 text-indigo-600 rounded-full">Personal Delivery</span>
                                     </template>
-                                    <template x-if="tracking.delivery_method === 'drone'">
+                                    <template x-if="tracking?.delivery_method === 'drone'">
                                         <span class="text-xs px-2 py-1 bg-cyan-50 text-cyan-600 rounded-full">Drone Delivery</span>
                                     </template>
-                                    <template x-if="tracking.delivery_method === 'lockbox'">
+                                    <template x-if="tracking?.delivery_method === 'lockbox'">
                                         <span class="text-xs px-2 py-1 bg-amber-50 text-amber-600 rounded-full">Lockbox Pickup</span>
                                     </template>
-                                    <template x-if="tracking.delivery_method === 'mail'">
+                                    <template x-if="tracking?.delivery_method === 'mail'">
                                         <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">Mail/Courier</span>
                                     </template>
-                                    <template x-if="tracking.delivery_method === 'pickup'">
+                                    <template x-if="tracking?.delivery_method === 'pickup'">
                                         <span class="text-xs px-2 py-1 bg-orange-50 text-orange-600 rounded-full">Self Pickup</span>
                                     </template>
-                                    <span x-show="tracking.delivery_person_name" class="text-xs text-gray-500">
-                                        by <span x-text="tracking.delivery_person_name" class="font-medium"></span>
+                                    <span x-show="tracking?.delivery_person_name" class="text-xs text-gray-500">
+                                        by <span x-text="tracking?.delivery_person_name" class="font-medium"></span>
                                     </span>
-                                    <span x-show="tracking.tracking_number" class="text-xs text-gray-400">
-                                        # <span x-text="tracking.tracking_number"></span>
+                                    <span x-show="tracking?.tracking_number" class="text-xs text-gray-400">
+                                        # <span x-text="tracking?.tracking_number"></span>
                                     </span>
                                 </div>
 
                                 <!-- Timeline events -->
                                 <div class="relative pl-5 space-y-3">
                                     <div class="absolute left-2 top-1 bottom-1 w-0.5 bg-gray-200"></div>
-                                    <template x-for="(event, idx) in tracking.events" :key="event.id">
+                                    <template x-for="(event, idx) in tracking?.events" :key="event.id">
                                         <div class="relative">
                                             <div class="absolute -left-3 top-1 w-2.5 h-2.5 rounded-full border-2 border-white"
-                                                 :class="idx === tracking.events.length - 1 ? 'bg-indigo-500' : 'bg-gray-300'"></div>
+                                                 :class="idx === tracking?.events.length - 1 ? 'bg-indigo-500' : 'bg-gray-300'"></div>
                                             <div class="ml-2">
                                                 <div class="flex items-center justify-between">
                                                     <p class="text-sm font-medium text-gray-900" x-text="event.title"></p>
