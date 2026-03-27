@@ -787,3 +787,178 @@ async def export_my_data(
         content=export,
         headers={"Content-Disposition": "attachment; filename=lapiazza-my-data.json"},
     )
+
+
+# ── Skills CRUD + AI Suggestions ────────────────────────────────────
+
+from pydantic import BaseModel, Field
+from src.models.user import BHUserSkill
+
+
+class SkillCreate(BaseModel):
+    skill_name: str = Field(..., min_length=2, max_length=100)
+    category: str = Field(..., max_length=50)
+    self_rating: int = Field(default=3, ge=1, le=5)
+    years_experience: Optional[int] = Field(None, ge=0, le=60)
+
+
+class SkillOut(BaseModel):
+    id: UUID
+    skill_name: str
+    category: str
+    self_rating: int
+    years_experience: Optional[int] = None
+    verified_by_count: int = 0
+
+    class Config:
+        from_attributes = True
+
+
+@router.get("/me/skills", response_model=List[SkillOut])
+async def list_my_skills(
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """List current user's skills."""
+    user = await get_user(db, token)
+    result = await db.execute(
+        select(BHUserSkill)
+        .where(BHUserSkill.user_id == user.id)
+        .where(BHUserSkill.deleted_at.is_(None))
+        .order_by(BHUserSkill.created_at)
+    )
+    return result.scalars().all()
+
+
+@router.post("/me/skills", response_model=SkillOut, status_code=201)
+async def add_skill(
+    data: SkillCreate,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Add a skill to current user's profile."""
+    user = await get_user(db, token)
+
+    # Check for duplicate
+    existing = await db.execute(
+        select(BHUserSkill)
+        .where(BHUserSkill.user_id == user.id)
+        .where(func.lower(BHUserSkill.skill_name) == data.skill_name.lower())
+        .where(BHUserSkill.deleted_at.is_(None))
+    )
+    if existing.scalars().first():
+        raise HTTPException(status_code=409, detail="Skill already exists")
+
+    skill = BHUserSkill(
+        user_id=user.id,
+        skill_name=data.skill_name,
+        category=data.category,
+        self_rating=data.self_rating,
+        years_experience=data.years_experience,
+    )
+    db.add(skill)
+
+    from src.services.badges import check_and_award_badges
+    await db.flush()
+    await check_and_award_badges(db, user.id)
+
+    await db.commit()
+    await db.refresh(skill)
+    return skill
+
+
+@router.post("/me/skills/batch", status_code=201)
+async def add_skills_batch(
+    request: Request,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Add multiple skills at once (used by AI suggest flow)."""
+    user = await get_user(db, token)
+    body = await request.json()
+    skills_data = body.get("skills", [])
+    if not skills_data or len(skills_data) > 10:
+        raise HTTPException(status_code=400, detail="Provide 1-10 skills")
+
+    # Get existing skill names for dedup
+    existing_result = await db.execute(
+        select(func.lower(BHUserSkill.skill_name))
+        .where(BHUserSkill.user_id == user.id)
+        .where(BHUserSkill.deleted_at.is_(None))
+    )
+    existing_names = {row[0] for row in existing_result.all()}
+
+    added = []
+    for s in skills_data:
+        name = s.get("skill_name", "").strip()
+        if not name or name.lower() in existing_names:
+            continue
+        skill = BHUserSkill(
+            user_id=user.id,
+            skill_name=name,
+            category=s.get("category", "other"),
+            self_rating=max(1, min(5, s.get("self_rating", 3))),
+            years_experience=s.get("years_experience"),
+        )
+        db.add(skill)
+        existing_names.add(name.lower())
+        added.append(name)
+
+    if added:
+        from src.services.badges import check_and_award_badges
+        await db.flush()
+        await check_and_award_badges(db, user.id)
+        await db.commit()
+
+    return {"added": len(added), "skills": added}
+
+
+@router.delete("/me/skills/{skill_id}", status_code=200)
+async def delete_skill(
+    skill_id: UUID,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Remove a skill from current user's profile."""
+    user = await get_user(db, token)
+    result = await db.execute(
+        select(BHUserSkill)
+        .where(BHUserSkill.id == skill_id)
+        .where(BHUserSkill.user_id == user.id)
+    )
+    skill = result.scalars().first()
+    if not skill:
+        raise HTTPException(status_code=404, detail="Skill not found")
+
+    await db.delete(skill)
+    await db.commit()
+    return {"status": "deleted", "skill_name": skill.skill_name}
+
+
+@router.post("/me/skills/suggest")
+async def suggest_skills(
+    request: Request,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """AI-powered skill suggestions from user's bio."""
+    user = await get_user(db, token)
+
+    if not user.bio or len(user.bio.strip()) < 20:
+        raise HTTPException(status_code=400, detail="Bio must be at least 20 characters for skill extraction")
+
+    # Get existing skills to avoid duplicates
+    existing_result = await db.execute(
+        select(BHUserSkill.skill_name)
+        .where(BHUserSkill.user_id == user.id)
+        .where(BHUserSkill.deleted_at.is_(None))
+    )
+    existing_skills = [row[0] for row in existing_result.all()]
+
+    from src.services.gemini import suggest_skills_from_bio
+    suggestions, provider = await suggest_skills_from_bio(user.bio, existing_skills)
+
+    if not suggestions:
+        raise HTTPException(status_code=503, detail="AI service unavailable")
+
+    return {"suggestions": suggestions, "provider": provider}

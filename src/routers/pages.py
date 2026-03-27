@@ -818,6 +818,8 @@ async def profile(request: Request,
         skills=skills,
         stats=stats,
         is_owner=True if profile_user else False,
+        is_own_profile=True if profile_user else False,
+        user_bio=profile_user.bio if profile_user else "",
     )
     return _render("pages/profile.html", ctx)
 

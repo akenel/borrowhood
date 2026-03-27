@@ -223,24 +223,204 @@
     {% endif %}
 
     <!-- Skills -->
-    {% if skills %}
-    <div class="mt-4 bg-white rounded-lg border border-gray-200 p-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-3">{{ t('profile.skills') }}</h2>
-        <div class="flex flex-wrap gap-2">
-            {% for skill in skills %}
-            <span class="inline-flex items-center px-3 py-1.5 bg-indigo-50 border border-indigo-200 rounded-full text-sm">
-                <span class="font-medium text-indigo-700">{{ skill.skill_name }}</span>
-                {% if skill.verified_by_count > 0 %}
-                <span class="ml-1.5 text-xs text-emerald-600" title="Verified by {{ skill.verified_by_count }} neighbors">&#10003; {{ skill.verified_by_count }}</span>
+    <div class="mt-4 bg-white rounded-lg border border-gray-200 p-6"
+         x-data="{
+            skills: [],
+            loading: true,
+            showAdd: false,
+            newSkill: { skill_name: '', category: 'other', self_rating: 3, years_experience: null },
+            suggesting: false,
+            suggestions: [],
+            showSuggestions: false,
+            async loadSkills() {
+                try {
+                    const r = await fetch('/api/v1/users/me/skills');
+                    if (r.ok) this.skills = await r.json();
+                } catch(e) {}
+                this.loading = false;
+            },
+            async addSkill() {
+                if (!this.newSkill.skill_name.trim()) return;
+                const r = await fetch('/api/v1/users/me/skills', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(this.newSkill)
+                });
+                if (r.ok) {
+                    this.newSkill = { skill_name: '', category: 'other', self_rating: 3, years_experience: null };
+                    this.showAdd = false;
+                    await this.loadSkills();
+                    window.dispatchEvent(new CustomEvent('toast', {detail: {type:'success', message:'Skill added'}}));
+                } else {
+                    const err = await r.json();
+                    window.dispatchEvent(new CustomEvent('toast', {detail: {type:'error', message: err.detail || 'Failed'}}));
+                }
+            },
+            async deleteSkill(id, name) {
+                if (!confirm('Remove skill: ' + name + '?')) return;
+                const r = await fetch('/api/v1/users/me/skills/' + id, {method: 'DELETE'});
+                if (r.ok) {
+                    await this.loadSkills();
+                    window.dispatchEvent(new CustomEvent('toast', {detail: {type:'success', message: name + ' removed'}}));
+                }
+            },
+            async suggestFromBio() {
+                this.suggesting = true;
+                this.showSuggestions = false;
+                try {
+                    const r = await fetch('/api/v1/users/me/skills/suggest', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({source: 'bio'})
+                    });
+                    if (r.ok) {
+                        const data = await r.json();
+                        this.suggestions = (data.suggestions || []).map(s => ({...s, selected: true}));
+                        this.showSuggestions = true;
+                    } else {
+                        const err = await r.json();
+                        window.dispatchEvent(new CustomEvent('toast', {detail: {type:'error', message: err.detail || 'AI unavailable'}}));
+                    }
+                } catch(e) {
+                    window.dispatchEvent(new CustomEvent('toast', {detail: {type:'error', message: 'Network error'}}));
+                }
+                this.suggesting = false;
+            },
+            async acceptSuggestions() {
+                const selected = this.suggestions.filter(s => s.selected);
+                if (!selected.length) return;
+                const r = await fetch('/api/v1/users/me/skills/batch', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({skills: selected})
+                });
+                if (r.ok) {
+                    const data = await r.json();
+                    this.showSuggestions = false;
+                    this.suggestions = [];
+                    await this.loadSkills();
+                    window.dispatchEvent(new CustomEvent('toast', {detail: {type:'success', message: data.added + ' skills added'}}));
+                }
+            }
+         }"
+         x-init="loadSkills()">
+
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-lg font-semibold text-gray-900">{{ t('profile.skills') }}</h2>
+            {% if is_own_profile %}
+            <div class="flex gap-2">
+                {% if user_bio and user_bio | length > 20 %}
+                <button @click="suggestFromBio()" :disabled="suggesting"
+                        class="text-xs px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg hover:bg-purple-100 disabled:opacity-50 flex items-center gap-1">
+                    <template x-if="!suggesting">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            {{ t('profile.suggest_from_bio') }}
+                        </span>
+                    </template>
+                    <template x-if="suggesting">
+                        <span class="flex items-center gap-1">
+                            <svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                            {{ t('profile.analyzing_bio') }}
+                        </span>
+                    </template>
+                </button>
                 {% endif %}
-                {% if skill.years_experience %}
-                <span class="ml-1.5 text-xs text-gray-400">{{ skill.years_experience }}yr</span>
-                {% endif %}
-            </span>
-            {% endfor %}
+                <button @click="showAdd = !showAdd"
+                        class="text-xs px-3 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-100">
+                    + {{ t('profile.add_skill') }}
+                </button>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- AI Suggestions panel -->
+        <template x-if="showSuggestions && suggestions.length > 0">
+            <div class="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                <h3 class="text-sm font-semibold text-purple-800 mb-2 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    {{ t('profile.ai_suggested_skills') }}
+                </h3>
+                <div class="space-y-2">
+                    <template x-for="(s, i) in suggestions" :key="i">
+                        <label class="flex items-center gap-3 p-2 bg-white rounded-lg border border-purple-100 cursor-pointer hover:border-purple-300">
+                            <input type="checkbox" x-model="s.selected" class="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                            <div class="flex-1 min-w-0">
+                                <span class="text-sm font-medium text-gray-900" x-text="s.skill_name"></span>
+                                <span class="text-xs text-gray-500 ml-1" x-text="'(' + s.category.replace(/_/g, ' ') + ')'"></span>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs text-gray-500 shrink-0">
+                                <span x-text="s.self_rating + '/5'"></span>
+                                <template x-if="s.years_experience"><span x-text="s.years_experience + 'yr'"></span></template>
+                                <span class="text-purple-400" x-text="Math.round(s.confidence * 100) + '%'"></span>
+                            </div>
+                        </label>
+                    </template>
+                </div>
+                <div class="flex gap-2 mt-3">
+                    <button @click="acceptSuggestions()"
+                            class="px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700">
+                        {{ t('profile.accept_selected') }}
+                    </button>
+                    <button @click="showSuggestions = false; suggestions = []"
+                            class="px-4 py-2 bg-white text-gray-700 text-sm rounded-lg border border-gray-300 hover:bg-gray-50">
+                        {{ t('common.cancel') }}
+                    </button>
+                </div>
+            </div>
+        </template>
+
+        <!-- Add skill form -->
+        <div x-show="showAdd" x-cloak class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <input type="text" x-model="newSkill.skill_name" placeholder="{{ t('profile.skill_name') }}"
+                       class="col-span-2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                <select x-model="newSkill.category" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                    <option value="other">{{ t('profile.category') }}</option>
+                    {% for cat in ['power_tools','hand_tools','automotive','welding','woodworking','kitchen','garden','art','music','photography','electronics','computers','repairs','education','sports','food','sewing','cleaning','camping'] %}
+                    <option value="{{ cat }}">{{ t('categories.' + cat) }}</option>
+                    {% endfor %}
+                </select>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs text-gray-500 whitespace-nowrap">{{ t('profile.rating') }}:</label>
+                    <select x-model.number="newSkill.self_rating" class="px-2 py-2 border border-gray-300 rounded-lg text-sm">
+                        <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-2 mt-2">
+                <input type="number" x-model.number="newSkill.years_experience" placeholder="{{ t('profile.years_experience') }}" min="0" max="60"
+                       class="w-32 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                <button @click="addSkill()" class="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700">
+                    {{ t('profile.save_skill') }}
+                </button>
+            </div>
+        </div>
+
+        <!-- Skills list -->
+        <div x-show="loading" class="text-sm text-gray-400">Loading...</div>
+        <div x-show="!loading && skills.length === 0" x-cloak class="text-sm text-gray-400">{{ t('profile.no_skills') }}</div>
+        <div x-show="!loading && skills.length > 0" x-cloak class="flex flex-wrap gap-2">
+            <template x-for="skill in skills" :key="skill.id">
+                <span class="inline-flex items-center px-3 py-1.5 bg-indigo-50 border border-indigo-200 rounded-full text-sm group">
+                    <span class="font-medium text-indigo-700" x-text="skill.skill_name"></span>
+                    <template x-if="skill.verified_by_count > 0">
+                        <span class="ml-1.5 text-xs text-emerald-600" x-text="'&#10003; ' + skill.verified_by_count"></span>
+                    </template>
+                    <template x-if="skill.years_experience">
+                        <span class="ml-1.5 text-xs text-gray-400" x-text="skill.years_experience + 'yr'"></span>
+                    </template>
+                    {% if is_own_profile %}
+                    <button @click="deleteSkill(skill.id, skill.skill_name)"
+                            class="ml-1.5 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Remove">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                    {% endif %}
+                </span>
+            </template>
         </div>
     </div>
-    {% endif %}
 
     <!-- Badges -->
     <div class="mt-4 bg-white rounded-lg border border-gray-200 p-6"
