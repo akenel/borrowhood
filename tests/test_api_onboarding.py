@@ -8,7 +8,7 @@ async def test_onboarding_page_returns_200(client):
     """GET /onboarding should return 200."""
     resp = await client.get("/onboarding")
     assert resp.status_code == 200
-    assert "BorrowHood" in resp.text
+    assert "La Piazza" in resp.text or "Piazza" in resp.text
 
 
 @pytest.mark.asyncio

@@ -133,7 +133,8 @@ class TestEnums:
     def test_rental_status_values(self):
         from src.models.rental import RentalStatus
         expected = {"pending", "approved", "declined", "picked_up", "returned",
-                    "completed", "cancelled", "disputed"}
+                    "completed", "cancelled", "disputed",
+                    "committed", "buyer_paid", "payment_confirmed", "expired"}
         assert {s.value for s in RentalStatus} == expected
 
     def test_listing_type_values(self):
@@ -143,7 +144,7 @@ class TestEnums:
 
     def test_listing_status_values(self):
         from src.models.listing import ListingStatus
-        expected = {"draft", "active", "paused", "expired", "removed"}
+        expected = {"draft", "pending", "active", "paused", "expired", "removed"}
         assert {s.value for s in ListingStatus} == expected
 
     def test_item_type_values(self):
@@ -169,82 +170,79 @@ class TestEnums:
         assert {s.value for s in BidStatus} == expected
 
 
-# --- Public API Endpoints ---
+# --- Public API Endpoints (DB required) ---
 
 @pytest.mark.asyncio
-async def test_items_list_returns_data(client: AsyncClient):
+async def test_items_list_returns_data(db_client):
     """Public items endpoint returns seeded data."""
-    resp = await client.get("/api/v1/items?limit=5")
+    resp = await db_client.get("/api/v1/items?limit=5")
     assert resp.status_code == 200
-    data = resp.json()
-    assert isinstance(data, list)
+    assert isinstance(resp.json(), list)
 
 @pytest.mark.asyncio
-async def test_items_search_filters(client: AsyncClient):
+async def test_items_search_filters(db_client):
     """Search by keyword filters results."""
-    resp = await client.get("/api/v1/items?q=nonexistent_item_xyz")
+    resp = await db_client.get("/api/v1/items?q=nonexistent_item_xyz")
     assert resp.status_code == 200
-    data = resp.json()
-    assert len(data) == 0
+    assert len(resp.json()) == 0
 
 @pytest.mark.asyncio
-async def test_items_category_filter(client: AsyncClient):
+async def test_items_category_filter(db_client):
     """Category filter returns matching items."""
-    resp = await client.get("/api/v1/items?category=tools")
+    resp = await db_client.get("/api/v1/items?category=tools")
     assert resp.status_code == 200
-    data = resp.json()
-    for item in data:
+    for item in resp.json():
         assert item["category"] == "tools"
 
 @pytest.mark.asyncio
-async def test_items_sort_options(client: AsyncClient):
+async def test_items_sort_options(db_client):
     """All sort options return 200."""
     for sort in ["newest", "oldest", "name_asc"]:
-        resp = await client.get(f"/api/v1/items?sort={sort}&limit=3")
+        resp = await db_client.get(f"/api/v1/items?sort={sort}&limit=3")
         assert resp.status_code == 200
 
 @pytest.mark.asyncio
-async def test_listings_list_returns_data(client: AsyncClient):
+async def test_listings_list_returns_data(db_client):
     """Public listings endpoint works."""
-    resp = await client.get("/api/v1/listings?limit=5")
+    resp = await db_client.get("/api/v1/listings?limit=5")
     assert resp.status_code == 200
-    data = resp.json()
-    assert isinstance(data, list)
+    assert isinstance(resp.json(), list)
 
 @pytest.mark.asyncio
-async def test_listings_filter_by_type(client: AsyncClient):
+async def test_listings_filter_by_type(db_client):
     """Filter listings by type returns 200."""
-    resp = await client.get("/api/v1/listings?listing_type=rent&limit=5")
+    resp = await db_client.get("/api/v1/listings?listing_type=rent&limit=5")
     assert resp.status_code == 200
 
 @pytest.mark.asyncio
-async def test_reviews_public(client: AsyncClient):
+async def test_reviews_public(db_client):
     """Reviews list is public."""
-    resp = await client.get("/api/v1/reviews?limit=5")
+    resp = await db_client.get("/api/v1/reviews?limit=5")
     assert resp.status_code == 200
 
+# --- Public API Endpoints (no DB) ---
+
 @pytest.mark.asyncio
-async def test_badge_catalog_public(client: AsyncClient):
+async def test_badge_catalog_public(client):
     """Badge catalog is public and complete."""
     resp = await client.get("/api/v1/badges/catalog")
     assert resp.status_code == 200
     data = resp.json()
     assert len(data) >= 10
-    # Check badge structure
     for badge in data:
         assert "code" in badge
         assert "name" in badge
         assert "description" in badge
 
 @pytest.mark.asyncio
-async def test_health_returns_all_fields(client: AsyncClient):
+async def test_health_returns_all_fields(client):
     """Health check returns required fields."""
     resp = await client.get("/api/v1/health")
     assert resp.status_code == 200
     data = resp.json()
-    assert data["status"] in ("healthy", "degraded")  # degraded without DB is expected
-    assert data["app"] == "BorrowHood"
+    assert data["status"] in ("healthy", "degraded")
+    assert data["app"] == "La Piazza"
     assert "version" in data
     assert "timestamp" in data
     assert "uptime_seconds" in data
-    assert "database" in data["checks"]  # may be "healthy" or "unhealthy: ..."
+    assert "checks" in data

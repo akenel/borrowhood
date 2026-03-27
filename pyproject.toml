@@ -1,3 +1,9 @@
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+# Exclude integration tests (live server) from default runs
+# Run integration tests with: pytest tests/integration/ -v
+norecursedirs = ["tests/integration"]
+markers = [
+    "db: tests that require a live database connection",
+]

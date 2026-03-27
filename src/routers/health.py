@@ -32,7 +32,7 @@ async def health_check(db: AsyncSession = Depends(get_db)):
 
     return {
         "status": "healthy" if db_status == "healthy" else "degraded",
-        "app": "BorrowHood",
+        "app": "La Piazza",
         "version": "1.0.0",
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "uptime_seconds": uptime_seconds,

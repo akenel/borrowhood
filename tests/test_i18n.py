@@ -21,26 +21,26 @@ def test_load_locale_en():
     """Should load English locale file."""
     data = load_locale("en")
     assert "app" in data
-    assert data["app"]["name"] == "BorrowHood"
+    assert data["app"]["name"] == "La Piazza"
 
 
 def test_load_locale_it():
     """Should load Italian locale file."""
     data = load_locale("it")
     assert "app" in data
-    assert data["app"]["name"] == "BorrowHood"
+    assert data["app"]["name"] == "La Piazza"
 
 
 def test_load_locale_fallback():
     """Unknown locale should fall back to English."""
     data = load_locale("xx")
-    assert data["app"]["name"] == "BorrowHood"
+    assert data["app"]["name"] == "La Piazza"
 
 
 def test_resolve_key_simple():
     """Should resolve simple dot-notation keys."""
     data = load_locale("en")
-    assert resolve_key(data, "app.name") == "BorrowHood"
+    assert resolve_key(data, "app.name") == "La Piazza"
 
 
 def test_resolve_key_nested():
