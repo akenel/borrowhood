@@ -168,7 +168,7 @@ async def _pollinations_generate(prompt: str, json_mode: bool = True) -> Optiona
         })
 
     try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
+        async with httpx.AsyncClient(timeout=30.0) as client:
             resp = await client.post(
                 POLLINATIONS_TEXT_URL,
                 json={
