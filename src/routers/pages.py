@@ -18,7 +18,7 @@ from src.config import settings
 from src.database import get_db
 from src.dependencies import get_current_user_token, get_user
 from src.i18n import detect_language, get_translator, SUPPORTED_LANGUAGES
-from src.models.item import BHItem, CATEGORY_GROUPS
+from src.models.item import ATTRIBUTE_SCHEMAS, BHItem, CATEGORY_GROUPS
 from src.models.listing import BHListing, ListingStatus
 from src.models.rental import BHRental, RentalStatus
 from src.models.review import BHReview
@@ -168,6 +168,7 @@ async def home(request: Request,
 async def browse(request: Request,
                  q: Optional[str] = None,
                  category: Optional[str] = None,
+                 category_group: Optional[str] = None,
                  item_type: Optional[str] = None,
                  sort: str = "newest",
                  limit: int = 12,
@@ -203,6 +204,9 @@ async def browse(request: Request,
         )
     if category:
         query = query.where(BHItem.category == category)
+    elif category_group and category_group in CATEGORY_GROUPS:
+        cats = CATEGORY_GROUPS[category_group]
+        query = query.where(BHItem.category.in_(cats))
     if item_type:
         query = query.where(BHItem.item_type == item_type)
 
@@ -228,6 +232,8 @@ async def browse(request: Request,
         )
     if category:
         count_q = count_q.where(BHItem.category == category)
+    elif category_group and category_group in CATEGORY_GROUPS:
+        count_q = count_q.where(BHItem.category.in_(CATEGORY_GROUPS[category_group]))
     if item_type:
         count_q = count_q.where(BHItem.item_type == item_type)
     total_count = await db.scalar(count_q) or 0
@@ -238,16 +244,28 @@ async def browse(request: Request,
     result = await db.execute(query)
     items = result.scalars().unique().all()
 
+    # Determine which attribute schema to show for the active group
+    active_attr_schema = {}
+    if category_group and category_group in ATTRIBUTE_SCHEMAS:
+        active_attr_schema = ATTRIBUTE_SCHEMAS[category_group]
+    elif category:
+        for gname, gcats in CATEGORY_GROUPS.items():
+            if category in gcats and gname in ATTRIBUTE_SCHEMAS:
+                active_attr_schema = ATTRIBUTE_SCHEMAS[gname]
+                break
+
     ctx = _ctx(request, token,
         items=items,
         total_count=total_count,
         category_groups=CATEGORY_GROUPS,
         q=q or "",
         selected_category=category,
+        selected_category_group=category_group,
         selected_type=item_type,
         selected_sort=sort,
         selected_limit=limit,
         selected_offset=offset,
+        attribute_schema=active_attr_schema,
     )
     return _render("pages/browse.html", ctx)
 

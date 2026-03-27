@@ -242,6 +242,32 @@
                     {% endif %}
                 </div>
 
+                <!-- Category-specific attributes (vehicle specs, property details, job info) -->
+                {% if item.attributes %}
+                <div class="mt-6">
+                    <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">{{ t('item.specifications') }}</h2>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {% for key, value in item.attributes.items() %}
+                        {% if value is not none and value != '' %}
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider">{{ t('attributes.' + key, key | replace('_', ' ') | title) }}</span>
+                            {% if value is sameas true %}
+                            <p class="text-sm font-medium text-green-600 mt-0.5">
+                                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                {{ t('common.yes') }}
+                            </p>
+                            {% elif value is sameas false %}
+                            <p class="text-sm font-medium text-gray-400 mt-0.5">{{ t('common.no') }}</p>
+                            {% else %}
+                            <p class="text-sm font-medium text-gray-900 mt-0.5">{{ value | string | replace('_', ' ') | title }}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
                 <!-- Description -->
                 {% if item.description %}
                 <div class="mt-6">

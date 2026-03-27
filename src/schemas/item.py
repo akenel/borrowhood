@@ -35,6 +35,7 @@ class ItemOut(BaseModel):
     tags: Optional[str] = None
     needs_equipment: Optional[str] = None
     compatible_with: Optional[str] = None
+    attributes: Optional[dict] = None
     owner_id: UUID
     media: List[ItemMediaOut] = []
 
@@ -49,7 +50,7 @@ class ItemCreate(BaseModel):
     story: Optional[str] = None
     content_language: str = Field(default="en", max_length=5)
     item_type: ItemType
-    category: ItemCategory
+    category: str = Field(..., max_length=50)
     subcategory: Optional[str] = Field(None, max_length=50)
     condition: Optional[ItemCondition] = None
     brand: Optional[str] = Field(None, max_length=100)
@@ -61,6 +62,7 @@ class ItemCreate(BaseModel):
     compatible_with: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
+    attributes: Optional[dict] = None
 
 
 class ItemUpdate(BaseModel):
@@ -69,10 +71,11 @@ class ItemUpdate(BaseModel):
     description: Optional[str] = None
     story: Optional[str] = None
     content_language: Optional[str] = Field(None, max_length=5)
-    category: Optional[ItemCategory] = None
+    category: Optional[str] = Field(None, max_length=50)
     subcategory: Optional[str] = Field(None, max_length=50)
     condition: Optional[ItemCondition] = None
     brand: Optional[str] = Field(None, max_length=100)
     tags: Optional[str] = None
     needs_equipment: Optional[str] = None
     compatible_with: Optional[str] = None
+    attributes: Optional[dict] = None

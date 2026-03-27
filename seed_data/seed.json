@@ -30255,6 +30255,1208 @@
           "alt_text": "Close-up vintage Vespa on Sicilian cobblestones"
         }
       ]
+    },
+    {
+      "owner_slug": "mikes-garage",
+      "name": "Fiat Panda 4x4 1990 Classic",
+      "slug": "fiat-panda-4x4-1990-classic",
+      "description": "Legendary Fiat Panda 4x4 Sisley edition. Original Steyr-Puch drivetrain, rebuilt engine 2019. Perfect for Sicilian mountain roads. Starts every time.",
+      "content_language": "it",
+      "item_type": "physical",
+      "category": "vehicles",
+      "subcategory": "car",
+      "condition": "fair",
+      "brand": "Fiat",
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+          "alt_text": "Fiat Panda 4x4 classic",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 4500,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.536,
+      "attributes": {
+        "year": 1990,
+        "mileage_km": 142000,
+        "fuel_type": "gasoline",
+        "transmission": "manual",
+        "engine_cc": 965,
+        "body_type": "hatchback",
+        "doors": 3,
+        "seats": 4,
+        "color": "Verde Sisley",
+        "euro_class": "euro_1",
+        "owners_count": 3,
+        "accident_free": true
+      }
+    },
+    {
+      "owner_slug": "antonios-garage",
+      "name": "Piaggio Vespa Primavera 125",
+      "slug": "piaggio-vespa-primavera-125",
+      "description": "Vespa Primavera 125cc, 2021 model. Barely used, garaged. Perfect for Trapani centro storico.",
+      "content_language": "it",
+      "item_type": "physical",
+      "category": "vehicles",
+      "subcategory": "scooter",
+      "condition": "like_new",
+      "brand": "Piaggio",
+      "needs_equipment": "Helmet required",
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800",
+          "alt_text": "Vespa Primavera",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 3200,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.017,
+      "longitude": 12.514,
+      "attributes": {
+        "year": 2021,
+        "mileage_km": 3200,
+        "fuel_type": "gasoline",
+        "transmission": "automatic",
+        "engine_cc": 125,
+        "body_type": "scooter",
+        "color": "Bianco",
+        "euro_class": "euro_5",
+        "owners_count": 1,
+        "accident_free": true
+      }
+    },
+    {
+      "owner_slug": "ninos-campers",
+      "name": "Fiat Ducato Camper Van 2018",
+      "slug": "fiat-ducato-camper-van-2018",
+      "description": "Professionally converted Fiat Ducato camper. Solar panels, 200L water tank, gas stove, sleeping for 4. Ready for adventure.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "vehicles",
+      "subcategory": "camper",
+      "condition": "good",
+      "brand": "Fiat",
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?w=800",
+          "alt_text": "Fiat Ducato camper van",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 28000,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        },
+        {
+          "listing_type": "rent",
+          "price": 85,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "status": "active",
+          "deposit": 500
+        }
+      ],
+      "latitude": 38.003,
+      "longitude": 12.54,
+      "attributes": {
+        "year": 2018,
+        "mileage_km": 67000,
+        "fuel_type": "diesel",
+        "transmission": "manual",
+        "engine_cc": 2287,
+        "power_kw": 96,
+        "body_type": "camper",
+        "doors": 3,
+        "seats": 4,
+        "color": "Bianco",
+        "euro_class": "euro_6",
+        "owners_count": 2,
+        "accident_free": true
+      }
+    },
+    {
+      "owner_slug": "giuseppes-electric",
+      "name": "Renault Zoe E-Tech 2022",
+      "slug": "renault-zoe-e-tech-2022",
+      "description": "100% electric, 395km range. Perfect city car. Free charging at home with solar. Includes winter tires.",
+      "content_language": "it",
+      "item_type": "physical",
+      "category": "vehicles",
+      "subcategory": "car",
+      "condition": "like_new",
+      "brand": "Renault",
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800",
+          "alt_text": "Renault Zoe electric car",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 18500,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.021,
+      "longitude": 12.53,
+      "attributes": {
+        "year": 2022,
+        "mileage_km": 15000,
+        "fuel_type": "electric",
+        "transmission": "automatic",
+        "power_kw": 100,
+        "body_type": "hatchback",
+        "doors": 5,
+        "seats": 5,
+        "color": "Blu Celadon",
+        "euro_class": "euro_6d",
+        "owners_count": 1,
+        "accident_free": true
+      }
+    },
+    {
+      "owner_slug": "mikes-garage",
+      "name": "Suzuki Jimny 2019 4WD",
+      "slug": "suzuki-jimny-2019-4wd",
+      "description": "Rugged Suzuki Jimny. 4-wheel drive, manual gearbox. Roof rack and off-road tires included. Perfect for countryside.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "vehicles",
+      "subcategory": "car",
+      "condition": "good",
+      "brand": "Suzuki",
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1609152858824-7e3e6428d5e1?w=800",
+          "alt_text": "Suzuki Jimny 4WD",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 22000,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        },
+        {
+          "listing_type": "rent",
+          "price": 55,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "status": "active",
+          "deposit": 300
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.536,
+      "attributes": {
+        "year": 2019,
+        "mileage_km": 38000,
+        "fuel_type": "gasoline",
+        "transmission": "manual",
+        "engine_cc": 1462,
+        "power_kw": 75,
+        "body_type": "suv",
+        "doors": 3,
+        "seats": 4,
+        "color": "Kinetic Yellow",
+        "euro_class": "euro_6d",
+        "owners_count": 1,
+        "accident_free": true
+      }
+    },
+    {
+      "owner_slug": "lucas-plumbing",
+      "name": "Peugeot Partner Van 2020",
+      "slug": "peugeot-partner-van-2020",
+      "description": "Commercial van, perfect for tradesman. Roof rack, interior shelving, tow bar. 3 seats.",
+      "content_language": "it",
+      "item_type": "physical",
+      "category": "vehicles",
+      "subcategory": "van",
+      "condition": "good",
+      "brand": "Peugeot",
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1632245889029-e406faaa34cd?w=800",
+          "alt_text": "Peugeot Partner van",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 14500,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.015,
+      "longitude": 12.51,
+      "attributes": {
+        "year": 2020,
+        "mileage_km": 52000,
+        "fuel_type": "diesel",
+        "transmission": "manual",
+        "engine_cc": 1499,
+        "power_kw": 75,
+        "body_type": "van",
+        "doors": 4,
+        "seats": 3,
+        "color": "Bianco",
+        "euro_class": "euro_6d",
+        "accident_free": true,
+        "mot_expiry": "2027-03"
+      }
+    },
+    {
+      "owner_slug": "antonios-garage",
+      "name": "Honda SH 300i Scooter 2019",
+      "slug": "honda-sh-300i-scooter-2019",
+      "description": "Honda SH 300i, top seller in Italy. ABS, smart key, underseat storage. Serviced every 5000km.",
+      "content_language": "it",
+      "item_type": "physical",
+      "category": "vehicles",
+      "subcategory": "scooter",
+      "condition": "good",
+      "brand": "Honda",
+      "needs_equipment": "Helmet required",
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800",
+          "alt_text": "Honda SH 300i",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 4800,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        },
+        {
+          "listing_type": "rent",
+          "price": 25,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "status": "active",
+          "deposit": 200
+        }
+      ],
+      "latitude": 38.017,
+      "longitude": 12.514,
+      "attributes": {
+        "year": 2019,
+        "mileage_km": 18000,
+        "fuel_type": "gasoline",
+        "transmission": "automatic",
+        "engine_cc": 279,
+        "body_type": "scooter",
+        "color": "Grigio",
+        "euro_class": "euro_4",
+        "accident_free": true
+      }
+    },
+    {
+      "owner_slug": "mikes-garage",
+      "name": "Bianchi Kuma 26 Mountain Bike Frame",
+      "slug": "bianchi-kuma-26-mountain-bike-frame-welded",
+      "description": "Welded Bianchi Kuma 26 frame. Was broken, fixed with TIG welding in Mike's Garage. Ready for a new build.",
+      "content_language": "en",
+      "item_type": "physical",
+      "category": "cycling",
+      "subcategory": "frame",
+      "condition": "fair",
+      "brand": "Bianchi",
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800",
+          "alt_text": "Mountain bike frame",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 80,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.536
+    },
+    {
+      "owner_slug": "georges-villa",
+      "name": "Appartamento Centro Storico Trapani",
+      "slug": "appartamento-centro-storico-trapani",
+      "description": "Charming 2-bedroom apartment in Trapani old town. Exposed stone walls, renovated kitchen, 3 minutes to the sea. Furnished.",
+      "content_language": "it",
+      "item_type": "space",
+      "category": "apartment",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800",
+          "alt_text": "Trapani centro storico apartment",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 450,
+          "price_unit": "per_month",
+          "currency": "EUR",
+          "status": "active",
+          "deposit": 900
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.514,
+      "attributes": {
+        "bedrooms": 2,
+        "bathrooms": 1,
+        "floor_area_sqm": 65,
+        "floor_number": 2,
+        "total_floors": 3,
+        "elevator": false,
+        "energy_class": "E",
+        "heating_type": "autonomous",
+        "furnished": "furnished",
+        "year_built": 1890,
+        "balcony": true,
+        "air_conditioning": true,
+        "monthly_expenses": 40
+      }
+    },
+    {
+      "owner_slug": "georges-villa",
+      "name": "Villa con Giardino Erice",
+      "slug": "villa-con-giardino-erice",
+      "description": "Beautiful 4-bedroom villa in Erice with panoramic sea views. Large garden, olive trees, private parking. Perfect for families.",
+      "content_language": "it",
+      "item_type": "space",
+      "category": "house",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+          "alt_text": "Villa in Erice with garden",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 185000,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.037,
+      "longitude": 12.587,
+      "attributes": {
+        "bedrooms": 4,
+        "bathrooms": 2,
+        "floor_area_sqm": 180,
+        "total_floors": 2,
+        "energy_class": "D",
+        "heating_type": "autonomous",
+        "furnished": "partially",
+        "year_built": 1975,
+        "parking": true,
+        "balcony": true,
+        "garden": true,
+        "air_conditioning": true
+      }
+    },
+    {
+      "owner_slug": "rosas-home",
+      "name": "Stanza Singola per Studenti",
+      "slug": "stanza-singola-studenti-trapani",
+      "description": "Single room in shared apartment near university. WiFi included, shared kitchen and bathroom. Female only.",
+      "content_language": "it",
+      "item_type": "space",
+      "category": "room",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800",
+          "alt_text": "Student room",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 250,
+          "price_unit": "per_month",
+          "currency": "EUR",
+          "status": "active",
+          "deposit": 250
+        }
+      ],
+      "latitude": 38.016,
+      "longitude": 12.52,
+      "attributes": {
+        "bedrooms": 1,
+        "bathrooms": 1,
+        "floor_area_sqm": 14,
+        "floor_number": 1,
+        "furnished": "furnished",
+        "air_conditioning": false,
+        "monthly_expenses": 20
+      }
+    },
+    {
+      "owner_slug": "ninos-campers",
+      "name": "Casa Vacanza Bonagia sul Mare",
+      "slug": "casa-vacanza-bonagia-sul-mare",
+      "description": "Vacation rental 50m from the beach in Bonagia. 2 bedrooms, terrace with sea view, parking. Weekly or monthly.",
+      "content_language": "it",
+      "item_type": "space",
+      "category": "vacation_rental",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800",
+          "alt_text": "Beach vacation house Bonagia",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 70,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "status": "active",
+          "deposit": 300
+        }
+      ],
+      "latitude": 38.055,
+      "longitude": 12.59,
+      "attributes": {
+        "bedrooms": 2,
+        "bathrooms": 1,
+        "floor_area_sqm": 55,
+        "energy_class": "F",
+        "furnished": "furnished",
+        "parking": true,
+        "balcony": true,
+        "air_conditioning": true,
+        "contract_type": "seasonal"
+      }
+    },
+    {
+      "owner_slug": "marias-garden",
+      "name": "Terreno Agricolo con Uliveto",
+      "slug": "terreno-agricolo-uliveto-paceco",
+      "description": "5000 sqm agricultural land with 40 olive trees in Paceco. Water well, tool shed, road access.",
+      "content_language": "it",
+      "item_type": "space",
+      "category": "land",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800",
+          "alt_text": "Olive grove Paceco",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 25000,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 37.989,
+      "longitude": 12.556,
+      "attributes": {
+        "floor_area_sqm": 5000,
+        "parking": true,
+        "garden": true
+      }
+    },
+    {
+      "owner_slug": "marcos-workshop",
+      "name": "Locale Commerciale Via Fardella",
+      "slug": "locale-commerciale-via-fardella",
+      "description": "Commercial space on main shopping street Via Fardella. 80 sqm, large windows, bathroom, storage room. Ideal for shop or office.",
+      "content_language": "it",
+      "item_type": "space",
+      "category": "commercial_space",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800",
+          "alt_text": "Commercial space Via Fardella",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 800,
+          "price_unit": "per_month",
+          "currency": "EUR",
+          "status": "active",
+          "deposit": 2400
+        }
+      ],
+      "latitude": 38.015,
+      "longitude": 12.51,
+      "attributes": {
+        "bathrooms": 1,
+        "floor_area_sqm": 80,
+        "floor_number": 0,
+        "energy_class": "C",
+        "heating_type": "autonomous",
+        "furnished": "unfurnished",
+        "air_conditioning": true,
+        "monthly_expenses": 100,
+        "contract_type": "commercial"
+      }
+    },
+    {
+      "owner_slug": "valentinas-bakery",
+      "name": "Monolocale Arredato Marsala",
+      "slug": "monolocale-arredato-marsala",
+      "description": "Cozy studio apartment in Marsala center. Recently renovated, new kitchen, washing machine. Bills excluded.",
+      "content_language": "it",
+      "item_type": "space",
+      "category": "apartment",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800",
+          "alt_text": "Studio apartment Marsala",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 350,
+          "price_unit": "per_month",
+          "currency": "EUR",
+          "status": "active",
+          "deposit": 700
+        }
+      ],
+      "latitude": 37.798,
+      "longitude": 12.437,
+      "attributes": {
+        "bedrooms": 1,
+        "bathrooms": 1,
+        "floor_area_sqm": 35,
+        "floor_number": 1,
+        "elevator": false,
+        "energy_class": "D",
+        "heating_type": "autonomous",
+        "furnished": "furnished",
+        "year_built": 2010,
+        "air_conditioning": true,
+        "monthly_expenses": 25,
+        "contract_type": "4+4"
+      }
+    },
+    {
+      "owner_slug": "tommasos-farm",
+      "name": "Rustico da Ristrutturare Valderice",
+      "slug": "rustico-da-ristrutturare-valderice",
+      "description": "Stone farmhouse to restore. 120 sqm + 2000 sqm land. Original tiles, cistern, fig trees. 15 min from Trapani.",
+      "content_language": "it",
+      "item_type": "space",
+      "category": "house",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800",
+          "alt_text": "Stone farmhouse to restore",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 45000,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.033,
+      "longitude": 12.579,
+      "attributes": {
+        "bedrooms": 3,
+        "bathrooms": 1,
+        "floor_area_sqm": 120,
+        "total_floors": 1,
+        "energy_class": "G",
+        "furnished": "unfurnished",
+        "garden": true,
+        "parking": true
+      }
+    },
+    {
+      "owner_slug": "georges-villa",
+      "name": "Attico con Terrazza Panoramica",
+      "slug": "attico-terrazza-panoramica-trapani",
+      "description": "Penthouse with 40 sqm panoramic terrace. Sea views, modern finishes, elevator building. 3 bedrooms, 2 bathrooms.",
+      "content_language": "it",
+      "item_type": "space",
+      "category": "apartment",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
+          "alt_text": "Penthouse terrace Trapani",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "sell",
+          "price": 220000,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.019,
+      "longitude": 12.515,
+      "attributes": {
+        "bedrooms": 3,
+        "bathrooms": 2,
+        "floor_area_sqm": 110,
+        "floor_number": 5,
+        "total_floors": 5,
+        "elevator": true,
+        "energy_class": "B",
+        "heating_type": "autonomous",
+        "furnished": "unfurnished",
+        "year_built": 2015,
+        "parking": true,
+        "balcony": true,
+        "air_conditioning": true,
+        "monthly_expenses": 80
+      }
+    },
+    {
+      "owner_slug": "elenas-yoga",
+      "name": "Loft Open Space per Yoga / Studio",
+      "slug": "loft-open-space-yoga-studio-trapani",
+      "description": "Bright 90 sqm loft, high ceilings, wooden floors. Perfect for yoga studio, art workshop, or creative office. Bathroom + kitchenette.",
+      "content_language": "it",
+      "item_type": "space",
+      "category": "commercial_space",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=800",
+          "alt_text": "Loft studio space",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 600,
+          "price_unit": "per_month",
+          "currency": "EUR",
+          "status": "active",
+          "deposit": 1200
+        }
+      ],
+      "latitude": 38.014,
+      "longitude": 12.509,
+      "attributes": {
+        "bathrooms": 1,
+        "floor_area_sqm": 90,
+        "floor_number": 1,
+        "energy_class": "D",
+        "heating_type": "autonomous",
+        "furnished": "unfurnished",
+        "air_conditioning": true,
+        "monthly_expenses": 60,
+        "contract_type": "commercial"
+      }
+    },
+    {
+      "owner_slug": "ninos-campers",
+      "name": "Meccanico Camper e Furgoni",
+      "slug": "meccanico-camper-furgoni-trapani",
+      "description": "Cerchiamo meccanico esperto in camper e veicoli commerciali. Contratto a tempo indeterminato, orario 8-17.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "job_full_time",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=800",
+          "alt_text": "Mechanic working on van",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "offer",
+          "price": 0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.003,
+      "longitude": 12.54,
+      "attributes": {
+        "job_type": "full_time",
+        "salary_min": 1400,
+        "salary_max": 1800,
+        "salary_period": "monthly",
+        "experience_level": "mid",
+        "remote_option": "on_site",
+        "industry": "Automotive"
+      }
+    },
+    {
+      "owner_slug": "sallys-kitchen",
+      "name": "Aiuto Pasticcere Part-Time",
+      "slug": "aiuto-pasticcere-part-time",
+      "description": "Looking for a part-time pastry assistant. 4 hours/day, weekends. Must love baking and be reliable. Training provided.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "job_part_time",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1556217477-d325251ece38?w=800",
+          "alt_text": "Pastry chef at work",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "offer",
+          "price": 0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.536,
+      "attributes": {
+        "job_type": "part_time",
+        "salary_min": 8,
+        "salary_max": 10,
+        "salary_period": "hourly",
+        "experience_level": "entry",
+        "remote_option": "on_site",
+        "industry": "Food & Beverage"
+      }
+    },
+    {
+      "owner_slug": "giulias-design",
+      "name": "Graphic Designer Freelance",
+      "slug": "graphic-designer-freelance-remote",
+      "description": "Need a freelance graphic designer for brand identity projects. Remote OK. Portfolio required. EUR 25-35/hour.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "job_freelance",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1626785774625-ddcddc3445e9?w=800",
+          "alt_text": "Graphic design workspace",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "offer",
+          "price": 0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.017,
+      "longitude": 12.514,
+      "attributes": {
+        "job_type": "freelance",
+        "salary_min": 25,
+        "salary_max": 35,
+        "salary_period": "hourly",
+        "experience_level": "mid",
+        "remote_option": "remote",
+        "industry": "Design"
+      }
+    },
+    {
+      "owner_slug": "ninos-campers",
+      "name": "Cameriere Stagionale Estate 2026",
+      "slug": "cameriere-stagionale-estate-2026-bonagia",
+      "description": "Seasonal waiter/waitress for beach restaurant, June-September 2026. Tips + meals included. Experience preferred.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "job_seasonal",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800",
+          "alt_text": "Restaurant service",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "offer",
+          "price": 0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.055,
+      "longitude": 12.59,
+      "attributes": {
+        "job_type": "seasonal",
+        "salary_min": 1200,
+        "salary_max": 1500,
+        "salary_period": "monthly",
+        "experience_level": "entry",
+        "remote_option": "on_site",
+        "industry": "Hospitality",
+        "application_deadline": "2026-05-15"
+      }
+    },
+    {
+      "owner_slug": "jakes-electronics",
+      "name": "IT Support Technician",
+      "slug": "it-support-technician-trapani",
+      "description": "Looking for IT support tech. Hardware repairs, network setup, customer visits. Must have own transport.",
+      "content_language": "en",
+      "item_type": "service",
+      "category": "job_full_time",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": "Own laptop and transport",
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800",
+          "alt_text": "IT technician",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "offer",
+          "price": 0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.015,
+      "longitude": 12.51,
+      "attributes": {
+        "job_type": "full_time",
+        "salary_min": 1300,
+        "salary_max": 1600,
+        "salary_period": "monthly",
+        "experience_level": "junior",
+        "remote_option": "hybrid",
+        "industry": "Technology"
+      }
+    },
+    {
+      "owner_slug": "marcos-workshop",
+      "name": "Apprendista Falegname",
+      "slug": "apprendista-falegname-trapani",
+      "description": "Apprenticeship in traditional woodworking. Learn from a master craftsman. 6-month program, potential full-time after.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "job_internship",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800",
+          "alt_text": "Woodworking apprentice",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "offer",
+          "price": 0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.015,
+      "longitude": 12.51,
+      "attributes": {
+        "job_type": "internship",
+        "salary_min": 600,
+        "salary_max": 800,
+        "salary_period": "monthly",
+        "experience_level": "entry",
+        "remote_option": "on_site",
+        "industry": "Crafts & Woodworking"
+      }
+    },
+    {
+      "owner_slug": "chiaras-kitchen",
+      "name": "Cuoco per Catering a Domicilio",
+      "slug": "cuoco-catering-domicilio-trapani",
+      "description": "Contract cook for home catering events. 2-3 events per week, EUR 100-150 per event. Must have food handler certificate.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "job_contract",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": "Food handler certificate (HACCP)",
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800",
+          "alt_text": "Chef cooking",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "offer",
+          "price": 0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.017,
+      "longitude": 12.514,
+      "attributes": {
+        "job_type": "contract",
+        "salary_min": 100,
+        "salary_max": 150,
+        "salary_period": "hourly",
+        "experience_level": "mid",
+        "remote_option": "on_site",
+        "industry": "Food & Catering"
+      }
+    },
+    {
+      "owner_slug": "francescas-flowers",
+      "name": "Fiorista Part-Time Weekend",
+      "slug": "fiorista-part-time-weekend-trapani",
+      "description": "Part-time florist for weekends and events. Creative eye required. Knowledge of seasonal flowers preferred.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "job_part_time",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=800",
+          "alt_text": "Florist arranging flowers",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "offer",
+          "price": 0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.015,
+      "longitude": 12.51,
+      "attributes": {
+        "job_type": "part_time",
+        "salary_min": 9,
+        "salary_max": 12,
+        "salary_period": "hourly",
+        "experience_level": "entry",
+        "remote_option": "on_site",
+        "industry": "Floristry"
+      }
+    },
+    {
+      "owner_slug": "paolos-painting",
+      "name": "Imbianchino con Esperienza",
+      "slug": "imbianchino-esperienza-trapani",
+      "description": "Experienced house painter needed. Interior and exterior. Own tools preferred. Per-project pricing.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "job_freelance",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": "Own painting tools preferred",
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1562259929-b4e1fd3aef09?w=800",
+          "alt_text": "House painter",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "offer",
+          "price": 0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.017,
+      "longitude": 12.514,
+      "attributes": {
+        "job_type": "freelance",
+        "salary_min": 15,
+        "salary_max": 25,
+        "salary_period": "hourly",
+        "experience_level": "mid",
+        "remote_option": "on_site",
+        "industry": "Construction & Painting"
+      }
+    },
+    {
+      "owner_slug": "robertos-fishing",
+      "name": "Aiutante Pescatore Stagionale",
+      "slug": "aiutante-pescatore-stagionale-trapani",
+      "description": "Seasonal fishing assistant. Night shifts, physical work. April-October. Shared catch bonus.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "job_seasonal",
+      "subcategory": null,
+      "condition": null,
+      "brand": null,
+      "needs_equipment": null,
+      "media": [
+        {
+          "url": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800",
+          "alt_text": "Fishing boat",
+          "media_type": "photo"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "offer",
+          "price": 0,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "status": "active"
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.514,
+      "attributes": {
+        "job_type": "seasonal",
+        "salary_min": 1000,
+        "salary_max": 1400,
+        "salary_period": "monthly",
+        "experience_level": "entry",
+        "remote_option": "on_site",
+        "industry": "Fishing",
+        "application_deadline": "2026-04-01"
+      }
     }
   ],
   "teams": [

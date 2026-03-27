@@ -29,7 +29,8 @@
             age_restricted: {{ 'true' if edit_item.age_restricted else 'false' }},
             media: {{ edit_media_json }},
             listings: {{ edit_listings_json }},
-            itemId: {{ edit_item_id | tojson }}
+            itemId: {{ edit_item_id | tojson }},
+            attributes: {{ (edit_item.attributes or {}) | tojson }}
         };
         // Pre-build form and listing data for Alpine x-data
         window._editForm = {
@@ -104,6 +105,8 @@
             content_language: '{{ lang }}', currency: 'EUR',
             delivery_available: false, delivery_fee: '', notes: '', return_policy: ''
         },
+        itemAttributes: {},
+        attributeSchema: {},
         selectedTypes: ['rent'],
         init() {
             if (window._editData) {
@@ -120,6 +123,7 @@
                 this.form.tags = d.tags || '';
                 this.existingMedia = d.media || [];
                 this.editItemId = d.itemId || '';
+                if (d.attributes) this.itemAttributes = d.attributes;
                 if (d.listings && d.listings.length) {
                     this.selectedTypes = d.listings.map(function(l) { return l.listing_type; });
                     var self = this;
@@ -289,6 +293,7 @@
                 var item;
                 if (this.editMode) {
                     // Edit mode: PATCH existing item
+                    const cleanAttrs = Object.keys(this.itemAttributes).length > 0 ? this.itemAttributes : null;
                     const itemResp = await fetch('/api/v1/items/' + this.editItemId, {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
@@ -300,6 +305,7 @@
                             condition: this.form.condition || null,
                             brand: this.form.brand || null,
                             tags: this.form.tags || null,
+                            attributes: cleanAttrs,
                         })
                     });
                     if (!itemResp.ok) {
@@ -309,6 +315,7 @@
                     item = await itemResp.json();
                 } else {
                     // Create mode: POST new item
+                    const createAttrs = Object.keys(this.itemAttributes).length > 0 ? this.itemAttributes : null;
                     const itemResp = await fetch('/api/v1/items', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -323,7 +330,8 @@
                             age_restricted: this.form.age_restricted || false,
                             safety_notes: this.form.safety_notes || null,
                             tags: this.form.tags || null,
-                            content_language: this.form.content_language
+                            content_language: this.form.content_language,
+                            attributes: createAttrs,
                         })
                     });
 
@@ -578,6 +586,8 @@
                 const svcCats = ['repairs', 'training_service', 'custom_orders', 'education', 'tool_library'];
                 const communityCats = ['skill_exchange', 'neighborhood_help', 'local_food', 'rides'];
                 const propertyCats = ['apartment', 'room', 'house', 'vacation_rental', 'commercial_space', 'land'];
+                const vehicleCats = ['vehicles', 'automotive'];
+                const jobCats = ['job_full_time', 'job_part_time', 'job_contract', 'job_seasonal', 'job_freelance', 'job_internship'];
                 const spaceCats = ['workshops', 'kitchens', 'garages', 'studios'];
                 if (svcCats.includes(form.category)) {
                     form.item_type = 'service';
@@ -601,9 +611,20 @@
                     if (form.category === 'vacation_rental') selectedTypes = ['rent'];
                     else if (form.category === 'land') selectedTypes = ['sell'];
                     else selectedTypes = ['rent'];
+                } else if (vehicleCats.includes(form.category)) {
+                    form.item_type = 'physical';
+                    selectedTypes = ['sell'];
+                } else if (jobCats.includes(form.category)) {
+                    form.item_type = 'service';
+                    selectedTypes = ['offer'];
                 } else if (spaceCats.includes(form.category)) {
                     form.item_type = 'space';
                 }
+                // Load attribute schema for this category
+                fetch('/api/v1/items/attribute-schema/' + form.category)
+                    .then(r => r.json())
+                    .then(data => { attributeSchema = data.fields || {}; })
+                    .catch(() => { attributeSchema = {}; });
             "></template>
 
             <!-- AI Generate Button -->
@@ -629,6 +650,57 @@
                     </template>
                 </button>
             </div>
+
+            <!-- Dynamic Attribute Fields (Vehicle specs, Property details, Job info) -->
+            <template x-if="Object.keys(attributeSchema).length > 0">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        {{ t('item.specifications') }}
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <template x-for="[key, field] in Object.entries(attributeSchema)" :key="key">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1" x-text="'{{ lang }}' === 'it' && field.label_it ? field.label_it : field.label"></label>
+
+                                <!-- Select -->
+                                <template x-if="field.type === 'select'">
+                                    <select x-model="itemAttributes[key]"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="">--</option>
+                                        <template x-for="opt in field.options" :key="opt">
+                                            <option :value="opt" x-text="opt.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())"></option>
+                                        </template>
+                                    </select>
+                                </template>
+
+                                <!-- Integer -->
+                                <template x-if="field.type === 'int'">
+                                    <input type="number" x-model.number="itemAttributes[key]"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                           :placeholder="'{{ lang }}' === 'it' && field.label_it ? field.label_it : field.label">
+                                </template>
+
+                                <!-- Text -->
+                                <template x-if="field.type === 'text'">
+                                    <input type="text" x-model="itemAttributes[key]"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                           :placeholder="'{{ lang }}' === 'it' && field.label_it ? field.label_it : field.label">
+                                </template>
+
+                                <!-- Boolean -->
+                                <template x-if="field.type === 'bool'">
+                                    <label class="flex items-center gap-2 cursor-pointer mt-1">
+                                        <input type="checkbox" x-model="itemAttributes[key]"
+                                               class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="text-sm text-gray-700" x-text="'{{ lang }}' === 'it' && field.label_it ? field.label_it : field.label"></span>
+                                    </label>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
 
             <div>
                 <label for="description" class="block text-sm font-medium text-gray-700 mb-1">

@@ -186,8 +186,9 @@ async def seed_database(db: AsyncSession) -> dict:
             model=item_data.get("model"),
             needs_equipment=item_data.get("needs_equipment"),
             compatible_with=item_data.get("compatible_with"),
-            latitude=owner.latitude,
-            longitude=owner.longitude,
+            attributes=item_data.get("attributes"),
+            latitude=item_data.get("latitude") or owner.latitude,
+            longitude=item_data.get("longitude") or owner.longitude,
         )
         db.add(item)
         await db.flush()

@@ -19,7 +19,7 @@ from sqlalchemy.orm import selectinload
 
 from src.database import get_db
 from src.dependencies import get_current_user_token, get_user, require_auth, require_badge_tier, user_throttle
-from src.models.item import BHItem, BHItemFavorite, BHItemMedia, MediaType
+from src.models.item import ATTRIBUTE_SCHEMAS, CATEGORY_GROUPS, BHItem, BHItemFavorite, BHItemMedia, MediaType, get_attribute_schema
 from src.models.listing import BHListing, ListingStatus
 from src.models.user import BHUser
 from src.schemas.item import ItemCreate, ItemOut, ItemUpdate
@@ -53,10 +53,13 @@ async def _unique_slug(db: AsyncSession, base: str) -> str:
 async def list_items(
     q: Optional[str] = None,
     category: Optional[str] = None,  # accepts ItemCategory values
+    category_group: Optional[str] = None,  # "vehicles", "property", "jobs" etc.
     item_type: Optional[str] = None,
     sort: str = Query("newest", pattern="^(newest|oldest|name_asc)$"),
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
+    # Attribute filters (JSONB) -- pass as query params like attr_fuel_type=diesel
+    request: Request = None,
     db: AsyncSession = Depends(get_db),
 ):
     """List items with optional search and filters. Public endpoint."""
@@ -78,8 +81,42 @@ async def list_items(
         )
     if category:
         query = query.where(BHItem.category == category)
+    if category_group and category_group in CATEGORY_GROUPS:
+        cats = CATEGORY_GROUPS[category_group]
+        query = query.where(BHItem.category.in_(cats))
     if item_type:
         query = query.where(BHItem.item_type == item_type)
+
+    # JSONB attribute filters: ?attr_fuel_type=diesel&attr_bedrooms=3
+    if request:
+        from sqlalchemy import cast, text as sa_text
+        for key, value in request.query_params.items():
+            if key.startswith("attr_"):
+                attr_name = key[5:]  # strip "attr_" prefix
+                # Try numeric comparison for range filters
+                if key.endswith("_min"):
+                    attr_name = attr_name[:-4]
+                    try:
+                        val = int(value)
+                        query = query.where(
+                            cast(BHItem.attributes[attr_name].as_string(), Integer) >= val
+                        )
+                    except (ValueError, TypeError):
+                        pass
+                elif key.endswith("_max"):
+                    attr_name = attr_name[:-4]
+                    try:
+                        val = int(value)
+                        query = query.where(
+                            cast(BHItem.attributes[attr_name].as_string(), Integer) <= val
+                        )
+                    except (ValueError, TypeError):
+                        pass
+                else:
+                    # Exact match
+                    query = query.where(
+                        BHItem.attributes[attr_name].as_string() == value
+                    )
 
     if sort == "newest":
         query = query.order_by(BHItem.created_at.desc())
@@ -133,6 +170,7 @@ async def create_item(
         model=data.model,
         needs_equipment=data.needs_equipment,
         compatible_with=data.compatible_with,
+        attributes=data.attributes,
         latitude=round(data.latitude, 3) if data.latitude else (round(user.latitude, 3) if user.latitude else None),
         longitude=round(data.longitude, 3) if data.longitude else (round(user.longitude, 3) if user.longitude else None),
     )
@@ -631,3 +669,23 @@ async def toggle_vote(
 
     await db.commit()
     return {"voted": voted, "count": count}
+
+
+# ── Attribute schemas ──
+
+
+@router.get("/attribute-schema/{category}")
+async def get_category_attributes(category: str):
+    """Return the attribute field definitions for a category.
+    Frontend uses this to render dynamic form fields."""
+    schema = get_attribute_schema(category)
+    return {"category": category, "fields": schema}
+
+
+@router.get("/attribute-schemas")
+async def get_all_attribute_schemas():
+    """Return all attribute schemas and category groups."""
+    return {
+        "schemas": ATTRIBUTE_SCHEMAS,
+        "groups": CATEGORY_GROUPS,
+    }
