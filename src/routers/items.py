@@ -130,6 +130,26 @@ async def list_items(
     return result.scalars().unique().all()
 
 
+# ── Attribute schemas (must be BEFORE /{item_id} to avoid UUID conflict) ──
+
+
+@router.get("/attribute-schema/{category}")
+async def get_category_attributes(category: str):
+    """Return the attribute field definitions for a category.
+    Frontend uses this to render dynamic form fields."""
+    schema = get_attribute_schema(category)
+    return {"category": category, "fields": schema}
+
+
+@router.get("/attribute-schemas")
+async def get_all_attribute_schemas():
+    """Return all attribute schemas and category groups."""
+    return {
+        "schemas": ATTRIBUTE_SCHEMAS,
+        "groups": CATEGORY_GROUPS,
+    }
+
+
 @router.get("/{item_id}", response_model=ItemOut)
 async def get_item(item_id: UUID, db: AsyncSession = Depends(get_db)):
     """Get a single item by ID. Public endpoint."""
@@ -669,23 +689,3 @@ async def toggle_vote(
 
     await db.commit()
     return {"voted": voted, "count": count}
-
-
-# ── Attribute schemas ──
-
-
-@router.get("/attribute-schema/{category}")
-async def get_category_attributes(category: str):
-    """Return the attribute field definitions for a category.
-    Frontend uses this to render dynamic form fields."""
-    schema = get_attribute_schema(category)
-    return {"category": category, "fields": schema}
-
-
-@router.get("/attribute-schemas")
-async def get_all_attribute_schemas():
-    """Return all attribute schemas and category groups."""
-    return {
-        "schemas": ATTRIBUTE_SCHEMAS,
-        "groups": CATEGORY_GROUPS,
-    }
