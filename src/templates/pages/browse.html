@@ -122,7 +122,7 @@
         </form>
 
         <!-- Category quick-pick cards -->
-        {% if not selected_category %}
+        {% if not selected_category and not selected_category_group %}
         <div class="mt-4">
             <div class="flex gap-2 overflow-x-auto pb-2 sm:grid sm:grid-cols-5 lg:grid-cols-9 sm:overflow-visible">
                 {% set cat_icons = {
@@ -289,23 +289,6 @@
             </script>
             {% endif %}
         </div>
-    </div>
-
-    <!-- Map toggle -->
-    <div class="mt-6" x-data="{ showMap: false }">
-        <button @click="showMap = !showMap; if(showMap) $nextTick(() => initBrowseMap())"
-                class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border transition-colors min-h-[44px]"
-                :class="showMap ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            <span x-text="showMap ? '{{ t('browse.hide_map') }}' : '{{ t('browse.show_map') }}'"></span>
-        </button>
-
-        <div x-show="showMap" x-transition class="mt-4 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
-            <div id="browse-map" style="height: 350px; z-index: 0;"></div>
-        </div>
 
         <!-- AI Concierge Response -->
         <template x-if="aiResult">
@@ -333,6 +316,23 @@
         </div>
         </template>
 
+    </div>
+
+    <!-- Map toggle -->
+    <div class="mt-6" x-data="{ showMap: false }">
+        <button @click="showMap = !showMap; if(showMap) $nextTick(() => initBrowseMap())"
+                class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border transition-colors min-h-[44px]"
+                :class="showMap ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span x-text="showMap ? '{{ t('browse.hide_map') }}' : '{{ t('browse.show_map') }}'"></span>
+        </button>
+
+        <div x-show="showMap" x-transition class="mt-4 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+            <div id="browse-map" style="height: 350px; z-index: 0;"></div>
+        </div>
     </div>
 
     <!-- Results -->
