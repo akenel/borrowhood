@@ -126,6 +126,34 @@
                     {% endif %}
                 </div>
 
+                <!-- Lockbox codes (inline, auto-fetched) -->
+                {% if order.status.value in ('approved', 'picked_up', 'committed', 'buyer_paid', 'payment_confirmed') %}
+                <div class="flex-shrink-0" x-data="{ codes: null, loaded: false }"
+                     x-init="fetch('/api/v1/lockbox/{{ order.id }}').then(r => r.ok ? r.json() : null).then(d => { codes = d; loaded = true; }).catch(() => { loaded = true; })">
+                    <template x-if="loaded && codes">
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center min-w-[140px]">
+                            <p class="text-xs text-amber-600 font-medium mb-1">
+                                <svg class="w-3.5 h-3.5 inline -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                {% if lang == 'it' %}Codici Lockbox{% else %}Lockbox Codes{% endif %}
+                            </p>
+                            <div class="space-y-1">
+                                <div>
+                                    <span class="text-xs text-gray-500">{% if lang == 'it' %}Ritiro{% else %}Pickup{% endif %}:</span>
+                                    <span class="font-mono font-bold text-sm text-amber-800" x-text="codes.pickup_code"></span>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-500">{% if lang == 'it' %}Reso{% else %}Return{% endif %}:</span>
+                                    <span class="font-mono font-bold text-sm text-amber-800" x-text="codes.return_code"></span>
+                                </div>
+                            </div>
+                            <template x-if="codes.location_hint">
+                                <p class="text-xs text-amber-600 mt-1" x-text="codes.location_hint"></p>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+                {% endif %}
+
                 <!-- Date + actions -->
                 <div class="flex-shrink-0 text-right space-y-1">
                     <p class="text-sm text-gray-500">{{ order.created_at.strftime('%b %d, %Y') }}</p>
