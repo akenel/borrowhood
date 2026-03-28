@@ -589,36 +589,40 @@
                 const vehicleCats = ['vehicles', 'automotive'];
                 const jobCats = ['job_full_time', 'job_part_time', 'job_contract', 'job_seasonal', 'job_freelance', 'job_internship'];
                 const spaceCats = ['workshops', 'kitchens', 'garages', 'studios'];
-                if (svcCats.includes(form.category)) {
-                    form.item_type = 'service';
-                    if (!selectedTypes.includes('service') && !selectedTypes.includes('training')) {
-                        if (form.category === 'training_service' || form.category === 'education' || form.category === 'skill_exchange') {
-                            selectedTypes = ['training'];
-                        } else if (form.category === 'tool_library') {
-                            selectedTypes = ['rent'];
-                        } else {
-                            selectedTypes = ['service'];
+                // Only auto-set item_type and listing types in CREATE mode
+                // In edit mode, preserve what was saved
+                if (!editMode) {
+                    if (svcCats.includes(form.category)) {
+                        form.item_type = 'service';
+                        if (!selectedTypes.includes('service') && !selectedTypes.includes('training')) {
+                            if (form.category === 'training_service' || form.category === 'education' || form.category === 'skill_exchange') {
+                                selectedTypes = ['training'];
+                            } else if (form.category === 'tool_library') {
+                                selectedTypes = ['rent'];
+                            } else {
+                                selectedTypes = ['service'];
+                            }
                         }
+                    } else if (communityCats.includes(form.category)) {
+                        form.item_type = 'service';
+                        if (form.category === 'skill_exchange') selectedTypes = ['training'];
+                        else if (form.category === 'local_food') selectedTypes = ['sell'];
+                        else if (form.category === 'rides') selectedTypes = ['service'];
+                        else if (form.category === 'neighborhood_help') selectedTypes = ['offer'];
+                    } else if (propertyCats.includes(form.category)) {
+                        form.item_type = 'space';
+                        if (form.category === 'vacation_rental') selectedTypes = ['rent'];
+                        else if (form.category === 'land') selectedTypes = ['sell'];
+                        else selectedTypes = ['rent'];
+                    } else if (vehicleCats.includes(form.category)) {
+                        form.item_type = 'physical';
+                        selectedTypes = ['sell'];
+                    } else if (jobCats.includes(form.category)) {
+                        form.item_type = 'service';
+                        selectedTypes = ['offer'];
+                    } else if (spaceCats.includes(form.category)) {
+                        form.item_type = 'space';
                     }
-                } else if (communityCats.includes(form.category)) {
-                    form.item_type = 'service';
-                    if (form.category === 'skill_exchange') selectedTypes = ['training'];
-                    else if (form.category === 'local_food') selectedTypes = ['sell'];
-                    else if (form.category === 'rides') selectedTypes = ['service'];
-                    else if (form.category === 'neighborhood_help') selectedTypes = ['offer'];
-                } else if (propertyCats.includes(form.category)) {
-                    form.item_type = 'space';
-                    if (form.category === 'vacation_rental') selectedTypes = ['rent'];
-                    else if (form.category === 'land') selectedTypes = ['sell'];
-                    else selectedTypes = ['rent'];
-                } else if (vehicleCats.includes(form.category)) {
-                    form.item_type = 'physical';
-                    selectedTypes = ['sell'];
-                } else if (jobCats.includes(form.category)) {
-                    form.item_type = 'service';
-                    selectedTypes = ['offer'];
-                } else if (spaceCats.includes(form.category)) {
-                    form.item_type = 'space';
                 }
                 // Load attribute schema for this category
                 fetch('/api/v1/items/attribute-schema/' + form.category)

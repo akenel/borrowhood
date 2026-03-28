@@ -2068,10 +2068,10 @@
         var KEY = 'bh_recently_viewed';
         var MAX = 12;
         var current = {
-            slug: '{{ item.slug }}',
-            name: '{{ item.name | e }}',
-            image: '{{ item.media[0].url if item.media else "" }}',
-            price: '{{ item.listings[0].price if item.listings else "" }}',
+            slug: {{ item.slug | tojson }},
+            name: {{ item.name | tojson }},
+            image: {{ (item.media[0].url if item.media else "") | tojson }},
+            price: {{ (item.listings[0].price|string if item.listings else "") | tojson }},
         };
         try {
             var items = JSON.parse(localStorage.getItem(KEY) || '[]');
