@@ -2070,8 +2070,8 @@
         var current = {
             slug: {{ item.slug | tojson }},
             name: {{ item.name | tojson }},
-            image: {{ (item.media[0].url if item.media else "") | tojson }},
-            price: {{ (item.listings[0].price|string if item.listings else "") | tojson }},
+            image: '{{ item.media[0].url if item.media else "" }}',
+            price: '{{ "%.2f"|format(item.listings[0].price) if item.listings and item.listings[0].price else "" }}',
         };
         try {
             var items = JSON.parse(localStorage.getItem(KEY) || '[]');
