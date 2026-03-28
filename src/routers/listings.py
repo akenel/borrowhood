@@ -165,6 +165,17 @@ async def create_listing(
     db.add(listing)
     await db.commit()
     await db.refresh(listing)
+
+    # Check saved searches if listing is immediately active
+    if create_status == ListingStatus.ACTIVE:
+        try:
+            from src.services.saved_search_matcher import check_saved_searches
+            await check_saved_searches(db, item, listing)
+            await db.commit()
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning("Saved search check failed: %s", e)
+
     return listing
 
 
@@ -294,6 +305,17 @@ async def change_listing_status(
     listing.version += 1
     await db.commit()
     await db.refresh(listing)
+
+    # Check saved searches when listing becomes active
+    if new_status == ListingStatus.ACTIVE:
+        try:
+            from src.services.saved_search_matcher import check_saved_searches
+            await check_saved_searches(db, listing.item, listing)
+            await db.commit()
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning("Saved search check failed: %s", e)
+
     return {"status": listing.status.value, "id": str(listing.id)}
 
 
