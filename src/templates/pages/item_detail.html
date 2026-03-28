@@ -254,10 +254,10 @@
                             {% if value is sameas true %}
                             <p class="text-sm font-medium text-green-600 mt-0.5">
                                 <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                {{ t('common.yes') }}
+                                {{ t('i18n.yes') }}
                             </p>
                             {% elif value is sameas false %}
-                            <p class="text-sm font-medium text-gray-400 mt-0.5">{{ t('common.no') }}</p>
+                            <p class="text-sm font-medium text-gray-400 mt-0.5">{{ t('i18n.no') }}</p>
                             {% else %}
                             <p class="text-sm font-medium text-gray-900 mt-0.5">{{ value | string | replace('_', ' ') | title }}</p>
                             {% endif %}
