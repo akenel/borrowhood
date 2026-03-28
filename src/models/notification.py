@@ -46,7 +46,7 @@ class NotificationType(str, enum.Enum):
     DELIVERY_CONFIRMED = "delivery_confirmed"      # Buyer confirmed receipt
     DELIVERY_FAILED = "delivery_failed"            # Delivery attempt failed
     DELIVERY_DAMAGED = "delivery_damaged"          # Buyer reports damage
-    SAVED_SEARCH_MATCH = "saved_search_match"   # A new listing matches your saved search
+    SAVED_SEARCH_MATCH = "SAVED_SEARCH_MATCH"   # A new listing matches your saved search
     SYSTEM = "system"                         # Platform announcement
 
 
