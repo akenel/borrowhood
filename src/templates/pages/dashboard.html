@@ -1685,6 +1685,21 @@
         </div>
 
         <!-- Settings tab -->
+        <script>
+        // Shared profile cache -- one fetch, all components use it
+        window._profileCache = null;
+        window._profilePromise = null;
+        function getProfile() {
+            if (window._profileCache) return Promise.resolve(window._profileCache);
+            if (!window._profilePromise) {
+                window._profilePromise = fetch('/api/v1/users/me')
+                    .then(function(r) { return r.ok ? r.json() : null; })
+                    .then(function(d) { window._profileCache = d; return d; })
+                    .catch(function() { return null; });
+            }
+            return window._profilePromise;
+        }
+        </script>
         <div x-show="tab === 'settings'" x-cloak x-data="telegramLink()">
             <div class="max-w-lg space-y-6">
 
@@ -1697,9 +1712,8 @@
                     services: { offers_delivery: false, offers_pickup: false, offers_training: false, offers_custom_orders: false, offers_repair: false },
                     async load() {
                         try {
-                            const r = await fetch('/api/v1/users/me');
-                            if (r.ok) {
-                                const d = await r.json();
+                            const d = await getProfile();
+                            if (d) {
                                 this.p.display_name = d.display_name || '';
                                 this.p.tagline = d.tagline || '';
                                 this.p.bio = d.bio || '';
@@ -2209,8 +2223,8 @@
                     toggling: false,
                     async load() {
                         try {
-                            const r = await fetch('/api/v1/users/me');
-                            if (r.ok) { const d = await r.json(); this.emailEnabled = d.notify_email !== false; }
+                            const d = await getProfile();
+                            if (d) { this.emailEnabled = d.notify_email !== false; }
                         } catch(e) {}
                     },
                     async toggle() {
@@ -2252,8 +2266,8 @@
                     loaded: false,
                     async load() {
                         try {
-                            const r = await fetch('/api/v1/users/me');
-                            if (r.ok) { const d = await r.json(); this.waNumber = d.whatsapp_number || ''; }
+                            const d = await getProfile();
+                            if (d) { this.waNumber = d.whatsapp_number || ''; }
                         } catch(e) {}
                         this.loaded = true;
                     },
@@ -2313,9 +2327,8 @@
                     loaded: false,
                     async load() {
                         try {
-                            var r = await fetch('/api/v1/users/me');
-                            if (r.ok) {
-                                var d = await r.json();
+                            var d = await getProfile();
+                            if (d) {
                                 this.sellerType = d.seller_type || 'personal';
                                 this.businessName = d.business_name || '';
                                 this.vatNumber = d.vat_number || '';
@@ -2438,9 +2451,8 @@
                     },
                     async load() {
                         try {
-                            var r = await fetch('/api/v1/users/me');
-                            if (r.ok) {
-                                var d = await r.json();
+                            var d = await getProfile();
+                            if (d) {
                                 this.payments = d.accepted_payments ? d.accepted_payments.split(',').filter(Boolean) : [];
                             }
                         } catch(e) {}
