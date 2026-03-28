@@ -296,7 +296,13 @@
                                 {% endif %}
                                 <!-- City -->
                                 {% if member.city %}
-                                <span class="text-xs text-gray-400">{{ member.city }}{% if member.country_code %}, {{ member.country_code }}{% endif %}</span>
+                                <span class="text-xs text-gray-400" x-data x-text="(() => {
+                                    var city = '{{ member.city | e }}';
+                                    var cc = '{{ (member.country_code or '') | upper | e }}';
+                                    if (!cc) return city;
+                                    var flag = String.fromCodePoint(...[...cc].map(c => 127397 + c.charCodeAt(0)));
+                                    return flag + ' ' + city + ', ' + cc;
+                                })()">{{ member.city }}{% if member.country_code %}, {{ member.country_code }}{% endif %}</span>
                                 {% endif %}
                                 {% set seen = member.last_active_at | last_seen(lang) %}
                                 {% if seen %}
