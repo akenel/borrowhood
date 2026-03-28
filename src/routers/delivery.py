@@ -270,7 +270,7 @@ async def create_delivery_tracking(
     return result.scalars().first()
 
 
-@router.get("/{rental_id}", response_model=DeliveryTrackingOut)
+@router.get("/{rental_id}")
 async def get_delivery_tracking(
     rental_id: UUID,
     token: dict = Depends(require_auth),
@@ -286,7 +286,7 @@ async def get_delivery_tracking(
     )
     tracking = result.scalars().first()
     if not tracking:
-        raise HTTPException(status_code=404, detail="No delivery tracking for this rental")
+        return None
 
     # Verify user is a participant
     rental_result = await db.execute(

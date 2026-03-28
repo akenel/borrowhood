@@ -135,18 +135,18 @@ async def generate_codes(
     return lockbox
 
 
-@router.get("/{rental_id}", response_model=LockBoxOut)
+@router.get("/{rental_id}")
 async def get_codes(
     rental_id: UUID,
     token: dict = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
-    """Get lock box codes for a rental. Owner or renter."""
+    """Get lock box codes for a rental. Owner or renter. Returns null if none exist."""
     user = await get_user(db, token)
     rental = await _get_rental_with_auth(db, rental_id, user)
 
     if not rental.lockbox:
-        raise HTTPException(status_code=404, detail="No lock box codes for this rental")
+        return None
 
     return rental.lockbox
 
