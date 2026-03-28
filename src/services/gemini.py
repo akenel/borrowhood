@@ -82,8 +82,8 @@ def _get_provider_order() -> list:
         return ["ollama"]
     elif provider == "pollinations":
         return ["pollinations"]
-    else:  # "auto" or anything else
-        return ["gemini", "ollama", "pollinations"]
+    else:  # "auto" or anything else -- Ollama Turbo is paid+reliable, Pollinations is images only
+        return ["gemini", "ollama"]
 
 
 # ── JSON parsing ─────────────────────────────────────────────────────
