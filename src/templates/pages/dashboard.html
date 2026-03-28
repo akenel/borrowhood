@@ -1758,113 +1758,106 @@
                         </div>
 
                         <!-- Skills (right below bio) -->
-                        <div x-data="{
-                            skills: [],
-                            skillsLoading: true,
-                            showAddSkill: false,
-                            newSkill: { skill_name: '', category: 'other', self_rating: 3, years_experience: null },
-                            skillSuggesting: false,
-                            skillSuggestions: [],
-                            showSkillSuggestions: false,
-                            async loadSkills() {
-                                try {
-                                    const r = await fetch('/api/v1/users/me/skills');
-                                    if (r.ok) this.skills = await r.json();
-                                } catch(e) {}
-                                this.skillsLoading = false;
-                            },
-                            async addOneSkill() {
-                                if (!this.newSkill.skill_name.trim()) return;
-                                const r = await fetch('/api/v1/users/me/skills', {
-                                    method: 'POST',
-                                    headers: {'Content-Type': 'application/json'},
-                                    body: JSON.stringify(this.newSkill)
-                                });
-                                if (r.ok) {
-                                    this.newSkill = { skill_name: '', category: 'other', self_rating: 3, years_experience: null };
-                                    this.showAddSkill = false;
-                                    await this.loadSkills();
-                                    window.dispatchEvent(new CustomEvent('toast', {detail: {type:'success', message:'Skill added'}}));
-                                } else {
-                                    const err = await r.json();
-                                    window.dispatchEvent(new CustomEvent('toast', {detail: {type:'error', message: err.detail || 'Failed'}}));
-                                }
-                            },
-                            async removeSkill(id, name) {
-                                if (!confirm('Remove skill: ' + name + '?')) return;
-                                const r = await fetch('/api/v1/users/me/skills/' + id, {method: 'DELETE'});
-                                if (r.ok) {
-                                    await this.loadSkills();
-                                    window.dispatchEvent(new CustomEvent('toast', {detail: {type:'success', message: name + ' removed'}}));
-                                }
-                            },
-                            async suggestFromBio() {
-                                this.skillSuggesting = true;
-                                this.showSkillSuggestions = false;
-                                try {
-                                    // Get bio from the form field (parent scope) so unsaved edits work
-                                    var bioEl = document.querySelector('textarea[x-model="p.bio"]');
-                                    var bioText = bioEl ? bioEl.value : '';
-                                    if (bioText.trim().length < 20) {
-                                        window.dispatchEvent(new CustomEvent('toast', {detail: {type:'warning', message: 'Bio must be at least 20 characters'}}));
-                                        this.skillSuggesting = false;
-                                        return;
-                                    }
-                                    const r = await fetch('/api/v1/users/me/skills/suggest', {
+                        <script>
+                        function skillsManager() {
+                            return {
+                                skills: [],
+                                skillsLoading: true,
+                                showAddSkill: false,
+                                newSkill: { skill_name: '', category: 'other', self_rating: 3, years_experience: null },
+                                skillSuggesting: false,
+                                skillSuggestions: [],
+                                showSkillSuggestions: false,
+                                async loadSkills() {
+                                    try {
+                                        var r = await fetch('/api/v1/users/me/skills');
+                                        if (r.ok) this.skills = await r.json();
+                                    } catch(e) {}
+                                    this.skillsLoading = false;
+                                },
+                                async addOneSkill() {
+                                    if (!this.newSkill.skill_name.trim()) return;
+                                    var r = await fetch('/api/v1/users/me/skills', {
                                         method: 'POST',
                                         headers: {'Content-Type': 'application/json'},
-                                        body: JSON.stringify({bio: bioText})
+                                        body: JSON.stringify(this.newSkill)
                                     });
                                     if (r.ok) {
-                                        const data = await r.json();
-                                        this.skillSuggestions = (data.suggestions || []).map(s => ({...s, selected: true}));
-                                        this.showSkillSuggestions = true;
+                                        this.newSkill = { skill_name: '', category: 'other', self_rating: 3, years_experience: null };
+                                        this.showAddSkill = false;
+                                        await this.loadSkills();
+                                        window.dispatchEvent(new CustomEvent('toast', {detail: {type:'success', message:'Skill added'}}));
                                     } else {
-                                        const err = await r.json();
-                                        window.dispatchEvent(new CustomEvent('toast', {detail: {type:'error', message: err.detail || 'AI unavailable'}}));
+                                        var err = await r.json();
+                                        window.dispatchEvent(new CustomEvent('toast', {detail: {type:'error', message: err.detail || 'Failed'}}));
                                     }
-                                } catch(e) {
-                                    window.dispatchEvent(new CustomEvent('toast', {detail: {type:'error', message: 'Network error'}}));
-                                }
-                                this.skillSuggesting = false;
-                            },
-                            async acceptSkillSuggestions() {
-                                const selected = this.skillSuggestions.filter(s => s.selected);
-                                if (!selected.length) return;
-                                const r = await fetch('/api/v1/users/me/skills/batch', {
-                                    method: 'POST',
-                                    headers: {'Content-Type': 'application/json'},
-                                    body: JSON.stringify({skills: selected})
-                                });
-                                if (r.ok) {
-                                    const data = await r.json();
+                                },
+                                async removeSkill(id, name) {
+                                    if (!confirm('Remove skill: ' + name + '?')) return;
+                                    var r = await fetch('/api/v1/users/me/skills/' + id, {method: 'DELETE'});
+                                    if (r.ok) {
+                                        await this.loadSkills();
+                                        window.dispatchEvent(new CustomEvent('toast', {detail: {type:'success', message: name + ' removed'}}));
+                                    }
+                                },
+                                async suggestFromBio() {
+                                    this.skillSuggesting = true;
                                     this.showSkillSuggestions = false;
-                                    this.skillSuggestions = [];
-                                    await this.loadSkills();
-                                    window.dispatchEvent(new CustomEvent('toast', {detail: {type:'success', message: data.added + ' skills added'}}));
+                                    try {
+                                        var bioEl = document.querySelector('textarea[x-model="p.bio"]');
+                                        var bioText = bioEl ? bioEl.value : '';
+                                        if (bioText.trim().length < 20) {
+                                            window.dispatchEvent(new CustomEvent('toast', {detail: {type:'warning', message: 'Bio must be at least 20 characters'}}));
+                                            this.skillSuggesting = false;
+                                            return;
+                                        }
+                                        var r = await fetch('/api/v1/users/me/skills/suggest', {
+                                            method: 'POST',
+                                            headers: {'Content-Type': 'application/json'},
+                                            body: JSON.stringify({bio: bioText})
+                                        });
+                                        if (r.ok) {
+                                            var data = await r.json();
+                                            this.skillSuggestions = (data.suggestions || []).map(function(s) { return Object.assign({}, s, {selected: true}); });
+                                            this.showSkillSuggestions = true;
+                                        } else {
+                                            var err = await r.json();
+                                            window.dispatchEvent(new CustomEvent('toast', {detail: {type:'error', message: err.detail || 'AI unavailable'}}));
+                                        }
+                                    } catch(e) {
+                                        window.dispatchEvent(new CustomEvent('toast', {detail: {type:'error', message: 'Network error'}}));
+                                    }
+                                    this.skillSuggesting = false;
+                                },
+                                async acceptSkillSuggestions() {
+                                    var selected = this.skillSuggestions.filter(function(s) { return s.selected; });
+                                    if (!selected.length) return;
+                                    var r = await fetch('/api/v1/users/me/skills/batch', {
+                                        method: 'POST',
+                                        headers: {'Content-Type': 'application/json'},
+                                        body: JSON.stringify({skills: selected})
+                                    });
+                                    if (r.ok) {
+                                        var data = await r.json();
+                                        this.showSkillSuggestions = false;
+                                        this.skillSuggestions = [];
+                                        await this.loadSkills();
+                                        window.dispatchEvent(new CustomEvent('toast', {detail: {type:'success', message: data.added + ' skills added'}}));
+                                    }
                                 }
-                            }
-                        }" x-init="loadSkills()">
+                            };
+                        }
+                        </script>
+                        <div x-data="skillsManager()" x-init="loadSkills()">
                             <div class="flex items-center justify-between mb-2">
                                 <label class="block text-sm font-medium text-gray-700">{{ t('profile.skills') }}</label>
                                 <div class="flex gap-2">
-                                    <template x-if="p.bio && p.bio.length >= 20">
-                                        <button type="button" @click="suggestFromBio()" :disabled="skillSuggesting"
-                                                class="text-xs px-2.5 py-1 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg hover:bg-purple-100 disabled:opacity-50 flex items-center gap-1">
-                                            <template x-if="!skillSuggesting">
-                                                <span class="flex items-center gap-1">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                                                    {{ t('profile.suggest_from_bio') }}
-                                                </span>
-                                            </template>
-                                            <template x-if="skillSuggesting">
-                                                <span class="flex items-center gap-1">
-                                                    <svg class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
-                                                    {{ t('profile.analyzing_bio') }}
-                                                </span>
-                                            </template>
-                                        </button>
-                                    </template>
+                                    <button type="button" @click="suggestFromBio()" :disabled="skillSuggesting"
+                                            class="text-xs px-2.5 py-1 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg hover:bg-purple-100 disabled:opacity-50 flex items-center gap-1">
+                                        <svg x-show="!skillSuggesting" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                        <svg x-show="skillSuggesting" x-cloak class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                                        <span x-text="skillSuggesting ? '{{ t('profile.analyzing_bio') }}' : '{{ t('profile.suggest_from_bio') }}'"></span>
+                                    </button>
                                     <button type="button" @click="showAddSkill = !showAddSkill"
                                             class="text-xs px-2.5 py-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-100">
                                         + {{ t('profile.add_skill') }}
