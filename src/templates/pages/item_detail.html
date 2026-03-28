@@ -2068,8 +2068,8 @@
         var KEY = 'bh_recently_viewed';
         var MAX = 12;
         var current = {
-            slug: {{ item.slug | tojson }},
-            name: {{ item.name | tojson }},
+            slug: '{{ item.slug }}',
+            name: decodeURIComponent('{{ item.name | urlencode }}'),
             image: '{{ item.media[0].url if item.media else "" }}',
             price: '{{ "%.2f"|format(item.listings[0].price) if item.listings and item.listings[0].price else "" }}',
         };
