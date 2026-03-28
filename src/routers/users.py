@@ -941,10 +941,20 @@ async def suggest_skills(
     token: dict = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
-    """AI-powered skill suggestions from user's bio."""
+    """AI-powered skill suggestions from user's bio.
+
+    Accepts optional {bio: "..."} in request body to use unsaved form text.
+    Falls back to the saved bio from the database.
+    """
     user = await get_user(db, token)
 
-    if not user.bio or len(user.bio.strip()) < 20:
+    # Use bio from request body (form field) if provided, else DB
+    body = await request.json() if request else {}
+    bio_text = (body.get("bio") or "").strip() if body else ""
+    if not bio_text:
+        bio_text = (user.bio or "").strip()
+
+    if len(bio_text) < 20:
         raise HTTPException(status_code=400, detail="Bio must be at least 20 characters for skill extraction")
 
     # Get existing skills to avoid duplicates
@@ -956,7 +966,7 @@ async def suggest_skills(
     existing_skills = [row[0] for row in existing_result.all()]
 
     from src.services.gemini import suggest_skills_from_bio
-    suggestions, provider = await suggest_skills_from_bio(user.bio, existing_skills)
+    suggestions, provider = await suggest_skills_from_bio(bio_text, existing_skills)
 
     if not suggestions:
         raise HTTPException(status_code=503, detail="AI service unavailable")

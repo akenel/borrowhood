@@ -1802,10 +1802,18 @@
                                 this.skillSuggesting = true;
                                 this.showSkillSuggestions = false;
                                 try {
+                                    // Get bio from the form field (parent scope) so unsaved edits work
+                                    var bioEl = document.querySelector('textarea[x-model="p.bio"]');
+                                    var bioText = bioEl ? bioEl.value : '';
+                                    if (bioText.trim().length < 20) {
+                                        window.dispatchEvent(new CustomEvent('toast', {detail: {type:'warning', message: 'Bio must be at least 20 characters'}}));
+                                        this.skillSuggesting = false;
+                                        return;
+                                    }
                                     const r = await fetch('/api/v1/users/me/skills/suggest', {
                                         method: 'POST',
                                         headers: {'Content-Type': 'application/json'},
-                                        body: JSON.stringify({source: 'bio'})
+                                        body: JSON.stringify({bio: bioText})
                                     });
                                     if (r.ok) {
                                         const data = await r.json();
