@@ -254,19 +254,34 @@
                         {% if member.offers_repair or member.offers_custom_orders or member.offers_training or member.offers_delivery or member.offers_pickup %}
                         <div class="mt-3 flex flex-wrap gap-1">
                             {% if member.offers_repair %}
-                            <span class="text-xs px-1.5 py-0.5 bg-emerald-50 text-emerald-700 rounded font-medium">{{ t('i18n.repair') }}</span>
+                            <span class="text-xs px-1.5 py-0.5 bg-emerald-50 text-emerald-700 rounded font-medium inline-flex items-center gap-0.5">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                {{ t('i18n.repair') }}
+                            </span>
                             {% endif %}
                             {% if member.offers_custom_orders %}
-                            <span class="text-xs px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded font-medium">{{ t('i18n.custom') }}</span>
+                            <span class="text-xs px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded font-medium inline-flex items-center gap-0.5">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
+                                {{ t('i18n.custom') }}
+                            </span>
                             {% endif %}
                             {% if member.offers_training %}
-                            <span class="text-xs px-1.5 py-0.5 bg-cyan-50 text-cyan-700 rounded font-medium">{{ t('i18n.training') }}</span>
+                            <span class="text-xs px-1.5 py-0.5 bg-cyan-50 text-cyan-700 rounded font-medium inline-flex items-center gap-0.5">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                {{ t('i18n.training') }}
+                            </span>
                             {% endif %}
                             {% if member.offers_delivery %}
-                            <span class="text-xs px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded font-medium">{{ t('i18n.delivery') }}</span>
+                            <span class="text-xs px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded font-medium inline-flex items-center gap-0.5">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10m10 0H3m10 0h2m4 0h2V9a3 3 0 00-3-3h-1l-2 4m0 0h-2m2 0v4m-7 0a2 2 0 11-4 0m14 0a2 2 0 11-4 0"/></svg>
+                                {{ t('i18n.delivery') }}
+                            </span>
                             {% endif %}
                             {% if member.offers_pickup %}
-                            <span class="text-xs px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded font-medium">{{ t('i18n.pickup') }}</span>
+                            <span class="text-xs px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded font-medium inline-flex items-center gap-0.5">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                {{ t('i18n.pickup') }}
+                            </span>
                             {% endif %}
                         </div>
                         {% endif %}
