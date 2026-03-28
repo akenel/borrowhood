@@ -378,7 +378,8 @@
                 }
 
                 // Auto-generate AI image if no photo -- items NEVER appear without a picture
-                if (!hasImage) {
+                // In edit mode, existing media counts as having an image
+                if (!hasImage && this.existingMedia.length === 0) {
                     try {
                         const aiResp = await fetch('/api/v1/ai/generate-image', {
                             method: 'POST',
