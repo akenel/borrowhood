@@ -250,7 +250,7 @@
                         {% for key, value in item.attributes.items() %}
                         {% if value is not none and value != '' %}
                         <div class="bg-gray-50 rounded-lg p-3">
-                            <span class="text-xs text-gray-500 uppercase tracking-wider">{{ t('attributes.' + key, key | replace('_', ' ') | title) }}</span>
+                            {% set attr_label = t('attributes.' + key) %}<span class="text-xs text-gray-500 uppercase tracking-wider">{% if attr_label.startswith('attributes.') %}{{ key | replace('_', ' ') | title }}{% else %}{{ attr_label }}{% endif %}</span>
                             {% if value is sameas true %}
                             <p class="text-sm font-medium text-green-600 mt-0.5">
                                 <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
