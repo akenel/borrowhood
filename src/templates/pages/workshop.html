@@ -383,6 +383,42 @@
             </div>
             {% endif %}
 
+            <!-- Mentorships -->
+            {% if mentorships %}
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-3">{% if lang == 'it' %}Mentorship{% else %}Mentorships{% endif %}</h2>
+                <div class="space-y-3">
+                    {% for m in mentorships %}
+                    <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        {% if m.mentor_id == workshop.id %}
+                        <!-- This user is the MENTOR -->
+                        <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900">{% if lang == 'it' %}Mentore di{% else %}Mentoring{% endif %} <a href="/workshop/{{ m.apprentice.slug }}" class="text-indigo-600 hover:underline">{{ m.apprentice.display_name }}</a></p>
+                            <p class="text-xs text-gray-500">{{ m.skill_name }} &middot; {{ m.hours_logged }}h logged{% if m.milestones_completed %} &middot; {{ m.milestones_completed }} milestones{% endif %}</p>
+                        </div>
+                        {% else %}
+                        <!-- This user is the APPRENTICE -->
+                        <div class="w-8 h-8 bg-cyan-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900">{% if lang == 'it' %}Apprendista di{% else %}Learning from{% endif %} <a href="/workshop/{{ m.mentor.slug }}" class="text-indigo-600 hover:underline">{{ m.mentor.display_name }}</a></p>
+                            <p class="text-xs text-gray-500">{{ m.skill_name }} &middot; {{ m.hours_logged }}h logged{% if m.milestones_completed %} &middot; {{ m.milestones_completed }} milestones{% endif %}</p>
+                        </div>
+                        {% endif %}
+                        <span class="text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0
+                            {% if m.status.value == 'active' %}bg-emerald-100 text-emerald-700{% else %}bg-gray-100 text-gray-500{% endif %}">
+                            {{ m.status.value | title }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Items -->
             <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="{ showAll: false }">
                 {% set active_items = workshop.items | rejectattr('deleted_at') | list %}

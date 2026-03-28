@@ -445,6 +445,18 @@ async def workshop_profile(slug: str, request: Request,
     )
     user_badges = badge_result.scalars().all()
 
+    # Fetch mentorships (as mentor or apprentice)
+    from src.models.mentorship import BHMentorship, MentorshipStatus
+    from sqlalchemy import or_
+    mentor_result = await db.execute(
+        select(BHMentorship)
+        .options(selectinload(BHMentorship.apprentice), selectinload(BHMentorship.mentor))
+        .where(or_(BHMentorship.mentor_id == workshop_owner.id, BHMentorship.apprentice_id == workshop_owner.id))
+        .where(BHMentorship.status.in_([MentorshipStatus.ACTIVE, MentorshipStatus.COMPLETED]))
+        .order_by(BHMentorship.created_at.desc())
+    )
+    mentorships = mentor_result.scalars().unique().all()
+
     # Resolve viewer's badge tier for progressive disclosure
     viewer_tier = "anonymous"
     if token:
@@ -458,6 +470,7 @@ async def workshop_profile(slug: str, request: Request,
     ctx = _ctx(request, token,
         workshop=workshop_owner,
         workshop_badges=user_badges,
+        mentorships=mentorships,
         badge_info=BADGE_INFO,
         viewer_tier=viewer_tier,
         og_title=f"{workshop_owner.workshop_name or workshop_owner.display_name} - La Piazza",
