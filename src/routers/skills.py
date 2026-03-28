@@ -126,6 +126,23 @@ async def unverify_skill(
     return {"status": "unverified", "verified_by_count": skill.verified_by_count if skill else 0}
 
 
+@router.get("/{skill_id}/verified")
+async def check_my_verification(
+    skill_id: UUID,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Check if the current user has verified this skill."""
+    user = await get_user(db, token)
+    result = await db.execute(
+        select(BHSkillVerification)
+        .where(BHSkillVerification.verifier_id == user.id)
+        .where(BHSkillVerification.skill_id == skill_id)
+    )
+    verification = result.scalars().first()
+    return {"verified": verification is not None}
+
+
 @router.get("/{skill_id}/verifications")
 async def list_verifications(
     skill_id: UUID,
