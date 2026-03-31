@@ -52,67 +52,64 @@
 
     <!-- Tabs -->
     <div x-data="{ tab: new URLSearchParams(window.location.search).get('tab') || 'items' }" class="space-y-6">
-        <div class="border-b border-gray-200">
-            <nav class="flex space-x-4 sm:space-x-6">
+        <!-- Mobile: dropdown select (all tabs visible, one tap) -->
+        {% set active_renter = renter_rentals|rejectattr('status.value', 'in', ['completed','cancelled','declined'])|list %}
+        {% set active_owner = owner_rentals|rejectattr('status.value', 'in', ['completed','cancelled','declined'])|list %}
+        {% set history_count = (renter_rentals|selectattr('status.value', 'in', ['completed','cancelled','declined'])|list|length) + (owner_rentals|selectattr('status.value', 'in', ['completed','cancelled','declined'])|list|length) %}
+        <div class="sm:hidden">
+            <select @change="tab = $event.target.value" x-model="tab"
+                    class="w-full px-4 py-3 text-base font-medium text-gray-900 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 min-h-[48px]">
+                <option value="items">{{ t('dashboard.my_items') }}{% if items %} ({{ item_total }}){% endif %}</option>
+                <option value="renting">{{ t('dashboard.my_rentals') }}{% if active_renter %} ({{ active_renter|length }}){% endif %}</option>
+                <option value="requests">{{ t('dashboard.incoming_requests') }}{% if active_owner %} ({{ active_owner|length }}){% endif %}</option>
+                <option value="history">{{ t('dashboard.history') }}{% if history_count %} ({{ history_count }}){% endif %}</option>
+                <option value="favorites">{{ t('dashboard.favorites') }}</option>
+                <option value="disputes">{{ t('i18n.disputes') }}</option>
+                <option value="settings">{{ t('nav.settings') }}</option>
+            </select>
+        </div>
+        <!-- Desktop: horizontal tabs (plenty of room) -->
+        <div class="hidden sm:block border-b border-gray-200">
+            <nav class="flex space-x-6">
                 <button @click="tab = 'items'"
                         :class="tab === 'items' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
-                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px] flex-shrink-0">
+                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
                     {{ t('dashboard.my_items') }}
-                    {% if items %}<span class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold rounded-full bg-indigo-100 text-indigo-600">{{ item_total }}</span>{% endif %}
+                    {% if items %}<span class="ml-1.5 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full bg-indigo-100 text-indigo-600">{{ item_total }}</span>{% endif %}
                 </button>
                 <button @click="tab = 'renting'"
                         :class="tab === 'renting' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
-                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px] flex-shrink-0">
+                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
                     {{ t('dashboard.my_rentals') }}
-                    {% set active_renter = renter_rentals|rejectattr('status.value', 'in', ['completed','cancelled','declined'])|list %}
-                    {% if active_renter %}<span class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold rounded-full bg-indigo-100 text-indigo-600">{{ active_renter|length }}</span>{% endif %}
+                    {% if active_renter %}<span class="ml-1.5 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full bg-indigo-100 text-indigo-600">{{ active_renter|length }}</span>{% endif %}
                 </button>
                 <button @click="tab = 'requests'"
                         :class="tab === 'requests' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
-                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px] flex-shrink-0">
+                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
                     {{ t('dashboard.incoming_requests') }}
-                    {% set active_owner = owner_rentals|rejectattr('status.value', 'in', ['completed','cancelled','declined'])|list %}
-                    {% if active_owner %}<span class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold rounded-full bg-indigo-100 text-indigo-600">{{ active_owner|length }}</span>{% endif %}
+                    {% if active_owner %}<span class="ml-1.5 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full bg-indigo-100 text-indigo-600">{{ active_owner|length }}</span>{% endif %}
                 </button>
                 <button @click="tab = 'history'"
                         :class="tab === 'history' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
-                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px] flex-shrink-0">
+                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
                     {{ t('dashboard.history') }}
-                    {% set history_count = (renter_rentals|selectattr('status.value', 'in', ['completed','cancelled','declined'])|list|length) + (owner_rentals|selectattr('status.value', 'in', ['completed','cancelled','declined'])|list|length) %}
-                    {% if history_count %}<span class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold rounded-full bg-gray-100 text-gray-600">{{ history_count }}</span>{% endif %}
+                    {% if history_count %}<span class="ml-1.5 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full bg-gray-100 text-gray-600">{{ history_count }}</span>{% endif %}
                 </button>
                 <button @click="tab = 'favorites'"
                         :class="tab === 'favorites' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
-                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px] flex-shrink-0">
+                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
                     {{ t('dashboard.favorites') }}
                 </button>
-                <!-- More menu for Disputes + Settings (visible on all screens, keeps tab bar clean) -->
-                <div class="relative flex-shrink-0" x-data="{ moreOpen: false }">
-                    <button @click="moreOpen = !moreOpen"
-                            :class="(tab === 'disputes' || tab === 'settings') ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
-                            class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px] inline-flex items-center gap-1">
-                        <span x-show="tab === 'disputes'">{{ t('i18n.disputes') }}</span>
-                        <span x-show="tab === 'settings'">{{ t('nav.settings') }}</span>
-                        <span x-show="tab !== 'disputes' && tab !== 'settings'">{{ t('i18n.more') }}</span>
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div x-show="moreOpen" @click.away="moreOpen = false" x-cloak
-                         class="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1 min-w-[160px]">
-                        <button @click="tab = 'disputes'; moreOpen = false"
-                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
-                                :class="tab === 'disputes' ? 'text-red-600 font-medium' : 'text-gray-700'">
-                            {{ t('i18n.disputes') }}
-                        </button>
-                        <button @click="tab = 'settings'; moreOpen = false"
-                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
-                                :class="tab === 'settings' ? 'text-indigo-600 font-medium' : 'text-gray-700'">
-                            <span class="inline-flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                {{ t('nav.settings') }}
-                            </span>
-                        </button>
-                    </div>
-                </div>
+                <button @click="tab = 'disputes'"
+                        :class="tab === 'disputes' ? 'border-red-600 text-red-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
+                    {{ t('i18n.disputes') }}
+                </button>
+                <button @click="tab = 'settings'"
+                        :class="tab === 'settings' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                        class="pb-3 border-b-2 text-sm font-medium transition-colors min-h-[44px]">
+                    {{ t('nav.settings') }}
+                </button>
             </nav>
         </div>
 
