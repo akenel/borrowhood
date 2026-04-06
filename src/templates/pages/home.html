@@ -55,6 +55,130 @@
     </div>
 </section>
 
+<!-- Quick Start Strip -- the goldfish funnel -->
+<section class="bg-gradient-to-r from-indigo-50 via-white to-emerald-50 py-6 border-b border-gray-200">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if not user %}
+        <!-- NOT LOGGED IN: show the journey -->
+        <div class="text-center mb-3">
+            <p class="text-sm font-semibold text-gray-700 uppercase tracking-wider">{% if lang == 'it' %}Inizia in 60 secondi{% else %}Get started in 60 seconds{% endif %}</p>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <a href="/auth/login" class="flex items-center gap-3 p-3 bg-white rounded-lg border-2 border-indigo-300 hover:border-indigo-500 hover:shadow-md transition-all group">
+                <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-200">
+                    <span class="text-lg font-bold text-indigo-600">1</span>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-900">{% if lang == 'it' %}Accedi{% else %}Sign In{% endif %}</p>
+                    <p class="text-xs text-gray-500">Google, GitHub, Email</p>
+                </div>
+            </a>
+            <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 opacity-60">
+                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="text-lg font-bold text-gray-400">2</span>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">{% if lang == 'it' %}Profilo{% else %}Set Up Profile{% endif %}</p>
+                    <p class="text-xs text-gray-400">{% if lang == 'it' %}Bio, foto, competenze{% else %}Bio, photo, skills{% endif %}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 opacity-60">
+                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="text-lg font-bold text-gray-400">3</span>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">{% if lang == 'it' %}Pubblica{% else %}List Something{% endif %}</p>
+                    <p class="text-xs text-gray-400">{% if lang == 'it' %}Vendi, affitta, regala{% else %}Sell, rent, give away{% endif %}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 opacity-60">
+                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="text-lg font-bold text-gray-400">4</span>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-500">{% if lang == 'it' %}Connetti{% else %}Connect{% endif %}</p>
+                    <p class="text-xs text-gray-400">{% if lang == 'it' %}Chatta, recensisci{% else %}Chat, review, trade{% endif %}</p>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- LOGGED IN: show their NEXT action -->
+        <div class="flex flex-col sm:flex-row items-center gap-4">
+            <div class="flex-1">
+                <p class="text-sm text-gray-500">{% if lang == 'it' %}Bentornato{% else %}Welcome back{% endif %}, <strong class="text-gray-900">{{ home_user.display_name if home_user else 'friend' }}</strong></p>
+
+                {% if home_user and not home_user.bio %}
+                <!-- Next: complete profile -->
+                <p class="text-lg font-semibold text-indigo-700 mt-1">{% if lang == 'it' %}Completa il tuo profilo -- aggiungi bio e competenze{% else %}Complete your profile -- add your bio and skills{% endif %}</p>
+                <a href="/dashboard?tab=settings" class="mt-2 inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    {% if lang == 'it' %}Completa Profilo{% else %}Complete Profile{% endif %}
+                </a>
+
+                {% elif user_item_count == 0 %}
+                <!-- Next: list first item -->
+                <p class="text-lg font-semibold text-emerald-700 mt-1">{% if lang == 'it' %}Pubblica il tuo primo annuncio -- servizio, oggetto, o regalo{% else %}List your first item -- service, tool, or giveaway{% endif %}</p>
+                <a href="/list" class="mt-2 inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    {% if lang == 'it' %}Pubblica Qualcosa{% else %}List Something{% endif %}
+                </a>
+
+                {% elif user_skill_count == 0 %}
+                <!-- Next: add skills -->
+                <p class="text-lg font-semibold text-purple-700 mt-1">{% if lang == 'it' %}Aggiungi le tue competenze -- l'AI puo suggerirle dal tuo bio{% else %}Add your skills -- AI can suggest them from your bio{% endif %}</p>
+                <a href="/dashboard?tab=settings" class="mt-2 inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    {% if lang == 'it' %}Aggiungi Competenze{% else %}Add Skills{% endif %}
+                </a>
+
+                {% else %}
+                <!-- All set: show quick actions -->
+                <p class="text-lg font-semibold text-gray-700 mt-1">{% if lang == 'it' %}Cosa vuoi fare oggi?{% else %}What do you want to do today?{% endif %}</p>
+                <div class="mt-2 flex flex-wrap gap-2">
+                    <a href="/browse" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white text-gray-700 font-medium rounded-lg border border-gray-200 hover:bg-indigo-50 hover:border-indigo-300 hover:text-indigo-700 transition-all text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        {% if lang == 'it' %}Esplora{% else %}Browse{% endif %}
+                    </a>
+                    <a href="/list" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white text-gray-700 font-medium rounded-lg border border-gray-200 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 transition-all text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        {% if lang == 'it' %}Pubblica{% else %}List{% endif %}
+                    </a>
+                    <a href="/helpboard" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white text-gray-700 font-medium rounded-lg border border-gray-200 hover:bg-amber-50 hover:border-amber-300 hover:text-amber-700 transition-all text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        {% if lang == 'it' %}Aiuto{% else %}Help Board{% endif %}
+                    </a>
+                    <a href="/messages" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white text-gray-700 font-medium rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        {% if lang == 'it' %}Messaggi{% else %}Messages{% endif %}
+                    </a>
+                    <a href="/dashboard" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white text-gray-700 font-medium rounded-lg border border-gray-200 hover:bg-gray-50 hover:border-gray-400 transition-all text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                        {% if lang == 'it' %}Dashboard{% else %}Dashboard{% endif %}
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Progress indicator -->
+            {% if home_user %}
+            <div class="flex-shrink-0 text-center">
+                {% set steps_done = 1 %}
+                {% if home_user.bio %}{% set steps_done = steps_done + 1 %}{% endif %}
+                {% if user_item_count > 0 %}{% set steps_done = steps_done + 1 %}{% endif %}
+                {% if user_skill_count > 0 %}{% set steps_done = steps_done + 1 %}{% endif %}
+                <div class="w-16 h-16 rounded-full border-4 flex items-center justify-center mx-auto
+                    {% if steps_done >= 4 %}border-emerald-400 text-emerald-600{% elif steps_done >= 3 %}border-blue-400 text-blue-600{% elif steps_done >= 2 %}border-amber-400 text-amber-600{% else %}border-gray-300 text-gray-400{% endif %}">
+                    <span class="text-xl font-bold">{{ steps_done }}/4</span>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">{% if steps_done >= 4 %}{% if lang == 'it' %}Completo{% else %}All set{% endif %}{% else %}{% if lang == 'it' %}Profilo{% else %}Profile{% endif %}{% endif %}</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
 <!-- How It Works -->
 <section class="py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -90,6 +214,63 @@
                 <p class="mt-2 text-base text-gray-500">{{ t('home.step_3_desc') }}</p>
                 <a href="/members" class="mt-3 inline-block text-sm font-medium text-amber-600 hover:text-amber-800 transition-colors">{{ t('home.step_3_cta') }} &rarr;</a>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- LTFM: Learn. Teach. Fix. Make. -->
+<section class="bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900">{{ t('ltfm_title') }}</h2>
+            <p class="mt-3 text-lg text-gray-600">{{ t('ltfm_subtitle') }}</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Learn / Impara -->
+            <a href="/members?service=training" class="group bg-white rounded-xl border border-amber-200 p-6 hover:shadow-lg hover:border-amber-400 transition-all">
+                <div class="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-amber-200 transition-colors">
+                    <svg class="w-7 h-7 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">{{ t('ltfm_learn') }}</h3>
+                <p class="text-xs font-medium text-amber-600 italic mb-2">{{ t('ltfm_learn_it') }}</p>
+                <p class="text-sm text-gray-600 leading-relaxed">{{ t('ltfm_learn_desc') }}</p>
+            </a>
+            <!-- Teach / Insegna -->
+            <a href="/list" class="group bg-white rounded-xl border border-orange-200 p-6 hover:shadow-lg hover:border-orange-400 transition-all">
+                <div class="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-orange-200 transition-colors">
+                    <svg class="w-7 h-7 text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">{{ t('ltfm_teach') }}</h3>
+                <p class="text-xs font-medium text-orange-600 italic mb-2">{{ t('ltfm_teach_it') }}</p>
+                <p class="text-sm text-gray-600 leading-relaxed">{{ t('ltfm_teach_desc') }}</p>
+            </a>
+            <!-- Fix / Ripara -->
+            <a href="/members?service=repair" class="group bg-white rounded-xl border border-emerald-200 p-6 hover:shadow-lg hover:border-emerald-400 transition-all">
+                <div class="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-200 transition-colors">
+                    <svg class="w-7 h-7 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">{{ t('ltfm_fix') }}</h3>
+                <p class="text-xs font-medium text-emerald-600 italic mb-2">{{ t('ltfm_fix_it') }}</p>
+                <p class="text-sm text-gray-600 leading-relaxed">{{ t('ltfm_fix_desc') }}</p>
+            </a>
+            <!-- Make / Crea -->
+            <a href="/members?service=custom_orders" class="group bg-white rounded-xl border border-red-200 p-6 hover:shadow-lg hover:border-red-400 transition-all">
+                <div class="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-red-200 transition-colors">
+                    <svg class="w-7 h-7 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">{{ t('ltfm_make') }}</h3>
+                <p class="text-xs font-medium text-red-600 italic mb-2">{{ t('ltfm_make_it') }}</p>
+                <p class="text-sm text-gray-600 leading-relaxed">{{ t('ltfm_make_desc') }}</p>
+            </a>
         </div>
     </div>
 </section>
@@ -210,6 +391,63 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                 </svg>
             </a>
+        </div>
+    </div>
+</section>
+
+<!-- Open Your Bottega -->
+<section class="bg-gradient-to-br from-stone-800 via-stone-900 to-stone-950 py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-amber-100">{{ t('bottega_title') }}</h2>
+            <p class="mt-3 text-lg text-stone-300 max-w-2xl mx-auto">{{ t('bottega_subtitle') }}</p>
+        </div>
+        <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="mx-auto w-12 h-12 bg-amber-900/50 rounded-full flex items-center justify-center mb-3 border border-amber-700/50">
+                    <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <p class="text-sm font-medium text-amber-200">{{ t('bottega_step_1') }}</p>
+            </div>
+            <div class="text-center">
+                <div class="mx-auto w-12 h-12 bg-amber-900/50 rounded-full flex items-center justify-center mb-3 border border-amber-700/50">
+                    <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                </div>
+                <p class="text-sm font-medium text-amber-200">{{ t('bottega_step_2') }}</p>
+            </div>
+            <div class="text-center">
+                <div class="mx-auto w-12 h-12 bg-amber-900/50 rounded-full flex items-center justify-center mb-3 border border-amber-700/50">
+                    <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
+                </div>
+                <p class="text-sm font-medium text-amber-200">{{ t('bottega_step_3') }}</p>
+            </div>
+        </div>
+        <div class="mt-10 text-center">
+            {% if user %}
+            <a href="/profile"
+               class="inline-flex items-center px-8 py-4 bg-amber-600 text-white text-lg font-bold rounded-xl hover:bg-amber-500 transition-colors shadow-lg shadow-amber-900/30 min-h-[52px]">
+                {{ t('bottega_cta_logged_in') }}
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                </svg>
+            </a>
+            {% else %}
+            <a href="/login"
+               class="inline-flex items-center px-8 py-4 bg-amber-600 text-white text-lg font-bold rounded-xl hover:bg-amber-500 transition-colors shadow-lg shadow-amber-900/30 min-h-[52px]">
+                {{ t('bottega_cta') }}
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                </svg>
+            </a>
+            {% endif %}
+            <p class="mt-3 text-amber-400 text-sm font-medium italic">{{ t('andiamo') }}</p>
         </div>
     </div>
 </section>

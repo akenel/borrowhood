@@ -154,12 +154,36 @@ async def home(request: Request,
     )
     featured_items = result.scalars().unique().all()
 
+    # For logged-in users: compute "next step" for the quick-start strip
+    home_user = None
+    user_item_count = 0
+    user_skill_count = 0
+    if token:
+        try:
+            home_user = await get_user(db, token)
+            user_item_count = await db.scalar(
+                select(func.count(BHItem.id))
+                .where(BHItem.owner_id == home_user.id)
+                .where(BHItem.deleted_at.is_(None))
+            ) or 0
+            from src.models.user import BHUserSkill
+            user_skill_count = await db.scalar(
+                select(func.count(BHUserSkill.id))
+                .where(BHUserSkill.user_id == home_user.id)
+                .where(BHUserSkill.deleted_at.is_(None))
+            ) or 0
+        except Exception:
+            home_user = None
+
     ctx = _ctx(request, token,
         listing_count=listing_count or 0,
         user_count=user_count or 0,
         category_count=category_count or 0,
         review_count=review_count or 0,
         featured_items=featured_items,
+        home_user=home_user,
+        user_item_count=user_item_count,
+        user_skill_count=user_skill_count,
     )
     return _render("pages/home.html", ctx)
 
