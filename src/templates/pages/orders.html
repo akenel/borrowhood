@@ -3,7 +3,7 @@
 {% block title %}{{ t('i18n.order_history') }} - {{ t('app.name') }}{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
@@ -14,29 +14,26 @@
             </p>
         </div>
         {% if earnings_total > 0 %}
-        <div class="mt-3 sm:mt-0 text-right">
-            <p class="text-sm text-gray-500">{{ t('i18n.lifetime_earnings') }}</p>
-            <p class="text-2xl font-bold text-emerald-600">EUR {{ "%.2f"|format(earnings_total) }}</p>
+        <div class="mt-3 sm:mt-0 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-2 text-right">
+            <p class="text-xs text-emerald-600 font-medium">{{ t('i18n.lifetime_earnings') }}</p>
+            <p class="text-xl font-bold text-emerald-700">EUR {{ "%.2f"|format(earnings_total) }}</p>
         </div>
         {% endif %}
     </div>
 
     <!-- Filters -->
-    <form method="GET" action="/orders" class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
-        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <!-- Role -->
+    <form method="GET" action="/orders" class="bg-white rounded-xl border border-gray-200 p-4 mb-6 shadow-sm">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.role') }}</label>
+                <label class="block text-xs font-medium text-gray-500 mb-1">{{ t('i18n.role') }}</label>
                 <select name="role" class="w-full border border-gray-300 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]">
                     <option value="">{{ t('i18n.all') }}</option>
                     <option value="buyer" {% if selected_role == 'buyer' %}selected{% endif %}>{{ t('i18n.as_buyer') }}</option>
                     <option value="seller" {% if selected_role == 'seller' %}selected{% endif %}>{{ t('i18n.as_seller') }}</option>
                 </select>
             </div>
-
-            <!-- Status -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.status') }}</label>
+                <label class="block text-xs font-medium text-gray-500 mb-1">{{ t('i18n.status') }}</label>
                 <select name="status" class="w-full border border-gray-300 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]">
                     <option value="">{{ t('i18n.all') }}</option>
                     <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending</option>
@@ -47,23 +44,19 @@
                     <option value="cancelled" {% if selected_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
                 </select>
             </div>
-
-            <!-- Sort -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.sort') }}</label>
+                <label class="block text-xs font-medium text-gray-500 mb-1">{{ t('i18n.sort') }}</label>
                 <select name="sort" class="w-full border border-gray-300 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]">
                     <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>{{ t('i18n.newest_first') }}</option>
                     <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>{{ t('i18n.oldest_first') }}</option>
                 </select>
             </div>
-
-            <!-- Actions -->
             <div class="flex items-end gap-2">
-                <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[40px]">
+                <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[40px] text-sm">
                     {{ t('browse.apply') }}
                 </button>
-                <a href="/orders" class="flex-1 px-4 py-2 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 text-center min-h-[40px] flex items-center justify-center">
-                    {{ t('browse.clear') }}
+                <a href="/orders" class="px-3 py-2 text-gray-500 hover:text-gray-700 min-h-[40px] flex items-center" title="{{ t('browse.clear') }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </a>
             </div>
         </div>
@@ -74,29 +67,32 @@
     <div class="space-y-4">
         {% for order in orders %}
         {% set item = order.listing.item if order.listing else None %}
-        <div class="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-sm transition-shadow">
-            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-                <!-- Item image -->
-                {% if item and item.media %}
-                <a href="/items/{{ item.slug }}" class="flex-shrink-0">
-                    <img src="{{ item.media[0].url }}" alt="{{ item.name }}" class="w-16 h-16 rounded-lg object-cover">
-                </a>
-                {% else %}
-                <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                    </svg>
-                </div>
-                {% endif %}
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:border-gray-300 transition-colors">
 
-                <!-- Details -->
+            <!-- Card top: image + info row -->
+            <div class="flex gap-4 p-4">
+                <!-- Thumbnail -->
+                <a href="{{ '/items/' + item.slug if item else '#' }}" class="flex-shrink-0">
+                    {% if item and item.media %}
+                    <img src="{{ item.media[0].url }}" alt="{{ item.name }}"
+                         class="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-cover">
+                    {% else %}
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-lg bg-gray-100 flex items-center justify-center">
+                        <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                    </div>
+                    {% endif %}
+                </a>
+
+                <!-- Info -->
                 <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2">
-                        <h3 class="font-semibold text-gray-900 truncate">
-                            {% if item %}<a href="/items/{{ item.slug }}" class="hover:text-indigo-600">{{ item.name }}</a>{% else %}Unknown item{% endif %}
+                    <!-- Title + badge -->
+                    <div class="flex items-start gap-2 mb-1">
+                        <h3 class="font-semibold text-gray-900 text-base leading-tight line-clamp-2">
+                            {% if item %}<a href="/items/{{ item.slug }}" class="hover:text-indigo-600 transition-colors">{{ item.name }}</a>{% else %}Unknown item{% endif %}
                         </h3>
-                        <!-- Status badge -->
-                        <span class="flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium
+                        <span class="flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap mt-0.5
                             {% if order.status.value == 'completed' %}bg-emerald-100 text-emerald-700
                             {% elif order.status.value == 'payment_confirmed' %}bg-emerald-100 text-emerald-700
                             {% elif order.status.value == 'buyer_paid' %}bg-blue-100 text-blue-700
@@ -112,201 +108,241 @@
                             {% else %}{{ order.status.value | replace('_', ' ') | title }}{% endif %}
                         </span>
                     </div>
-                    <div class="flex items-center gap-3 mt-1 text-sm text-gray-500">
+
+                    <!-- Meta line -->
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
                         {% if order.listing %}
-                        <span>{{ order.listing.listing_type.value | title }}</span>
-                        <span>EUR {{ "%.2f"|format(order.listing.price) }}</span>
+                        <span class="inline-flex items-center gap-1">
+                            {% if order.listing.listing_type.value == 'sell' %}
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
+                            {% elif order.listing.listing_type.value == 'rent' %}
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                            {% else %}
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            {% endif %}
+                            {{ order.listing.listing_type.value | title }}
+                        </span>
+                        <span class="font-semibold text-gray-700">EUR {{ "%.2f"|format(order.listing.price) }}</span>
                         {% endif %}
                         {% if item and item.owner %}
-                        <span>{% if viewer_user_id and item.owner.id == viewer_user_id %}{{ t('i18n.you_sold') }}{% else %}From <a href="/workshop/{{ item.owner.slug }}" class="text-indigo-600 hover:underline">{{ item.owner.display_name }}</a>{% endif %}</span>
+                        <span>{% if viewer_user_id and item.owner.id == viewer_user_id %}{{ t('i18n.you_sold') }}{% else %}{{ t('i18n.from') }} <a href="/workshop/{{ item.owner.slug }}" class="text-indigo-600 hover:underline">{{ item.owner.display_name }}</a>{% endif %}</span>
                         {% endif %}
                     </div>
-                    {% if order.renter_message %}
-                    <p class="text-xs text-gray-400 mt-1 truncate">{{ order.renter_message }}</p>
-                    {% endif %}
-                </div>
 
-                <!-- Lockbox codes (inline, auto-fetched) -->
-                {% if order.status.value in ('approved', 'picked_up', 'committed', 'buyer_paid', 'payment_confirmed') %}
-                <div class="flex-shrink-0" x-data="{ codes: null, loaded: false }"
-                     x-init="fetch('/api/v1/lockbox/{{ order.id }}').then(r => r.ok ? r.json() : null).then(d => { codes = d; loaded = true; }).catch(() => { loaded = true; })">
-                    <template x-if="loaded && codes">
-                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center min-w-[140px]">
-                            <p class="text-xs text-amber-600 font-medium mb-1">
-                                <svg class="w-3.5 h-3.5 inline -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                {% if lang == 'it' %}Codici Lockbox{% else %}Lockbox Codes{% endif %}
-                            </p>
-                            <div class="space-y-1">
-                                <div>
-                                    <span class="text-xs text-gray-500">{% if lang == 'it' %}Ritiro{% else %}Pickup{% endif %}:</span>
-                                    <span class="font-mono font-bold text-sm text-amber-800" x-text="codes.pickup_code"></span>
-                                </div>
-                                <div>
-                                    <span class="text-xs text-gray-500">{% if lang == 'it' %}Reso{% else %}Return{% endif %}:</span>
-                                    <span class="font-mono font-bold text-sm text-amber-800" x-text="codes.return_code"></span>
-                                </div>
-                            </div>
-                            <template x-if="codes.location_hint">
-                                <p class="text-xs text-amber-600 mt-1" x-text="codes.location_hint"></p>
-                            </template>
-                        </div>
-                    </template>
-                </div>
-                {% endif %}
-
-                <!-- Date + actions -->
-                <div class="flex-shrink-0 text-right space-y-1">
-                    <p class="text-sm text-gray-500">{{ order.created_at.strftime('%b %d, %Y') }}</p>
-                    {% if order.requested_start %}
-                    <p class="text-xs text-gray-400">{{ order.requested_start.strftime('%b %d') }} - {{ order.requested_end.strftime('%b %d') if order.requested_end else '...' }}</p>
-                    {% endif %}
-                    <div class="flex items-center justify-end gap-2 mt-1">
-                        <!-- Message about this order -->
-                        {% if item and item.owner %}
-                        {% set other_id = item.owner.id if (viewer_user_id and item.owner.id != viewer_user_id) else order.renter_id %}
-                        <a href="/messages?rental={{ order.id }}&to={{ other_id }}" class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-indigo-600 transition-colors" title="{{ t('i18n.message') }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                            </svg>
-                            <span>{{ t('i18n.message') }}</span>
-                        </a>
+                    <!-- Date + period -->
+                    <div class="flex flex-wrap items-center gap-x-3 text-xs text-gray-400 mt-1">
+                        <span>{{ order.created_at.strftime('%b %d, %Y') }}</span>
+                        {% if order.requested_start %}
+                        <span>{{ order.requested_start.strftime('%b %d') }} - {{ order.requested_end.strftime('%b %d') if order.requested_end else '...' }}</span>
                         {% endif %}
-                        {% if order.status.value == 'completed' and item %}
-                        {% if order.id in reviewed_rental_ids %}
-                        <a href="/items/{{ item.slug }}#reviews" class="inline-flex items-center gap-1 text-xs text-emerald-600 hover:underline">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            {{ t('i18n.edit_review') }}
-                        </a>
-                        {% else %}
-                        <a href="/items/{{ item.slug }}#reviews" class="inline-flex items-center text-xs text-indigo-600 hover:underline">
-                            {{ t('i18n.leave_review') }}
-                        </a>
-                        {% endif %}
-                        {% endif %}
-                        {% if order.status.value in ('approved', 'picked_up', 'returned') %}
-                        <button onclick="openDisputeModal('{{ order.id }}', '{{ item.name if item else 'Unknown' }}')"
-                                class="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-700 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
-                            </svg>
-                            <span>{{ t('i18n.report_issue') }}</span>
-                        </button>
-                        {% endif %}
-                        {% if order.status.value == 'disputed' %}
-                        <span class="inline-flex items-center gap-1 text-xs text-amber-600">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            {{ t('i18n.dispute_in_progress') }}
-                        </span>
-                        {% endif %}
-
-                        <!-- Commitment flow: "I Paid" button (buyer only, committed status) -->
-                        {% if order.status.value == 'committed' and viewer_user_id == order.renter_id %}
-                        <div x-data="{ showPay: false, payMethod: 'iban', payNote: '', proofFile: null, paying: false }">
-                            <button @click="showPay = true" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg min-h-[36px]">
-                                I Paid
-                            </button>
-                            <div x-show="showPay" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="showPay = false">
-                                <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6" @click.stop>
-                                    <h3 class="text-lg font-bold text-gray-900 mb-3">Mark as Paid</h3>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">How did you pay?</label>
-                                    <select x-model="payMethod" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-3">
-                                        <option value="cash">Cash</option>
-                                        <option value="iban">IBAN / Bank Transfer</option>
-                                        <option value="swift">SWIFT</option>
-                                        <option value="paypal">PayPal</option>
-                                        <option value="revolut">Revolut</option>
-                                        <option value="wise">Wise</option>
-                                        <option value="card">Credit / Debit Card</option>
-                                        <option value="satispay">Satispay</option>
-                                        <option value="venmo">Venmo</option>
-                                        <option value="zelle">Zelle</option>
-                                        <option value="cashapp">Cash App</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Note (optional)</label>
-                                    <input x-model="payNote" type="text" maxlength="500" placeholder="e.g. Transaction reference..."
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-3">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Payment proof (optional)</label>
-                                    <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf"
-                                           @change="proofFile = $event.target.files[0]"
-                                           class="w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 mb-1">
-                                    <p class="text-xs text-gray-400 mb-4">Screenshot or receipt (JPEG, PNG, PDF, max 10 MB)</p>
-                                    <div class="flex gap-3">
-                                        <button @click="showPay = false" class="flex-1 px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">Cancel</button>
-                                        <button @click="
-                                            paying = true;
-                                            fetch('/api/v1/rentals/{{ order.id }}/i-paid', {
-                                                method: 'POST',
-                                                headers: { 'Content-Type': 'application/json' },
-                                                body: JSON.stringify({ payment_method: payMethod, note: payNote })
-                                            }).then(async r => {
-                                                if (!r.ok) { var e = await r.json(); throw new Error(e.detail || 'Failed'); }
-                                                // Upload proof if attached
-                                                if (proofFile) {
-                                                    var fd = new FormData();
-                                                    fd.append('file', proofFile);
-                                                    await fetch('/api/v1/rentals/{{ order.id }}/payment-proof', { method: 'POST', body: fd });
-                                                }
-                                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Payment marked! Seller notified.' } }));
-                                                setTimeout(() => location.reload(), 1500);
-                                            }).catch(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } })); })
-                                            .finally(() => { paying = false; });
-                                        " :disabled="paying" class="flex-1 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 min-h-[44px]">
-                                            <span x-text="paying ? 'Sending...' : 'Confirm I Paid'"></span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        <!-- Commitment flow: "Confirm Payment" button (seller only, buyer_paid status) -->
-                        {% if order.status.value == 'buyer_paid' and item and viewer_user_id == item.owner_id %}
-                        <button onclick="
-                            if (!confirm('Confirm you received payment for {{ item.name }}?')) return;
-                            fetch('/api/v1/rentals/{{ order.id }}/confirm-payment', { method: 'POST' })
-                                .then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Payment confirmed!' } })); setTimeout(() => location.reload(), 1500); }
-                                else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); });
-                        " class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg min-h-[36px]">
-                            Confirm Payment
-                        </button>
-                        {% endif %}
-
-                        <!-- Commitment flow: "Mark Complete" button (either party, payment_confirmed status) -->
-                        {% if order.status.value == 'payment_confirmed' %}
-                        <button onclick="
-                            fetch('/api/v1/rentals/{{ order.id }}/complete', { method: 'POST' })
-                                .then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Order completed!' } })); setTimeout(() => location.reload(), 1500); }
-                                else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); });
-                        " class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg min-h-[36px]">
-                            Mark Complete
-                        </button>
-                        {% endif %}
-
-                        <!-- Commitment timer countdown -->
-                        {% if order.status.value == 'committed' and order.commitment_expires_at %}
-                        <span class="text-xs text-amber-600">
-                            Expires: {{ order.commitment_expires_at.strftime('%b %d, %H:%M UTC') }}
-                        </span>
-                        {% endif %}
-
-                        <!-- Payment method tag -->
                         {% if order.payment_method_used %}
-                        <span class="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full">
-                            Paid via {{ order.payment_method_used | replace('_', ' ') | title }}
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                            {{ order.payment_method_used | replace('_', ' ') | title }}
                         </span>
                         {% endif %}
                         {% if order.payment_proof_url %}
-                        <a href="{{ order.payment_proof_url }}" target="_blank" class="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-full hover:bg-emerald-100 transition-colors">
-                            View Receipt
+                        <a href="{{ order.payment_proof_url }}" target="_blank" class="inline-flex items-center gap-1 text-emerald-600 hover:underline">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Receipt
                         </a>
                         {% endif %}
                     </div>
+
+                    <!-- Buyer message preview -->
+                    {% if order.renter_message %}
+                    <p class="text-xs text-gray-400 mt-1.5 italic truncate">"{{ order.renter_message }}"</p>
+                    {% endif %}
                 </div>
+            </div>
+
+            <!-- Lockbox codes (if active order) -->
+            {% if order.status.value in ('approved', 'picked_up', 'committed', 'buyer_paid', 'payment_confirmed') %}
+            <div class="px-4 pb-3" x-data="{ codes: null, loaded: false }"
+                 x-init="fetch('/api/v1/lockbox/{{ order.id }}').then(r => r.ok ? r.json() : null).then(d => { codes = d; loaded = true; }).catch(() => { loaded = true; })">
+                <template x-if="loaded && codes">
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 flex flex-wrap items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            <span class="text-xs font-medium text-amber-700">{% if lang == 'it' %}Codici Lockbox{% else %}Lockbox Codes{% endif %}</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <span class="text-xs text-gray-500">{% if lang == 'it' %}Ritiro{% else %}Pickup{% endif %}:</span>
+                                <span class="font-mono font-bold text-sm text-amber-800 ml-1" x-text="codes.pickup_code"></span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-gray-500">{% if lang == 'it' %}Reso{% else %}Return{% endif %}:</span>
+                                <span class="font-mono font-bold text-sm text-amber-800 ml-1" x-text="codes.return_code"></span>
+                            </div>
+                        </div>
+                        <template x-if="codes.location_hint">
+                            <span class="text-xs text-amber-600" x-text="codes.location_hint"></span>
+                        </template>
+                    </div>
+                </template>
+            </div>
+            {% endif %}
+
+            <!-- Commitment timer -->
+            {% if order.status.value == 'committed' and order.commitment_expires_at %}
+            <div class="px-4 pb-3">
+                <div class="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="text-xs text-amber-700">Payment deadline: <strong>{{ order.commitment_expires_at.strftime('%b %d, %H:%M UTC') }}</strong></span>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Action bar -->
+            <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex flex-wrap items-center gap-2">
+                <!-- Message -->
+                {% if item and item.owner %}
+                {% set other_id = item.owner.id if (viewer_user_id and item.owner.id != viewer_user_id) else order.renter_id %}
+                <a href="/messages?rental={{ order.id }}&to={{ other_id }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors min-h-[36px]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    {{ t('i18n.message') }}
+                </a>
+                {% endif %}
+
+                <!-- Review -->
+                {% if order.status.value == 'completed' and item %}
+                    {% if order.id in reviewed_rental_ids %}
+                    <a href="/items/{{ item.slug }}#reviews" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors min-h-[36px]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        {{ t('i18n.edit_review') }}
+                    </a>
+                    {% else %}
+                    <a href="/items/{{ item.slug }}#reviews" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors min-h-[36px]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                        </svg>
+                        {{ t('i18n.leave_review') }}
+                    </a>
+                    {% endif %}
+                {% endif %}
+
+                <!-- Report issue -->
+                {% if order.status.value in ('approved', 'picked_up', 'returned') %}
+                <button onclick="openDisputeModal('{{ order.id }}', '{{ item.name if item else 'Unknown' }}')"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors min-h-[36px]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                    </svg>
+                    {{ t('i18n.report_issue') }}
+                </button>
+                {% endif %}
+
+                <!-- Dispute in progress -->
+                {% if order.status.value == 'disputed' %}
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg min-h-[36px]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    {{ t('i18n.dispute_in_progress') }}
+                </span>
+                {% endif %}
+
+                <!-- "I Paid" button (buyer only, committed status) -->
+                {% if order.status.value == 'committed' and viewer_user_id == order.renter_id %}
+                <div x-data="{ showPay: false, payMethod: 'iban', payNote: '', proofFile: null, paying: false }">
+                    <button @click="showPay = true" class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg min-h-[36px] transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                        I Paid
+                    </button>
+                    <!-- Payment modal -->
+                    <div x-show="showPay" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="showPay = false">
+                        <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6" @click.stop>
+                            <h3 class="text-lg font-bold text-gray-900 mb-3">Mark as Paid</h3>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">How did you pay?</label>
+                            <select x-model="payMethod" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-3">
+                                <option value="cash">Cash</option>
+                                <option value="iban">IBAN / Bank Transfer</option>
+                                <option value="swift">SWIFT</option>
+                                <option value="paypal">PayPal</option>
+                                <option value="revolut">Revolut</option>
+                                <option value="wise">Wise</option>
+                                <option value="card">Credit / Debit Card</option>
+                                <option value="satispay">Satispay</option>
+                                <option value="venmo">Venmo</option>
+                                <option value="zelle">Zelle</option>
+                                <option value="cashapp">Cash App</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Note (optional)</label>
+                            <input x-model="payNote" type="text" maxlength="500" placeholder="e.g. Transaction reference..."
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Payment proof (optional)</label>
+                            <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf"
+                                   @change="proofFile = $event.target.files[0]"
+                                   class="w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 mb-1">
+                            <p class="text-xs text-gray-400 mb-4">Screenshot or receipt (JPEG, PNG, PDF, max 10 MB)</p>
+                            <div class="flex gap-3">
+                                <button @click="showPay = false" class="flex-1 px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">Cancel</button>
+                                <button @click="
+                                    paying = true;
+                                    fetch('/api/v1/rentals/{{ order.id }}/i-paid', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ payment_method: payMethod, note: payNote })
+                                    }).then(async r => {
+                                        if (!r.ok) { var e = await r.json(); throw new Error(e.detail || 'Failed'); }
+                                        if (proofFile) {
+                                            var fd = new FormData();
+                                            fd.append('file', proofFile);
+                                            await fetch('/api/v1/rentals/{{ order.id }}/payment-proof', { method: 'POST', body: fd });
+                                        }
+                                        window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Payment marked! Seller notified.' } }));
+                                        setTimeout(() => location.reload(), 1500);
+                                    }).catch(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } })); })
+                                    .finally(() => { paying = false; });
+                                " :disabled="paying" class="flex-1 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 min-h-[44px]">
+                                    <span x-text="paying ? 'Sending...' : 'Confirm I Paid'"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- "Confirm Payment" button (seller only, buyer_paid status) -->
+                {% if order.status.value == 'buyer_paid' and item and viewer_user_id == item.owner_id %}
+                <button onclick="
+                    if (!confirm('Confirm you received payment for {{ item.name }}?')) return;
+                    fetch('/api/v1/rentals/{{ order.id }}/confirm-payment', { method: 'POST' })
+                        .then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Payment confirmed!' } })); setTimeout(() => location.reload(), 1500); }
+                        else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); });
+                " class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg min-h-[36px] transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    Confirm Payment
+                </button>
+                {% endif %}
+
+                <!-- "Mark Complete" button (either party, payment_confirmed status) -->
+                {% if order.status.value == 'payment_confirmed' %}
+                <button onclick="
+                    fetch('/api/v1/rentals/{{ order.id }}/complete', { method: 'POST' })
+                        .then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Order completed!' } })); setTimeout(() => location.reload(), 1500); }
+                        else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); });
+                " class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg min-h-[36px] transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Mark Complete
+                </button>
+                {% endif %}
+
+                <!-- Spacer pushes view item to the right -->
+                <div class="flex-1"></div>
+
+                <!-- View item link -->
+                {% if item %}
+                <a href="/items/{{ item.slug }}" class="text-xs text-gray-400 hover:text-indigo-600 transition-colors">
+                    View item &rarr;
+                </a>
+                {% endif %}
             </div>
         </div>
         {% endfor %}
@@ -321,11 +357,11 @@
         <nav class="flex items-center gap-1">
             {% if current_page > 1 %}
             <a href="/orders?{% if selected_role %}role={{ selected_role }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}sort={{ selected_sort }}&limit={{ selected_limit }}&offset={{ (current_page - 2) * selected_limit }}"
-               class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">{{ t('i18n.prev') }}</a>
+               class="px-3 py-1.5 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">{{ t('i18n.prev') }}</a>
             {% endif %}
             {% if current_page < total_pages %}
             <a href="/orders?{% if selected_role %}role={{ selected_role }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}sort={{ selected_sort }}&limit={{ selected_limit }}&offset={{ current_page * selected_limit }}"
-               class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">{{ t('i18n.next') }}</a>
+               class="px-3 py-1.5 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">{{ t('i18n.next') }}</a>
             {% endif %}
         </nav>
     </div>
@@ -333,12 +369,14 @@
 
     {% else %}
     <!-- Empty state -->
-    <div class="text-center py-16">
-        <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-        </svg>
-        <h3 class="mt-4 text-lg font-semibold text-gray-900">{{ t('i18n.no_orders_yet') }}</h3>
-        <p class="mt-2 text-sm text-gray-500">{{ t('i18n.start_browsing_the_marketplace') }}</p>
+    <div class="text-center py-20">
+        <div class="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="h-10 w-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900">{{ t('i18n.no_orders_yet') }}</h3>
+        <p class="mt-2 text-sm text-gray-500 max-w-sm mx-auto">{{ t('i18n.start_browsing_the_marketplace') }}</p>
         <a href="/browse" class="mt-6 inline-flex px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
             {{ t('nav.browse') }}
         </a>
@@ -395,7 +433,6 @@
 
         <p class="text-sm text-gray-500" x-text="itemName"></p>
 
-        <!-- Reason -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.reason') }} *</label>
             <select x-model="reason" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 min-h-[40px]">
@@ -410,7 +447,6 @@
             </select>
         </div>
 
-        <!-- Description -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.description') }} *</label>
             <textarea x-model="description" rows="4" maxlength="2000"
@@ -419,10 +455,8 @@
             <p class="text-xs text-gray-400 mt-1" x-text="description.length + '/2000'"></p>
         </div>
 
-        <!-- Error -->
         <p x-show="error" x-cloak class="text-sm text-red-600" x-text="error"></p>
 
-        <!-- Info box -->
         <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700">
             <p class="font-semibold mb-1">{{ t('i18n.what_happens_next') }}</p>
             <ol class="list-decimal ml-4 space-y-0.5">
@@ -432,7 +466,6 @@
             </ol>
         </div>
 
-        <!-- Actions -->
         <div class="flex justify-end gap-3 pt-2">
             <button onclick="closeDisputeModal()" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium">
                 {{ t('i18n.cancel') }}
