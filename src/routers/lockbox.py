@@ -125,7 +125,7 @@ async def generate_codes(
         notification_type=NotificationType.LOCKBOX_CODES_READY,
         title=f"Pickup code ready for {rental.listing.item.name}",
         body=f"Code: {pickup_code}" + (f" | {data.location_hint}" if data.location_hint else ""),
-        link=f"/dashboard",
+        link="/orders",
         entity_type="rental",
         entity_id=rental.id,
     )
@@ -193,7 +193,7 @@ async def verify_code(
             notification_type=NotificationType.LOCKBOX_PICKUP_CONFIRMED,
             title=f"{rental.listing.item.name} has been picked up",
             body="Renter confirmed pickup using lock box code.",
-            link="/dashboard",
+            link="/orders",
             entity_type="rental",
             entity_id=rental.id,
         )
@@ -219,7 +219,7 @@ async def verify_code(
             notification_type=NotificationType.LOCKBOX_RETURN_CONFIRMED,
             title=f"{rental.listing.item.name} has been returned",
             body="Renter confirmed return using lock box code.",
-            link="/dashboard",
+            link="/orders",
             entity_type="rental",
             entity_id=rental.id,
         )

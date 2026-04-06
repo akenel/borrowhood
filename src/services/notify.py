@@ -1,6 +1,6 @@
 """Unified notification service.
 
-Creates in-app notifications and optionally forwards to Telegram.
+Creates in-app notifications and optionally forwards to Telegram and email.
 All notification creation goes through this service -- single source of truth.
 """
 
@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.notification import BHNotification, NotificationType
 from src.services.notification import send_telegram_message
+from src.services.email import send_email, format_notification_email
 
 logger = logging.getLogger(__name__)
 
@@ -54,14 +55,14 @@ async def create_notification(
     )
     db.add(notification)
 
-    # Auto-fetch telegram_chat_id from user record if not explicitly provided
-    if not telegram_chat_id:
-        from src.models.user import BHUser
-        user = await db.get(BHUser, user_id)
-        if user and user.notify_telegram and user.telegram_chat_id:
-            telegram_chat_id = user.telegram_chat_id
+    # Fetch user record for channel preferences
+    from src.models.user import BHUser
+    user = await db.get(BHUser, user_id)
 
     # Best-effort Telegram forwarding
+    if not telegram_chat_id and user and user.notify_telegram and user.telegram_chat_id:
+        telegram_chat_id = user.telegram_chat_id
+
     if telegram_chat_id:
         telegram_text = f"<b>{title}</b>"
         if body:
@@ -71,6 +72,16 @@ async def create_notification(
 
         sent = await send_telegram_message(telegram_chat_id, telegram_text)
         notification.telegram_sent = sent
+
+    # Best-effort email forwarding
+    if user and user.notify_email and user.email and not user.email.endswith("@borrowhood.local"):
+        email_html = format_notification_email(title, body, link)
+        email_sent = await send_email(
+            to=user.email,
+            subject=title,
+            html=email_html,
+        )
+        notification.email_sent = email_sent
 
     await db.flush()
     return notification
@@ -122,7 +133,7 @@ async def notify_rental_event(
         user_id=user_id,
         notification_type=notification_type,
         title=title,
-        link=f"/dashboard",
+        link="/orders",
         entity_type="rental",
         entity_id=rental_id,
         telegram_chat_id=telegram_chat_id,

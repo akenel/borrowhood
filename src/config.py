@@ -55,6 +55,11 @@ class BHSettings(BaseSettings):
     stripe_publishable_key: str = ""    # pk_test_... or pk_live_...
     stripe_webhook_secret: str = ""     # whsec_...
 
+    # Email (Resend)
+    resend_api_key: str = ""
+    mail_from: str = "La Piazza <noreply@lapiazza.app>"
+    email_enabled: bool = False
+
     # LibreTranslate (self-hosted translation)
     libretranslate_url: str = ""  # e.g. "http://libretranslate:5000"
     libretranslate_enabled: bool = False

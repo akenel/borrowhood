@@ -74,6 +74,7 @@ class BHNotification(BHBase, Base):
     # Status
     read: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
     telegram_sent: Mapped[bool] = mapped_column(Boolean, default=False)
+    email_sent: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # Relationship
     user: Mapped["BHUser"] = relationship()
