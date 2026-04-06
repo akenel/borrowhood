@@ -78,6 +78,22 @@ async def get_user(db: AsyncSession, token: dict) -> BHUser:
 
     # Auto-provision: create BHUser from JWT claims
     email = token.get("email", f"{username}@borrowhood.local")
+
+    # Check if email already exists (e.g. user registered with password, now logging in via Google)
+    if email and not email.endswith("@borrowhood.local"):
+        result = await db.execute(
+            select(BHUser).where(BHUser.email == email, BHUser.deleted_at.is_(None))
+        )
+        existing_by_email = result.scalars().first()
+        if existing_by_email:
+            logger.info("Linking social login to existing user '%s' (email=%s, new kc_id=%s)", existing_by_email.display_name, email, kc_id)
+            existing_by_email.keycloak_id = kc_id
+            existing_by_email.last_active_at = datetime.now(timezone.utc)
+            if not existing_by_email.avatar_url and token.get("picture"):
+                existing_by_email.avatar_url = token.get("picture")
+            await db.commit()
+            return existing_by_email
+
     display_name = token.get("name") or token.get("preferred_username", "Neighbor")
     base_slug = slugify(username or display_name, max_length=80)
 
