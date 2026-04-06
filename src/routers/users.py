@@ -115,8 +115,13 @@ async def update_me(
         "notify_telegram", "notify_email",
     }
 
+    # Fields backed by Postgres enums -- empty string must become None
+    enum_fields = {"workshop_type", "seller_type"}
+
     for field, value in data.items():
         if field in allowed:
+            if field in enum_fields and value == "":
+                value = None
             setattr(user, field, value)
 
     await db.commit()
