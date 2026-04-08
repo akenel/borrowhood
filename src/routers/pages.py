@@ -120,17 +120,39 @@ def _og_workshop_desc(user) -> str:
 
 
 def _og_item_desc(item, listing=None) -> str:
-    """Build a rich OG description for item pages."""
+    """Build a rich OG description for item pages.
+
+    Format: EUR 120.00 · Training · by Corrado Sassi, Trapani · Learn to sail...
+    Price and seller come FIRST -- that's what converts clicks.
+    """
     parts = []
-    if listing and listing.price:
-        parts.append(f"EUR {listing.price:.2f}")
     if listing:
-        parts.append(listing.listing_type.value.title())
-    if item.description:
-        parts.append(item.description[:120])
+        try:
+            price = float(listing.price or 0)
+            if price > 0:
+                currency = getattr(listing, 'currency', 'EUR') or 'EUR'
+                parts.append(f"{currency} {price:.2f}")
+        except (TypeError, ValueError):
+            pass
+        try:
+            lt = listing.listing_type
+            parts.append(lt.value.replace('_', ' ').title() if hasattr(lt, 'value') else str(lt).replace('_', ' ').title())
+        except Exception:
+            pass
     if item.owner:
-        parts.append(f"by {item.owner.display_name}")
-    return " — ".join(parts) if parts else "Available on La Piazza"
+        seller = f"by {item.owner.display_name}"
+        if item.owner.city:
+            seller += f", {item.owner.city}"
+        parts.append(seller)
+    if item.description:
+        # Fill remaining space with description (Telegram shows ~200 chars)
+        used = len(" · ".join(parts))
+        remaining = max(60, 200 - used)
+        desc = item.description[:remaining].strip()
+        if len(item.description) > remaining:
+            desc += "..."
+        parts.append(desc)
+    return " · ".join(parts) if parts else "Available on La Piazza"
 
 
 def _ctx(request: Request, token: Optional[dict] = None, **kwargs) -> dict:
