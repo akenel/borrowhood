@@ -234,6 +234,12 @@ async def update_item(
         raise HTTPException(status_code=403, detail="Not your item")
 
     update_data = data.model_dump(exclude_unset=True)
+
+    # Regenerate slug when name changes
+    if "name" in update_data and update_data["name"] != item.name:
+        new_slug = await _unique_slug(db, update_data["name"])
+        item.slug = new_slug
+
     for field, value in update_data.items():
         setattr(item, field, value)
 
