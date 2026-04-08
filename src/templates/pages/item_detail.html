@@ -3,20 +3,14 @@
 {% block title %}{{ item.name }} - {{ t('app.name') }}{% endblock %}
 
 {% block head %}
-<!-- Open Graph / WhatsApp / Facebook / LinkedIn preview -->
+<!-- Item-specific OG overrides (base.html handles og:title, og:description, og:image via context vars) -->
 <meta property="og:type" content="product">
-<meta property="og:title" content="{{ item.name }}">
-<meta property="og:description" content="{{ (item.description or '')|truncate(160, True, '...') }}">
-{% if item.media %}<meta property="og:image" content="{{ og_image }}">{% endif %}
-<meta property="og:url" content="{{ request.url | replace('http://', 'https://') }}">
-<meta property="og:site_name" content="{{ t('app.name') }}">
-{% if active_listing and active_listing.price %}<meta property="product:price:amount" content="{{ active_listing.price }}">
-<meta property="product:price:currency" content="{{ active_listing.currency or 'EUR' }}">{% endif %}
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ item.name }}">
-<meta name="twitter:description" content="{{ (item.description or '')|truncate(160, True, '...') }}">
-{% if item.media %}<meta name="twitter:image" content="{{ og_image }}">{% endif %}
+{% for listing in item.listings %}{% if listing.price %}
+<meta property="product:price:amount" content="{{ listing.price }}">
+<meta property="product:price:currency" content="{{ listing.currency or 'EUR' }}">
+{% endif %}{% endfor %}
+{% if og_image %}<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">{% endif %}
 <!-- JSON-LD Structured Data (Google rich results: price, rating, availability) -->
 <script type="application/ld+json">
 {
