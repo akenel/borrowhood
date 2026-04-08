@@ -81,7 +81,7 @@ async def create_order(
                 "experience_context": {
                     "return_url": return_url or f"{settings.app_url}/payments/success",
                     "cancel_url": cancel_url or f"{settings.app_url}/payments/cancel",
-                    "brand_name": "BorrowHood",
+                    "brand_name": "La Piazza",
                     "user_action": "PAY_NOW",
                 }
             }

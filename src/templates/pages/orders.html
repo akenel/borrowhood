@@ -675,6 +675,42 @@
                 </div>
                 {% endif %}
 
+                <!-- Pay with PayPal (buyer only, committed status) -->
+                {% if order.status.value == 'committed' and viewer_user_id == order.renter_id and order.listing %}
+                <div x-data="{ creatingOrder: false }">
+                    <button @click="
+                        creatingOrder = true;
+                        fetch('/api/v1/payments/create-order', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                rental_id: '{{ order.id }}',
+                                payment_type: 'PURCHASE',
+                                amount: {{ order.listing.price or 0 }},
+                                currency: '{{ order.listing.currency or 'EUR' }}'
+                            })
+                        }).then(async r => {
+                            if (!r.ok) { var e = await r.json(); throw new Error(e.detail || 'Failed'); }
+                            var data = await r.json();
+                            if (data.approval_url) {
+                                sessionStorage.setItem('pp_payment_id', data.payment_id);
+                                sessionStorage.setItem('pp_order_id', data.paypal_order_id);
+                                window.location.href = data.approval_url;
+                            } else {
+                                throw new Error('No approval URL returned');
+                            }
+                        }).catch(e => {
+                            window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } }));
+                            creatingOrder = false;
+                        });
+                    " :disabled="creatingOrder"
+                       class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-[#0070BA] hover:bg-[#003087] rounded-lg min-h-[36px] transition-colors disabled:opacity-50">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M20.067 8.478c.492.876.708 1.906.572 3.034-.702 4.636-3.94 6.24-7.834 6.24H12.2a.96.96 0 00-.948.811l-.016.092-.607 3.85-.016.066a.96.96 0 01-.948.811H7.304a.574.574 0 01-.566-.664l.008-.06.516-3.272.016-.092.016-.108.504-3.19a.96.96 0 01.948-.812h2.028c4.35 0 7.754-1.768 8.752-6.877.002-.008.003-.016.004-.024-.293-.146-.293-.146 0 0zM17.132 2.21a8.63 8.63 0 011.948.608 6.174 6.174 0 011.176.69c.726 3.242-.008 5.446-2.502 7.008-2.502 1.562-5.752 1.562-7.502 1.562h-1.36a1.2 1.2 0 00-1.186 1.016l-1.1 6.972H3.574a.72.72 0 01-.71-.832L5.274 3.03A1.44 1.44 0 016.694 1.8h7.312c1.1 0 2.186.124 3.126.41z"/></svg>
+                        <span x-text="creatingOrder ? 'Redirecting...' : 'Pay with PayPal'"></span>
+                    </button>
+                </div>
+                {% endif %}
+
                 <!-- "I Paid" button (buyer only, committed status) -->
                 {% if order.status.value == 'committed' and viewer_user_id == order.renter_id %}
                 <div x-data="{ showPay: false, payMethod: 'iban', payNote: '', proofFile: null, paying: false }">
