@@ -72,7 +72,12 @@ async def get_current_user(
         "tagline": user.tagline or "",
         "bio": user.bio or "",
         "city": user.city or "",
+        "state_region": user.state_region or "",
+        "postal_code": user.postal_code or "",
+        "address_line": user.address_line or "",
         "country_code": user.country_code or "",
+        "latitude": user.latitude,
+        "longitude": user.longitude,
         "workshop_name": user.workshop_name or "",
         "workshop_type": user.workshop_type.value if user.workshop_type else "",
         "whatsapp_number": user.whatsapp_number or "",
@@ -105,7 +110,8 @@ async def update_me(
 
     # Allowed fields
     allowed = {
-        "display_name", "tagline", "bio", "city", "country_code",
+        "display_name", "tagline", "bio",
+        "city", "state_region", "postal_code", "address_line", "country_code",
         "workshop_name", "workshop_type",
         "latitude", "longitude",
         "seller_type", "business_name", "vat_number",

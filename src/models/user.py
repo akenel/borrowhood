@@ -100,6 +100,9 @@ class BHUser(BHBase, Base):
     longitude: Mapped[Optional[float]] = mapped_column(Float)
     altitude: Mapped[Optional[float]] = mapped_column(Float, default=None)  # meters ASL
     city: Mapped[Optional[str]] = mapped_column(String(100))
+    state_region: Mapped[Optional[str]] = mapped_column(String(100))
+    postal_code: Mapped[Optional[str]] = mapped_column(String(20))
+    address_line: Mapped[Optional[str]] = mapped_column(String(300))  # private -- only shared in active orders
     country_code: Mapped[Optional[str]] = mapped_column(String(2))
 
     # Status

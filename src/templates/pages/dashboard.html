@@ -1699,7 +1699,10 @@
                     profileLoaded: false,
                     saving: false,
                     saved: false,
-                    p: { display_name: '', tagline: '', bio: '', city: '', country_code: '', workshop_name: '', workshop_type: '' },
+                    p: { display_name: '', tagline: '', bio: '', city: '', state_region: '', postal_code: '', address_line: '', country_code: '', latitude: null, longitude: null, workshop_name: '', workshop_type: '' },
+                    locating: false,
+                    searchingCity: false,
+                    cityResults: [],
                     services: { offers_delivery: false, offers_pickup: false, offers_training: false, offers_custom_orders: false, offers_repair: false },
                     async load() {
                         try {
@@ -1709,7 +1712,12 @@
                                 this.p.tagline = d.tagline || '';
                                 this.p.bio = d.bio || '';
                                 this.p.city = d.city || '';
+                                this.p.state_region = d.state_region || '';
+                                this.p.postal_code = d.postal_code || '';
+                                this.p.address_line = d.address_line || '';
                                 this.p.country_code = d.country_code || '';
+                                this.p.latitude = d.latitude || null;
+                                this.p.longitude = d.longitude || null;
                                 this.p.workshop_name = d.workshop_name || '';
                                 this.p.workshop_type = d.workshop_type || '';
                                 this.services.offers_delivery = d.offers_delivery || false;
@@ -1956,16 +1964,114 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.city') }}</label>
-                                <input x-model="p.city" type="text" placeholder="Trapani" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <!-- Location section -->
+                        <div class="border border-gray-200 rounded-lg p-4 space-y-3 bg-gray-50">
+                            <div class="flex items-center justify-between">
+                                <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    {% if lang == 'it' %}Posizione{% else %}Location{% endif %}
+                                </label>
+                                <button type="button" @click="
+                                    if (!navigator.geolocation) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Geolocation not available' } })); return; }
+                                    locating = true;
+                                    navigator.geolocation.getCurrentPosition(
+                                        async (pos) => {
+                                            p.latitude = Math.round(pos.coords.latitude * 1000) / 1000;
+                                            p.longitude = Math.round(pos.coords.longitude * 1000) / 1000;
+                                            try {
+                                                var r = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + p.latitude + '&lon=' + p.longitude + '&zoom=14&addressdetails=1', { headers: { 'Accept-Language': '{{ lang }}' } });
+                                                if (r.ok) {
+                                                    var d = await r.json();
+                                                    var a = d.address || {};
+                                                    p.city = a.city || a.town || a.village || a.municipality || '';
+                                                    p.state_region = a.state || a.county || a.region || '';
+                                                    p.postal_code = a.postcode || '';
+                                                    p.country_code = (a.country_code || '').toUpperCase();
+                                                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Location found: ' + p.city } }));
+                                                }
+                                            } catch(e) {}
+                                            locating = false;
+                                        },
+                                        (err) => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: err.message || 'Location access denied' } })); locating = false; },
+                                        { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+                                    );
+                                " :disabled="locating"
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors min-h-[36px]">
+                                    <svg class="w-4 h-4" :class="locating && 'animate-pulse'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span x-text="locating ? '{% if lang == 'it' %}Localizzazione...{% else %}Locating...{% endif %}' : '{% if lang == 'it' %}Usa la mia posizione{% else %}Use my location{% endif %}'"></span>
+                                </button>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.country') }}</label>
-                                <input x-model="p.country_code" type="text" maxlength="2" placeholder="IT" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                                <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Codice a 2 lettere: IT, CH, US, DE{% else %}2-letter code: IT, CH, US, DE{% endif %}</p>
+                            <p class="text-xs text-gray-400">{% if lang == 'it' %}Un clic riempie tutto automaticamente. Puoi modificare dopo.{% else %}One click fills everything. You can edit after.{% endif %}</p>
+
+                            <!-- City search (manual fallback) -->
+                            <div class="relative">
+                                <label class="block text-xs font-medium text-gray-600 mb-1">{% if lang == 'it' %}Citta{% else %}City{% endif %}</label>
+                                <input x-model="p.city" type="text" placeholder="{% if lang == 'it' %}Cerca una citta...{% else %}Search a city...{% endif %}"
+                                       @input.debounce.500ms="
+                                           if (p.city.length < 3) { cityResults = []; return; }
+                                           searchingCity = true;
+                                           fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(p.city) + '&limit=5&addressdetails=1', { headers: { 'Accept-Language': '{{ lang }}' } })
+                                               .then(r => r.json())
+                                               .then(d => { cityResults = d; searchingCity = false; })
+                                               .catch(() => { searchingCity = false; });
+                                       "
+                                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-base min-h-[48px]">
+                                <template x-if="cityResults.length > 0">
+                                    <div class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                                        <template x-for="r in cityResults" :key="r.place_id">
+                                            <button type="button" @click="
+                                                var a = r.address || {};
+                                                p.city = a.city || a.town || a.village || a.municipality || r.name || '';
+                                                p.state_region = a.state || a.county || a.region || '';
+                                                p.postal_code = a.postcode || '';
+                                                p.country_code = (a.country_code || '').toUpperCase();
+                                                p.latitude = Math.round(parseFloat(r.lat) * 1000) / 1000;
+                                                p.longitude = Math.round(parseFloat(r.lon) * 1000) / 1000;
+                                                cityResults = [];
+                                            " class="w-full text-left px-3 py-2 text-sm hover:bg-indigo-50 border-b border-gray-100 last:border-0">
+                                                <span class="font-medium" x-text="r.display_name"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </template>
                             </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">{% if lang == 'it' %}Regione / Cantone{% else %}State / Region{% endif %}</label>
+                                    <input x-model="p.state_region" type="text" placeholder="{% if lang == 'it' %}es. Nidwalden{% else %}e.g. Nidwalden{% endif %}"
+                                           class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-base min-h-[48px]">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">{% if lang == 'it' %}Codice Paese{% else %}Country{% endif %}</label>
+                                    <input x-model="p.country_code" type="text" maxlength="2" placeholder="CH"
+                                           class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-base min-h-[48px] uppercase">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">{% if lang == 'it' %}CAP{% else %}Postal Code{% endif %}</label>
+                                    <input x-model="p.postal_code" type="text" maxlength="20" placeholder="6363"
+                                           class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-base min-h-[48px]">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1 flex items-center gap-1">
+                                        {% if lang == 'it' %}Indirizzo{% else %}Address{% endif %}
+                                        <span class="text-xs text-gray-400 font-normal">({% if lang == 'it' %}privato{% else %}private{% endif %})</span>
+                                    </label>
+                                    <input x-model="p.address_line" type="text" maxlength="300" placeholder="{% if lang == 'it' %}Via Roma 1{% else %}123 Main St{% endif %}"
+                                           class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-base min-h-[48px]">
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400">{% if lang == 'it' %}L'indirizzo e privato -- visibile solo alla controparte negli ordini attivi.{% else %}Address is private -- only shared with the other party in active orders.{% endif %}</p>
+
+                            <!-- Location preview -->
+                            <template x-if="p.latitude && p.longitude">
+                                <div class="flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 rounded-lg px-3 py-2">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span>{% if lang == 'it' %}Posizione impostata{% else %}Location set{% endif %}: <span x-text="p.city + (p.state_region ? ', ' + p.state_region : '') + ' ' + p.country_code"></span> (<span x-text="p.latitude + ', ' + p.longitude"></span>)</span>
+                                </div>
+                            </template>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.workshop_name') }}</label>
