@@ -7,8 +7,8 @@
 <meta property="og:type" content="product">
 <meta property="og:title" content="{{ item.name }}">
 <meta property="og:description" content="{{ (item.description or '')|truncate(160, True, '...') }}">
-{% if item.media %}<meta property="og:image" content="{{ item.media[0].url }}">{% endif %}
-<meta property="og:url" content="{{ request.url }}">
+{% if item.media %}<meta property="og:image" content="{{ og_image }}">{% endif %}
+<meta property="og:url" content="{{ request.url | replace('http://', 'https://') }}">
 <meta property="og:site_name" content="{{ t('app.name') }}">
 {% if active_listing and active_listing.price %}<meta property="product:price:amount" content="{{ active_listing.price }}">
 <meta property="product:price:currency" content="{{ active_listing.currency or 'EUR' }}">{% endif %}
@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ item.name }}">
 <meta name="twitter:description" content="{{ (item.description or '')|truncate(160, True, '...') }}">
-{% if item.media %}<meta name="twitter:image" content="{{ item.media[0].url }}">{% endif %}
+{% if item.media %}<meta name="twitter:image" content="{{ og_image }}">{% endif %}
 <!-- JSON-LD Structured Data (Google rich results: price, rating, availability) -->
 <script type="application/ld+json">
 {

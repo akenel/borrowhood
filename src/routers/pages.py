@@ -87,6 +87,52 @@ templates.env.globals["lang_flags"] = {
 }
 
 
+def _abs_url(path: Optional[str]) -> Optional[str]:
+    """Convert a relative path to absolute URL for OG tags."""
+    if not path:
+        return None
+    if path.startswith("http"):
+        return path
+    return f"{settings.app_url}{path}"
+
+
+def _og_workshop_desc(user) -> str:
+    """Build a rich OG description for workshop pages."""
+    parts = []
+    if user.tagline:
+        parts.append(user.tagline)
+    if user.city:
+        loc = user.city
+        if user.state_region:
+            loc += f", {user.state_region}"
+        if user.country_code:
+            loc += f" {user.country_code}"
+        parts.append(loc)
+    item_count = len([i for i in user.items if not i.deleted_at]) if user.items else 0
+    if item_count:
+        parts.append(f"{item_count} items listed")
+    skill_names = [s.skill_name for s in (user.skills or [])[:3]]
+    if skill_names:
+        parts.append(" | ".join(skill_names))
+    if not parts:
+        parts.append(f"{user.display_name} on La Piazza")
+    return " — ".join(parts)
+
+
+def _og_item_desc(item, listing=None) -> str:
+    """Build a rich OG description for item pages."""
+    parts = []
+    if listing and listing.price:
+        parts.append(f"EUR {listing.price:.2f}")
+    if listing:
+        parts.append(listing.listing_type.value.title())
+    if item.description:
+        parts.append(item.description[:120])
+    if item.owner:
+        parts.append(f"by {item.owner.display_name}")
+    return " — ".join(parts) if parts else "Available on La Piazza"
+
+
 def _ctx(request: Request, token: Optional[dict] = None, **kwargs) -> dict:
     """Build template context with i18n, lang, and common vars.
 
@@ -346,8 +392,8 @@ async def item_detail(slug: str, request: Request,
         viewer_tier=viewer_tier,
         similar_items=similar_items,
         og_title=f"{item.name} - La Piazza",
-        og_description=item.description[:160] if item.description else "Available on La Piazza",
-        og_image=item.media[0].url if item.media else None,
+        og_description=_og_item_desc(item, item.listings[0] if item.listings else None),
+        og_image=_abs_url(item.media[0].url) if item.media else None,
     )
     return _render("pages/item_detail.html", ctx)
 
@@ -498,8 +544,8 @@ async def workshop_profile(slug: str, request: Request,
         badge_info=BADGE_INFO,
         viewer_tier=viewer_tier,
         og_title=f"{workshop_owner.workshop_name or workshop_owner.display_name} - La Piazza",
-        og_description=workshop_owner.tagline or (f"{workshop_owner.display_name}'s shop on La Piazza — {len([i for i in workshop_owner.items if not i.deleted_at])} items listed" if workshop_owner.items else f"{workshop_owner.display_name} on La Piazza"),
-        og_image=workshop_owner.banner_url or workshop_owner.avatar_url or None,
+        og_description=_og_workshop_desc(workshop_owner),
+        og_image=_abs_url(workshop_owner.banner_url or workshop_owner.avatar_url),
     )
     return _render("pages/workshop.html", ctx)
 
