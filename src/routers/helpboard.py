@@ -391,6 +391,36 @@ async def update_post_status(
     return {"status": post.status.value}
 
 
+# ── Smart Matching: Suggested Helpers ──
+
+@router.get("/posts/{post_id}/suggested-helpers")
+async def suggested_helpers(
+    post_id: UUID,
+    limit: int = 5,
+    db: AsyncSession = Depends(get_db),
+):
+    """Find users with skills matching this help post's category.
+
+    Public endpoint -- no auth required so visitors can see who can help.
+    Returns up to `limit` users ranked by verified skills, rating, trust.
+    """
+    result = await db.execute(
+        select(BHHelpPost).where(BHHelpPost.id == post_id, BHHelpPost.deleted_at.is_(None))
+    )
+    post = result.scalars().first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    from src.services.helpboard_matching import find_suggested_helpers
+    helpers = await find_suggested_helpers(
+        db=db,
+        post_category=post.category,
+        post_author_id=post.author_id,
+        limit=min(limit, 10),
+    )
+    return helpers
+
+
 # ── Resolve ──
 
 @router.post("/posts/{post_id}/resolve")
