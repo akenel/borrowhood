@@ -110,13 +110,13 @@ class TestEmptyEnumCoercion:
     """Empty string enum values should be coerced to None, not sent to Postgres."""
 
     def test_enum_fields_defined_in_update_endpoint(self):
-        """The update_me endpoint must define enum_fields for coercion."""
+        """The update_me endpoint must handle enum coercion."""
         import inspect
         from src.routers.users import update_me
         source = inspect.getsource(update_me)
-        assert "enum_fields" in source, "update_me must define enum_fields set"
+        assert "enum_map" in source, "update_me must define enum_map for coercion"
         assert "workshop_type" in source
-        assert "seller_type" in source
+        assert "WorkshopType" in source
 
     def test_empty_string_coercion_logic(self):
         """Empty strings on enum fields must become None."""

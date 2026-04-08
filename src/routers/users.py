@@ -115,13 +115,27 @@ async def update_me(
         "notify_telegram", "notify_email",
     }
 
-    # Fields backed by Postgres enums -- empty string must become None
-    enum_fields = {"workshop_type", "seller_type"}
+    # Fields backed by Postgres enums -- must convert string to enum or None
+    from src.models.user import WorkshopType
+    enum_map = {
+        "workshop_type": WorkshopType,
+        "seller_type": None,  # handled below
+    }
 
     for field, value in data.items():
         if field in allowed:
-            if field in enum_fields and value == "":
-                value = None
+            if field in enum_map:
+                if not value or value == "":
+                    value = None
+                elif enum_map[field]:
+                    try:
+                        value = enum_map[field](value)
+                    except ValueError:
+                        # Try uppercase (DB enum is uppercase)
+                        try:
+                            value = enum_map[field](value.upper())
+                        except (ValueError, AttributeError):
+                            value = None
             setattr(user, field, value)
 
     await db.commit()
