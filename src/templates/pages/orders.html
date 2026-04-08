@@ -21,8 +21,317 @@
         {% endif %}
     </div>
 
+    <!-- Tabs: Orders | Quotes -->
+    <div class="flex border-b border-gray-200 mb-6">
+        <a href="/orders?tab=orders"
+           class="px-4 py-2.5 text-sm font-medium border-b-2 transition-colors
+                  {% if selected_tab != 'quotes' %}border-indigo-600 text-indigo-600{% else %}border-transparent text-gray-500 hover:text-gray-700{% endif %}">
+            {{ t('i18n.order_history') }}
+        </a>
+        <a href="/orders?tab=quotes"
+           class="px-4 py-2.5 text-sm font-medium border-b-2 transition-colors
+                  {% if selected_tab == 'quotes' %}border-amber-600 text-amber-600{% else %}border-transparent text-gray-500 hover:text-gray-700{% endif %}">
+            {{ t('i18n.quotes') }}
+        </a>
+    </div>
+
+    {% if selected_tab == 'quotes' %}
+    <!-- ═══ QUOTES TAB ═══ -->
+
+    <!-- Quote Filters -->
+    <form method="GET" action="/orders" class="bg-white rounded-xl border border-gray-200 p-4 mb-6 shadow-sm">
+        <input type="hidden" name="tab" value="quotes">
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">{{ t('i18n.role') }}</label>
+                <select name="role" class="w-full border border-gray-300 rounded-lg py-2 px-3 text-sm min-h-[40px]">
+                    <option value="">{{ t('i18n.all') }}</option>
+                    <option value="customer" {% if selected_role == 'customer' %}selected{% endif %}>{{ t('i18n.as_customer') }}</option>
+                    <option value="provider" {% if selected_role == 'provider' %}selected{% endif %}>{{ t('i18n.as_provider') }}</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">{{ t('i18n.status') }}</label>
+                <select name="status" class="w-full border border-gray-300 rounded-lg py-2 px-3 text-sm min-h-[40px]">
+                    <option value="">{{ t('i18n.all') }}</option>
+                    <option value="requested" {% if selected_status == 'requested' %}selected{% endif %}>Requested</option>
+                    <option value="quoted" {% if selected_status == 'quoted' %}selected{% endif %}>Quoted</option>
+                    <option value="accepted" {% if selected_status == 'accepted' %}selected{% endif %}>Accepted</option>
+                    <option value="in_progress" {% if selected_status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                    <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="declined" {% if selected_status == 'declined' %}selected{% endif %}>Declined</option>
+                    <option value="cancelled" {% if selected_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+            <div class="flex items-end gap-2">
+                <button type="submit" class="flex-1 px-4 py-2 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors min-h-[40px] text-sm">
+                    {{ t('browse.apply') }}
+                </button>
+                <a href="/orders?tab=quotes" class="px-3 py-2 text-gray-500 hover:text-gray-700 min-h-[40px] flex items-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </a>
+            </div>
+        </div>
+    </form>
+
+    <!-- Quotes List -->
+    {% if quotes %}
+    <div class="space-y-4">
+        {% for quote in quotes %}
+        {% set item = quote.listing.item if quote.listing else None %}
+        {% set is_provider = (viewer_user_id == quote.provider_id) %}
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <!-- Quote card top -->
+            <div class="flex gap-4 p-4">
+                <a href="{{ '/items/' + item.slug if item else '#' }}" class="flex-shrink-0">
+                    {% if item and item.media %}
+                    <img src="{{ item.media[0].url }}" alt="{{ item.name }}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-cover">
+                    {% else %}
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-lg bg-gray-100 flex items-center justify-center">
+                        <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    {% endif %}
+                </a>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-start gap-2 mb-1">
+                        <h3 class="font-semibold text-gray-900 text-base leading-tight line-clamp-2">
+                            {% if item %}<a href="/items/{{ item.slug }}" class="hover:text-indigo-600">{{ item.name }}</a>{% else %}Service{% endif %}
+                        </h3>
+                        <span class="flex-shrink-0 text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap mt-0.5
+                            {% if quote.status.value == 'COMPLETED' %}bg-emerald-100 text-emerald-700
+                            {% elif quote.status.value == 'ACCEPTED' or quote.status.value == 'IN_PROGRESS' %}bg-blue-100 text-blue-700
+                            {% elif quote.status.value == 'QUOTED' %}bg-indigo-100 text-indigo-700
+                            {% elif quote.status.value == 'REQUESTED' %}bg-amber-100 text-amber-700
+                            {% elif quote.status.value in ('DECLINED', 'CANCELLED') %}bg-red-100 text-red-700
+                            {% else %}bg-gray-100 text-gray-600{% endif %}">
+                            {{ quote.status.value | replace('_', ' ') | title }}
+                        </span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-x-3 text-sm text-gray-500">
+                        {% if is_provider %}
+                        <span>From <a href="/workshop/{{ quote.customer.slug }}" class="text-indigo-600 hover:underline">{{ quote.customer.display_name }}</a></span>
+                        {% else %}
+                        <span>To <a href="/workshop/{{ quote.provider.slug }}" class="text-indigo-600 hover:underline">{{ quote.provider.display_name }}</a></span>
+                        {% endif %}
+                        <span class="text-xs text-gray-400">{{ quote.created_at.strftime('%b %d, %Y') }}</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ quote.request_description }}</p>
+                    {% if quote.total_amount %}
+                    <div class="flex items-center gap-3 mt-2">
+                        <span class="text-lg font-bold text-gray-900">EUR {{ "%.2f"|format(quote.total_amount) }}</span>
+                        {% if quote.estimated_days %}
+                        <span class="text-xs text-gray-400">~{{ quote.estimated_days }} days</span>
+                        {% endif %}
+                        {% if quote.deposit_required %}
+                        <span class="text-xs px-2 py-0.5 bg-amber-50 text-amber-700 rounded">Deposit: EUR {{ "%.2f"|format(quote.deposit_required) }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quote breakdown (if provider has submitted pricing) -->
+            {% if quote.total_amount and quote.status.value != 'REQUESTED' %}
+            <div class="px-4 pb-3">
+                <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-3 flex flex-wrap gap-x-6 gap-y-1 text-xs text-gray-600">
+                    {% if quote.labor_hours %}<span><strong>{{ t('i18n.labor_hours') }}:</strong> {{ quote.labor_hours }}h</span>{% endif %}
+                    {% if quote.labor_rate %}<span><strong>{{ t('i18n.labor_rate') }}:</strong> EUR {{ "%.2f"|format(quote.labor_rate) }}/h</span>{% endif %}
+                    {% if quote.materials_cost %}<span><strong>{{ t('i18n.materials_cost') }}:</strong> EUR {{ "%.2f"|format(quote.materials_cost) }}</span>{% endif %}
+                    {% if quote.quote_description %}<p class="w-full mt-1 text-gray-500 italic">{{ quote.quote_description }}</p>{% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Action bar -->
+            <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex flex-wrap items-center gap-2">
+                <!-- Provider: Submit Quote (only for REQUESTED status) -->
+                {% if is_provider and quote.status.value == 'REQUESTED' %}
+                <div x-data="{ showQuoteForm: false, qDesc: '', qHours: '', qRate: '', qMat: '', qTotal: '', qDeposit: '', qDays: '7', qValid: '7', qMsg: '', submitting: false }">
+                    <button @click="showQuoteForm = true" class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg min-h-[36px] transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                        {{ t('i18n.submit_quote') }}
+                    </button>
+                    <div x-show="showQuoteForm" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto" @click.self="showQuoteForm = false">
+                        <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 my-8" @click.stop>
+                            <h3 class="text-lg font-bold text-gray-900 mb-1">{{ t('i18n.submit_quote') }}</h3>
+                            <p class="text-sm text-gray-500 mb-4">{{ item.name if item else 'Service' }}</p>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.quote_details') }} *</label>
+                                    <textarea x-model="qDesc" rows="3" maxlength="2000" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="What's included in this quote..."></textarea>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">{{ t('i18n.labor_hours') }}</label>
+                                        <input type="number" step="0.5" min="0" x-model="qHours" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">{{ t('i18n.labor_rate') }} (&euro;/h)</label>
+                                        <input type="number" step="0.01" min="0" x-model="qRate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">{{ t('i18n.materials_cost') }} (&euro;)</label>
+                                        <input type="number" step="0.01" min="0" x-model="qMat" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">{{ t('i18n.total_amount') }} (&euro;) *</label>
+                                        <input type="number" step="0.01" min="0.01" x-model="qTotal" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">{{ t('i18n.deposit_required') }} (&euro;)</label>
+                                        <input type="number" step="0.01" min="0" x-model="qDeposit" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">{{ t('i18n.estimated_days') }}</label>
+                                        <input type="number" min="1" x-model="qDays" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">{{ t('i18n.provider_notes') }}</label>
+                                    <input type="text" maxlength="1000" x-model="qMsg" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Optional notes...">
+                                </div>
+                            </div>
+                            <div class="flex gap-3 mt-4">
+                                <button @click="showQuoteForm = false" class="flex-1 px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">{{ t('common.cancel') }}</button>
+                                <button @click="
+                                    if (!qDesc || qDesc.length < 5) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Quote details required (min 5 chars)' } })); return; }
+                                    if (!qTotal || parseFloat(qTotal) <= 0) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Total amount required' } })); return; }
+                                    submitting = true;
+                                    fetch('/api/v1/service-quotes/{{ quote.id }}/quote', {
+                                        method: 'PATCH',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            quote_description: qDesc,
+                                            labor_hours: qHours ? parseFloat(qHours) : null,
+                                            labor_rate: qRate ? parseFloat(qRate) : null,
+                                            materials_cost: qMat ? parseFloat(qMat) : null,
+                                            total_amount: parseFloat(qTotal),
+                                            deposit_required: qDeposit ? parseFloat(qDeposit) : null,
+                                            estimated_days: qDays ? parseInt(qDays) : null,
+                                            quote_valid_days: parseInt(qValid) || 7,
+                                            provider_message: qMsg || null
+                                        })
+                                    }).then(async r => {
+                                        if (!r.ok) { var e = await r.json(); throw new Error(e.detail || 'Failed'); }
+                                        window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Quote submitted! Customer notified.' } }));
+                                        setTimeout(() => location.reload(), 1500);
+                                    }).catch(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } })); })
+                                    .finally(() => { submitting = false; });
+                                " :disabled="submitting" class="flex-1 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 min-h-[44px]">
+                                    <span x-text="submitting ? 'Sending...' : '{{ t('i18n.submit_quote') }}'"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Customer: Accept Quote -->
+                {% if not is_provider and quote.status.value == 'QUOTED' %}
+                <button onclick="
+                    if (!confirm('Accept this quote for EUR {{ '%.2f'|format(quote.total_amount) }}?')) return;
+                    fetch('/api/v1/service-quotes/{{ quote.id }}/status', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'ACCEPTED', message: 'Quote accepted' })
+                    }).then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Quote accepted!' } })); setTimeout(() => location.reload(), 1500); }
+                    else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); });
+                " class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg min-h-[36px] transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    {{ t('i18n.accept_quote') }}
+                </button>
+                {% endif %}
+
+                <!-- Customer: Decline Quote -->
+                {% if not is_provider and quote.status.value == 'QUOTED' %}
+                <button onclick="
+                    if (!confirm('Decline this quote?')) return;
+                    fetch('/api/v1/service-quotes/{{ quote.id }}/status', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'DECLINED', decline_reason: 'Customer declined' })
+                    }).then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Quote declined.' } })); setTimeout(() => location.reload(), 1500); }
+                    else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); });
+                " class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors min-h-[36px]">
+                    {{ t('i18n.decline_quote') }}
+                </button>
+                {% endif %}
+
+                <!-- Provider: Mark In Progress (accepted quotes) -->
+                {% if is_provider and quote.status.value == 'ACCEPTED' %}
+                <button onclick="
+                    fetch('/api/v1/service-quotes/{{ quote.id }}/status', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'IN_PROGRESS' })
+                    }).then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Marked as in progress!' } })); setTimeout(() => location.reload(), 1500); }
+                    else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); });
+                " class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg min-h-[36px] transition-colors">
+                    Start Work
+                </button>
+                {% endif %}
+
+                <!-- Either: Mark Complete (in_progress quotes) -->
+                {% if quote.status.value == 'IN_PROGRESS' %}
+                <button onclick="
+                    fetch('/api/v1/service-quotes/{{ quote.id }}/status', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'COMPLETED' })
+                    }).then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Service completed!' } })); setTimeout(() => location.reload(), 1500); }
+                    else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); });
+                " class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg min-h-[36px] transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Mark Complete
+                </button>
+                {% endif %}
+
+                <!-- Message the other party -->
+                {% if item and item.owner %}
+                {% set other_user_id = quote.customer_id if is_provider else quote.provider_id %}
+                <a href="/messages?to={{ other_user_id }}&about={{ item.name | urlencode }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors min-h-[36px]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    {{ t('i18n.message') }}
+                </a>
+                {% endif %}
+
+                <div class="flex-1"></div>
+                {% if item %}
+                <a href="/items/{{ item.slug }}" class="text-xs text-gray-400 hover:text-indigo-600 transition-colors">View service &rarr;</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- Empty state -->
+    <div class="text-center py-20">
+        <div class="w-20 h-20 mx-auto bg-amber-50 rounded-full flex items-center justify-center mb-4">
+            <svg class="h-10 w-10 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+            </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900">{{ t('i18n.no_quotes_yet') }}</h3>
+        <p class="mt-2 text-sm text-gray-500 max-w-sm mx-auto">{{ t('i18n.start_browsing_services') }}</p>
+        <a href="/browse?type=service" class="mt-6 inline-flex px-6 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors">
+            {{ t('nav.browse') }}
+        </a>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- ═══ ORDERS TAB (existing) ═══ -->
+
     <!-- Filters -->
     <form method="GET" action="/orders" class="bg-white rounded-xl border border-gray-200 p-4 mb-6 shadow-sm">
+        <input type="hidden" name="tab" value="orders">
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div>
                 <label class="block text-xs font-medium text-gray-500 mb-1">{{ t('i18n.role') }}</label>
@@ -501,6 +810,7 @@
         </a>
     </div>
     {% endif %}
+    {% endif %}{# end tab conditional #}
 </div>
 
 <!-- Dispute Modal -->

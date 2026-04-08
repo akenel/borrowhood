@@ -150,7 +150,7 @@ async def request_quote(
         notification_type=NotificationType.SYSTEM,
         title=f"New quote request for {listing.item.name}",
         body=req.request_description[:100],
-        link="/dashboard",
+        link="/orders?tab=quotes",
         entity_type="quote",
         entity_id=quote.id,
     )
@@ -291,7 +291,7 @@ async def submit_quote(
         notification_type=NotificationType.SYSTEM,
         title=f"Quote received: {req.total_amount:.2f} {req.currency}",
         body=req.quote_description[:100],
-        link="/dashboard",
+        link="/orders?tab=quotes",
         entity_type="quote",
         entity_id=quote.id,
     )
@@ -366,7 +366,7 @@ async def update_quote_status(
         notification_type=NotificationType.SYSTEM,
         title=title,
         body=req.message,
-        link="/dashboard",
+        link="/orders?tab=quotes",
         entity_type="quote",
         entity_id=quote.id,
     )

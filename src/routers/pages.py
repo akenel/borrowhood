@@ -672,6 +672,7 @@ async def dashboard(request: Request,
 @router.get("/orders", response_class=HTMLResponse)
 async def orders_page(
     request: Request,
+    tab: str = "orders",
     status: Optional[str] = None,
     role: Optional[str] = None,
     sort: str = "newest",
@@ -758,12 +759,45 @@ async def orders_page(
             )
             earnings_total = float(earnings_row.scalar() or 0)
 
+    # Fetch service quotes for Quotes tab
+    quotes = []
+    if token and db_user and tab == "quotes":
+        from src.models.quote import BHServiceQuote, QuoteStatus
+        from sqlalchemy.orm import selectinload as sinload
+        q = (
+            select(BHServiceQuote)
+            .options(
+                sinload(BHServiceQuote.listing).selectinload(BHListing.item).selectinload(BHItem.media),
+                sinload(BHServiceQuote.listing).selectinload(BHListing.item).selectinload(BHItem.owner),
+                sinload(BHServiceQuote.customer),
+                sinload(BHServiceQuote.provider),
+            )
+        )
+        if role == "customer":
+            q = q.where(BHServiceQuote.customer_id == db_user.id)
+        elif role == "provider":
+            q = q.where(BHServiceQuote.provider_id == db_user.id)
+        else:
+            q = q.where(
+                (BHServiceQuote.customer_id == db_user.id) | (BHServiceQuote.provider_id == db_user.id)
+            )
+        if status:
+            try:
+                q = q.where(BHServiceQuote.status == QuoteStatus(status.upper()))
+            except ValueError:
+                pass
+        q = q.order_by(BHServiceQuote.created_at.desc()).limit(limit).offset(offset)
+        result = await db.execute(q)
+        quotes = result.scalars().unique().all()
+
     ctx = _ctx(request, token,
         orders=orders,
+        quotes=quotes,
         total_count=total_count,
         earnings_total=earnings_total,
         viewer_user_id=db_user.id if token and db_user else None,
         reviewed_rental_ids=reviewed_rental_ids if token and db_user else set(),
+        selected_tab=tab,
         selected_status=status,
         selected_role=role,
         selected_sort=sort,
