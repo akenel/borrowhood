@@ -740,9 +740,20 @@
     "unlink_confirm": "Are you sure you want to unlink Telegram?"
   },
   "account": {
-    "delete": "Delete Account",
+    "delete": "Delete My Account",
     "delete_title": "Danger Zone",
-    "delete_description": "Permanently delete your account and hide your profile. Your listings will be paused and you will be logged out. This cannot be undone.",
+    "delete_description": "Once deleted, your account and all data are gone forever. There is no undo. Think carefully.",
+    "delete_warning_title": "This Will Delete Everything",
+    "delete_you_will_lose": "You will permanently lose:",
+    "lose_profile": "Your profile, workshop, bio, and avatar",
+    "lose_items": "All your items, listings, and active bookings",
+    "lose_reputation": "All your points, badge tier, and trust score",
+    "lose_messages": "All your messages and conversations",
+    "lose_achievements": "All your achievements, streaks, and leaderboard rank",
+    "delete_permanent": "This action is PERMANENT. There is no way to recover your account, your reputation, or your data. Ever.",
+    "delete_type_confirm": "Type DELETE to confirm:",
+    "delete_cancel": "Keep My Account",
+    "delete_final": "Delete Everything",
     "delete_confirm": "Are you sure you want to permanently delete your account? This action cannot be undone.",
     "delete_success": "Account deleted. Goodbye.",
     "delete_blocked": "Cannot delete account"
