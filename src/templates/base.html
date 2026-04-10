@@ -578,6 +578,55 @@
         <button onclick="this.parentElement.style.display='none'" class="text-indigo-200 hover:text-white flex-shrink-0">&times;</button>
     </div>
 
+    <!-- Session Expiry Warning -->
+    {% if user %}
+    <div id="session-warning" style="display:none"
+         class="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-white px-4 py-3 shadow-lg">
+        <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="text-sm font-semibold" id="session-warning-text">
+                    {{ t('session.expiring') }}
+                </span>
+            </div>
+            <a href="/login" class="px-4 py-1.5 bg-white text-amber-600 text-sm font-bold rounded-lg hover:bg-amber-50 flex-shrink-0 min-h-[36px] flex items-center">
+                {{ t('session.stay_logged_in') }}
+            </a>
+        </div>
+    </div>
+    <script>
+    (function() {
+        var SESSION_MINUTES = 60;
+        var WARN_AT = (SESSION_MINUTES - 5) * 60 * 1000;
+        var LOGOUT_AT = SESSION_MINUTES * 60 * 1000;
+        var warnTimer = setTimeout(function() {
+            document.getElementById('session-warning').style.display = 'block';
+        }, WARN_AT);
+        var logoutTimer = setTimeout(function() {
+            document.getElementById('session-warning-text').textContent =
+                '{{ t("session.expired") }}';
+            setTimeout(function() { window.location.href = '/login'; }, 2000);
+        }, LOGOUT_AT);
+        // Reset timers on user activity (click/keypress = still here)
+        var resetTimer = function() {
+            clearTimeout(warnTimer);
+            clearTimeout(logoutTimer);
+            document.getElementById('session-warning').style.display = 'none';
+            warnTimer = setTimeout(function() {
+                document.getElementById('session-warning').style.display = 'block';
+            }, WARN_AT);
+            logoutTimer = setTimeout(function() {
+                window.location.href = '/login';
+            }, LOGOUT_AT);
+        };
+        document.addEventListener('click', resetTimer);
+        document.addEventListener('keydown', resetTimer);
+    })();
+    </script>
+    {% endif %}
+
     <!-- Floating Feedback Button -->
     <div x-data="{
         open: false,

@@ -24,6 +24,11 @@
     "orders": "Ordini",
     "leaderboard": "Classifica"
   },
+  "session": {
+    "expiring": "La sessione scade tra 5 minuti. Clicca per restare collegato.",
+    "expired": "Sessione scaduta. Reindirizzamento al login...",
+    "stay_logged_in": "Resta Collegato"
+  },
   "leaderboard": {
     "title": "Classifica",
     "subtitle": "Presentati. Lavora sodo. Guadagna il tuo posto.",

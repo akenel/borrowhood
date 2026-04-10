@@ -24,6 +24,11 @@
     "orders": "Orders",
     "leaderboard": "Leaderboard"
   },
+  "session": {
+    "expiring": "Your session expires in 5 minutes. Click to stay logged in.",
+    "expired": "Session expired. Redirecting to login...",
+    "stay_logged_in": "Stay Logged In"
+  },
   "leaderboard": {
     "title": "Leaderboard",
     "subtitle": "Show up. Put in the work. Earn your rank.",
