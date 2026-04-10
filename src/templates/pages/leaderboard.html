@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ t('leaderboard.title') || 'Leaderboard' }} -- La Piazza{% endblock %}
+{% block title %}{{  t('leaderboard.title') }} -- La Piazza{% endblock %}
 
 {% block content %}
 <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8"
@@ -21,50 +21,50 @@
 
     <!-- Header -->
     <div class="text-center mb-8">
-        <h1 class="text-3xl font-extrabold text-gray-900">{{ t('leaderboard.title') || 'Leaderboard' }}</h1>
-        <p class="text-gray-500 mt-2">{{ t('leaderboard.subtitle') || 'Show up. Put in the work. Earn your rank.' }}</p>
+        <h1 class="text-3xl font-extrabold text-gray-900">{{  t('leaderboard.title') }}</h1>
+        <p class="text-gray-500 mt-2">{{  t('leaderboard.subtitle') }}</p>
     </div>
 
     <!-- My Stats Card (if logged in) -->
     <template x-if="myStats">
         <div class="mb-8 bg-gradient-to-r from-rose-500 via-red-500 to-amber-500 rounded-xl p-[2px]">
             <div class="bg-white rounded-xl p-6">
-                <h2 class="font-bold text-lg text-gray-900 mb-4">{{ t('leaderboard.my_stats') || 'My Stats' }}</h2>
+                <h2 class="font-bold text-lg text-gray-900 mb-4">{{  t('leaderboard.my_stats') }}</h2>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     <div class="text-center p-3 bg-rose-50 rounded-lg">
                         <div class="text-2xl font-extrabold text-rose-600" x-text="myStats.events_attended"></div>
-                        <div class="text-xs text-gray-500 mt-1">{{ t('leaderboard.events_attended') || 'Events Attended' }}</div>
+                        <div class="text-xs text-gray-500 mt-1">{{  t('leaderboard.events_attended') }}</div>
                     </div>
                     <div class="text-center p-3 bg-amber-50 rounded-lg">
                         <div class="text-2xl font-extrabold text-amber-600 flex items-center justify-center gap-1">
                             <span x-text="myStats.event_streak"></span>
                             <svg x-show="myStats.event_streak >= 3" class="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 23c-3.866 0-7-3.134-7-7 0-3 2-5.5 4-8.5.667-1 1.167-1.833 1.5-2.5.333.667.833 1.5 1.5 2.5 2 3 4 5.5 4 8.5 0 3.866-3.134 7-7 7z"/></svg>
                         </div>
-                        <div class="text-xs text-gray-500 mt-1">{{ t('leaderboard.current_streak') || 'Current Streak' }}</div>
+                        <div class="text-xs text-gray-500 mt-1">{{  t('leaderboard.current_streak') }}</div>
                     </div>
                     <div class="text-center p-3 bg-indigo-50 rounded-lg">
                         <div class="text-2xl font-extrabold text-indigo-600" x-text="myStats.total_points"></div>
-                        <div class="text-xs text-gray-500 mt-1">{{ t('leaderboard.total_points') || 'Total Points' }}</div>
+                        <div class="text-xs text-gray-500 mt-1">{{  t('leaderboard.total_points') }}</div>
                     </div>
                     <div class="text-center p-3 rounded-lg" :class="myStats.no_show_count > 0 ? 'bg-red-50' : 'bg-green-50'">
                         <div class="text-2xl font-extrabold" :class="myStats.no_show_count > 0 ? 'text-red-600' : 'text-green-600'" x-text="myStats.no_show_count > 0 ? myStats.no_show_count : '0'"></div>
-                        <div class="text-xs text-gray-500 mt-1" x-text="myStats.no_show_count > 0 ? '{{ t('leaderboard.no_shows') || 'No-Shows' }}' : '{{ t('leaderboard.clean_record') || 'Clean Record' }}'"></div>
+                        <div class="text-xs text-gray-500 mt-1" x-text="myStats.no_show_count > 0 ? '{{  t('leaderboard.no_shows') }}' : '{{  t('leaderboard.clean_record') }}'"></div>
                     </div>
                 </div>
 
                 <!-- Rank -->
                 <template x-if="myStats.rank">
                     <div class="mt-4 text-center">
-                        <span class="text-sm text-gray-500">{{ t('leaderboard.your_rank') || 'Your Rank' }}:</span>
+                        <span class="text-sm text-gray-500">{{  t('leaderboard.your_rank') }}:</span>
                         <span class="text-lg font-bold text-rose-600" x-text="'#' + myStats.rank"></span>
-                        <span class="text-sm text-gray-400" x-text="'| {{ t('leaderboard.best_streak') || 'Best Streak' }}: ' + myStats.best_streak"></span>
+                        <span class="text-sm text-gray-400" x-text="'| {{  t('leaderboard.best_streak') }}: ' + myStats.best_streak"></span>
                     </div>
                 </template>
 
                 <!-- Unlocked Achievements -->
                 <template x-if="myStats.achievements && myStats.achievements.length > 0">
                     <div class="mt-4">
-                        <h3 class="text-sm font-semibold text-gray-700 mb-2">{{ t('leaderboard.achievements_unlocked') || 'Achievements Unlocked' }}</h3>
+                        <h3 class="text-sm font-semibold text-gray-700 mb-2">{{  t('leaderboard.achievements_unlocked') }}</h3>
                         <div class="flex flex-wrap gap-2">
                             <template x-for="ach in myStats.achievements" :key="ach.key">
                                 <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold"
@@ -80,7 +80,7 @@
                 <!-- Next achievements (progress bars) -->
                 <template x-if="myStats.next_achievements && myStats.next_achievements.length > 0">
                     <div class="mt-4">
-                        <h3 class="text-sm font-semibold text-gray-700 mb-2">{{ t('leaderboard.next_up') || 'Next Up' }}</h3>
+                        <h3 class="text-sm font-semibold text-gray-700 mb-2">{{  t('leaderboard.next_up') }}</h3>
                         <div class="space-y-2">
                             <template x-for="next in myStats.next_achievements" :key="next.key">
                                 <div class="flex items-center gap-3">
@@ -102,15 +102,15 @@
     <div class="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1">
         <button @click="tab = 'rankings'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
                 :class="tab === 'rankings' ? 'bg-white text-rose-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
-            {{ t('leaderboard.tab_rankings') || 'Rankings' }}
+            {{  t('leaderboard.tab_rankings') }}
         </button>
         <button @click="tab = 'streaks'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
                 :class="tab === 'streaks' ? 'bg-white text-amber-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
-            {{ t('leaderboard.tab_streaks') || 'Streaks' }}
+            {{  t('leaderboard.tab_streaks') }}
         </button>
         <button @click="tab = 'coaches'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
                 :class="tab === 'coaches' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
-            {{ t('leaderboard.tab_coaches') || 'Coaches' }}
+            {{  t('leaderboard.tab_coaches') }}
         </button>
     </div>
 
@@ -158,8 +158,8 @@
             </template>
             <template x-if="leaderboard.top_attendees.length === 0">
                 <div class="text-center py-12 text-gray-400">
-                    <p class="text-lg font-medium">{{ t('leaderboard.no_data') || 'No events yet. Be the first.' }}</p>
-                    <a href="/list" class="mt-3 inline-block text-rose-600 font-semibold hover:underline">{{ t('leaderboard.create_event') || 'Create an Event' }}</a>
+                    <p class="text-lg font-medium">{{  t('leaderboard.no_data') }}</p>
+                    <a href="/list" class="mt-3 inline-block text-rose-600 font-semibold hover:underline">{{  t('leaderboard.create_event') }}</a>
                 </div>
             </template>
         </div>
@@ -179,13 +179,13 @@
                     </div>
                     <div class="text-right">
                         <div class="text-2xl font-extrabold text-amber-600" x-text="user.event_streak"></div>
-                        <div class="text-xs text-gray-400" x-text="'{{ t('leaderboard.best') || 'best' }}: ' + user.best_streak"></div>
+                        <div class="text-xs text-gray-400" x-text="'{{  t('leaderboard.best') }}: ' + user.best_streak"></div>
                     </div>
                 </div>
             </template>
             <template x-if="leaderboard.top_streaks.length === 0">
                 <div class="text-center py-12 text-gray-400">
-                    <p>{{ t('leaderboard.no_streaks') || 'No streaks yet. Start one today.' }}</p>
+                    <p>{{  t('leaderboard.no_streaks') }}</p>
                 </div>
             </template>
         </div>
@@ -206,13 +206,13 @@
                     </div>
                     <div class="text-right">
                         <div class="text-lg font-bold text-indigo-600" x-text="host.events_hosted"></div>
-                        <div class="text-xs text-gray-400">{{ t('leaderboard.events_hosted') || 'events hosted' }}</div>
+                        <div class="text-xs text-gray-400">{{  t('leaderboard.events_hosted') }}</div>
                     </div>
                 </a>
             </template>
             <template x-if="leaderboard.top_hosts.length === 0">
                 <div class="text-center py-12 text-gray-400">
-                    <p>{{ t('leaderboard.no_coaches') || 'No coaches yet. Step up.' }}</p>
+                    <p>{{  t('leaderboard.no_coaches') }}</p>
                 </div>
             </template>
         </div>
@@ -220,7 +220,7 @@
 
     <!-- Achievement Gallery -->
     <div class="mt-10">
-        <h2 class="text-xl font-bold text-gray-900 mb-4">{{ t('leaderboard.all_achievements') || 'All Achievements' }}</h2>
+        <h2 class="text-xl font-bold text-gray-900 mb-4">{{  t('leaderboard.all_achievements') }}</h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {% for key, ach in achievements.items() %}
             <div class="p-4 rounded-lg border text-center
@@ -241,7 +241,7 @@
 
     <!-- Motivational footer -->
     <div class="mt-10 text-center py-8 border-t border-gray-200">
-        <p class="text-gray-400 text-sm italic">"{{ t('leaderboard.quote') || 'I fear not the man who has practiced 10,000 kicks once, but I fear the man who has practiced one kick 10,000 times.' }}"</p>
+        <p class="text-gray-400 text-sm italic">"{{  t('leaderboard.quote') }}"</p>
         <p class="text-gray-300 text-xs mt-1">-- Bruce Lee</p>
     </div>
 
