@@ -25,7 +25,9 @@
     "leaderboard": "Classifica"
   },
   "settings": {
-    "font_size": "Dimensione Testo"
+    "font_size": "Dimensione Testo",
+    "smaller": "Piu Piccolo",
+    "larger": "Piu Grande"
   },
   "session": {
     "expiring": "La sessione scade tra 5 minuti. Clicca per restare collegato.",

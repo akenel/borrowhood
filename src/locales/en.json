@@ -25,7 +25,9 @@
     "leaderboard": "Leaderboard"
   },
   "settings": {
-    "font_size": "Text Size"
+    "font_size": "Text Size",
+    "smaller": "Smaller",
+    "larger": "Larger"
   },
   "session": {
     "expiring": "Your session expires in 5 minutes. Click to stay logged in.",
