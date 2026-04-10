@@ -207,6 +207,88 @@ async def create_item(
 
 
 # ================================================================
+# API: User Feedback (public -- no auth required)
+# ================================================================
+from pydantic import BaseModel as _BaseModel, Field as _Field
+
+
+class FeedbackCreate(_BaseModel):
+    message: str = _Field(..., min_length=5, max_length=2000)
+    page_url: str = _Field(..., max_length=500)
+    feedback_type: str = _Field(default="bug", max_length=20)  # bug, idea, other
+    email: Optional[str] = _Field(None, max_length=200)
+
+
+@router.post("/feedback", status_code=201)
+async def submit_feedback(
+    data: FeedbackCreate,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    token: Optional[dict] = Depends(get_current_user_token),
+):
+    """Submit user feedback -- creates a backlog item tagged 'user-feedback'.
+
+    Works for both logged-in and anonymous users.
+    Rate limited by IP via the global rate limiter.
+    """
+    # Determine who submitted
+    submitter = "Anonymous"
+    if token:
+        from src.dependencies import get_user
+        try:
+            user = await get_user(db, token)
+            submitter = user.display_name or user.username or user.email
+        except Exception:
+            pass
+    elif data.email:
+        submitter = data.email
+
+    # Map feedback type to backlog type + priority
+    type_map = {
+        "bug": (BacklogItemType.BUG_FIX, BacklogPriority.HIGH),
+        "idea": (BacklogItemType.FEATURE, BacklogPriority.MEDIUM),
+        "other": (BacklogItemType.IMPROVEMENT, BacklogPriority.MEDIUM),
+    }
+    item_type, priority = type_map.get(data.feedback_type, (BacklogItemType.BUG_FIX, BacklogPriority.MEDIUM))
+
+    # Auto-generate title from message
+    title = data.message[:80].strip()
+    if len(data.message) > 80:
+        title = title.rsplit(" ", 1)[0] + "..."
+
+    # Build description with context
+    description = (
+        f"**User Feedback**\n\n"
+        f"{data.message}\n\n"
+        f"---\n"
+        f"- **Page:** {data.page_url}\n"
+        f"- **Type:** {data.feedback_type}\n"
+        f"- **From:** {submitter}\n"
+        f"- **Browser:** {request.headers.get('user-agent', 'unknown')[:100]}\n"
+    )
+
+    max_num = await db.execute(
+        select(func.coalesce(func.max(BHBacklogItem.item_number), 0))
+    )
+    next_number = max_num.scalar() + 1
+
+    new_item = BHBacklogItem(
+        item_number=next_number,
+        title=f"[Feedback] {title}",
+        description=description,
+        item_type=item_type,
+        priority=priority,
+        tags="user-feedback",
+        created_by=submitter,
+    )
+    db.add(new_item)
+    await db.commit()
+
+    logger.info(f"BL-{next_number:03d} feedback from {submitter}: {title}")
+    return {"detail": "Feedback received", "item_number": next_number}
+
+
+# ================================================================
 # API: Get Single Item
 # ================================================================
 @router.get("/items/{item_id}", response_model=BacklogItemRead)

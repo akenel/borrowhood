@@ -49,6 +49,21 @@
     "best": "record",
     "quote": "Non temo l'uomo che ha praticato 10.000 calci una volta, ma temo l'uomo che ha praticato un calcio 10.000 volte."
   },
+  "feedback": {
+    "title": "Invia Feedback",
+    "subtitle": "Aiutaci a migliorare La Piazza",
+    "bug": "Problema",
+    "idea": "Idea",
+    "other": "Altro",
+    "placeholder": "Cosa e successo? Cosa ti aspettavi?",
+    "email_optional": "Email (opzionale -- per poterti rispondere)",
+    "send": "Invia Feedback",
+    "sending": "Invio...",
+    "thanks": "Grazie!",
+    "created": "creato -- ci pensiamo noi",
+    "close": "Chiudi",
+    "page_captured": "L'URL della pagina viene catturato automaticamente"
+  },
   "home": {
     "hero_title": "La Piazza è Aperta",
     "hero_subtitle": "Il tuo quartiere ha tutto ciò di cui hai bisogno. Ogni vicino ha qualcosa da condividere. Noleggia. Impara. Crea. Fai un'offerta. Senza commissioni.",

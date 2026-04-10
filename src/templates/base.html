@@ -578,6 +578,125 @@
         <button onclick="this.parentElement.style.display='none'" class="text-indigo-200 hover:text-white flex-shrink-0">&times;</button>
     </div>
 
+    <!-- Floating Feedback Button -->
+    <div x-data="{
+        open: false,
+        feedbackType: 'bug',
+        message: '',
+        email: '',
+        submitting: false,
+        submitted: false,
+        blNumber: null,
+        async submitFeedback() {
+            if (this.message.length < 5) return;
+            this.submitting = true;
+            try {
+                const resp = await fetch('/api/v1/backlog/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: this.message,
+                        page_url: window.location.href,
+                        feedback_type: this.feedbackType,
+                        email: this.email || null,
+                    })
+                });
+                if (!resp.ok) { const e = await resp.json(); throw new Error(e.detail || 'Failed'); }
+                const data = await resp.json();
+                this.blNumber = data.item_number;
+                this.submitted = true;
+                this.message = '';
+            } catch (e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } }));
+            } finally {
+                this.submitting = false;
+            }
+        },
+        reset() { this.open = false; this.submitted = false; this.blNumber = null; this.message = ''; }
+    }">
+        <!-- Floating button -->
+        <button @click="open = !open; submitted = false"
+                class="fixed bottom-6 right-6 z-40 w-12 h-12 bg-rose-600 hover:bg-rose-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 min-h-[48px] min-w-[48px]"
+                :class="open ? 'rotate-45' : ''">
+            <svg x-show="!open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+            </svg>
+            <svg x-show="open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+        </button>
+
+        <!-- Feedback panel -->
+        <div x-show="open" x-cloak
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 translate-y-4 scale-95"
+             class="fixed bottom-20 right-6 z-40 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
+
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-rose-500 to-amber-500 px-4 py-3">
+                <h3 class="text-white font-bold text-sm">{{ t('feedback.title') || 'Send Feedback' }}</h3>
+                <p class="text-white/70 text-xs">{{ t('feedback.subtitle') || 'Help us make La Piazza better' }}</p>
+            </div>
+
+            <!-- Success state -->
+            <template x-if="submitted">
+                <div class="p-6 text-center">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <p class="font-semibold text-gray-900">{{ t('feedback.thanks') || 'Thank you!' }}</p>
+                    <p class="text-sm text-gray-500 mt-1" x-text="'BL-' + String(blNumber).padStart(3, '0') + ' {{ t('feedback.created') || 'created' }}'"></p>
+                    <button @click="reset()" class="mt-4 text-sm text-rose-600 font-semibold hover:underline">{{ t('feedback.close') || 'Close' }}</button>
+                </div>
+            </template>
+
+            <!-- Form -->
+            <template x-if="!submitted">
+                <div class="p-4 space-y-3">
+                    <!-- Type selector -->
+                    <div class="flex gap-1 bg-gray-100 rounded-lg p-0.5">
+                        <button @click="feedbackType = 'bug'" class="flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors"
+                                :class="feedbackType === 'bug' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500'">
+                            {{ t('feedback.bug') || 'Bug' }}
+                        </button>
+                        <button @click="feedbackType = 'idea'" class="flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors"
+                                :class="feedbackType === 'idea' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'">
+                            {{ t('feedback.idea') || 'Idea' }}
+                        </button>
+                        <button @click="feedbackType = 'other'" class="flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors"
+                                :class="feedbackType === 'other' ? 'bg-white text-gray-700 shadow-sm' : 'text-gray-500'">
+                            {{ t('feedback.other') || 'Other' }}
+                        </button>
+                    </div>
+
+                    <!-- Message -->
+                    <textarea x-model="message" rows="3" maxlength="2000"
+                              placeholder="{{ t('feedback.placeholder') || 'What happened? What did you expect?' }}"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-500 resize-none"></textarea>
+
+                    <!-- Email (optional, for anonymous users) -->
+                    {% if not user %}
+                    <input type="email" x-model="email" placeholder="{{ t('feedback.email_optional') || 'Email (optional -- so we can follow up)' }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500">
+                    {% endif %}
+
+                    <!-- Submit -->
+                    <button @click="submitFeedback()" :disabled="submitting || message.length < 5"
+                            class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg text-sm disabled:opacity-50 transition-colors min-h-[44px]">
+                        <span x-text="submitting ? '{{ t('feedback.sending') || 'Sending...' }}' : '{{ t('feedback.send') || 'Send Feedback' }}'"></span>
+                    </button>
+                    <p class="text-xs text-gray-400 text-center">{{ t('feedback.page_captured') || 'Current page URL is captured automatically' }}</p>
+                </div>
+            </template>
+        </div>
+    </div>
+
     {% block scripts %}{% endblock %}
 </body>
 </html>
