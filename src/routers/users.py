@@ -512,9 +512,10 @@ async def delete_my_account(
     ]
     for sql in cleanup_tables:
         try:
-            await db.execute(sa_text(sql), {"uid": uid})
+            async with db.begin_nested():
+                await db.execute(sa_text(sql), {"uid": uid})
         except Exception:
-            pass  # Skip tables that don't exist
+            pass  # Savepoint rolled back -- table may not exist yet
 
     # Step 3: Audit trail before deletion
     db.add(BHAuditLog(
