@@ -450,8 +450,9 @@
                                     {% elif listing.listing_type.value == 'training' %}bg-teal-50 text-teal-700
                                     {% elif listing.listing_type.value == 'service' %}bg-cyan-50 text-cyan-700
                                     {% elif listing.listing_type.value == 'giveaway' %}bg-green-50 text-green-700
+                                    {% elif listing.listing_type.value == 'event' %}bg-rose-50 text-rose-700
                                     {% else %}bg-indigo-50 text-indigo-700{% endif %}">
-                                    {{ listing.listing_type.value | title }}
+                                    {{ t('listing_types.' + listing.listing_type.value) }}
                                 </span>
                                 {% if listing.price %}
                                 <span class="text-xs font-semibold text-gray-700">
@@ -459,6 +460,10 @@
                                 </span>
                                 {% elif listing.listing_type.value == 'giveaway' %}
                                 <span class="text-xs font-semibold text-green-600">{{ t('i18n.free') }}</span>
+                                {% endif %}
+                                {% if listing.listing_type.value == 'event' and listing.event_start %}
+                                <span class="text-xs text-rose-600">{{ listing.event_start.strftime('%b %d, %H:%M') }}</span>
+                                {% if not listing.price %}<span class="text-xs font-semibold text-green-600">{{ t('events.free_event') }}</span>{% endif %}
                                 {% endif %}
                             </div>
                             {% endfor %}

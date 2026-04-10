@@ -24,6 +24,9 @@
     "orders": "Ordini",
     "leaderboard": "Classifica"
   },
+  "settings": {
+    "font_size": "Dimensione Testo"
+  },
   "session": {
     "expiring": "La sessione scade tra 5 minuti. Clicca per restare collegato.",
     "expired": "Sessione scaduta. Reindirizzamento al login...",
@@ -261,6 +264,7 @@
   "common": {
     "save": "Salva",
     "cancel": "Annulla",
+    "reset": "Ripristina",
     "delete": "Elimina",
     "edit": "Modifica",
     "back": "Indietro",

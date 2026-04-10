@@ -75,6 +75,13 @@
     </style>
 
     {% block head %}{% endblock %}
+    <script>
+    // Font size preference (persisted in localStorage)
+    (function() {
+        var saved = localStorage.getItem('lp-font-size');
+        if (saved) document.documentElement.style.fontSize = saved + 'px';
+    })();
+    </script>
 </head>
 <body class="h-full bg-gray-50 font-sans text-gray-900"
       x-data="{ mobileMenuOpen: false }">
@@ -301,6 +308,24 @@
                     </a>
                     {% endfor %}
                 </div>
+                <!-- Font size control (mobile) -->
+                <div class="flex items-center justify-between px-4 py-3 border-t border-gray-100" x-data="{
+                    size: parseInt(localStorage.getItem('lp-font-size') || 16),
+                    set(val) {
+                        this.size = Math.min(24, Math.max(12, val));
+                        document.documentElement.style.fontSize = this.size + 'px';
+                        localStorage.setItem('lp-font-size', this.size);
+                    },
+                    reset() { this.set(16); }
+                }">
+                    <span class="text-sm text-gray-500">{{ t('settings.font_size') }}</span>
+                    <div class="flex items-center gap-2">
+                        <button @click="set(size - 2)" class="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-lg flex items-center justify-center">A-</button>
+                        <span class="text-xs text-gray-400 w-8 text-center" x-text="size + 'px'"></span>
+                        <button @click="set(size + 2)" class="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-lg flex items-center justify-center">A+</button>
+                        <button @click="reset()" class="text-xs text-gray-400 hover:text-indigo-600 ml-1">{{ t('common.reset') }}</button>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
@@ -337,12 +362,25 @@
                     <p class="text-sm font-semibold text-gray-900">&copy; {{ now().year }} {{ t('app.name') }}</p>
                     <p class="text-xs text-gray-500 mt-1">{{ t('footer.tagline') }}</p>
                 </div>
-                <div class="flex space-x-6 text-sm text-gray-500">
+                <div class="flex items-center space-x-6 text-sm text-gray-500">
                     <a href="https://github.com/akenel/borrowhood" target="_blank" rel="noopener"
                        class="hover:text-indigo-600 transition-colors">{{ t('footer.github') }}</a>
                     <a href="/terms" class="hover:text-indigo-600 transition-colors">{{ t('footer.terms') }}</a>
                     <a href="/terms" class="hover:text-indigo-600 transition-colors">{{ t('footer.privacy') }}</a>
                     <a href="/legal" class="hover:text-indigo-600 transition-colors">{% if lang == 'it' %}Note Legali{% else %}Legal{% endif %}</a>
+                    <!-- Font size (desktop) -->
+                    <span class="hidden sm:inline-flex items-center gap-1 text-xs text-gray-400" x-data="{
+                        size: parseInt(localStorage.getItem('lp-font-size') || 16),
+                        set(val) {
+                            this.size = Math.min(24, Math.max(12, val));
+                            document.documentElement.style.fontSize = this.size + 'px';
+                            localStorage.setItem('lp-font-size', this.size);
+                        }
+                    }">
+                        <button @click="set(size - 2)" class="hover:text-indigo-600 font-bold">A-</button>
+                        <span class="text-gray-300">|</span>
+                        <button @click="set(size + 2)" class="hover:text-indigo-600 font-bold">A+</button>
+                    </span>
                 </div>
             </div>
         </div>

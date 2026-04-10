@@ -24,6 +24,9 @@
     "orders": "Orders",
     "leaderboard": "Leaderboard"
   },
+  "settings": {
+    "font_size": "Text Size"
+  },
   "session": {
     "expiring": "Your session expires in 5 minutes. Click to stay logged in.",
     "expired": "Session expired. Redirecting to login...",
@@ -261,6 +264,7 @@
   "common": {
     "save": "Save",
     "cancel": "Cancel",
+    "reset": "Reset",
     "delete": "Delete",
     "edit": "Edit",
     "back": "Back",
