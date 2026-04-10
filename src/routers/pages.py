@@ -473,6 +473,10 @@ async def edit_item_page(slug: str, request: Request,
                 "per_person_rate": float(l.per_person_rate) if l.per_person_rate else None,
                 "max_participants": l.max_participants,
                 "group_discount_pct": float(l.group_discount_pct) if l.group_discount_pct else None,
+                "event_start": l.event_start.isoformat() if l.event_start else None,
+                "event_end": l.event_end.isoformat() if l.event_end else None,
+                "event_venue": l.event_venue or "",
+                "event_address": l.event_address or "",
             })
 
     ctx = _ctx(request, token,

@@ -71,6 +71,14 @@
                     window._editListingPrices[l.listing_type].price_unit = l.price_unit || 'flat';
                     window._editListingPrices[l.listing_type].deposit = l.deposit || '';
                 }
+                if (l.listing_type === 'event') {
+                    window._editListingPrices['event'].event_start = l.event_start ? l.event_start.slice(0, 16) : '';
+                    window._editListingPrices['event'].event_end = l.event_end ? l.event_end.slice(0, 16) : '';
+                    window._editListingPrices['event'].event_venue = l.event_venue || '';
+                    window._editListingPrices['event'].event_address = l.event_address || '';
+                    window._editListingPrices['event'].max_participants = l.max_participants || '';
+                    window._editListingPrices['event'].event_is_free = (l.price === null || l.price === 0);
+                }
             });
         }
     {% else %}
