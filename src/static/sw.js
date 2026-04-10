@@ -6,7 +6,7 @@
  * - HTML pages and API calls: network-first with offline fallback
  */
 
-const CACHE_NAME = 'lp-v2';
+const CACHE_NAME = 'lp-v3';
 const STATIC_ASSETS = [
   '/',
   '/browse',

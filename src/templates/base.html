@@ -85,17 +85,16 @@
     body[data-text-scale="48"] :is(p,span,a,li,td,th,label,h1,h2,h3,h4,h5,h6,input,textarea,select,button,dt,dd) { font-size: 300% !important; }
     </style>
     <script>
-    // Text scale preference (persisted in localStorage)
-    (function() {
-        // Clean up old broken font-size approach
-        localStorage.removeItem('lp-font-size');
-        document.documentElement.style.removeProperty('font-size');
-        // Apply text-only scale
-        var saved = localStorage.getItem('lp-text-scale');
-        if (saved && saved !== '16') document.addEventListener('DOMContentLoaded', function() {
-            document.body.setAttribute('data-text-scale', saved);
-        });
-    })();
+    // NUCLEAR CLEANUP: force reset root font-size immediately (before render)
+    // Old approach wrote huge px values to html root -- this kills it dead
+    document.documentElement.style.cssText = '';
+    document.documentElement.removeAttribute('style');
+    localStorage.removeItem('lp-font-size');
+    // Apply new text-only scale (safe -- only targets text elements via CSS)
+    var _ts = localStorage.getItem('lp-text-scale');
+    if (_ts && _ts !== '16') document.addEventListener('DOMContentLoaded', function() {
+        document.body.setAttribute('data-text-scale', _ts);
+    });
     </script>
 </head>
 <body class="h-full bg-gray-50 font-sans text-gray-900"
