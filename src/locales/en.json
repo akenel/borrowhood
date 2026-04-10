@@ -750,6 +750,7 @@
     "lose_reputation": "All your points, badge tier, and trust score",
     "lose_messages": "All your messages and conversations",
     "lose_achievements": "All your achievements, streaks, and leaderboard rank",
+    "delete_member_since": "you've been a member since",
     "delete_permanent": "This action is PERMANENT. There is no way to recover your account, your reputation, or your data. Ever.",
     "delete_type_confirm": "Type DELETE to confirm:",
     "delete_cancel": "Keep My Account",

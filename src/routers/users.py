@@ -352,6 +352,62 @@ _ACTIVE_RENTAL_STATUSES = [
 ]
 
 
+@router.get("/me/delete-preview")
+async def delete_preview(
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Show the user exactly what they'll lose if they delete their account."""
+    user = await get_user(db, token)
+
+    # Count everything they have
+    from src.models.user import BHUserPoints, BHUserSkill, BHUserSocialLink
+    from src.models.helpboard import BHHelpPost, BHHelpReply
+    from src.models.review import BHReview
+
+    item_count = await db.scalar(
+        select(func.count()).select_from(BHItem).where(BHItem.owner_id == user.id)
+    ) or 0
+    listing_count = await db.scalar(
+        select(func.count()).select_from(BHListing)
+        .where(BHListing.item_id.in_(select(BHItem.id).where(BHItem.owner_id == user.id)))
+    ) or 0
+    from src.models.message import BHMessage
+    message_count = await db.scalar(
+        select(func.count()).select_from(BHMessage)
+        .where(or_(BHMessage.sender_id == user.id, BHMessage.recipient_id == user.id))
+    ) or 0
+    review_count = await db.scalar(
+        select(func.count()).select_from(BHReview).where(BHReview.reviewer_id == user.id)
+    ) or 0
+    helppost_count = await db.scalar(
+        select(func.count()).select_from(BHHelpPost).where(BHHelpPost.author_id == user.id)
+    ) or 0
+    skill_count = await db.scalar(
+        select(func.count()).select_from(BHUserSkill).where(BHUserSkill.user_id == user.id)
+    ) or 0
+
+    pts_result = await db.execute(
+        select(BHUserPoints).where(BHUserPoints.user_id == user.id)
+    )
+    pts = pts_result.scalar_one_or_none()
+
+    return {
+        "display_name": user.display_name or user.username,
+        "badge_tier": user.badge_tier.value if user.badge_tier else "newcomer",
+        "total_points": pts.total_points if pts else 0,
+        "events_attended": pts.events_attended if pts else 0,
+        "best_streak": pts.best_streak if pts else 0,
+        "items": item_count,
+        "listings": listing_count,
+        "messages": message_count,
+        "reviews": review_count,
+        "help_posts": helppost_count,
+        "skills": skill_count,
+        "member_since": user.created_at.strftime("%B %Y") if user.created_at else "unknown",
+    }
+
+
 @router.delete("/me", status_code=200)
 async def delete_my_account(
     token: dict = Depends(require_auth),
