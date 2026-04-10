@@ -126,6 +126,16 @@ async def create_listing(
         from datetime import datetime, timezone
         auction_end_dt = datetime.fromisoformat(data.auction_end.replace("Z", "+00:00"))
 
+    # Parse event datetimes from ISO string if provided
+    event_start_dt = None
+    event_end_dt = None
+    if data.event_start:
+        from datetime import datetime as _dt
+        event_start_dt = _dt.fromisoformat(data.event_start.replace("Z", "+00:00"))
+    if data.event_end:
+        from datetime import datetime as _dt
+        event_end_dt = _dt.fromisoformat(data.event_end.replace("Z", "+00:00"))
+
     # Determine listing status on create:
     # - Draft stays draft (user wants to save without publishing)
     # - Moderators/admins go straight to active
@@ -161,6 +171,10 @@ async def create_listing(
         per_person_rate=data.per_person_rate,
         max_participants=data.max_participants,
         group_discount_pct=data.group_discount_pct,
+        event_start=event_start_dt,
+        event_end=event_end_dt,
+        event_venue=data.event_venue,
+        event_address=data.event_address,
     )
     db.add(listing)
     await db.commit()
@@ -202,6 +216,13 @@ async def update_listing(
         raise HTTPException(status_code=403, detail="Not your listing")
 
     update_data = data.model_dump(exclude_unset=True)
+    # Parse ISO datetime strings for event fields
+    for dt_field in ("event_start", "event_end"):
+        if dt_field in update_data and update_data[dt_field]:
+            from datetime import datetime as _dt
+            update_data[dt_field] = _dt.fromisoformat(
+                update_data[dt_field].replace("Z", "+00:00")
+            )
     for field, value in update_data.items():
         setattr(listing, field, value)
 

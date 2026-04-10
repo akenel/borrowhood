@@ -127,9 +127,10 @@ class BHUser(BHBase, Base):
     accepted_payments: Mapped[Optional[str]] = mapped_column(Text, default="")
 
     # Seller type (BL-069: tax/VAT compliance)
-    seller_type: Mapped[Optional[str]] = mapped_column(String(20), default="personal")  # personal | business
+    seller_type: Mapped[Optional[str]] = mapped_column(String(20), default="personal")  # personal | business | organization
     business_name: Mapped[Optional[str]] = mapped_column(String(200), default=None)
     vat_number: Mapped[Optional[str]] = mapped_column(String(50), default=None)
+    organization_description: Mapped[Optional[str]] = mapped_column(Text, default=None)
 
     # Stripe Connect (marketplace payouts)
     stripe_account_id: Mapped[Optional[str]] = mapped_column(String(200), default=None)
@@ -138,6 +139,9 @@ class BHUser(BHBase, Base):
     default_community_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         UUID(as_uuid=True), ForeignKey("bh_community.id"), nullable=True
     )
+
+    # Event reliability tracking
+    no_show_count: Mapped[int] = mapped_column(Integer, default=0)
 
     # Activity tracking
     last_active_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), default=None)
@@ -209,6 +213,13 @@ class BHUserPoints(BHBase, Base):
     items_listed: Mapped[int] = mapped_column(Integer, default=0)
     helpful_flags: Mapped[int] = mapped_column(Integer, default=0)
     giveaways_completed: Mapped[int] = mapped_column(Integer, default=0)
+
+    # Event gamification
+    events_attended: Mapped[int] = mapped_column(Integer, default=0)
+    events_hosted: Mapped[int] = mapped_column(Integer, default=0)
+    event_streak: Mapped[int] = mapped_column(Integer, default=0)     # Current consecutive streak
+    best_streak: Mapped[int] = mapped_column(Integer, default=0)      # All-time best streak
+    challenges_completed: Mapped[int] = mapped_column(Integer, default=0)
 
     user: Mapped["BHUser"] = relationship(back_populates="points")
 

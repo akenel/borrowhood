@@ -14137,6 +14137,93 @@
         "helpful_flags": 40
       },
       "offers_training": true
+    },
+    {
+      "slug": "nics-dojo",
+      "display_name": "Nicolò Roccamena",
+      "email": "roccamenanicolo@gmail.com",
+      "workshop_name": "Nic's Dojo",
+      "workshop_type": "dojo",
+      "tagline": "Be water, my friend",
+      "bio": "Atleta di jiu-jitsu, 19 anni, Alcamo. Mi alleno 5 giorni a settimana e sto costruendo la mia carriera come coach sportivo professionista. Il mio obiettivo: aiutare i giovani a scoprire la disciplina, la forza e la fiducia attraverso le arti marziali e il fitness.\n\nJiu-jitsu athlete, 19, from Alcamo. Training 5 days a week, building my career as a professional athletic coach. Helping young people discover discipline, strength, and confidence through martial arts and fitness.",
+      "telegram_username": "nic_dojo",
+      "city": "Trapani",
+      "address": "Alcamo / Trapani",
+      "country_code": "IT",
+      "latitude": 37.9809,
+      "longitude": 12.959,
+      "badge_tier": "active",
+      "date_of_birth": "2006-07-15",
+      "mother_name": "Airelo",
+      "father_name": "Marcello Roccamena",
+      "seller_type": "personal",
+      "languages": [
+        {
+          "language_code": "it",
+          "proficiency": "native"
+        },
+        {
+          "language_code": "en",
+          "proficiency": "B1"
+        }
+      ],
+      "skills": [
+        {
+          "skill_name": "Jiu-Jitsu",
+          "category": "martial_arts",
+          "self_rating": 4,
+          "years_experience": 5
+        },
+        {
+          "skill_name": "Self-Defense",
+          "category": "martial_arts",
+          "self_rating": 4,
+          "years_experience": 5
+        },
+        {
+          "skill_name": "Strength & Conditioning",
+          "category": "fitness",
+          "self_rating": 3,
+          "years_experience": 2
+        },
+        {
+          "skill_name": "Fitness Coaching",
+          "category": "fitness",
+          "self_rating": 3,
+          "years_experience": 1
+        },
+        {
+          "skill_name": "Youth Mentoring",
+          "category": "community",
+          "self_rating": 3,
+          "years_experience": 1
+        }
+      ],
+      "social_links": [
+        {
+          "platform": "instagram",
+          "url": "https://instagram.com/nic_dojo_trapani",
+          "label": "Nic's Dojo"
+        },
+        {
+          "platform": "strava",
+          "url": "https://strava.com/athletes/nic_dojo",
+          "label": "Training Log"
+        }
+      ],
+      "points": {
+        "total_points": 85,
+        "rentals_completed": 3,
+        "reviews_given": 4,
+        "reviews_received": 6,
+        "items_listed": 5,
+        "helpful_flags": 2
+      },
+      "offers_delivery": false,
+      "offers_training": true,
+      "offers_pickup": true,
+      "avatar_url": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=200&h=200&fit=crop&crop=face",
+      "banner_url": "https://images.unsplash.com/photo-1555597673-b21d5c935865?w=1200&h=400&fit=crop"
     }
   ],
   "items": [
@@ -31457,6 +31544,184 @@
         "industry": "Fishing",
         "application_deadline": "2026-04-01"
       }
+    },
+    {
+      "owner_slug": "nics-dojo",
+      "name": "Jiu-Jitsu per Principianti -- Workshop Gratuito",
+      "slug": "jiu-jitsu-per-principianti-workshop-gratuito",
+      "description": "Introduzione al jiu-jitsu per tutti i livelli. Impara le basi della difesa personale, il controllo del corpo e la disciplina mentale. Porta vestiti comodi e una bottiglia d'acqua.\n\nIntroduction to jiu-jitsu for all levels. Learn the basics of self-defense, body control, and mental discipline. Bring comfortable clothes and a water bottle.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "workshop_event",
+      "condition": "new",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Jiu-jitsu training session"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "event",
+          "price": null,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "max_participants": 15,
+          "event_start": "2026-04-19T15:00:00+02:00",
+          "event_end": "2026-04-19T17:00:00+02:00",
+          "event_venue": "DesTEENazione D50",
+          "event_address": "Trapani, Sicilia",
+          "notes": "Evento gratuito. Tutti i livelli benvenuti. / Free event. All levels welcome."
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.514,
+      "story": "Ho iniziato il jiu-jitsu a 14 anni. Mi ha insegnato che la vera forza non e nei muscoli -- e nella mente. Ora voglio condividere questa lezione con altri giovani. / I started jiu-jitsu at 14. It taught me that real strength isn't in the muscles -- it's in the mind. Now I want to share that lesson with other young people.",
+      "attributes": {
+        "age_requirement": "all_ages",
+        "skill_level": "beginner",
+        "what_to_bring": "Vestiti comodi, bottiglia d'acqua / Comfortable clothes, water bottle"
+      }
+    },
+    {
+      "owner_slug": "nics-dojo",
+      "name": "Autodifesa per Ragazze -- Self-Defense for Girls",
+      "slug": "autodifesa-per-ragazze-self-defense",
+      "description": "Workshop di autodifesa pensato per ragazze e donne. Tecniche pratiche, sicurezza personale, consapevolezza situazionale. Nessuna esperienza richiesta.\n\nSelf-defense workshop designed for girls and women. Practical techniques, personal safety, situational awareness. No experience needed.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "sports_event",
+      "condition": "new",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Self-defense training"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "event",
+          "price": null,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "max_participants": 12,
+          "event_start": "2026-04-26T10:00:00+02:00",
+          "event_end": "2026-04-26T12:00:00+02:00",
+          "event_venue": "DesTEENazione D50",
+          "event_address": "Trapani, Sicilia",
+          "notes": "Evento gratuito. Solo per ragazze/donne. / Free event. Girls/women only."
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.514,
+      "story": "Mia madre mi ha detto: 'Insegna alle ragazze a difendersi.' Ha ragione. / My mother told me: 'Teach girls to defend themselves.' She's right.",
+      "attributes": {
+        "age_requirement": "16_plus",
+        "skill_level": "beginner",
+        "what_to_bring": "Vestiti comodi / Comfortable clothes"
+      }
+    },
+    {
+      "owner_slug": "nics-dojo",
+      "name": "Personal Training -- Forza e Condizionamento",
+      "slug": "personal-training-forza-condizionamento",
+      "description": "Sessioni di personal training focalizzate su forza, mobilita e condizionamento atletico. Programma personalizzato basato sui tuoi obiettivi.\n\nPersonal training sessions focused on strength, mobility, and athletic conditioning. Customized program based on your goals.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "training_service",
+      "condition": "new",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Strength training session"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "training",
+          "price": 15.0,
+          "price_unit": "per_hour",
+          "currency": "EUR",
+          "minimum_charge": 15.0,
+          "per_person_rate": 10.0,
+          "max_participants": 4,
+          "group_discount_pct": 20.0,
+          "notes": "Prima sessione gratuita per provare. / First session free to try."
+        }
+      ],
+      "latitude": 37.981,
+      "longitude": 12.959,
+      "story": "Bruce Lee diceva 'Non temo l'uomo che ha praticato 10.000 calci una volta, ma temo l'uomo che ha praticato un calcio 10.000 volte.' Questo e il mio approccio al training. / Bruce Lee said 'I fear not the man who has practiced 10,000 kicks once, but I fear the man who has practiced one kick 10,000 times.' That's my approach to training."
+    },
+    {
+      "owner_slug": "nics-dojo",
+      "name": "Sacco da Boxe Professionale + Guantoni",
+      "slug": "sacco-boxe-professionale-guantoni",
+      "description": "Sacco da boxe 40kg con supporto a muro + 2 paia di guantoni (12oz e 16oz). Perfetto per allenamento cardio e tecnica. Disponibile per prestito.\n\nProfessional 40kg heavy bag with wall mount + 2 pairs of gloves (12oz and 16oz). Perfect for cardio and technique training. Available for loan.",
+      "content_language": "it",
+      "item_type": "physical",
+      "category": "sports",
+      "subcategory": "martial_arts",
+      "condition": "good",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Heavy bag and boxing gloves"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "rent",
+          "price": 5.0,
+          "price_unit": "per_day",
+          "currency": "EUR",
+          "deposit": 30.0,
+          "delivery_available": false,
+          "pickup_only": true,
+          "notes": "Ritiro ad Alcamo. / Pickup in Alcamo."
+        }
+      ],
+      "latitude": 37.981,
+      "longitude": 12.959,
+      "story": "Il mio primo sacco me l'ha regalato mio padre quando avevo 15 anni. L'ho distrutto in 6 mesi. Questo e il secondo -- piu resistente. / My father gave me my first bag when I was 15. I destroyed it in 6 months. This is the second one -- tougher."
+    },
+    {
+      "owner_slug": "nics-dojo",
+      "name": "Fitness Bootcamp al Parco -- Sabato Mattina",
+      "slug": "fitness-bootcamp-parco-sabato-mattina",
+      "description": "Bootcamp all'aperto ogni sabato mattina. Circuiti, corsa, esercizi a corpo libero. Tutti i livelli. Porta acqua e un asciugamano.\n\nOutdoor bootcamp every Saturday morning. Circuits, running, bodyweight exercises. All levels. Bring water and a towel.",
+      "content_language": "it",
+      "item_type": "service",
+      "category": "community_meetup",
+      "condition": "new",
+      "media": [
+        {
+          "media_type": "photo",
+          "url": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop&q=80",
+          "alt_text": "Outdoor fitness bootcamp"
+        }
+      ],
+      "listings": [
+        {
+          "listing_type": "event",
+          "price": null,
+          "price_unit": "flat",
+          "currency": "EUR",
+          "max_participants": 20,
+          "event_start": "2026-05-03T08:00:00+02:00",
+          "event_end": "2026-05-03T09:30:00+02:00",
+          "event_venue": "Parco Comunale",
+          "event_address": "Trapani, Sicilia",
+          "notes": "Gratuito. Ogni sabato mattina. / Free. Every Saturday morning."
+        }
+      ],
+      "latitude": 38.018,
+      "longitude": 12.514,
+      "story": "Chuck Norris non fa flessioni. Spinge la terra verso il basso. Noi facciamo flessioni normali, ma con lo stesso spirito. / Chuck Norris doesn't do push-ups. He pushes the earth down. We do normal push-ups, but with the same spirit."
     }
   ],
   "teams": [
@@ -31511,6 +31776,18 @@
       "milestones_completed": 0,
       "goal": "Learn neighborhood delivery routes. Help Johnny with his rounds.",
       "notes": "Johnny's bike is broken. Sofia could help with deliveries on foot until the scooter arrives."
+    },
+    {
+      "mentor_slug": "angel-hq",
+      "apprentice_slug": "nics-dojo",
+      "mentorship_type": "mentor",
+      "status": "active",
+      "skill_name": "Community Leadership",
+      "skill_category": "business",
+      "hours_logged": 1,
+      "milestones_completed": 0,
+      "goal": "Build Nic into La Piazza's first community ambassador. CONI certification within 12 months.",
+      "notes": "Met April 9, 2026. 30-minute career conversation. Father is Marcello (antique dealer, Alcamo). Nic trains jiu-jitsu 5 days/week. Target: D50 volunteer + first paid clients within 6 months."
     }
   ]
 }

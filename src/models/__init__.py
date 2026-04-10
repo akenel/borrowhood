@@ -29,6 +29,8 @@ from src.models.telegram import BHTelegramLink
 from src.models.mentorship import BHMentorship
 from src.models.message import BHMessage
 from src.models.listing_qa import BHListingQA
+from src.models.event_rsvp import BHEventRSVP
+from src.models.achievement import BHAchievement
 
 __all__ = [
     "BHUser",
@@ -68,4 +70,6 @@ __all__ = [
     "BHMentorship",
     "BHMessage",
     "BHListingQA",
+    "BHEventRSVP",
+    "BHAchievement",
 ]

@@ -61,7 +61,8 @@
             service: { price: '', price_unit: 'per_hour', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '' },
             training: { price: '', price_unit: 'per_hour', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '' },
             auction: { price: '', price_unit: 'flat', deposit: '', bid_increment: '1', auction_days: '7' },
-            giveaway: { price: '', price_unit: 'flat', deposit: '' }
+            giveaway: { price: '', price_unit: 'flat', deposit: '' },
+            event: { price: '', price_unit: 'per_person', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '', event_start: '', event_end: '', event_venue: '', event_address: '', event_is_free: false }
         };
         if (window._editData.listings) {
             window._editData.listings.forEach(function(l) {
@@ -155,7 +156,8 @@
             service: { price: '', price_unit: 'per_hour', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '' },
             training: { price: '', price_unit: 'per_hour', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '' },
             auction: { price: '', price_unit: 'flat', deposit: '', bid_increment: '1', auction_days: '7' },
-            giveaway: { price: '', price_unit: 'flat', deposit: '' }
+            giveaway: { price: '', price_unit: 'flat', deposit: '' },
+            event: { price: '', price_unit: 'per_person', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '', event_start: '', event_end: '', event_venue: '', event_address: '', event_is_free: false }
         },
         toggleListingType(val) {
             // Used by AI suggestion -- direct assignment for card buttons
@@ -470,6 +472,15 @@
                             payload.auction_end = end.toISOString();
                         }
                     }
+                    if (lt === 'event') {
+                        if (terms.event_start) payload.event_start = new Date(terms.event_start).toISOString();
+                        if (terms.event_end) payload.event_end = new Date(terms.event_end).toISOString();
+                        if (terms.event_venue) payload.event_venue = terms.event_venue;
+                        if (terms.event_address) payload.event_address = terms.event_address;
+                        if (terms.max_participants) payload.max_participants = parseInt(terms.max_participants);
+                        if (terms.per_person_rate) payload.per_person_rate = parseFloat(terms.per_person_rate);
+                        if (terms.event_is_free) { payload.price = null; payload.price_unit = 'flat'; }
+                    }
                     const listingResp = await fetch('/api/v1/listings', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -590,10 +601,14 @@
                 const vehicleCats = ['vehicles', 'automotive'];
                 const jobCats = ['job_full_time', 'job_part_time', 'job_contract', 'job_seasonal', 'job_freelance', 'job_internship'];
                 const spaceCats = ['workshops', 'kitchens', 'garages', 'studios'];
+                const eventCats = ['workshop_event', 'garage_sale', 'concert', 'art_show', 'community_meetup', 'sports_event', 'market', 'festival'];
                 // Only auto-set item_type and listing types in CREATE mode
                 // In edit mode, preserve what was saved
                 if (!editMode) {
-                    if (svcCats.includes(form.category)) {
+                    if (eventCats.includes(form.category)) {
+                        form.item_type = 'service';
+                        selectedTypes = ['event'];
+                    } else if (svcCats.includes(form.category)) {
                         form.item_type = 'service';
                         if (!selectedTypes.includes('service') && !selectedTypes.includes('training')) {
                             if (form.category === 'training_service' || form.category === 'education' || form.category === 'skill_exchange') {
@@ -1107,12 +1122,22 @@
                         <span class="text-sm font-semibold" :class="selectedTypes.includes('giveaway') ? 'text-emerald-700' : 'text-gray-700'">{{ t('i18n.give_away') }}</span>
                         <span class="text-[10px] text-gray-400">{{ t('i18n.free') }}</span>
                     </button>
+                    <!-- Event -->
+                    <button type="button" @click="selectedTypes = ['event']"
+                            class="flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all min-h-[90px]"
+                            :class="selectedTypes.includes('event') ? 'border-rose-500 bg-rose-50 shadow-md' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'">
+                        <svg class="w-7 h-7" :class="selectedTypes.includes('event') ? 'text-rose-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="text-sm font-semibold" :class="selectedTypes.includes('event') ? 'text-rose-700' : 'text-gray-700'">{{ t('events.rsvp') || 'Event' }}</span>
+                        <span class="text-[10px] text-gray-400">{{ t('events.event_subtitle') || 'Workshop, concert, meetup' }}</span>
+                    </button>
                 </div>
             </div>
 
             <!-- Pricing section based on selection -->
             <div class="space-y-3">
-                {% for ltype in ['rent','sell','commission','offer','service','training','auction','giveaway'] %}
+                {% for ltype in ['rent','sell','commission','offer','service','training','auction','giveaway','event'] %}
                 <div>
                     <div x-show="selectedTypes.includes('{{ ltype }}')" x-cloak
                         <div x-show="selectedTypes.includes('{{ ltype }}')" x-cloak
@@ -1120,7 +1145,63 @@
                              x-transition:enter-start="opacity-0 -translate-y-1"
                              x-transition:enter-end="opacity-100 translate-y-0"
                              class="ml-7 mt-2 p-3 bg-gray-50 rounded-lg">
-                            {% if ltype == 'giveaway' %}
+                            {% if ltype == 'event' %}
+                            <!-- Event details -->
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">{{ t('events.event_start') }}</label>
+                                        <input type="datetime-local"
+                                               x-model="listingPrices['event'].event_start"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-rose-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">{{ t('events.event_end') }}</label>
+                                        <input type="datetime-local"
+                                               x-model="listingPrices['event'].event_end"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-rose-500">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">{{ t('events.event_venue') }}</label>
+                                        <input type="text" placeholder="e.g. D50 Youth Center"
+                                               x-model="listingPrices['event'].event_venue"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-rose-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">{{ t('events.event_address') }}</label>
+                                        <input type="text" placeholder="Via Roma 1, Trapani"
+                                               x-model="listingPrices['event'].event_address"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-rose-500">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">{{ t('events.capacity') }}</label>
+                                        <input type="number" step="1" min="1" placeholder="--"
+                                               x-model="listingPrices['event'].max_participants"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-rose-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-500 mb-1">{{ t('list_item.price') }} (EUR)</label>
+                                        <input type="number" step="0.01" min="0" placeholder="0.00"
+                                               x-model="listingPrices['event'].price"
+                                               :disabled="listingPrices['event'].event_is_free"
+                                               :class="listingPrices['event'].event_is_free ? 'bg-gray-100' : ''"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-rose-500">
+                                    </div>
+                                    <div class="flex items-end pb-2">
+                                        <label class="flex items-center gap-2 text-sm">
+                                            <input type="checkbox" x-model="listingPrices['event'].event_is_free"
+                                                   @change="if(listingPrices['event'].event_is_free) listingPrices['event'].price = ''"
+                                                   class="rounded border-gray-300 text-rose-600 focus:ring-rose-500">
+                                            {{ t('events.free_event') }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% elif ltype == 'giveaway' %}
                             <p class="text-sm text-green-700 font-medium">{{ t('giveaway.free_hint') }}</p>
                             {% elif ltype in ('service', 'training') %}
                             <!-- Service/Training pricing (no deposit, service-specific fields) -->

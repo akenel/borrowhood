@@ -95,6 +95,22 @@ async def run_migrations():
         "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMPTZ",
         # 2026-03-13: Message edit tracking
         "ALTER TABLE bh_message ADD COLUMN IF NOT EXISTS edited_at TIMESTAMPTZ",
+        # 2026-04-09: Events feature
+        "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS event_start TIMESTAMPTZ",
+        "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS event_end TIMESTAMPTZ",
+        "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS event_venue VARCHAR(200)",
+        "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS event_address VARCHAR(500)",
+        "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS organization_description TEXT",
+        # 2026-04-09: Index for event date queries
+        "CREATE INDEX IF NOT EXISTS idx_listing_event_start ON bh_listing (event_start) WHERE event_start IS NOT NULL",
+        # 2026-04-09: No-show tracking
+        "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS no_show_count INTEGER DEFAULT 0",
+        # 2026-04-10: Event gamification
+        "ALTER TABLE bh_user_points ADD COLUMN IF NOT EXISTS events_attended INTEGER DEFAULT 0",
+        "ALTER TABLE bh_user_points ADD COLUMN IF NOT EXISTS events_hosted INTEGER DEFAULT 0",
+        "ALTER TABLE bh_user_points ADD COLUMN IF NOT EXISTS event_streak INTEGER DEFAULT 0",
+        "ALTER TABLE bh_user_points ADD COLUMN IF NOT EXISTS best_streak INTEGER DEFAULT 0",
+        "ALTER TABLE bh_user_points ADD COLUMN IF NOT EXISTS challenges_completed INTEGER DEFAULT 0",
     ]
     # ALTER TYPE ... ADD VALUE -- SQLAlchemy uses enum .name (UPPERCASE) for PG enums
     enum_migrations = [
@@ -111,6 +127,17 @@ async def run_migrations():
         "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'PALACE'",
         "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'PAVILION'",
         "ALTER TYPE workshoptype ADD VALUE IF NOT EXISTS 'STUDY'",
+        # 2026-04-09: Events feature
+        "ALTER TYPE listingtype ADD VALUE IF NOT EXISTS 'EVENT'",
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'WORKSHOP_EVENT'",
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'GARAGE_SALE'",
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'CONCERT'",
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'ART_SHOW'",
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'COMMUNITY_MEETUP'",
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'SPORTS_EVENT'",
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'MARKET'",
+        "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'FESTIVAL'",
+        "ALTER TYPE rsvpstatus ADD VALUE IF NOT EXISTS 'NO_SHOW'",
     ]
     # Fix any previously added lowercase values by renaming to UPPERCASE
     rename_fixes = [

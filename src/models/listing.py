@@ -24,6 +24,7 @@ class ListingType(str, enum.Enum):
     TRAINING = "training"     # "I'll teach you"
     AUCTION = "auction"       # Timed bidding
     GIVEAWAY = "giveaway"     # Free, take it, no return
+    EVENT = "event"           # Workshop, concert, meetup, garage sale
 
 
 class ListingStatus(str, enum.Enum):
@@ -77,6 +78,12 @@ class BHListing(BHBase, Base):
     starting_bid: Mapped[Optional[float]] = mapped_column(Float)
     reserve_price: Mapped[Optional[float]] = mapped_column(Float)  # Hidden minimum
     bid_increment: Mapped[Optional[float]] = mapped_column(Float, default=1.0)
+
+    # Event fields (only used when listing_type == EVENT)
+    event_start: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    event_end: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    event_venue: Mapped[Optional[str]] = mapped_column(String(200))   # Venue name
+    event_address: Mapped[Optional[str]] = mapped_column(String(500)) # Full address
 
     # Version for optimistic locking (Rule 28)
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)

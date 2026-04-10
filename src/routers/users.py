@@ -464,6 +464,10 @@ async def delete_my_account(
     # Step 2: Clean up all foreign key references
     from sqlalchemy import text as sa_text
     cleanup_tables = [
+        "DELETE FROM bh_event_rsvp WHERE user_id = :uid",
+        "DELETE FROM bh_achievement WHERE user_id = :uid",
+        "DELETE FROM bh_saved_search WHERE user_id = :uid",
+        "DELETE FROM bh_item_vote WHERE user_id = :uid",
         "DELETE FROM bh_help_upvote WHERE user_id = :uid",
         "DELETE FROM bh_listing_qa WHERE asker_id = :uid OR answered_by_id = :uid",
         "DELETE FROM bh_message WHERE sender_id = :uid OR recipient_id = :uid",

@@ -776,6 +776,40 @@
       "groups": [
         "/QA Testers"
       ]
+    },
+    {
+      "username": "nicolo",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "helix_pass",
+          "temporary": false
+        }
+      ],
+      "email": "roccamenanicolo@gmail.com",
+      "firstName": "Nicol\u00f2",
+      "lastName": "Roccamena",
+      "attributes": {
+        "display_name": [
+          "Nicol\u00f2 Roccamena"
+        ],
+        "language": [
+          "it"
+        ],
+        "notes": [
+          "La Piazza Community Ambassador. Jiu-jitsu athlete, 19, Alcamo. Son of Marcello."
+        ]
+      },
+      "realmRoles": [
+        "bh-member",
+        "bh-lender",
+        "default-roles-borrowhood"
+      ],
+      "groups": [
+        "/Members"
+      ]
     }
   ],
   "browserSecurityHeaders": {

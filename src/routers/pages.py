@@ -1059,6 +1059,15 @@ async def helpboard_page(request: Request,
     return _render("pages/helpboard.html", ctx)
 
 
+@router.get("/leaderboard", response_class=HTMLResponse)
+async def leaderboard_page(request: Request,
+                           token: Optional[dict] = Depends(get_current_user_token)):
+    """Event leaderboard: rankings, streaks, achievements."""
+    from src.models.achievement import ACHIEVEMENTS
+    ctx = _ctx(request, token, achievements=ACHIEVEMENTS)
+    return _render("pages/leaderboard.html", ctx)
+
+
 @router.get("/members", response_class=HTMLResponse)
 async def members_directory(
     request: Request,
@@ -1264,6 +1273,7 @@ async def demo_login_page(
         {"username": "sofiaferretti", "display_name": "Sofia Ferretti", "workshop": None, "roles": "member", "badge": "newcomer", "color": "gray", "avatar": f"{_av}/sofia.svg"},
         {"username": "rosa", "display_name": "Rosa Ferretti", "workshop": None, "roles": "member only", "badge": "newcomer", "color": "gray", "avatar": f"{_av}/rosa.svg"},
         {"username": "anne", "display_name": "Anne Muthoni", "workshop": None, "roles": "qa-tester", "badge": "active", "color": "blue", "avatar": f"{_av}/anne.svg"},
+        {"username": "nicolo", "display_name": "Nicol\u00f2 Roccamena", "workshop": "Nic's Dojo", "roles": "ambassador, lender", "badge": "active", "color": "rose", "avatar": f"{_av}/nicolo.svg"},
     ]
 
     # Use real avatar_url from DB so demo login matches profile pages

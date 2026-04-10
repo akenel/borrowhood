@@ -21,7 +21,33 @@
     "chat": "Concierge",
     "notifications": "Notifications",
     "mark_all_read": "Mark all read",
-    "orders": "Orders"
+    "orders": "Orders",
+    "leaderboard": "Leaderboard"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "subtitle": "Show up. Put in the work. Earn your rank.",
+    "my_stats": "My Stats",
+    "events_attended": "Events Attended",
+    "events_hosted": "Events Hosted",
+    "current_streak": "Current Streak",
+    "best_streak": "Best Streak",
+    "total_points": "Total Points",
+    "no_shows": "No-Shows",
+    "clean_record": "Clean Record",
+    "your_rank": "Your Rank",
+    "achievements_unlocked": "Achievements Unlocked",
+    "next_up": "Next Up",
+    "tab_rankings": "Rankings",
+    "tab_streaks": "Streaks",
+    "tab_coaches": "Coaches",
+    "no_data": "No events yet. Be the first.",
+    "create_event": "Create an Event",
+    "no_streaks": "No streaks yet. Start one today.",
+    "no_coaches": "No coaches yet. Step up.",
+    "all_achievements": "All Achievements",
+    "best": "best",
+    "quote": "I fear not the man who has practiced 10,000 kicks once, but I fear the man who has practiced one kick 10,000 times."
   },
   "home": {
     "hero_title": "The Town Square is Open",
@@ -282,6 +308,7 @@
     "tech": "Tech",
     "spaces_transport": "Spaces & Transport",
     "services": "Services",
+    "events": "Events",
     "other": "Other"
   },
   "categories": {
@@ -342,7 +369,15 @@
     "fashion": "Fashion",
     "technology": "Technology",
     "training": "Training",
-    "transport": "Transport"
+    "transport": "Transport",
+    "workshop_event": "Workshop",
+    "garage_sale": "Garage Sale",
+    "concert": "Concert",
+    "art_show": "Art Show",
+    "community_meetup": "Community Meetup",
+    "sports_event": "Sports Event",
+    "market": "Market",
+    "festival": "Festival"
   },
   "attributes": {
     "year": "Year",
@@ -383,7 +418,42 @@
     "experience_level": "Experience Level",
     "remote_option": "Remote Work",
     "industry": "Industry",
-    "application_deadline": "Application Deadline"
+    "application_deadline": "Application Deadline",
+    "age_requirement": "Age Requirement",
+    "skill_level": "Skill Level",
+    "what_to_bring": "What to Bring",
+    "all_ages": "All Ages",
+    "16_plus": "16+",
+    "18_plus": "18+",
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "all_levels": "All Levels"
+  },
+  "events": {
+    "rsvp": "RSVP",
+    "cancel_rsvp": "Cancel RSVP",
+    "registered": "You're registered!",
+    "waitlisted": "You're on the waitlist",
+    "spots_left": "spots left",
+    "sold_out": "Sold Out",
+    "free_event": "Free Event",
+    "upcoming": "Upcoming",
+    "this_week": "This Week",
+    "venue": "Venue",
+    "when": "When",
+    "add_to_calendar": "Add to Calendar",
+    "event_start": "Start Date & Time",
+    "event_end": "End Date & Time",
+    "event_venue": "Venue Name",
+    "event_address": "Address",
+    "capacity": "Capacity",
+    "attendees": "Attendees",
+    "event_subtitle": "Workshop, concert, meetup",
+    "no_show": "No-Show",
+    "no_show_warning": "You have missed events before. Your spot is waitlisted until confirmed.",
+    "close_event": "Close Event",
+    "event_closed": "Event closed"
   },
   "condition": {
     "new": "New",
@@ -416,7 +486,8 @@
     "service": "Service",
     "training": "Training",
     "auction": "Auction",
-    "giveaway": "Give Away"
+    "giveaway": "Give Away",
+    "event": "Event"
   },
   "item_types": {
     "physical": "Physical",

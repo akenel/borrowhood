@@ -398,7 +398,7 @@
                         {% set type_colors = {
                             'rent': 'bg-blue-600', 'sell': 'bg-green-600', 'auction': 'bg-amber-600',
                             'commission': 'bg-purple-600', 'offer': 'bg-pink-600', 'service': 'bg-teal-600',
-                            'training': 'bg-cyan-600', 'giveaway': 'bg-emerald-600'
+                            'training': 'bg-cyan-600', 'giveaway': 'bg-emerald-600', 'event': 'bg-rose-600'
                         } %}
                         {% for listing in item.listings if listing.status.value == 'active' %}
                         <span class="text-xs px-2 py-0.5 {{ type_colors.get(listing.listing_type.value, 'bg-gray-600') }} text-white rounded-full font-medium shadow-sm">
@@ -438,6 +438,21 @@
                         <span class="text-xs text-gray-400 ml-1">(+&euro;{{ "%.0f" | format(active_listing.deposit) }} {{ t('item.deposit') }})</span>
                         {% endif %}
                     </div>
+                    {% elif active_listing and active_listing.listing_type.value == 'event' and active_listing.event_start %}
+                    <div class="mt-2 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="text-sm font-semibold text-rose-700">{{ active_listing.event_start.strftime('%b %d, %H:%M') }}</span>
+                        {% if active_listing.price %}
+                        <span class="text-sm text-gray-500 ml-1">&euro;{{ "%.0f" | format(active_listing.price) }}</span>
+                        {% else %}
+                        <span class="text-xs font-medium text-green-600 ml-1">{{ t('events.free_event') }}</span>
+                        {% endif %}
+                    </div>
+                    {% if active_listing.event_venue %}
+                    <p class="text-xs text-gray-400 mt-0.5">{{ active_listing.event_venue }}</p>
+                    {% endif %}
                     {% elif active_listing and active_listing.listing_type.value in ('offer', 'giveaway') %}
                     <div class="mt-2">
                         <span class="text-lg font-bold text-green-600">{{ t('common.free') }}</span>

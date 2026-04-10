@@ -98,6 +98,15 @@ class ItemCategory(str, enum.Enum):
     JOB_SEASONAL = "job_seasonal"
     JOB_FREELANCE = "job_freelance"
     JOB_INTERNSHIP = "job_internship"
+    # Events
+    WORKSHOP_EVENT = "workshop_event"
+    GARAGE_SALE = "garage_sale"
+    CONCERT = "concert"
+    ART_SHOW = "art_show"
+    COMMUNITY_MEETUP = "community_meetup"
+    SPORTS_EVENT = "sports_event"
+    MARKET = "market"
+    FESTIVAL = "festival"
 
 
 CATEGORY_GROUPS = {
@@ -112,6 +121,7 @@ CATEGORY_GROUPS = {
     "tech": ["electronics", "computers", "drones"],
     "spaces_transport": ["spaces", "transport"],
     "services": ["repairs", "training_service", "custom_orders", "education"],
+    "events": ["workshop_event", "garage_sale", "concert", "art_show", "community_meetup", "sports_event", "market", "festival"],
     "other": ["other", "crafts", "food", "outdoor", "tools", "science", "engineering"],
 }
 
@@ -173,6 +183,13 @@ ATTRIBUTE_SCHEMAS = {
                           "options": ["on_site", "remote", "hybrid"]},
         "industry": {"type": "text", "label": "Industry", "label_it": "Settore"},
         "application_deadline": {"type": "text", "label": "Application Deadline", "label_it": "Scadenza Candidatura"},
+    },
+    "events": {
+        "age_requirement": {"type": "select", "label": "Age Requirement", "label_it": "Requisito Et\u00e0",
+                            "options": ["all_ages", "16_plus", "18_plus"]},
+        "skill_level": {"type": "select", "label": "Skill Level", "label_it": "Livello",
+                        "options": ["beginner", "intermediate", "advanced", "all_levels"]},
+        "what_to_bring": {"type": "text", "label": "What to Bring", "label_it": "Cosa Portare"},
     },
 }
 

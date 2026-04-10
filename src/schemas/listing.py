@@ -31,6 +31,10 @@ class ListingOut(BaseModel):
     per_person_rate: Optional[float] = None
     max_participants: Optional[int] = None
     group_discount_pct: Optional[float] = None
+    event_start: Optional[datetime] = None
+    event_end: Optional[datetime] = None
+    event_venue: Optional[str] = None
+    event_address: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -58,6 +62,10 @@ class ListingCreate(BaseModel):
     per_person_rate: Optional[float] = Field(None, ge=0)
     max_participants: Optional[int] = Field(None, ge=1)
     group_discount_pct: Optional[float] = Field(None, ge=0, le=100)
+    event_start: Optional[str] = None  # ISO datetime for event listings
+    event_end: Optional[str] = None
+    event_venue: Optional[str] = Field(None, max_length=200)
+    event_address: Optional[str] = Field(None, max_length=500)
 
 
 class ListingUpdate(BaseModel):
@@ -77,3 +85,7 @@ class ListingUpdate(BaseModel):
     per_person_rate: Optional[float] = Field(None, ge=0)
     max_participants: Optional[int] = Field(None, ge=1)
     group_discount_pct: Optional[float] = Field(None, ge=0, le=100)
+    event_start: Optional[str] = None
+    event_end: Optional[str] = None
+    event_venue: Optional[str] = Field(None, max_length=200)
+    event_address: Optional[str] = Field(None, max_length=500)

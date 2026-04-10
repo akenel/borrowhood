@@ -21,7 +21,33 @@
     "chat": "Concierge",
     "notifications": "Notifiche",
     "mark_all_read": "Segna tutto letto",
-    "orders": "Ordini"
+    "orders": "Ordini",
+    "leaderboard": "Classifica"
+  },
+  "leaderboard": {
+    "title": "Classifica",
+    "subtitle": "Presentati. Lavora sodo. Guadagna il tuo posto.",
+    "my_stats": "Le Mie Statistiche",
+    "events_attended": "Eventi Frequentati",
+    "events_hosted": "Eventi Organizzati",
+    "current_streak": "Serie Attuale",
+    "best_streak": "Record Personale",
+    "total_points": "Punti Totali",
+    "no_shows": "Assenze",
+    "clean_record": "Nessuna Assenza",
+    "your_rank": "La Tua Posizione",
+    "achievements_unlocked": "Obiettivi Sbloccati",
+    "next_up": "Prossimi Obiettivi",
+    "tab_rankings": "Classifica",
+    "tab_streaks": "Serie",
+    "tab_coaches": "Allenatori",
+    "no_data": "Nessun evento ancora. Sii il primo.",
+    "create_event": "Crea un Evento",
+    "no_streaks": "Nessuna serie ancora. Inizia oggi.",
+    "no_coaches": "Nessun allenatore ancora. Fatti avanti.",
+    "all_achievements": "Tutti gli Obiettivi",
+    "best": "record",
+    "quote": "Non temo l'uomo che ha praticato 10.000 calci una volta, ma temo l'uomo che ha praticato un calcio 10.000 volte."
   },
   "home": {
     "hero_title": "La Piazza è Aperta",
@@ -282,6 +308,7 @@
     "tech": "Tecnologia",
     "spaces_transport": "Spazi e Trasporti",
     "services": "Servizi",
+    "events": "Eventi",
     "other": "Altro"
   },
   "categories": {
@@ -342,7 +369,15 @@
     "fashion": "Moda",
     "technology": "Tecnologia",
     "training": "Formazione",
-    "transport": "Trasporti"
+    "transport": "Trasporti",
+    "workshop_event": "Laboratorio",
+    "garage_sale": "Mercatino",
+    "concert": "Concerto",
+    "art_show": "Mostra d'Arte",
+    "community_meetup": "Incontro Comunitario",
+    "sports_event": "Evento Sportivo",
+    "market": "Mercato",
+    "festival": "Festival"
   },
   "attributes": {
     "year": "Anno",
@@ -383,7 +418,42 @@
     "experience_level": "Livello Esperienza",
     "remote_option": "Lavoro Remoto",
     "industry": "Settore",
-    "application_deadline": "Scadenza Candidatura"
+    "application_deadline": "Scadenza Candidatura",
+    "age_requirement": "Requisito Et\u00e0",
+    "skill_level": "Livello",
+    "what_to_bring": "Cosa Portare",
+    "all_ages": "Tutte le Et\u00e0",
+    "16_plus": "16+",
+    "18_plus": "18+",
+    "beginner": "Principiante",
+    "intermediate": "Intermedio",
+    "advanced": "Avanzato",
+    "all_levels": "Tutti i Livelli"
+  },
+  "events": {
+    "rsvp": "Iscriviti",
+    "cancel_rsvp": "Annulla Iscrizione",
+    "registered": "Sei iscritto!",
+    "waitlisted": "Sei in lista d'attesa",
+    "spots_left": "posti disponibili",
+    "sold_out": "Esaurito",
+    "free_event": "Evento Gratuito",
+    "upcoming": "In Arrivo",
+    "this_week": "Questa Settimana",
+    "venue": "Luogo",
+    "when": "Quando",
+    "add_to_calendar": "Aggiungi al Calendario",
+    "event_start": "Data e Ora Inizio",
+    "event_end": "Data e Ora Fine",
+    "event_venue": "Nome del Luogo",
+    "event_address": "Indirizzo",
+    "capacity": "Capienza",
+    "attendees": "Partecipanti",
+    "event_subtitle": "Laboratorio, concerto, incontro",
+    "no_show": "Assente",
+    "no_show_warning": "Hai saltato eventi in passato. Il tuo posto e in lista d'attesa fino a conferma.",
+    "close_event": "Chiudi Evento",
+    "event_closed": "Evento chiuso"
   },
   "condition": {
     "new": "Nuovo",
@@ -416,7 +486,8 @@
     "service": "Servizio",
     "training": "Formazione",
     "auction": "Asta",
-    "giveaway": "Regalo"
+    "giveaway": "Regalo",
+    "event": "Evento"
   },
   "item_types": {
     "physical": "Fisico",
