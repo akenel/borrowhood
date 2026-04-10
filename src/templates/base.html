@@ -75,11 +75,26 @@
     </style>
 
     {% block head %}{% endblock %}
+    <style>
+    /* Text-only scaling -- does NOT affect layout (padding, margins, widths) */
+    body[data-text-scale="20"] :is(p,span,a,li,td,th,label,h1,h2,h3,h4,h5,h6,input,textarea,select,button,dt,dd) { font-size: 125% !important; }
+    body[data-text-scale="24"] :is(p,span,a,li,td,th,label,h1,h2,h3,h4,h5,h6,input,textarea,select,button,dt,dd) { font-size: 150% !important; }
+    body[data-text-scale="28"] :is(p,span,a,li,td,th,label,h1,h2,h3,h4,h5,h6,input,textarea,select,button,dt,dd) { font-size: 175% !important; }
+    body[data-text-scale="32"] :is(p,span,a,li,td,th,label,h1,h2,h3,h4,h5,h6,input,textarea,select,button,dt,dd) { font-size: 200% !important; }
+    body[data-text-scale="40"] :is(p,span,a,li,td,th,label,h1,h2,h3,h4,h5,h6,input,textarea,select,button,dt,dd) { font-size: 250% !important; }
+    body[data-text-scale="48"] :is(p,span,a,li,td,th,label,h1,h2,h3,h4,h5,h6,input,textarea,select,button,dt,dd) { font-size: 300% !important; }
+    </style>
     <script>
-    // Font size preference (persisted in localStorage)
+    // Text scale preference (persisted in localStorage)
     (function() {
-        var saved = localStorage.getItem('lp-font-size');
-        if (saved) document.documentElement.style.setProperty('font-size', saved + 'px', 'important');
+        // Clean up old broken font-size approach
+        localStorage.removeItem('lp-font-size');
+        document.documentElement.style.removeProperty('font-size');
+        // Apply text-only scale
+        var saved = localStorage.getItem('lp-text-scale');
+        if (saved && saved !== '16') document.addEventListener('DOMContentLoaded', function() {
+            document.body.setAttribute('data-text-scale', saved);
+        });
     })();
     </script>
 </head>
@@ -116,19 +131,28 @@
 
                 <!-- Right side: lang switch + auth -->
                 <div class="flex items-center space-x-3">
-                    <!-- Font size control (always visible) -->
+                    <!-- Text size control (always visible) -->
                     <div class="flex items-center gap-0.5" x-data="{
-                        size: parseInt(localStorage.getItem('lp-font-size') || 16),
-                        set(val) {
-                            this.size = Math.min(64, Math.max(12, val));
-                            document.documentElement.style.setProperty('font-size', this.size + 'px', 'important');
-                            localStorage.setItem('lp-font-size', this.size);
+                        scales: [16, 20, 24, 28, 32, 40, 48],
+                        idx: 0,
+                        init() {
+                            var saved = parseInt(localStorage.getItem('lp-text-scale') || 16);
+                            this.idx = Math.max(0, this.scales.indexOf(saved));
+                            this.apply();
+                        },
+                        smaller() { this.idx = Math.max(0, this.idx - 1); this.apply(); },
+                        larger() { this.idx = Math.min(this.scales.length - 1, this.idx + 1); this.apply(); },
+                        apply() {
+                            var val = this.scales[this.idx];
+                            if (val === 16) { document.body.removeAttribute('data-text-scale'); }
+                            else { document.body.setAttribute('data-text-scale', val); }
+                            localStorage.setItem('lp-text-scale', val);
                         }
                     }">
-                        <button @click="set(size - 4)"
+                        <button @click="smaller()"
                                 title="{{ t('settings.font_size') }}: {{ t('settings.smaller') }}"
                                 class="w-8 h-8 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 font-bold text-xs flex items-center justify-center transition-colors">A-</button>
-                        <button @click="set(size + 4)"
+                        <button @click="larger()"
                                 title="{{ t('settings.font_size') }}: {{ t('settings.larger') }}"
                                 class="w-8 h-8 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 font-bold text-sm flex items-center justify-center transition-colors">A+</button>
                     </div>
@@ -325,21 +349,30 @@
                     </a>
                     {% endfor %}
                 </div>
-                <!-- Font size control (mobile) -->
+                <!-- Text size control (mobile) -->
                 <div class="flex items-center justify-between px-4 py-3 border-t border-gray-100" x-data="{
-                    size: parseInt(localStorage.getItem('lp-font-size') || 16),
-                    set(val) {
-                        this.size = Math.min(64, Math.max(12, val));
-                        document.documentElement.style.setProperty('font-size', this.size + 'px', 'important');
-                        localStorage.setItem('lp-font-size', this.size);
+                    scales: [16, 20, 24, 28, 32, 40, 48],
+                    labels: ['100%', '125%', '150%', '175%', '200%', '250%', '300%'],
+                    idx: 0,
+                    init() {
+                        var saved = parseInt(localStorage.getItem('lp-text-scale') || 16);
+                        this.idx = Math.max(0, this.scales.indexOf(saved));
                     },
-                    reset() { this.set(16); }
+                    smaller() { this.idx = Math.max(0, this.idx - 1); this.apply(); },
+                    larger() { this.idx = Math.min(this.scales.length - 1, this.idx + 1); this.apply(); },
+                    reset() { this.idx = 0; this.apply(); },
+                    apply() {
+                        var val = this.scales[this.idx];
+                        if (val === 16) { document.body.removeAttribute('data-text-scale'); }
+                        else { document.body.setAttribute('data-text-scale', val); }
+                        localStorage.setItem('lp-text-scale', val);
+                    }
                 }">
                     <span class="text-sm text-gray-500">{{ t('settings.font_size') }}</span>
                     <div class="flex items-center gap-2">
-                        <button @click="set(size - 4)" class="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-lg flex items-center justify-center">A-</button>
-                        <span class="text-xs text-gray-400 w-8 text-center" x-text="size + 'px'"></span>
-                        <button @click="set(size + 4)" class="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-lg flex items-center justify-center">A+</button>
+                        <button @click="smaller()" class="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-lg flex items-center justify-center min-h-[44px]">A-</button>
+                        <span class="text-xs text-gray-400 w-10 text-center" x-text="labels[idx]"></span>
+                        <button @click="larger()" class="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-lg flex items-center justify-center min-h-[44px]">A+</button>
                         <button @click="reset()" class="text-xs text-gray-400 hover:text-indigo-600 ml-1">{{ t('common.reset') }}</button>
                     </div>
                 </div>
