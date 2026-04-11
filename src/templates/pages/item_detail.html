@@ -1324,10 +1324,10 @@
                                     :class="isGiveaway ? 'bg-green-600 hover:bg-green-700' : 'bg-indigo-600 hover:bg-indigo-700'"
                                     class="px-4 py-2 text-white font-semibold rounded-lg disabled:opacity-50 min-h-[44px]">
                                 <span x-show="!submitting">
-                                    <template x-if="isGiveaway">{{ t('giveaway.claim') }}</template>
-                                    <template x-if="!isGiveaway && listingType === 'sell'">{{ t('purchase.submit') }}</template>
-                                    <template x-if="!isGiveaway && (listingType === 'service' || listingType === 'training')">{{ t('booking.submit') }}</template>
-                                    <template x-if="!isGiveaway && listingType !== 'sell' && listingType !== 'service' && listingType !== 'training'">{{ t('rental.submit') }}</template>
+                                    <template x-if="isGiveaway"><span>{{ t('giveaway.claim') }}</span></template>
+                                    <template x-if="!isGiveaway && listingType === 'sell'"><span>{{ t('purchase.submit') }}</span></template>
+                                    <template x-if="!isGiveaway && (listingType === 'service' || listingType === 'training')"><span>{{ t('booking.submit') }}</span></template>
+                                    <template x-if="!isGiveaway && listingType !== 'sell' && listingType !== 'service' && listingType !== 'training'"><span>{{ t('rental.submit') }}</span></template>
                                 </span>
                                 <span x-show="submitting" x-cloak>{{ t('common.loading') }}</span>
                             </button>
