@@ -883,6 +883,12 @@
                         <span class="font-semibold text-gray-900" data-event-utc="{{ event_listing.obj.event_start.isoformat() }}">
                             {{ event_listing.obj.event_start.strftime('%A, %B %d, %Y at %H:%M') }}
                         </span>
+                        {% if event_listing.obj.event_end %}
+                        <span class="text-gray-500">-</span>
+                        <span class="font-semibold text-gray-900" data-event-utc="{{ event_listing.obj.event_end.isoformat() }}" data-time-only="true">
+                            {{ event_listing.obj.event_end.strftime('%H:%M') }}
+                        </span>
+                        {% endif %}
                     </div>
                     {% endif %}
                     {% if event_listing.obj.event_venue %}
