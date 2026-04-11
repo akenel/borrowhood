@@ -462,7 +462,8 @@
                                 <span class="text-xs font-semibold text-green-600">{{ t('i18n.free') }}</span>
                                 {% endif %}
                                 {% if listing.listing_type.value == 'event' and listing.event_start %}
-                                <span class="text-xs text-rose-600">{{ listing.event_start.strftime('%b %d, %H:%M') }}</span>
+                                <span class="text-xs text-rose-600"
+                                      x-data x-init="$el.textContent = new Date('{{ listing.event_start.isoformat() }}').toLocaleString(navigator.language, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })">{{ listing.event_start.strftime('%b %d, %H:%M') }}</span>
                                 {% if not listing.price %}<span class="text-xs font-semibold text-green-600">{{ t('events.free_event') }}</span>{% endif %}
                                 {% endif %}
                             </div>

@@ -880,7 +880,10 @@
                         <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        <span class="font-semibold text-gray-900">{{ event_listing.obj.event_start.strftime('%A, %B %d, %Y at %H:%M') }}</span>
+                        <span class="font-semibold text-gray-900"
+                              x-data="{ formatted: '' }"
+                              x-init="formatted = new Date('{{ event_listing.obj.event_start.isoformat() }}').toLocaleString(navigator.language, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })"
+                              x-text="formatted"></span>
                     </div>
                     {% endif %}
                     {% if event_listing.obj.event_venue %}
