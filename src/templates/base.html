@@ -247,7 +247,7 @@
                     <div class="hidden lg:block" x-data="{ u: null }" x-init="fetch('/api/v1/users/me').then(r=>r.ok?r.json():null).then(d=>u=d).catch(()=>{})">
                         <a href="/profile" class="inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">
                             <div class="w-9 h-9 rounded-full bg-indigo-100 ring-2 ring-indigo-200 hover:ring-indigo-400 transition-all relative overflow-hidden flex items-center justify-center flex-shrink-0">
-                                <span class="text-sm font-bold text-indigo-600" x-text="u ? (u.display_name||'?')[0] : '{{ user.get('preferred_username', '?')[0] | upper }}'"></span>
+                                <span class="text-sm font-bold text-indigo-600" data-fallback="{{ user.get('preferred_username', '?')[0] | upper }}" x-text="u ? (u.display_name||'?')[0] : $el.dataset.fallback"></span>
                                 <img x-show="u && u.avatar_url" :src="u ? u.avatar_url : ''" @error="$el.style.display='none'" class="absolute inset-0 w-full h-full object-cover rounded-full">
                             </div>
                             <span class="max-w-[120px] truncate">{{ user.get('preferred_username', '') }}</span>
