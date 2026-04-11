@@ -101,6 +101,8 @@ async def run_migrations():
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS event_venue VARCHAR(200)",
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS event_address VARCHAR(500)",
         "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS organization_description TEXT",
+        # 2026-04-11: Online event link
+        "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS event_link VARCHAR(1000)",
         # 2026-04-09: Index for event date queries
         "CREATE INDEX IF NOT EXISTS idx_listing_event_start ON bh_listing (event_start) WHERE event_start IS NOT NULL",
         # 2026-04-11: Google avatar URLs can be 1000+ chars

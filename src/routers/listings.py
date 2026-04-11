@@ -175,6 +175,7 @@ async def create_listing(
         event_end=event_end_dt,
         event_venue=data.event_venue,
         event_address=data.event_address,
+        event_link=data.event_link,
     )
     db.add(listing)
     await db.commit()

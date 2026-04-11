@@ -84,6 +84,7 @@ class BHListing(BHBase, Base):
     event_end: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     event_venue: Mapped[Optional[str]] = mapped_column(String(200))   # Venue name
     event_address: Mapped[Optional[str]] = mapped_column(String(500)) # Full address
+    event_link: Mapped[Optional[str]] = mapped_column(String(1000))   # Online event URL (Zoom/Meet/YouTube)
 
     # Version for optimistic locking (Rule 28)
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)

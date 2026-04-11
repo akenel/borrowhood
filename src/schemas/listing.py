@@ -35,6 +35,7 @@ class ListingOut(BaseModel):
     event_end: Optional[datetime] = None
     event_venue: Optional[str] = None
     event_address: Optional[str] = None
+    event_link: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -66,6 +67,7 @@ class ListingCreate(BaseModel):
     event_end: Optional[str] = None
     event_venue: Optional[str] = Field(None, max_length=200)
     event_address: Optional[str] = Field(None, max_length=500)
+    event_link: Optional[str] = Field(None, max_length=1000)
 
 
 class ListingUpdate(BaseModel):
@@ -89,3 +91,4 @@ class ListingUpdate(BaseModel):
     event_end: Optional[str] = None
     event_venue: Optional[str] = Field(None, max_length=200)
     event_address: Optional[str] = Field(None, max_length=500)
+    event_link: Optional[str] = Field(None, max_length=1000)

@@ -62,7 +62,7 @@
             training: { price: '', price_unit: 'per_hour', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '' },
             auction: { price: '', price_unit: 'flat', deposit: '', bid_increment: '1', auction_days: '7' },
             giveaway: { price: '', price_unit: 'flat', deposit: '' },
-            event: { price: '', price_unit: 'per_person', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '', event_start: '', event_end: '', event_venue: '', event_address: '', event_is_free: false }
+            event: { price: '', price_unit: 'per_person', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '', event_start: '', event_end: '', event_venue: '', event_address: '', event_link: '', event_is_free: false }
         };
         if (window._editData.listings) {
             window._editData.listings.forEach(function(l) {
@@ -76,6 +76,7 @@
                     window._editListingPrices['event'].event_end = l.event_end ? l.event_end.slice(0, 16) : '';
                     window._editListingPrices['event'].event_venue = l.event_venue || '';
                     window._editListingPrices['event'].event_address = l.event_address || '';
+                    window._editListingPrices['event'].event_link = l.event_link || '';
                     window._editListingPrices['event'].max_participants = l.max_participants || '';
                     window._editListingPrices['event'].event_is_free = (l.price === null || l.price === 0);
                 }
@@ -151,6 +152,7 @@
                                 lp.event_end = l.event_end ? l.event_end.slice(0, 16) : '';
                                 lp.event_venue = l.event_venue || '';
                                 lp.event_address = l.event_address || '';
+                                lp.event_link = l.event_link || '';
                                 lp.event_is_free = (l.price === null || l.price === 0);
                             }
                         }
@@ -172,7 +174,7 @@
             training: { price: '', price_unit: 'per_hour', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '' },
             auction: { price: '', price_unit: 'flat', deposit: '', bid_increment: '1', auction_days: '7' },
             giveaway: { price: '', price_unit: 'flat', deposit: '' },
-            event: { price: '', price_unit: 'per_person', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '', event_start: '', event_end: '', event_venue: '', event_address: '', event_is_free: false }
+            event: { price: '', price_unit: 'per_person', deposit: '', minimum_charge: '', per_person_rate: '', max_participants: '', group_discount_pct: '', event_start: '', event_end: '', event_venue: '', event_address: '', event_link: '', event_is_free: false }
         },
         toggleListingType(val) {
             // Used by AI suggestion -- direct assignment for card buttons
@@ -451,6 +453,7 @@
                             if (terms.event_end) payload.event_end = new Date(terms.event_end).toISOString();
                             if (terms.event_venue) payload.event_venue = terms.event_venue;
                             if (terms.event_address) payload.event_address = terms.event_address;
+                            if (terms.event_link) payload.event_link = terms.event_link;
                             if (terms.max_participants) payload.max_participants = parseInt(terms.max_participants);
                             if (terms.per_person_rate) payload.per_person_rate = parseFloat(terms.per_person_rate);
                             if (terms.event_is_free) { payload.price = null; payload.price_unit = 'flat'; }
@@ -501,6 +504,7 @@
                         if (terms.event_end) payload.event_end = new Date(terms.event_end).toISOString();
                         if (terms.event_venue) payload.event_venue = terms.event_venue;
                         if (terms.event_address) payload.event_address = terms.event_address;
+                        if (terms.event_link) payload.event_link = terms.event_link;
                         if (terms.max_participants) payload.max_participants = parseInt(terms.max_participants);
                         if (terms.per_person_rate) payload.per_person_rate = parseFloat(terms.per_person_rate);
                         if (terms.event_is_free) { payload.price = null; payload.price_unit = 'flat'; }
@@ -1199,6 +1203,12 @@
                                                x-model="listingPrices['event'].event_address"
                                                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-rose-500">
                                     </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-500 mb-1">{{ t('events.event_link') }} ({{ t('events.event_link_hint') }})</label>
+                                    <input type="url" placeholder="https://meet.google.com/abc-def-ghi"
+                                           x-model="listingPrices['event'].event_link"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-rose-500">
                                 </div>
                                 <div class="grid grid-cols-3 gap-3">
                                     <div>
