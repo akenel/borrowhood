@@ -27,7 +27,12 @@ def _kc_base() -> str:
 
 @router.get("/login")
 async def login(request: Request):
-    """Redirect to Keycloak login page."""
+    """Redirect to Keycloak login page. If already logged in, go to dashboard."""
+    # If user already has a valid session, don't send them to KC again
+    from src.dependencies import get_current_user_token
+    token = await get_current_user_token(request)
+    if token:
+        return RedirectResponse(url="/dashboard", status_code=302)
     next_page = request.query_params.get("next", "/")
     # Where to come back after login -- pass next page via state param
     callback_uri = f"{settings.app_url}/auth/callback"
