@@ -103,6 +103,8 @@ async def run_migrations():
         "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS organization_description TEXT",
         # 2026-04-09: Index for event date queries
         "CREATE INDEX IF NOT EXISTS idx_listing_event_start ON bh_listing (event_start) WHERE event_start IS NOT NULL",
+        # 2026-04-11: Google avatar URLs can be 1000+ chars
+        "ALTER TABLE bh_user ALTER COLUMN avatar_url TYPE VARCHAR(2000)",
         # 2026-04-09: No-show tracking
         "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS no_show_count INTEGER DEFAULT 0",
         # 2026-04-10: Event gamification

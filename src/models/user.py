@@ -86,7 +86,7 @@ class BHUser(BHBase, Base):
     workshop_type: Mapped[Optional[WorkshopType]] = mapped_column(Enum(WorkshopType))
     tagline: Mapped[Optional[str]] = mapped_column(String(200))
     bio: Mapped[Optional[str]] = mapped_column(Text)
-    avatar_url: Mapped[Optional[str]] = mapped_column(String(500))
+    avatar_url: Mapped[Optional[str]] = mapped_column(String(2000))
     banner_url: Mapped[Optional[str]] = mapped_column(String(500))
 
     # Contact
