@@ -823,26 +823,36 @@
     <!-- Convert UTC event dates to local timezone (vanilla JS, no Alpine) -->
     <script>
     function convertEventDates() {
+        // Get timezone abbreviation (e.g. CEST, UTC, EST)
+        var tzName = '';
+        try {
+            tzName = ' ' + Intl.DateTimeFormat(undefined, {timeZoneName:'short'}).formatToParts(new Date()).find(function(p){return p.type==='timeZoneName'}).value;
+        } catch(e) {}
+
         document.querySelectorAll('[data-event-utc]').forEach(function(el) {
+            if (el.dataset.converted) return;
             try {
                 var d = new Date(el.dataset.eventUtc);
                 if (isNaN(d)) return;
                 var isTimeOnly = el.dataset.timeOnly === 'true';
-                var isLong = el.classList.contains('font-semibold');
+                var isShort = el.classList.contains('text-rose-600') || el.classList.contains('text-xs');
                 if (isTimeOnly) {
-                    el.textContent = d.toLocaleTimeString(undefined, {hour:'2-digit',minute:'2-digit'});
-                } else if (isLong) {
-                    el.textContent = d.toLocaleDateString(undefined, {weekday:'long',year:'numeric',month:'long',day:'numeric'})
-                        + ' at ' + d.toLocaleTimeString(undefined, {hour:'2-digit',minute:'2-digit'});
-                } else {
+                    el.textContent = d.toLocaleTimeString(undefined, {hour:'2-digit',minute:'2-digit'}) + tzName;
+                } else if (isShort) {
                     el.textContent = d.toLocaleDateString(undefined, {month:'short',day:'numeric'})
-                        + ', ' + d.toLocaleTimeString(undefined, {hour:'2-digit',minute:'2-digit'});
+                        + ', ' + d.toLocaleTimeString(undefined, {hour:'2-digit',minute:'2-digit'}) + tzName;
+                } else {
+                    el.textContent = d.toLocaleDateString(undefined, {weekday:'long',year:'numeric',month:'long',day:'numeric'})
+                        + ' at ' + d.toLocaleTimeString(undefined, {hour:'2-digit',minute:'2-digit'}) + tzName;
                 }
+                el.dataset.converted = 'true';
             } catch(e) {}
         });
     }
     convertEventDates();
     document.addEventListener('DOMContentLoaded', convertEventDates);
+    // Also run after a short delay for late-rendering elements
+    setTimeout(convertEventDates, 500);
     </script>
 
     {% block scripts %}{% endblock %}
