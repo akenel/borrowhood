@@ -32,29 +32,7 @@
     <script src="/static/js/tailwind.min.js"></script>
 
     <!-- Alpine.js (self-hosted) -->
-    <script>
-    // Debug: find broken Alpine ternary expressions
-    window.addEventListener('error', function(e) {
-        if (e.filename && e.filename.includes('alpine')) {
-            var all = document.querySelectorAll('*');
-            for (var j = 0; j < all.length; j++) {
-                var el = all[j];
-                for (var i = 0; i < el.attributes.length; i++) {
-                    var a = el.attributes[i];
-                    var n = a.name;
-                    var v = a.value;
-                    if ((n.startsWith('x-') || n.startsWith(':') || n.indexOf('@') === 0) && v.indexOf('?') !== -1) {
-                        // Check: has ? but no : after it (broken ternary)
-                        var afterQ = v.substring(v.indexOf('?') + 1);
-                        if (afterQ.indexOf(':') === -1) {
-                            console.error('ALPINE BUG:', n, '=', v.substring(0, 150), '| TAG:', el.tagName, '| LINE HINT:', el.outerHTML.substring(0, 80));
-                        }
-                    }
-                }
-            }
-        }
-    });
-    </script>
+    <!-- Alpine debug removed -->
     <script defer src="/static/js/alpine.min.js"></script>
 
     <!-- Marked.js -- Markdown rendering (self-hosted) -->
