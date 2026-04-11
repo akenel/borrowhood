@@ -139,7 +139,7 @@ class TestEnums:
 
     def test_listing_type_values(self):
         from src.models.listing import ListingType
-        expected = {"rent", "sell", "commission", "offer", "service", "training", "auction", "giveaway"}
+        expected = {"rent", "sell", "commission", "offer", "service", "training", "auction", "giveaway", "event"}
         assert {t.value for t in ListingType} == expected
 
     def test_listing_status_values(self):
