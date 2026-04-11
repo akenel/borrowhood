@@ -193,7 +193,55 @@ async def get_current_user_token(request: Request) -> Optional[dict]:
         return decoded
     except JWTError as e:
         logger.warning("JWT verification failed: %s", e)
+        # Try silent refresh using refresh token
+        refresh_token = request.cookies.get("bh_refresh")
+        if refresh_token:
+            new_token = await _silent_refresh(refresh_token)
+            if new_token:
+                # Store the new token so middleware can set the cookie
+                request.state.new_access_token = new_token["access_token"]
+                request.state.new_refresh_token = new_token.get("refresh_token")
+                request.state.token_expires_in = new_token.get("expires_in", 3600)
+                request.state.refresh_expires_in = new_token.get("refresh_expires_in", 7200)
+                # Decode the fresh token
+                try:
+                    decoded = jwt.decode(
+                        new_token["access_token"],
+                        public_key,
+                        algorithms=["RS256"],
+                        audience=settings.kc_client_id,
+                        options={"verify_aud": False},
+                    )
+                    return decoded
+                except JWTError:
+                    pass
         return None
+
+
+async def _silent_refresh(refresh_token: str) -> Optional[dict]:
+    """Use refresh token to get a new access token from Keycloak."""
+    import httpx
+    kc_base = f"{settings.kc_url}/realms/{settings.kc_realm}/protocol/openid-connect"
+    try:
+        async with httpx.AsyncClient(verify=False) as client:
+            resp = await client.post(
+                f"{kc_base}/token",
+                data={
+                    "grant_type": "refresh_token",
+                    "client_id": settings.kc_client_id,
+                    "refresh_token": refresh_token,
+                },
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+                timeout=5.0,
+            )
+            if resp.status_code == 200:
+                logger.info("Silent token refresh successful")
+                return resp.json()
+            else:
+                logger.warning("Silent refresh failed: %s", resp.status_code)
+    except Exception as e:
+        logger.warning("Silent refresh error: %s", e)
+    return None
 
 
 async def require_auth(request: Request) -> dict:

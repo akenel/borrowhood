@@ -81,20 +81,31 @@ async def auth_callback(request: Request, code: str = "", state: str = "/"):
         return RedirectResponse(url="/?error=login_failed", status_code=302)
 
     access_token = token_data.get("access_token")
+    refresh_token = token_data.get("refresh_token")
     if not access_token:
         logger.error("No access_token in response")
         return RedirectResponse(url="/?error=login_failed", status_code=302)
 
-    # Set session cookie and redirect to the page user was trying to access
+    # Set session cookies and redirect to the page user was trying to access
     response = RedirectResponse(url=next_page, status_code=302)
     response.set_cookie(
         "bh_session",
         access_token,
-        max_age=token_data.get("expires_in", 1800),
+        max_age=token_data.get("expires_in", 3600),
         httponly=True,
         samesite="lax",
         secure=not settings.debug,
     )
+    # Store refresh token (longer-lived) for silent token renewal
+    if refresh_token:
+        response.set_cookie(
+            "bh_refresh",
+            refresh_token,
+            max_age=token_data.get("refresh_expires_in", 7200),
+            httponly=True,
+            samesite="lax",
+            secure=not settings.debug,
+        )
 
     # Process referral cookie (if present)
     ref_slug = request.cookies.get("bh_ref")
@@ -148,6 +159,7 @@ async def logout(request: Request):
 
     response = RedirectResponse(url=logout_url, status_code=302)
     response.delete_cookie("bh_session")
+    response.delete_cookie("bh_refresh")
     return response
 
 

@@ -45,6 +45,35 @@ def create_app() -> FastAPI:
     # Rate limiting (BL-089) -- 120 reads/min, 20 writes/min per IP
     app.add_middleware(RateLimitMiddleware, read_limit=120, write_limit=20, window_seconds=60)
 
+    # Silent token refresh middleware -- sets new cookies when token is refreshed
+    from starlette.middleware.base import BaseHTTPMiddleware
+
+    class TokenRefreshMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request, call_next):
+            response = await call_next(request)
+            # If the dependency refreshed the token, update the cookies
+            if hasattr(request.state, "new_access_token") and request.state.new_access_token:
+                response.set_cookie(
+                    "bh_session",
+                    request.state.new_access_token,
+                    max_age=getattr(request.state, "token_expires_in", 3600),
+                    httponly=True,
+                    samesite="lax",
+                    secure=not settings.debug,
+                )
+                if getattr(request.state, "new_refresh_token", None):
+                    response.set_cookie(
+                        "bh_refresh",
+                        request.state.new_refresh_token,
+                        max_age=getattr(request.state, "refresh_expires_in", 7200),
+                        httponly=True,
+                        samesite="lax",
+                        secure=not settings.debug,
+                    )
+            return response
+
+    app.add_middleware(TokenRefreshMiddleware)
+
     # Favicon at root (browsers request /favicon.ico directly)
     @app.get("/favicon.ico", include_in_schema=False)
     async def favicon():
