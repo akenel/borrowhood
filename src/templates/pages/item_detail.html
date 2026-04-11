@@ -1040,10 +1040,11 @@
                                 if (!r.ok) { var e = await r.json(); throw new Error(e.detail || 'Failed'); }
                                 var d = await r.json();
                                 rsvpStatus = d.status;
-                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: d.status === 'waitlisted' ? '{{ t('events.waitlisted') }}' : '{{ t('events.registered') }}' } }));
+                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: d.status === 'waitlisted' ? $el.dataset.msgWait : $el.dataset.msgOk } }));
                             }).catch(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } })); })
                             .finally(() => { submitting = false; });
                         " :disabled="submitting"
+                           data-msg-wait="{{ t('events.waitlisted') }}" data-msg-ok="{{ t('events.registered') }}"
                            class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition-colors min-h-[44px]">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
