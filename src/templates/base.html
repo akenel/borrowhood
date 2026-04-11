@@ -32,6 +32,26 @@
     <script src="/static/js/tailwind.min.js"></script>
 
     <!-- Alpine.js (self-hosted) -->
+    <script>
+    // Debug: catch Alpine expression errors and log the element
+    document.addEventListener('alpine:init', () => {
+        Alpine.onElErrors = [];
+    });
+    window.addEventListener('error', function(e) {
+        if (e.filename && e.filename.includes('alpine')) {
+            // Walk the DOM to find the offending element
+            document.querySelectorAll('[x-data],[x-text],[x-init],[@click],:not(script)').forEach(function(el) {
+                var attrs = el.attributes;
+                for (var i = 0; i < attrs.length; i++) {
+                    var val = attrs[i].value;
+                    if (val && val.includes('?') && !val.includes(':') && (attrs[i].name.startsWith('x-') || attrs[i].name.startsWith('@') || attrs[i].name.startsWith(':'))) {
+                        console.error('ALPINE DEBUG: broken ternary in', attrs[i].name, '=', val.substring(0, 100), 'on element:', el.tagName, el.className.substring(0, 50));
+                    }
+                }
+            });
+        }
+    });
+    </script>
     <script defer src="/static/js/alpine.min.js"></script>
 
     <!-- Marked.js -- Markdown rendering (self-hosted) -->
