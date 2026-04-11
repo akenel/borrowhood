@@ -389,7 +389,9 @@
                 {% endif %}
             </div>
 
-            <!-- Listings / Offers -->
+            <!-- Listings / Offers (hidden for event-only items -- info is in event card) -->
+            {% set non_event_listings = item.listings | selectattr('listing_type.value', 'ne', 'event') | rejectattr('deleted_at') | list %}
+            {% if non_event_listings %}
             <div class="bg-white rounded-lg border border-gray-200 p-6">
                 <h2 class="text-lg font-semibold text-gray-900">{{ t('item.available_as') }}</h2>
                 <div class="mt-4 space-y-4">
@@ -470,6 +472,7 @@
                     {% endfor %}
                 </div>
             </div>
+            {% endif %}
 
             <!-- Reviews section -->
             {% if item.owner %}
