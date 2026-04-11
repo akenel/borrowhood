@@ -820,6 +820,24 @@
         </div>
     </div>
 
+    <!-- Convert UTC event dates to local timezone (vanilla JS, no Alpine) -->
+    <script>
+    document.querySelectorAll('[data-event-utc]').forEach(function(el) {
+        try {
+            var d = new Date(el.dataset.eventUtc);
+            if (isNaN(d)) return;
+            var isLong = el.classList.contains('font-semibold');
+            if (isLong) {
+                el.textContent = d.toLocaleDateString(undefined, {weekday:'long',year:'numeric',month:'long',day:'numeric'})
+                    + ' at ' + d.toLocaleTimeString(undefined, {hour:'2-digit',minute:'2-digit'});
+            } else {
+                el.textContent = d.toLocaleDateString(undefined, {month:'short',day:'numeric'})
+                    + ', ' + d.toLocaleTimeString(undefined, {hour:'2-digit',minute:'2-digit'});
+            }
+        } catch(e) {}
+    });
+    </script>
+
     {% block scripts %}{% endblock %}
 </body>
 </html>
