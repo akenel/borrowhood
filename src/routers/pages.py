@@ -427,7 +427,7 @@ async def edit_item_page(slug: str, request: Request,
     """Edit item page -- same form as list_item but pre-filled."""
     if not token:
         from starlette.responses import RedirectResponse
-        return RedirectResponse(url="/auth/login", status_code=302)
+        return RedirectResponse(url="/login", status_code=302)
 
     result = await db.execute(
         select(BHItem)
