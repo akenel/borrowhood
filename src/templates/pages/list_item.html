@@ -146,6 +146,13 @@
                             if (l.per_person_rate) lp.per_person_rate = l.per_person_rate;
                             if (l.max_participants) lp.max_participants = l.max_participants;
                             if (l.group_discount_pct) lp.group_discount_pct = l.group_discount_pct;
+                            if (l.listing_type === 'event') {
+                                lp.event_start = l.event_start ? l.event_start.slice(0, 16) : '';
+                                lp.event_end = l.event_end ? l.event_end.slice(0, 16) : '';
+                                lp.event_venue = l.event_venue || '';
+                                lp.event_address = l.event_address || '';
+                                lp.event_is_free = (l.price === null || l.price === 0);
+                            }
                         }
                     });
                     // Pre-fill shared fields from first listing
