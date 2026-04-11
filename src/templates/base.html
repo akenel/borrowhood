@@ -774,7 +774,7 @@
                         </svg>
                     </div>
                     <p class="font-semibold text-gray-900">{{  t('feedback.thanks') }}</p>
-                    <p class="text-sm text-gray-500 mt-1" x-text="'BL-' + String(blNumber).padStart(3, '0') + ' {{  t('feedback.created') }}'"></p>
+                    <p class="text-sm text-gray-500 mt-1"><span x-text="'BL-' + String(blNumber).padStart(3, '0')"></span> {{ t('feedback.created') }}</p>
                     <button @click="reset()" class="mt-4 text-sm text-rose-600 font-semibold hover:underline">{{  t('feedback.close') }}</button>
                 </div>
             </template>
@@ -812,7 +812,8 @@
                     <!-- Submit -->
                     <button @click="submitFeedback()" :disabled="submitting || message.length < 5"
                             class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg text-sm disabled:opacity-50 transition-colors min-h-[44px]">
-                        <span x-text="submitting ? '{{  t('feedback.sending') }}' : '{{  t('feedback.send') }}'"></span>
+                        <template x-if="submitting"><span>{{ t('feedback.sending') }}</span></template>
+                        <template x-if="!submitting"><span>{{ t('feedback.send') }}</span></template>
                     </button>
                     <p class="text-xs text-gray-400 text-center">{{  t('feedback.page_captured') }}</p>
                 </div>
