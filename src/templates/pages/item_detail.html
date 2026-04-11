@@ -983,8 +983,21 @@
                         </template>
                     </div>
                     {% endif %}
-                    {% if not event_listing.obj.price %}
+                    {% if event_listing.obj.price %}
+                    <div class="mt-2 flex items-center gap-2">
+                        <span class="text-lg font-bold text-gray-900">&euro;{{ "%.2f" | format(event_listing.obj.price) }}</span>
+                        {% if event_listing.obj.price_unit and event_listing.obj.price_unit != 'flat' %}
+                        <span class="text-sm text-gray-500">{{ t('common.' + event_listing.obj.price_unit) }}</span>
+                        {% endif %}
+                    </div>
+                    {% else %}
                     <span class="inline-block mt-2 px-3 py-1 bg-green-100 text-green-700 text-sm font-semibold rounded-full">{{ t('events.free_event') }}</span>
+                    {% endif %}
+                    {% if event_listing.obj.delivery_available %}
+                    <div class="mt-2 flex items-center gap-1.5 text-sm text-gray-600">
+                        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span>{{ t('item.delivery_available') }}</span>
+                    </div>
                     {% endif %}
                     {% if event_listing.obj.event_link %}
                     <div class="mt-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
