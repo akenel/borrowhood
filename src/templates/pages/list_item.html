@@ -439,6 +439,15 @@
                             if (terms.max_participants) payload.max_participants = parseInt(terms.max_participants);
                             if (terms.group_discount_pct) payload.group_discount_pct = parseFloat(terms.group_discount_pct);
                         }
+                        if (lt === 'event') {
+                            if (terms.event_start) payload.event_start = new Date(terms.event_start).toISOString();
+                            if (terms.event_end) payload.event_end = new Date(terms.event_end).toISOString();
+                            if (terms.event_venue) payload.event_venue = terms.event_venue;
+                            if (terms.event_address) payload.event_address = terms.event_address;
+                            if (terms.max_participants) payload.max_participants = parseInt(terms.max_participants);
+                            if (terms.per_person_rate) payload.per_person_rate = parseFloat(terms.per_person_rate);
+                            if (terms.event_is_free) { payload.price = null; payload.price_unit = 'flat'; }
+                        }
                         await fetch('/api/v1/listings/' + existing.id, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
