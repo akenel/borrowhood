@@ -800,9 +800,9 @@
             {% set listing_type_val.val = listing.listing_type.value %}
             {% endif %}
             {% endfor %}
-            {# Event listings get highest priority #}
+            {# Event listings get highest priority (show for active + draft/pending if owner) #}
             {% for listing in item.listings %}
-            {% if listing.status.value == 'active' and listing.listing_type.value == 'event' %}
+            {% if listing.listing_type.value == 'event' and (listing.status.value == 'active' or (is_owner and listing.status.value in ('draft', 'pending'))) %}
             {% set active_listing_id.val = listing.id | string %}
             {% set listing_type_val.val = 'event' %}
             {% endif %}
@@ -869,7 +869,7 @@
                 {# Event info card + RSVP #}
                 {% set event_listing = namespace(obj=None) %}
                 {% for listing in item.listings %}
-                {% if listing.status.value == 'active' and listing.listing_type.value == 'event' %}
+                {% if listing.listing_type.value == 'event' and (listing.status.value == 'active' or (is_owner and listing.status.value in ('draft', 'pending'))) %}
                 {% set event_listing.obj = listing %}
                 {% endif %}
                 {% endfor %}
