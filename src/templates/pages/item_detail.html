@@ -969,6 +969,9 @@
                     {% endif %}
                     {% if event_listing.obj.max_participants %}
                     <div class="mt-2" x-data="{ rsvpInfo: null, loading: true, init() {
+                        this.loadInfo();
+                        window.addEventListener('rsvp-changed', () => this.loadInfo());
+                    }, loadInfo() {
                         fetch('/api/v1/events/{{ event_listing.obj.id }}/rsvp')
                         .then(r => r.ok ? r.json() : null)
                         .then(d => { if(d) this.rsvpInfo = d; })
@@ -1041,6 +1044,7 @@
                                 var d = await r.json();
                                 rsvpStatus = d.status;
                                 window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: d.status === 'waitlisted' ? $el.dataset.msgWait : $el.dataset.msgOk } }));
+                                window.dispatchEvent(new CustomEvent('rsvp-changed'));
                             }).catch(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } })); })
                             .finally(() => { submitting = false; });
                         " :disabled="submitting"
@@ -1060,7 +1064,7 @@
                             </div>
                             <button @click="
                                 fetch('/api/v1/events/{{ active_listing_id.val }}/rsvp', { method: 'DELETE' })
-                                .then(r => { if(r.ok) { rsvpStatus = 'cancelled'; window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: 'RSVP cancelled' } })); } });
+                                .then(r => { if(r.ok) { rsvpStatus = 'cancelled'; window.dispatchEvent(new CustomEvent('rsvp-changed')); window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: 'RSVP cancelled' } })); } });
                             " class="w-full text-sm text-gray-500 hover:text-red-600 transition-colors py-2">
                                 {{ t('events.cancel_rsvp') }}
                             </button>
