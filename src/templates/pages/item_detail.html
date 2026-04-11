@@ -272,7 +272,7 @@
                             <button @click="translate()" class="text-xs text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1"
                                     :disabled="loading">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
-                                <span x-text="loading ? '...' : (translated ? '{{ t('common.show_original') }}' : '{{ t('common.translate') }}')"></span>
+                                <span x-show="loading">...</span><span x-show="!loading && translated" x-cloak>{{ t('common.show_original') }}</span><span x-show="!loading && !translated" x-cloak>{{ t('common.translate') }}</span>
                             </button>
                         </div>
                     </div>
@@ -315,7 +315,7 @@
                             <button @click="translate()" class="text-xs text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1"
                                     :disabled="loading">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
-                                <span x-text="loading ? '...' : (translated ? '{{ t('common.show_original') }}' : '{{ t('common.translate') }}')"></span>
+                                <span x-show="loading">...</span><span x-show="!loading && translated" x-cloak>{{ t('common.show_original') }}</span><span x-show="!loading && !translated" x-cloak>{{ t('common.translate') }}</span>
                             </button>
                         </div>
                     </div>
@@ -728,12 +728,12 @@
                 <!-- Current bid -->
                 <div class="text-center py-4 bg-amber-50 rounded-lg mb-4">
                     <p class="text-xs text-amber-700 uppercase tracking-wider font-medium"
-                       x-text="totalBids > 0 ? '{{ t('auction.current_bid') }}' : '{{ t('auction.starting_bid') }}'"></p>
+                       ><span x-show="totalBids > 0">{{ t('auction.current_bid') }}</span><span x-show="totalBids === 0" x-cloak>{{ t('auction.starting_bid') }}</span></p>
                     <p class="text-3xl font-bold text-gray-900 mt-1">
                         <span x-text="currency"></span> <span x-text="currentPrice ? currentPrice.toFixed(2) : startingBid.toFixed(2)"></span>
                     </p>
                     <p class="text-sm text-gray-500 mt-1">
-                        <span x-text="totalBids"></span> <span x-text="totalBids === 1 ? '{{ t('auction.bid') }}' : '{{ t('auction.bids') }}'"></span>
+                        <span x-text="totalBids"></span> <span x-show="totalBids === 1">{{ t('auction.bid') }}</span><span x-show="totalBids !== 1" x-cloak>{{ t('auction.bids') }}</span>
                     </p>
                 </div>
 
@@ -1123,7 +1123,8 @@
                                         .finally(() => { submittingQuote = false; });
                                     " :disabled="submittingQuote || quoteDesc.length < 10"
                                        class="flex-1 px-4 py-2 text-sm font-semibold text-white bg-amber-600 rounded-lg hover:bg-amber-700 disabled:opacity-50 min-h-[44px]">
-                                        <span x-text="submittingQuote ? '{{ t('i18n.sending') }}...' : '{{ t('i18n.send_request') }}'"></span>
+                                        <template x-if="submittingQuote"><span>{{ t('i18n.sending') }}...</span></template>
+                                        <template x-if="!submittingQuote"><span>{{ t('i18n.send_request') }}</span></template>
                                     </button>
                                 </div>
                             </div>
@@ -1197,7 +1198,8 @@
                                         .finally(() => { submittingOffer = false; });
                                     " :disabled="submittingOffer || !offerPrice || offerPrice <= 0"
                                        class="flex-1 px-4 py-2 text-sm font-semibold text-white bg-amber-600 rounded-lg hover:bg-amber-700 disabled:opacity-50 min-h-[44px]">
-                                        <span x-text="submittingOffer ? '{{ t('i18n.sending') }}...' : '{{ t('i18n.send_offer') }}'"></span>
+                                        <template x-if="submittingOffer"><span>{{ t('i18n.sending') }}...</span></template>
+                                        <template x-if="!submittingOffer"><span>{{ t('i18n.send_offer') }}</span></template>
                                     </button>
                                 </div>
                                 <p class="text-xs text-gray-400 mt-3 text-center">{{ t('i18n.offer_expires_48h') }}</p>
@@ -1251,7 +1253,12 @@
                      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
                      @keydown.escape.window="showRentalModal = false">
                     <div class="bg-white rounded-lg max-w-md w-full p-6 space-y-4" @click.outside="showRentalModal = false">
-                        <h2 class="text-lg font-bold text-gray-900" x-text="isGiveaway ? '{{ t('giveaway.claim') }}' : listingType === 'sell' ? '{{ t('purchase.request_title') }}' : listingType === 'service' || listingType === 'training' ? '{{ t('booking.request_title') }}' : '{{ t('rental.request_title') }}'"></h2>
+                        <h2 class="text-lg font-bold text-gray-900">
+                            <span x-show="isGiveaway">{{ t('giveaway.claim') }}</span>
+                            <span x-show="!isGiveaway && listingType === 'sell'" x-cloak>{{ t('purchase.request_title') }}</span>
+                            <span x-show="!isGiveaway && (listingType === 'service' || listingType === 'training')" x-cloak>{{ t('booking.request_title') }}</span>
+                            <span x-show="!isGiveaway && listingType !== 'sell' && listingType !== 'service' && listingType !== 'training'" x-cloak>{{ t('rental.request_title') }}</span>
+                        </h2>
                         <p class="text-sm text-gray-500">{{ item.name }}</p>
 
                         <!-- Date pickers: hidden for giveaways -->
@@ -1316,7 +1323,12 @@
                             <button @click="submitRental()" :disabled="submitting || (hasSafety && !safetyAck)"
                                     :class="isGiveaway ? 'bg-green-600 hover:bg-green-700' : 'bg-indigo-600 hover:bg-indigo-700'"
                                     class="px-4 py-2 text-white font-semibold rounded-lg disabled:opacity-50 min-h-[44px]">
-                                <span x-show="!submitting" x-text="isGiveaway ? '{{ t('giveaway.claim') }}' : listingType === 'sell' ? '{{ t('purchase.submit') }}' : listingType === 'service' || listingType === 'training' ? '{{ t('booking.submit') }}' : '{{ t('rental.submit') }}'"></span>
+                                <span x-show="!submitting">
+                                    <template x-if="isGiveaway">{{ t('giveaway.claim') }}</template>
+                                    <template x-if="!isGiveaway && listingType === 'sell'">{{ t('purchase.submit') }}</template>
+                                    <template x-if="!isGiveaway && (listingType === 'service' || listingType === 'training')">{{ t('booking.submit') }}</template>
+                                    <template x-if="!isGiveaway && listingType !== 'sell' && listingType !== 'service' && listingType !== 'training'">{{ t('rental.submit') }}</template>
+                                </span>
                                 <span x-show="submitting" x-cloak>{{ t('common.loading') }}</span>
                             </button>
                         </div>
