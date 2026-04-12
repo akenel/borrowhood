@@ -122,30 +122,49 @@ def _og_workshop_desc(user) -> str:
 def _og_item_desc(item, listing=None) -> str:
     """Build a rich OG description for item pages.
 
-    Format: EUR 120.00 · Training · by Corrado Sassi, Trapani · Learn to sail...
-    Price and seller come FIRST -- that's what converts clicks.
+    Events:  Apr 22, 5:00 PM · D50 Palazzo, Alcamo · Free · by Nic · Learn basic positions...
+    Items:   EUR 120.00 · Training · by Corrado Sassi, Trapani · Learn to sail...
+    Date/venue/price come FIRST -- that's what converts clicks.
     """
     parts = []
+    is_event = listing and hasattr(listing, 'listing_type') and getattr(listing.listing_type, 'value', '') == 'event'
+
+    if is_event and listing.event_start:
+        parts.append(listing.event_start.strftime('%b %d, %I:%M %p').replace(' 0', ' '))
+        if listing.event_end:
+            parts[-1] += listing.event_end.strftime(' - %I:%M %p').replace(' 0', ' ')
+
+    if is_event and listing.event_venue:
+        venue = listing.event_venue
+        if listing.event_address:
+            city = listing.event_address.split(',')[-1].strip() if ',' in listing.event_address else listing.event_address
+            venue += f", {city}"
+        parts.append(venue)
+
     if listing:
         try:
             price = float(listing.price or 0)
             if price > 0:
                 currency = getattr(listing, 'currency', 'EUR') or 'EUR'
                 parts.append(f"{currency} {price:.2f}")
+            elif is_event:
+                parts.append("Free")
         except (TypeError, ValueError):
-            pass
-        try:
-            lt = listing.listing_type
-            parts.append(lt.value.replace('_', ' ').title() if hasattr(lt, 'value') else str(lt).replace('_', ' ').title())
-        except Exception:
-            pass
+            if is_event:
+                parts.append("Free")
+        if not is_event:
+            try:
+                lt = listing.listing_type
+                parts.append(lt.value.replace('_', ' ').title() if hasattr(lt, 'value') else str(lt).replace('_', ' ').title())
+            except Exception:
+                pass
+
     if item.owner:
         seller = f"by {item.owner.display_name}"
-        if item.owner.city:
+        if not is_event and item.owner.city:
             seller += f", {item.owner.city}"
         parts.append(seller)
     if item.description:
-        # Fill remaining space with description (Telegram shows ~200 chars)
         used = len(" · ".join(parts))
         remaining = max(60, 200 - used)
         desc = item.description[:remaining].strip()
