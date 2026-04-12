@@ -201,7 +201,10 @@
   "booking": {
     "request_title": "Service Request",
     "submit": "Send Service Request",
-    "message_placeholder": "Hi! I would like to book this service..."
+    "message_placeholder": "Hi! I would like to book this service...",
+    "participants": "Number of Participants",
+    "group_discount": "Group discount",
+    "total": "Total"
   },
   "rental": {
     "request_title": "Rental Request",
@@ -660,7 +663,32 @@
     "history": "History",
     "no_history": "No completed or cancelled orders yet.",
     "items": "Items",
-    "no_item_favorites": "No favorite items yet. Browse listings to find items you like."
+    "no_item_favorites": "No favorite items yet. Browse listings to find items you like.",
+    "saved_searches": "Saved Searches",
+    "no_saved_searches": "No saved searches yet.",
+    "browse_and_save": "Browse and save a search to get notified",
+    "analytics": "Analytics",
+    "total_views": "Total Views",
+    "total_orders": "Total Orders",
+    "total_revenue": "Revenue",
+    "conversion_rate": "Conversion",
+    "item_performance": "Item Performance",
+    "no_analytics": "No analytics data yet. Views start tracking when people visit your items.",
+    "mentorships": "Mentorships",
+    "no_mentorships": "No mentorships yet.",
+    "hours": "Hours",
+    "milestones": "Milestones",
+    "notes": "Notes",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "delivery_tracking": {
+    "tracking_title": "Delivery Tracking",
+    "loading": "Loading delivery info...",
+    "destination": "Delivery Point",
+    "map": "Delivery Map",
+    "timeline": "Timeline",
+    "no_events": "No tracking events yet."
   },
   "onboarding": {
     "title": "Welcome to La Piazza",

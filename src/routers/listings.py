@@ -389,3 +389,30 @@ async def resume_all_listings(
         count += 1
     await db.commit()
     return {"resumed": count}
+
+
+@router.get("/{listing_id}/price")
+async def calculate_price(
+    listing_id: UUID,
+    participants: int = Query(1, ge=1, le=200),
+    db: AsyncSession = Depends(get_db),
+):
+    """Calculate total price for a service/training listing with team pricing."""
+    listing = await db.get(BHListing, listing_id)
+    if not listing or listing.deleted_at:
+        raise HTTPException(status_code=404, detail="Listing not found")
+
+    from src.services.pricing import calculate_service_price
+    try:
+        result = calculate_service_price(
+            per_person_rate=listing.per_person_rate,
+            participant_count=participants,
+            minimum_charge=listing.minimum_charge,
+            group_discount_pct=listing.group_discount_pct,
+            max_participants=listing.max_participants,
+            base_price=listing.price,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    return result

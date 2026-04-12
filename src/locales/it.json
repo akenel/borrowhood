@@ -201,7 +201,10 @@
   "booking": {
     "request_title": "Richiesta di Servizio",
     "submit": "Invia Richiesta di Servizio",
-    "message_placeholder": "Ciao! Vorrei prenotare questo servizio..."
+    "message_placeholder": "Ciao! Vorrei prenotare questo servizio...",
+    "participants": "Numero di Partecipanti",
+    "group_discount": "Sconto gruppo",
+    "total": "Totale"
   },
   "rental": {
     "request_title": "Richiesta di Noleggio",
@@ -660,7 +663,32 @@
     "history": "Storico",
     "no_history": "Nessun ordine completato o annullato.",
     "items": "Oggetti",
-    "no_item_favorites": "Nessun oggetto preferito. Esplora gli annunci per trovare oggetti che ti piacciono."
+    "no_item_favorites": "Nessun oggetto preferito. Esplora gli annunci per trovare oggetti che ti piacciono.",
+    "saved_searches": "Ricerche Salvate",
+    "no_saved_searches": "Nessuna ricerca salvata.",
+    "browse_and_save": "Esplora e salva una ricerca per ricevere notifiche",
+    "analytics": "Statistiche",
+    "total_views": "Visite Totali",
+    "total_orders": "Ordini Totali",
+    "total_revenue": "Fatturato",
+    "conversion_rate": "Conversione",
+    "item_performance": "Performance Oggetti",
+    "no_analytics": "Nessun dato ancora. Le visite iniziano a essere tracciate quando le persone visitano i tuoi oggetti.",
+    "mentorships": "Mentoraggio",
+    "no_mentorships": "Nessun mentoraggio.",
+    "hours": "Ore",
+    "milestones": "Traguardi",
+    "notes": "Note",
+    "save": "Salva",
+    "cancel": "Annulla"
+  },
+  "delivery_tracking": {
+    "tracking_title": "Tracciamento Consegna",
+    "loading": "Caricamento informazioni...",
+    "destination": "Punto di Consegna",
+    "map": "Mappa Consegna",
+    "timeline": "Cronologia",
+    "no_events": "Nessun evento di tracciamento."
   },
   "onboarding": {
     "title": "Benvenuto su La Piazza",

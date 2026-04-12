@@ -611,7 +611,9 @@ class TestOGMetaTags:
 
     def test_item_detail_passes_og_type(self):
         content = PAGES_PY.read_text()
-        detail_section = content[content.find("def item_detail"):content.find("def item_detail") + 2000]
+        start = content.find("def item_detail")
+        end = content.find("\n@router", start + 1)
+        detail_section = content[start:end]
         assert 'og_type="product"' in detail_section
 
 

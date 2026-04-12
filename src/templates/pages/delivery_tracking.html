@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}{{ t('delivery_tracking.tracking_title') }} -- La Piazza{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-8"
+     x-data="{
+        tracking: null,
+        events: [],
+        rental: null,
+        loading: true,
+        error: null,
+
+        async init() {
+            this.loading = true;
+            try {
+                var [tRes, eRes] = await Promise.all([
+                    fetch('/api/v1/deliveries/{{ rental_id }}'),
+                    fetch('/api/v1/deliveries/{{ rental_id }}/events')
+                ]);
+                if (tRes.ok) this.tracking = await tRes.json();
+                else this.error = 'Could not load tracking info';
+                if (eRes.ok) this.events = await eRes.json();
+            } catch(e) { this.error = 'Failed to load delivery data'; }
+            this.loading = false;
+
+            if (this.tracking && this.tracking.delivery_lat && this.tracking.delivery_lng) {
+                this.$nextTick(() => this.initMap());
+            }
+        },
+
+        initMap() {
+            if (!window.L) return;
+            var lat = this.tracking.delivery_lat;
+            var lng = this.tracking.delivery_lng;
+            var map = L.map('delivery-map').setView([lat, lng], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'OpenStreetMap'
+            }).addTo(map);
+
+            L.marker([lat, lng]).addTo(map).bindPopup('{{ t('delivery_tracking.destination') }}');
+
+            if (this.events.length > 0) {
+                var coords = this.events
+                    .filter(e => e.event_lat && e.event_lng)
+                    .map(e => [e.event_lat, e.event_lng]);
+                if (coords.length > 0) {
+                    coords.forEach(c => L.circleMarker(c, { radius: 5, color: '#6366f1' }).addTo(map));
+                    if (coords.length > 1) {
+                        L.polyline(coords, { color: '#6366f1', weight: 3, dashArray: '5,10' }).addTo(map);
+                    }
+                    var allCoords = coords.concat([[lat, lng]]);
+                    map.fitBounds(allCoords, { padding: [30, 30] });
+                }
+            }
+        }
+     }">
+
+    <!-- Loading -->
+    <template x-if="loading">
+        <div class="text-center py-16">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mx-auto"></div>
+            <p class="text-gray-400 mt-3">{{ t('delivery_tracking.loading') }}</p>
+        </div>
+    </template>
+
+    <!-- Error -->
+    <template x-if="!loading && error">
+        <div class="text-center py-16">
+            <p class="text-red-500 text-lg" x-text="error"></p>
+            <a href="/dashboard" class="mt-3 inline-block text-indigo-600 hover:underline">{{ t('nav.dashboard') }}</a>
+        </div>
+    </template>
+
+    <!-- Tracking content -->
+    <template x-if="!loading && !error && tracking">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ t('delivery_tracking.tracking_title') }}</h1>
+
+            <!-- Status banner -->
+            <div class="mb-6 p-4 rounded-xl border"
+                 :class="tracking.status === 'DELIVERED' ? 'bg-green-50 border-green-200' : tracking.status === 'IN_TRANSIT' ? 'bg-blue-50 border-blue-200' : 'bg-amber-50 border-amber-200'">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center"
+                         :class="tracking.status === 'DELIVERED' ? 'bg-green-500' : tracking.status === 'IN_TRANSIT' ? 'bg-blue-500' : 'bg-amber-500'">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <template x-if="tracking.status === 'DELIVERED'"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></template>
+                            <template x-if="tracking.status !== 'DELIVERED'"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></template>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-900" x-text="tracking.status.replace('_', ' ')"></p>
+                        <p class="text-sm text-gray-600" x-text="tracking.delivery_method"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <template x-if="tracking.delivery_lat && tracking.delivery_lng">
+                <div class="mb-6">
+                    <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        {{ t('delivery_tracking.map') }}
+                    </h2>
+                    <div id="delivery-map" class="w-full h-64 sm:h-80 rounded-xl border border-gray-200 z-0"></div>
+                </div>
+            </template>
+
+            <!-- Event Timeline -->
+            <h2 class="text-lg font-bold text-gray-900 mb-3">{{ t('delivery_tracking.timeline') }}</h2>
+            <template x-if="events.length === 0">
+                <p class="text-gray-400">{{ t('delivery_tracking.no_events') }}</p>
+            </template>
+            <div class="space-y-0">
+                <template x-for="(ev, idx) in events" :key="ev.id">
+                    <div class="flex gap-3">
+                        <div class="flex flex-col items-center">
+                            <div class="w-3 h-3 rounded-full flex-shrink-0"
+                                 :class="idx === 0 ? 'bg-indigo-500' : 'bg-gray-300'"></div>
+                            <div class="w-0.5 flex-1 bg-gray-200" x-show="idx < events.length - 1"></div>
+                        </div>
+                        <div class="pb-6 flex-1">
+                            <p class="font-semibold text-gray-900 text-sm" x-text="ev.title"></p>
+                            <p class="text-xs text-gray-500" x-text="ev.description"></p>
+                            <p class="text-xs text-gray-400 mt-0.5" x-text="new Date(ev.created_at).toLocaleString('{{ lang }}')"></p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </template>
+</div>
+{% endblock %}

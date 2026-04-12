@@ -431,6 +431,21 @@ async def item_detail(slug: str, request: Request,
     )
     similar_items = similar_result.scalars().all()
 
+    # Track view (fire-and-forget, don't block page render)
+    try:
+        from src.models.analytics import BHItemView
+        viewer_id = None
+        if token:
+            try:
+                viewer_id = (await get_user(db, token)).id
+            except Exception:
+                pass
+        if not is_owner:
+            db.add(BHItemView(item_id=item.id, viewer_id=viewer_id))
+            await db.commit()
+    except Exception:
+        pass
+
     ctx = _ctx(request, token,
         item=item,
         is_owner=is_owner,
@@ -1095,6 +1110,17 @@ async def leaderboard_page(request: Request,
     from src.models.achievement import ACHIEVEMENTS
     ctx = _ctx(request, token, achievements=ACHIEVEMENTS)
     return _render("pages/leaderboard.html", ctx)
+
+
+@router.get("/delivery/{rental_id}", response_class=HTMLResponse)
+async def delivery_tracking_page(
+    rental_id: str,
+    request: Request,
+    token: Optional[dict] = Depends(get_current_user_token),
+):
+    """Delivery tracking page with GPS map and timeline."""
+    ctx = _ctx(request, token, rental_id=rental_id)
+    return _render("pages/delivery_tracking.html", ctx)
 
 
 @router.get("/calendar", response_class=HTMLResponse)
