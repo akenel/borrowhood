@@ -85,7 +85,18 @@
     "thu": "Thu",
     "fri": "Fri",
     "sat": "Sat",
-    "sun": "Sun"
+    "sun": "Sun",
+    "tab_my_rentals": "My Rentals",
+    "no_rentals": "No active rentals this month",
+    "browse_items": "Browse Items",
+    "lending": "Lending",
+    "borrowing": "Borrowing",
+    "with": "with",
+    "availability": "Availability",
+    "available_day": "Available",
+    "booked_day": "Booked",
+    "min_days": "Min days",
+    "max_days": "Max days"
   },
   "feedback": {
     "title": "Send Feedback",

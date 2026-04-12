@@ -5,19 +5,21 @@ Branch: PENDING -> DECLINED | CANCELLED
 Branch: any active -> DISPUTED -> COMPLETED | CANCELLED
 """
 
-from datetime import datetime, timezone
+import calendar as cal_mod
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from fastapi.responses import PlainTextResponse
 
-from sqlalchemy import select, or_
+from sqlalchemy import func, select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import get_db
-from src.dependencies import get_user, require_auth
+from src.dependencies import get_current_user_token, get_user, require_auth
+from src.models.item import BHItem
 from src.models.listing import BHListing, ListingType, ListingStatus
 from src.models.notification import NotificationType
 from src.models.rental import BHRental, RentalStatus, validate_rental_transition
@@ -647,4 +649,160 @@ async def complete_order(
     return {
         "status": "completed",
         "message": "Order completed! Don't forget to leave a review."
+    }
+
+
+# ── Calendar feeds ──────────────────────────────────────────────
+
+TERMINAL_STATUSES = {RentalStatus.COMPLETED, RentalStatus.CANCELLED, RentalStatus.DECLINED, RentalStatus.EXPIRED}
+ACTIVE_STATUSES = {s for s in RentalStatus if s not in TERMINAL_STATUSES}
+
+
+@router.get("/calendar")
+async def rental_calendar(
+    month: int = Query(default=None),
+    year: int = Query(default=None),
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """User's rentals for a given month (as renter AND owner).
+
+    Returns items with rental dates for the calendar grid + card list.
+    """
+    user = await get_user(db, token)
+    now = datetime.now(timezone.utc)
+    if not month:
+        month = now.month
+    if not year:
+        year = now.year
+
+    _, last_day = cal_mod.monthrange(year, month)
+    start = datetime(year, month, 1, tzinfo=timezone.utc)
+    end = datetime(year, month, last_day, 23, 59, 59, tzinfo=timezone.utc)
+
+    result = await db.execute(
+        select(BHRental)
+        .options(
+            selectinload(BHRental.listing).selectinload(BHListing.item).selectinload(BHItem.owner),
+            selectinload(BHRental.listing).selectinload(BHListing.item).selectinload(BHItem.media),
+            selectinload(BHRental.renter),
+        )
+        .where(
+            or_(
+                BHRental.renter_id == user.id,
+                BHRental.listing.has(BHListing.item.has(owner_id=user.id)),
+            ),
+            BHRental.status.in_(ACTIVE_STATUSES),
+            BHRental.requested_start.isnot(None),
+            BHRental.requested_start <= end,
+            func.coalesce(BHRental.requested_end, BHRental.requested_start) >= start,
+        )
+        .order_by(BHRental.requested_start.asc())
+    )
+    rentals = result.scalars().unique().all()
+
+    items = []
+    for rental in rentals:
+        listing = rental.listing
+        item = listing.item if listing else None
+        if not item or item.deleted_at:
+            continue
+        owner = item.owner
+        renter = rental.renter
+
+        first_image = None
+        if item.media:
+            for m in item.media:
+                if m.media_type and m.media_type.value in ("photo", "PHOTO"):
+                    first_image = m.url
+                    break
+
+        is_owner = item.owner_id == user.id
+        other_party = renter if is_owner else owner
+
+        r_start = rental.requested_start
+        r_end = rental.requested_end or r_start
+
+        days = []
+        d = r_start
+        while d <= r_end:
+            if d.month == month and d.year == year:
+                days.append(d.day)
+            d += timedelta(days=1)
+
+        items.append({
+            "id": str(rental.id),
+            "item_slug": item.slug,
+            "title": item.name,
+            "listing_type": listing.listing_type.value,
+            "status": rental.status.value,
+            "start": r_start.isoformat(),
+            "end": r_end.isoformat(),
+            "days": days,
+            "role": "owner" if is_owner else "renter",
+            "other_party": other_party.display_name if other_party else None,
+            "other_slug": other_party.slug if other_party else None,
+            "price": listing.price,
+            "image": first_image,
+        })
+
+    return {"year": year, "month": month, "rentals": items}
+
+
+@router.get("/availability/{listing_id}")
+async def listing_availability(
+    listing_id: UUID,
+    month: int = Query(default=None),
+    year: int = Query(default=None),
+    db: AsyncSession = Depends(get_db),
+):
+    """Booked dates for a listing. No auth required (public info).
+
+    Returns list of day numbers that are booked (active rentals).
+    """
+    now = datetime.now(timezone.utc)
+    if not month:
+        month = now.month
+    if not year:
+        year = now.year
+
+    listing = await db.get(BHListing, listing_id)
+    if not listing or listing.deleted_at:
+        raise HTTPException(status_code=404, detail="Listing not found")
+
+    _, last_day = cal_mod.monthrange(year, month)
+    start = datetime(year, month, 1, tzinfo=timezone.utc)
+    end = datetime(year, month, last_day, 23, 59, 59, tzinfo=timezone.utc)
+
+    result = await db.execute(
+        select(BHRental.requested_start, BHRental.requested_end)
+        .where(
+            BHRental.listing_id == listing_id,
+            BHRental.status.in_(ACTIVE_STATUSES),
+            BHRental.requested_start.isnot(None),
+            BHRental.requested_start <= end,
+            func.coalesce(BHRental.requested_end, BHRental.requested_start) >= start,
+        )
+    )
+    rentals = result.all()
+
+    booked_days = set()
+    for r_start, r_end in rentals:
+        if not r_end:
+            r_end = r_start
+        d = r_start
+        while d <= r_end:
+            if d.month == month and d.year == year:
+                booked_days.add(d.day)
+            d += timedelta(days=1)
+
+    return {
+        "year": year,
+        "month": month,
+        "listing_id": str(listing_id),
+        "booked_days": sorted(booked_days),
+        "min_days": listing.min_rental_days,
+        "max_days": listing.max_rental_days,
+        "available_from": listing.available_from,
+        "available_to": listing.available_to,
     }

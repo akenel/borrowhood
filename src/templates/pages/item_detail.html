@@ -472,6 +472,131 @@
             </div>
             {% endif %}
 
+            <!-- Availability Calendar (rental/service/training listings) -->
+            {% set rental_listing = namespace(obj=None) %}
+            {% for listing in item.listings %}
+                {% if listing.listing_type.value in ('rent', 'service', 'training') and listing.status.value == 'active' %}
+                    {% set rental_listing.obj = listing %}
+                {% endif %}
+            {% endfor %}
+            {% if rental_listing.obj %}
+            <div class="bg-white rounded-lg border border-gray-200 p-6"
+                 x-data="{
+                    avYear: new Date().getFullYear(),
+                    avMonth: new Date().getMonth() + 1,
+                    avDays: [],
+                    avOffset: 0,
+                    avBooked: [],
+                    avLoading: true,
+                    avMinDays: {{ rental_listing.obj.min_rental_days or 'null' }},
+                    avMaxDays: {{ rental_listing.obj.max_rental_days or 'null' }},
+
+                    get avMonthName() {
+                        return new Date(this.avYear, this.avMonth - 1).toLocaleString('{{ lang }}', { month: 'long', year: 'numeric' });
+                    },
+
+                    avIsToday(day) {
+                        var t = new Date();
+                        return t.getFullYear() === this.avYear && t.getMonth() + 1 === this.avMonth && t.getDate() === day;
+                    },
+
+                    avIsBooked(day) {
+                        return this.avBooked.indexOf(day) >= 0;
+                    },
+
+                    avIsPast(day) {
+                        return new Date(this.avYear, this.avMonth - 1, day, 23, 59, 59) < new Date();
+                    },
+
+                    async avLoad() {
+                        this.avLoading = true;
+                        try {
+                            var r = await fetch('/api/v1/rentals/availability/{{ rental_listing.obj.id }}?month=' + this.avMonth + '&year=' + this.avYear);
+                            if (r.ok) {
+                                var data = await r.json();
+                                this.avBooked = data.booked_days || [];
+                            }
+                        } catch(e) {}
+                        var fd = new Date(this.avYear, this.avMonth - 1, 1).getDay();
+                        this.avOffset = fd === 0 ? 6 : fd - 1;
+                        var total = new Date(this.avYear, this.avMonth, 0).getDate();
+                        this.avDays = [];
+                        for (var i = 1; i <= total; i++) this.avDays.push(i);
+                        this.avLoading = false;
+                    },
+
+                    avPrev() {
+                        if (this.avMonth === 1) { this.avMonth = 12; this.avYear--; } else { this.avMonth--; }
+                        this.avLoad();
+                    },
+                    avNext() {
+                        if (this.avMonth === 12) { this.avMonth = 1; this.avYear++; } else { this.avMonth++; }
+                        this.avLoad();
+                    },
+
+                    async init() { await this.avLoad(); }
+                 }">
+                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    {{ t('calendar.availability') }}
+                </h3>
+
+                <!-- Min/Max rental days -->
+                {% if rental_listing.obj.min_rental_days or rental_listing.obj.max_rental_days %}
+                <div class="flex gap-4 mb-3 text-xs text-gray-500">
+                    {% if rental_listing.obj.min_rental_days %}
+                    <span>{{ t('calendar.min_days') }}: <strong>{{ rental_listing.obj.min_rental_days }}</strong></span>
+                    {% endif %}
+                    {% if rental_listing.obj.max_rental_days %}
+                    <span>{{ t('calendar.max_days') }}: <strong>{{ rental_listing.obj.max_rental_days }}</strong></span>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Month nav -->
+                <div class="flex items-center justify-between mb-3">
+                    <button @click="avPrev()" class="p-1 rounded hover:bg-gray-100">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <span class="text-sm font-semibold text-gray-700 capitalize" x-text="avMonthName"></span>
+                    <button @click="avNext()" class="p-1 rounded hover:bg-gray-100">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+
+                <!-- Mini grid -->
+                <template x-if="!avLoading">
+                    <div>
+                        <div class="grid grid-cols-7 mb-1">
+                            <template x-for="d in ['{{ t('calendar.mon') }}','{{ t('calendar.tue') }}','{{ t('calendar.wed') }}','{{ t('calendar.thu') }}','{{ t('calendar.fri') }}','{{ t('calendar.sat') }}','{{ t('calendar.sun') }}']">
+                                <div class="text-center text-[10px] font-medium text-gray-400 uppercase py-1" x-text="d"></div>
+                            </template>
+                        </div>
+                        <div class="grid grid-cols-7 gap-0.5">
+                            <template x-for="_ in avOffset">
+                                <div class="h-8"></div>
+                            </template>
+                            <template x-for="day in avDays" :key="day">
+                                <div class="h-8 flex items-center justify-center rounded text-xs font-medium"
+                                     :class="avIsBooked(day) ? 'bg-red-100 text-red-600 line-through' : avIsPast(day) ? 'text-gray-300' : avIsToday(day) ? 'bg-emerald-500 text-white rounded-full' : 'text-gray-700 bg-emerald-50 hover:bg-emerald-100'"
+                                     x-text="day"></div>
+                            </template>
+                        </div>
+                        <!-- Legend -->
+                        <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-50 border border-emerald-200"></span> {{ t('calendar.available_day') }}</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-100 border border-red-200"></span> {{ t('calendar.booked_day') }}</span>
+                        </div>
+                    </div>
+                </template>
+                <template x-if="avLoading">
+                    <div class="text-center py-6">
+                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500 mx-auto"></div>
+                    </div>
+                </template>
+            </div>
+            {% endif %}
+
             <!-- Reviews section -->
             {% if item.owner %}
             <div class="bg-white rounded-lg border border-gray-200 p-6"

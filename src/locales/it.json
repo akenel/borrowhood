@@ -85,7 +85,18 @@
     "thu": "Gio",
     "fri": "Ven",
     "sat": "Sab",
-    "sun": "Dom"
+    "sun": "Dom",
+    "tab_my_rentals": "I Miei Noleggi",
+    "no_rentals": "Nessun noleggio attivo questo mese",
+    "browse_items": "Sfoglia Oggetti",
+    "lending": "In Prestito",
+    "borrowing": "In Noleggio",
+    "with": "con",
+    "availability": "Disponibilita",
+    "available_day": "Disponibile",
+    "booked_day": "Prenotato",
+    "min_days": "Giorni min",
+    "max_days": "Giorni max"
   },
   "feedback": {
     "title": "Invia Feedback",
