@@ -130,9 +130,13 @@ def _og_item_desc(item, listing=None) -> str:
     is_event = listing and hasattr(listing, 'listing_type') and getattr(listing.listing_type, 'value', '') == 'event'
 
     if is_event and listing.event_start:
-        parts.append(listing.event_start.strftime('%b %d, %I:%M %p').replace(' 0', ' '))
+        from datetime import timezone, timedelta
+        cest = timezone(timedelta(hours=2))
+        start_local = listing.event_start.astimezone(cest)
+        parts.append(start_local.strftime('%b %d, %I:%M %p').replace(' 0', ' '))
         if listing.event_end:
-            parts[-1] += listing.event_end.strftime(' - %I:%M %p').replace(' 0', ' ')
+            end_local = listing.event_end.astimezone(cest)
+            parts[-1] += end_local.strftime(' - %I:%M %p').replace(' 0', ' ')
 
     if is_event and listing.event_venue:
         venue = listing.event_venue
