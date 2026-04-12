@@ -1079,7 +1079,11 @@ async def calendar_page(
     token: Optional[dict] = Depends(get_current_user_token),
 ):
     """Community calendar with month view and event list."""
-    ctx = _ctx(request, token)
+    ctx = _ctx(request, token,
+        og_title="Community Calendar -- La Piazza",
+        og_description="Workshops, meetups, and events happening in your neighborhood. RSVP and join the community.",
+        og_image="https://lapiazza.app/static/images/icon-192.png",
+    )
     return _render("pages/calendar.html", ctx)
 
 

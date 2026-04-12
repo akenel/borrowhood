@@ -602,7 +602,7 @@ async def calendar_events(
         first_image = None
         if media:
             for m in media:
-                if m.media_type and m.media_type.startswith("image"):
+                if m.media_type and m.media_type.value in ("photo", "PHOTO"):
                     first_image = m.url
                     break
 
