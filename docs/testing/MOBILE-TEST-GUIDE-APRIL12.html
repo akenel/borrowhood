@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Piazza -- Mobile Test Guide (April 12, 2026)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; padding: 16px; max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+  .meta { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+  .meta a { color: #6366f1; text-decoration: none; font-weight: 600; }
+  .meta span { display: inline-block; background: #dcfce7; color: #166534; font-weight: 700; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+
+  .section { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
+  .section-header { background: #f1f5f9; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+  .section-header h2 { font-size: 15px; font-weight: 700; color: #0f172a; }
+  .section-header .badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; }
+  .section-header .page { font-size: 12px; color: #6366f1; font-weight: 600; }
+  .section-body { padding: 12px 16px; }
+
+  .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+  .check-item:last-child { border-bottom: none; }
+  .check-item input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0; accent-color: #22c55e; cursor: pointer; }
+  .check-item label { font-size: 14px; color: #334155; cursor: pointer; flex: 1; }
+  .check-item label.checked { text-decoration: line-through; color: #94a3b8; }
+  .sub-items { margin-left: 30px; font-size: 13px; color: #64748b; }
+  .sub-items li { padding: 2px 0; }
+
+  .notes-box { margin-top: 8px; }
+  .notes-box textarea { width: 100%; min-height: 60px; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-family: inherit; resize: vertical; }
+  .notes-box textarea:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+  .notes-label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+
+  .screenshot-btn { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600; color: #6366f1; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 6px; cursor: pointer; }
+  .screenshot-btn:active { background: #c7d2fe; }
+  .screenshot-preview { margin-top: 6px; max-width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; }
+
+  .progress-bar { height: 6px; background: #e2e8f0; border-radius: 3px; margin: 12px 0; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a); border-radius: 3px; transition: width 0.3s; }
+
+  .summary { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; text-align: center; }
+  .summary-num { font-size: 24px; font-weight: 800; }
+  .summary-label { font-size: 11px; color: #64748b; }
+  .green { color: #16a34a; }
+  .red { color: #dc2626; }
+  .gray { color: #94a3b8; }
+
+  .tip { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 14px; margin: 12px 0; font-size: 13px; color: #92400e; }
+  .tip strong { color: #78350f; }
+
+  .footer { text-align: center; padding: 20px 0; font-size: 12px; color: #94a3b8; }
+
+  @media (max-width: 480px) {
+    body { padding: 8px; }
+    .summary-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .summary-num { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>La Piazza -- Mobile Test Guide</h1>
+<div class="meta">
+  April 12, 2026 &middot; <a href="https://lapiazza.app">lapiazza.app</a> &middot; Login: <a href="https://lapiazza.app/demo">/demo</a> &middot; <span>853 tests green</span>
+</div>
+
+<!-- Summary -->
+<div class="summary" id="summary">
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width: 0%"></div></div>
+  <div class="summary-grid">
+    <div><div class="summary-num green" id="pass-count">0</div><div class="summary-label">Passed</div></div>
+    <div><div class="summary-num red" id="fail-count">0</div><div class="summary-label">Issues</div></div>
+    <div><div class="summary-num gray" id="remain-count">0</div><div class="summary-label">Remaining</div></div>
+  </div>
+</div>
+
+<!-- Sections -->
+<div id="sections"></div>
+
+<!-- Tips -->
+<div class="tip">
+  <strong>Share test tip:</strong> Always share a URL you've never shared before. WhatsApp caches old previews. Try: <code>lapiazza.app/items/drone-photography-erice</code>
+</div>
+<div class="tip">
+  <strong>Bug found?</strong> Tap the floating rose button (bottom-right on any page) to file a backlog item directly in the app. Or add a note + screenshot below.
+</div>
+
+<div class="footer">
+  La Piazza &middot; UAT Mobile Testing &middot; v2026.04.12
+</div>
+
+<script>
+var sections = [
+  {
+    title: "1. Community Calendar",
+    page: "/calendar",
+    items: [
+      "Calendar grid shows April with dots on event days (10, 13, 15, 18, 20, 22, 25, 27)",
+      "Tap an event dot -- goes to item detail page",
+      "Month name shows in your language",
+      "Prev/Next arrows change month",
+      "May has 3 events (3, 10, 17)",
+      "Event cards show image, title, date, venue, price",
+      "Free events show green 'Free' label",
+      "Paid events show EUR price"
+    ]
+  },
+  {
+    title: "2. My Events Tab",
+    page: "/calendar → My Events",
+    items: [
+      "Log in as Sally -- she has 4 RSVPs",
+      "Switch to 'My Events' -- see her 4 events",
+      "Registered badge shows in indigo",
+      "Cancel RSVP on one event -- disappears from My Events",
+      "Switch to Community -- event still shows, RSVP button is back"
+    ]
+  },
+  {
+    title: "3. My Rentals Tab",
+    page: "/calendar → My Rentals",
+    items: [
+      "Tab shows emerald green when active",
+      "Empty state shows 'Browse Items' link if no rentals",
+      "Rental cards show: role badge, date range, other party, status, type"
+    ]
+  },
+  {
+    title: "4. RSVP Flow",
+    page: "/calendar",
+    items: [
+      "Tap RSVP on 'Welding Basics' -- button flips to 'Cancel RSVP'",
+      "RSVP count updates (e.g., 2/8 → 3/8)",
+      "Cancel RSVP -- button flips back, count decreases",
+      "Try RSVP while logged out -- redirects to /login"
+    ]
+  },
+  {
+    title: "5. Share Buttons",
+    page: "/calendar",
+    items: [
+      "Share icon appears on each event card",
+      "Tap share -- native share sheet opens (or link copied)",
+      "Share a NEW event on WhatsApp -- preview shows image + date + venue + price",
+      "Share on Telegram -- same rich card with photo"
+    ]
+  },
+  {
+    title: "6. Availability Calendar",
+    page: "/items/welding-basics-workshop",
+    items: [
+      "Below listings, 'Availability' calendar appears",
+      "Mini month grid: green = available, red = booked",
+      "Month nav arrows work",
+      "Legend shows at bottom",
+      "Min/max rental days shown if configured"
+    ]
+  },
+  {
+    title: "7. Team Pricing",
+    page: "Any service/training item",
+    items: [
+      "'Number of Participants' input appears in booking form",
+      "Change count -- price calculates live",
+      "3+ people shows group discount line (if configured)",
+      "Total with breakdown: subtotal, discount, total"
+    ]
+  },
+  {
+    title: "8. Analytics Tab",
+    page: "/dashboard → Analytics",
+    items: [
+      "Summary cards: Views, Orders, Revenue, Conversion",
+      "Per-item table with views, orders, revenue, CTR",
+      "Items sorted by views (most first)",
+      "Click item row -- goes to detail page"
+    ]
+  },
+  {
+    title: "9. Mentorships Tab",
+    page: "/dashboard → Mentorships",
+    items: [
+      "Shows active mentorships (Angel → Nic)",
+      "Status badges (proposed, active, completed)",
+      "'Log' button opens inline form (hours, milestones, notes)",
+      "'Complete' and 'Cancel' buttons work"
+    ]
+  },
+  {
+    title: "10. Saved Searches Tab",
+    page: "/dashboard → Saved Searches",
+    items: [
+      "Shows saved searches (create one first via /browse → 'Alert me')",
+      "Bell icon toggles notifications on/off",
+      "Trash icon deletes the search",
+      "Match count badge shows 'X new' in red",
+      "Empty state links to /browse"
+    ]
+  },
+  {
+    title: "11. Delivery Tracking",
+    page: "/delivery/{rental_id}",
+    items: [
+      "Status banner (amber=preparing, blue=transit, green=delivered)",
+      "Map with destination pin (if GPS exists)",
+      "Event timeline with dots and timestamps"
+    ]
+  },
+  {
+    title: "12. Mobile UX",
+    page: "All pages",
+    items: [
+      "Calendar: dots on mobile, text chips on desktop",
+      "All tabs fit without horizontal scroll",
+      "Touch targets 44px+ (buttons, inputs)",
+      "No text overflow or clipping",
+      "Share works on mobile (native share API)",
+      "Font size A+/A- still works"
+    ]
+  }
+];
+
+var totalItems = 0;
+var container = document.getElementById('sections');
+
+sections.forEach(function(sec, si) {
+  var sectionEl = document.createElement('div');
+  sectionEl.className = 'section';
+
+  var header = document.createElement('div');
+  header.className = 'section-header';
+  header.innerHTML = '<h2>' + sec.title + '</h2><span class="page">' + sec.page + '</span>';
+  sectionEl.appendChild(header);
+
+  var body = document.createElement('div');
+  body.className = 'section-body';
+
+  sec.items.forEach(function(item, ii) {
+    var id = 'c-' + si + '-' + ii;
+    totalItems++;
+
+    var row = document.createElement('div');
+    row.className = 'check-item';
+
+    var cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.id = id;
+    var saved = localStorage.getItem(id);
+    if (saved === 'pass' || saved === 'fail') cb.checked = true;
+
+    var label = document.createElement('label');
+    label.htmlFor = id;
+    label.textContent = item;
+    if (cb.checked) label.classList.add('checked');
+
+    cb.addEventListener('change', function() {
+      if (this.checked) {
+        localStorage.setItem(id, 'pass');
+        label.classList.add('checked');
+      } else {
+        localStorage.removeItem(id);
+        label.classList.remove('checked');
+      }
+      updateProgress();
+    });
+
+    row.appendChild(cb);
+    row.appendChild(label);
+    body.appendChild(row);
+  });
+
+  // Notes section per test group
+  var notesBox = document.createElement('div');
+  notesBox.className = 'notes-box';
+  notesBox.innerHTML = '<div class="notes-label">Notes / Issues</div>';
+  var textarea = document.createElement('textarea');
+  textarea.placeholder = 'Bug description, device info, steps to reproduce...';
+  var notesKey = 'notes-' + si;
+  textarea.value = localStorage.getItem(notesKey) || '';
+  textarea.addEventListener('input', function() {
+    localStorage.setItem(notesKey, this.value);
+    updateProgress();
+  });
+  notesBox.appendChild(textarea);
+
+  // Screenshot upload
+  var ssBtn = document.createElement('label');
+  ssBtn.className = 'screenshot-btn';
+  ssBtn.innerHTML = '📷 Add Screenshot';
+  var fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.capture = 'environment';
+  fileInput.style.display = 'none';
+  fileInput.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var img = document.createElement('img');
+        img.className = 'screenshot-preview';
+        img.src = e.target.result;
+        notesBox.appendChild(img);
+        localStorage.setItem('screenshot-' + si, e.target.result);
+      };
+      reader.readAsDataURL(this.files[0]);
+    }
+  });
+  ssBtn.appendChild(fileInput);
+  notesBox.appendChild(ssBtn);
+
+  // Restore screenshot
+  var savedSS = localStorage.getItem('screenshot-' + si);
+  if (savedSS) {
+    var img = document.createElement('img');
+    img.className = 'screenshot-preview';
+    img.src = savedSS;
+    notesBox.appendChild(img);
+  }
+
+  body.appendChild(notesBox);
+  sectionEl.appendChild(body);
+  container.appendChild(sectionEl);
+});
+
+document.getElementById('remain-count').textContent = totalItems;
+
+function updateProgress() {
+  var passed = 0, failed = 0;
+  for (var i = 0; i < totalItems; i++) {
+    var keys = document.querySelectorAll('input[type="checkbox"]');
+  }
+  document.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+    if (cb.checked) passed++;
+  });
+  // Count notes with content as potential issues
+  var issues = 0;
+  for (var s = 0; s < sections.length; s++) {
+    var n = localStorage.getItem('notes-' + s);
+    if (n && n.trim().length > 0) issues++;
+  }
+  var remaining = totalItems - passed;
+  document.getElementById('pass-count').textContent = passed;
+  document.getElementById('fail-count').textContent = issues;
+  document.getElementById('remain-count').textContent = remaining;
+  document.getElementById('progress').style.width = Math.round(passed / totalItems * 100) + '%';
+}
+updateProgress();
+</script>
+</body>
+</html>
