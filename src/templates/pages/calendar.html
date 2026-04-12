@@ -180,7 +180,7 @@
                             <!-- Event dots -->
                             <div class="flex flex-wrap gap-0.5 justify-center sm:justify-start">
                                 <template x-for="ev in eventsOnDay(day).slice(0, 3)" :key="ev.id">
-                                    <a :href="'/item/' + ev.item_id"
+                                    <a :href="'/items/' + ev.item_slug"
                                        class="block w-full"
                                        :title="ev.title">
                                         <div class="hidden sm:block text-[10px] leading-tight px-1 py-0.5 rounded truncate"
@@ -213,7 +213,7 @@
                 </template>
 
                 <template x-for="ev in displayEvents" :key="ev.id">
-                    <a :href="'/item/' + ev.item_id"
+                    <a :href="'/items/' + ev.item_slug"
                        class="flex gap-4 p-4 bg-white rounded-xl border border-gray-200 hover:border-rose-300 hover:shadow-sm transition-all">
                         <!-- Image -->
                         <div class="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100">

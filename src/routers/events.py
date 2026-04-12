@@ -609,6 +609,7 @@ async def calendar_events(
         events.append({
             "id": str(listing.id),
             "item_id": str(item.id),
+            "item_slug": item.slug,
             "title": item.name,
             "description": (item.description or "")[:200],
             "event_start": listing.event_start.isoformat() if listing.event_start else None,

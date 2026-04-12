@@ -253,7 +253,7 @@ class TestEventCards:
 
     def test_links_to_item_detail(self):
         content = CALENDAR_HTML.read_text()
-        assert "'/item/' + ev.item_id" in content
+        assert "'/items/' + ev.item_slug" in content
 
 
 # ── 11. API imports ──
@@ -325,3 +325,235 @@ class TestCreateEventCTA:
         content = CALENDAR_HTML.read_text()
         assert 'href="/list"' in content
         assert "calendar.create_event" in content
+
+
+# ── 15. API endpoint structure ──
+
+class TestCalendarAPIStructure:
+    def test_api_fetches_active_and_expired_events(self):
+        content = EVENTS_PY.read_text()
+        assert "ListingStatus.ACTIVE" in content
+        assert "ListingStatus.EXPIRED" in content
+
+    def test_api_uses_month_boundaries(self):
+        content = EVENTS_PY.read_text()
+        assert "monthrange" in content
+
+    def test_api_includes_owner_info(self):
+        content = EVENTS_PY.read_text()
+        assert '"owner_name"' in content
+        assert '"owner_slug"' in content
+        assert '"owner_avatar"' in content
+
+    def test_api_includes_item_slug(self):
+        content = EVENTS_PY.read_text()
+        assert '"item_slug"' in content
+
+    def test_api_includes_event_fields(self):
+        content = EVENTS_PY.read_text()
+        for field in ['"event_start"', '"event_end"', '"event_venue"',
+                      '"event_address"', '"event_link"', '"price"',
+                      '"capacity"', '"rsvp_count"', '"image"', '"day"']:
+            assert field in content, f"Missing field in API response: {field}"
+
+    def test_api_loads_media_for_images(self):
+        content = EVENTS_PY.read_text()
+        assert "BHItem.media" in content
+        assert "media_type" in content
+
+    def test_api_handles_missing_month_year(self):
+        content = EVENTS_PY.read_text()
+        assert "if not month:" in content
+        assert "if not year:" in content
+
+    def test_api_handles_anonymous_users(self):
+        content = EVENTS_PY.read_text()
+        assert "get_current_user_token" in content
+        assert "user_rsvps = {}" in content
+
+
+# ── 16. Calendar template data flow ──
+
+class TestCalendarDataFlow:
+    def test_fetches_from_correct_api(self):
+        content = CALENDAR_HTML.read_text()
+        assert "/api/v1/events/calendar" in content
+
+    def test_passes_month_year_params(self):
+        content = CALENDAR_HTML.read_text()
+        assert "month=" in content
+        assert "year=" in content
+
+    def test_rsvp_posts_to_correct_endpoint(self):
+        content = CALENDAR_HTML.read_text()
+        assert "/api/v1/events/" in content
+        assert "/rsvp" in content
+
+    def test_cancel_uses_delete_method(self):
+        content = CALENDAR_HTML.read_text()
+        assert "method: 'DELETE'" in content
+
+    def test_rsvp_uses_post_method(self):
+        content = CALENDAR_HTML.read_text()
+        assert "method: 'POST'" in content
+
+    def test_redirects_to_login_on_401(self):
+        content = CALENDAR_HTML.read_text()
+        assert "r.status === 401" in content
+        assert "'/login'" in content
+
+    def test_reloads_month_after_rsvp(self):
+        content = CALENDAR_HTML.read_text()
+        rsvp_func = content[content.find("async rsvp("):content.find("async cancelRsvp(")]
+        assert "loadMonth()" in rsvp_func
+
+    def test_reloads_month_after_cancel(self):
+        content = CALENDAR_HTML.read_text()
+        cancel_func = content[content.find("async cancelRsvp("):]
+        assert "loadMonth()" in cancel_func
+
+
+# ── 17. Alpine.js computed properties ──
+
+class TestAlpineComputedProps:
+    def test_community_events_filter(self):
+        content = CALENDAR_HTML.read_text()
+        assert "communityEvents" in content
+
+    def test_my_events_filter(self):
+        content = CALENDAR_HTML.read_text()
+        assert "myEvents" in content
+        assert "e.user_rsvp" in content
+
+    def test_display_events_switches_on_tab(self):
+        content = CALENDAR_HTML.read_text()
+        assert "displayEvents" in content
+
+    def test_events_on_day_function(self):
+        content = CALENDAR_HTML.read_text()
+        assert "eventsOnDay(day)" in content
+        assert "e.day === day" in content
+
+    def test_is_past_function(self):
+        content = CALENDAR_HTML.read_text()
+        assert "isPast(day)" in content
+
+    def test_format_time_function(self):
+        content = CALENDAR_HTML.read_text()
+        assert "formatTime(iso)" in content
+        assert "toLocaleString" in content
+
+    def test_format_time_short_function(self):
+        content = CALENDAR_HTML.read_text()
+        assert "formatTimeShort(iso)" in content
+        assert "toLocaleTimeString" in content
+
+
+# ── 18. Accessibility & UX ──
+
+class TestCalendarAccessibility:
+    def test_prev_month_has_title(self):
+        content = CALENDAR_HTML.read_text()
+        assert "calendar.prev_month" in content
+
+    def test_next_month_has_title(self):
+        content = CALENDAR_HTML.read_text()
+        assert "calendar.next_month" in content
+
+    def test_event_links_to_detail(self):
+        content = CALENDAR_HTML.read_text()
+        assert "'/items/' + ev.item_slug" in content
+
+    def test_loading_spinner(self):
+        content = CALENDAR_HTML.read_text()
+        assert "animate-spin" in content
+        assert "loading" in content
+
+    def test_sold_out_button_disabled(self):
+        content = CALENDAR_HTML.read_text()
+        assert ":disabled=" in content
+        assert "ev.rsvp_count >= ev.capacity" in content
+
+    def test_past_events_show_label(self):
+        content = CALENDAR_HTML.read_text()
+        assert "calendar.past" in content
+        assert "ev.status !== 'active'" in content
+
+    def test_free_events_labeled(self):
+        content = CALENDAR_HTML.read_text()
+        assert "calendar.free" in content
+        assert "!ev.price" in content
+
+    def test_click_stop_propagation_on_rsvp(self):
+        content = CALENDAR_HTML.read_text()
+        assert "@click.prevent.stop" in content
+
+    def test_mobile_dots_desktop_chips(self):
+        content = CALENDAR_HTML.read_text()
+        assert "hidden sm:block" in content
+        assert "sm:hidden" in content
+
+    def test_event_overflow_indicator(self):
+        content = CALENDAR_HTML.read_text()
+        assert "eventsOnDay(day).length > 3" in content
+
+
+# ── 19. Locale consistency ──
+
+class TestLocaleConsistency:
+    def test_en_it_calendar_keys_match(self):
+        en = json.loads(EN_JSON.read_text())
+        it = json.loads(IT_JSON.read_text())
+        en_keys = set(en["calendar"].keys())
+        it_keys = set(it["calendar"].keys())
+        missing_in_it = en_keys - it_keys
+        missing_in_en = it_keys - en_keys
+        assert not missing_in_it, f"Keys in en but not it: {missing_in_it}"
+        assert not missing_in_en, f"Keys in it but not en: {missing_in_en}"
+
+    def test_en_it_nav_keys_match(self):
+        en = json.loads(EN_JSON.read_text())
+        it = json.loads(IT_JSON.read_text())
+        en_nav = set(en["nav"].keys())
+        it_nav = set(it["nav"].keys())
+        assert en_nav == it_nav, f"Nav key mismatch: en-it={en_nav - it_nav}, it-en={it_nav - en_nav}"
+
+
+# ── 20. Calendar grid math ──
+
+class TestCalendarGridMath:
+    def test_first_day_offset_calculation(self):
+        content = CALENDAR_HTML.read_text()
+        assert "firstDayOffset" in content
+        assert "getDay()" in content
+
+    def test_days_in_month_calculation(self):
+        content = CALENDAR_HTML.read_text()
+        assert "daysInMonth" in content
+        assert "new Date(this.year, this.month, 0).getDate()" in content
+
+    def test_empty_cells_for_offset(self):
+        content = CALENDAR_HTML.read_text()
+        assert "x-for=\"_ in firstDayOffset\"" in content
+
+
+# ── 21. Seed data script ──
+
+class TestSeedDataScript:
+    def test_seed_script_exists(self):
+        assert Path("scripts/seed-calendar-events.sql").exists()
+
+    def test_seed_has_10_items(self):
+        content = Path("scripts/seed-calendar-events.sql").read_text()
+        assert content.count("INSERT INTO bh_item") == 10
+
+    def test_seed_has_10_listings(self):
+        content = Path("scripts/seed-calendar-events.sql").read_text()
+        assert content.count("INSERT INTO bh_listing") == 10
+
+    def test_seed_uses_uppercase_enums(self):
+        content = Path("scripts/seed-calendar-events.sql").read_text()
+        assert "'EVENT'" in content
+        assert "'ACTIVE'" in content
+        assert "'REGISTERED'" in content
+        assert "'event'" not in content.split("-- ")[1]  # After first comment
