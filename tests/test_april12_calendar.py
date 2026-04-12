@@ -557,3 +557,141 @@ class TestSeedDataScript:
         assert "'ACTIVE'" in content
         assert "'REGISTERED'" in content
         assert "'event'" not in content.split("-- ")[1]  # After first comment
+
+
+# ── 22. Share button on calendar cards ──
+
+ITEM_DETAIL_HTML = Path("src/templates/pages/item_detail.html")
+PAGES_PY = Path("src/routers/pages.py")
+
+
+class TestCalendarShareButton:
+    def test_share_button_exists(self):
+        content = CALENDAR_HTML.read_text()
+        assert "bhShare(" in content
+
+    def test_share_uses_data_attributes(self):
+        content = CALENDAR_HTML.read_text()
+        assert "$el.dataset.name" in content
+        assert "$el.dataset.url" in content
+
+    def test_share_url_points_to_item_detail(self):
+        content = CALENDAR_HTML.read_text()
+        assert "'/items/' + ev.item_slug" in content
+        assert "lapiazza.app/items/" in content
+
+    def test_share_title_from_data_attr_not_inline(self):
+        content = CALENDAR_HTML.read_text()
+        lines = content.split("\n")
+        for i, line in enumerate(lines, 1):
+            if "bhShare(" in line and "ev.title" in line:
+                assert False, f"Line {i}: bhShare uses ev.title inline instead of data attribute"
+
+
+# ── 23. OG meta tags ──
+
+class TestOGMetaTags:
+    def test_base_has_twitter_image(self):
+        content = BASE_HTML.read_text()
+        assert 'twitter:image' in content
+
+    def test_base_og_type_uses_context_var(self):
+        content = BASE_HTML.read_text()
+        assert "og_type | default" in content
+
+    def test_item_detail_no_duplicate_og_type(self):
+        content = ITEM_DETAIL_HTML.read_text()
+        assert content.count('og:type') <= 1
+
+    def test_calendar_route_has_og_tags(self):
+        content = PAGES_PY.read_text()
+        cal_section = content[content.find("def calendar_page"):content.find("def calendar_page") + 500]
+        assert "og_title" in cal_section
+        assert "og_description" in cal_section
+
+    def test_item_detail_passes_og_type(self):
+        content = PAGES_PY.read_text()
+        detail_section = content[content.find("def item_detail"):content.find("def item_detail") + 2000]
+        assert 'og_type="product"' in detail_section
+
+
+# ── 24. Rich event OG descriptions ──
+
+class TestEventOGDescription:
+    def test_og_desc_builder_handles_events(self):
+        content = PAGES_PY.read_text()
+        func = content[content.find("def _og_item_desc"):content.find("\ndef ", content.find("def _og_item_desc") + 1)]
+        assert "is_event" in func
+        assert "event_start" in func
+        assert "event_venue" in func
+
+    def test_og_desc_includes_date_for_events(self):
+        content = PAGES_PY.read_text()
+        func = content[content.find("def _og_item_desc"):content.find("\ndef ", content.find("def _og_item_desc") + 1)]
+        assert "strftime" in func
+
+    def test_og_desc_includes_venue_for_events(self):
+        content = PAGES_PY.read_text()
+        func = content[content.find("def _og_item_desc"):content.find("\ndef ", content.find("def _og_item_desc") + 1)]
+        assert "event_venue" in func
+        assert "event_address" in func
+
+    def test_og_desc_shows_free_for_no_price_events(self):
+        content = PAGES_PY.read_text()
+        func = content[content.find("def _og_item_desc"):content.find("\ndef ", content.find("def _og_item_desc") + 1)]
+        assert '"Free"' in func
+
+    def test_og_desc_uses_cest_timezone(self):
+        content = PAGES_PY.read_text()
+        func = content[content.find("def _og_item_desc"):content.find("\ndef ", content.find("def _og_item_desc") + 1)]
+        assert "astimezone" in func
+        assert "hours=2" in func
+
+    def test_og_desc_non_events_unchanged(self):
+        content = PAGES_PY.read_text()
+        func = content[content.find("def _og_item_desc"):content.find("\ndef ", content.find("def _og_item_desc") + 1)]
+        assert "if not is_event" in func
+
+
+# ── 25. Media type fix in calendar API ──
+
+class TestMediaTypeFix:
+    def test_calendar_api_checks_photo_enum(self):
+        content = EVENTS_PY.read_text()
+        assert '"photo"' in content or "'photo'" in content
+
+    def test_calendar_api_does_not_use_startswith_image(self):
+        content = EVENTS_PY.read_text()
+        cal_section = content[content.find("def calendar_events"):]
+        assert 'startswith("image")' not in cal_section
+
+
+# ── 26. OG tags on all shareable pages ──
+
+class TestAllShareablePages:
+    def test_base_has_all_required_og_tags(self):
+        content = BASE_HTML.read_text()
+        for tag in ["og:site_name", "og:type", "og:title", "og:description", "og:image", "og:url"]:
+            assert tag in content, f"Missing {tag} in base.html"
+
+    def test_base_has_all_required_twitter_tags(self):
+        content = BASE_HTML.read_text()
+        for tag in ["twitter:card", "twitter:title", "twitter:description", "twitter:image"]:
+            assert tag in content, f"Missing {tag} in base.html"
+
+    def test_twitter_image_uses_og_image_var(self):
+        content = BASE_HTML.read_text()
+        lines = content.split("\n")
+        for line in lines:
+            if "twitter:image" in line:
+                assert "og_image" in line, "twitter:image should use og_image context var"
+                break
+
+    def test_workshop_page_has_og_tags(self):
+        content = PAGES_PY.read_text()
+        start = content.find("def workshop_profile")
+        end = content.find("\n@router", start + 1)
+        ws_section = content[start:end]
+        assert "og_title" in ws_section
+        assert "og_description" in ws_section
+        assert "og_image" in ws_section
