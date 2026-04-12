@@ -3,8 +3,6 @@
 {% block title %}{{ item.name }} - {{ t('app.name') }}{% endblock %}
 
 {% block head %}
-<!-- Item-specific OG overrides (base.html handles og:title, og:description, og:image via context vars) -->
-<meta property="og:type" content="product">
 {% for listing in item.listings %}{% if listing.price %}
 <meta property="product:price:amount" content="{{ listing.price }}">
 <meta property="product:price:currency" content="{{ listing.currency or 'EUR' }}">
