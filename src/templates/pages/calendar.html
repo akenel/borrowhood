@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+{% block title %}{{ t('calendar.title') }} -- La Piazza{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-8"
+     x-data="{
+        tab: 'community',
+        events: [],
+        loading: true,
+        year: new Date().getFullYear(),
+        month: new Date().getMonth() + 1,
+        today: new Date(),
+        daysInMonth: [],
+        firstDayOffset: 0,
+
+        get monthName() {
+            return new Date(this.year, this.month - 1).toLocaleString('{{ lang }}', { month: 'long', year: 'numeric' });
+        },
+
+        get communityEvents() {
+            return this.events.filter(e => e.status === 'active' || new Date(e.event_start) >= new Date(this.year, this.month - 1, 1));
+        },
+
+        get myEvents() {
+            return this.events.filter(e => e.user_rsvp);
+        },
+
+        get displayEvents() {
+            var list = this.tab === 'my_events' ? this.myEvents : this.communityEvents;
+            return list;
+        },
+
+        eventsOnDay(day) {
+            return this.events.filter(e => e.day === day);
+        },
+
+        isToday(day) {
+            return this.today.getFullYear() === this.year && this.today.getMonth() + 1 === this.month && this.today.getDate() === day;
+        },
+
+        isPast(day) {
+            var d = new Date(this.year, this.month - 1, day, 23, 59, 59);
+            return d < this.today;
+        },
+
+        async loadMonth() {
+            this.loading = true;
+            try {
+                var r = await fetch('/api/v1/events/calendar?month=' + this.month + '&year=' + this.year);
+                if (r.ok) {
+                    var data = await r.json();
+                    this.events = data.events;
+                    this.year = data.year;
+                    this.month = data.month;
+                }
+            } catch(e) {}
+
+            var firstDay = new Date(this.year, this.month - 1, 1).getDay();
+            this.firstDayOffset = firstDay === 0 ? 6 : firstDay - 1;
+            var totalDays = new Date(this.year, this.month, 0).getDate();
+            this.daysInMonth = [];
+            for (var i = 1; i <= totalDays; i++) this.daysInMonth.push(i);
+            this.loading = false;
+        },
+
+        prevMonth() {
+            if (this.month === 1) { this.month = 12; this.year--; }
+            else { this.month--; }
+            this.loadMonth();
+        },
+
+        nextMonth() {
+            if (this.month === 12) { this.month = 1; this.year++; }
+            else { this.month++; }
+            this.loadMonth();
+        },
+
+        formatTime(iso) {
+            if (!iso) return '';
+            var d = new Date(iso);
+            return d.toLocaleString('{{ lang }}', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        },
+
+        formatTimeShort(iso) {
+            if (!iso) return '';
+            var d = new Date(iso);
+            return d.toLocaleTimeString('{{ lang }}', { hour: '2-digit', minute: '2-digit' });
+        },
+
+        async rsvp(eventId) {
+            var r = await fetch('/api/v1/events/' + eventId + '/rsvp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            });
+            if (r.ok || r.status === 201) {
+                this.loadMonth();
+            } else if (r.status === 401) {
+                window.location.href = '/login';
+            }
+        },
+
+        async cancelRsvp(eventId) {
+            var r = await fetch('/api/v1/events/' + eventId + '/rsvp', { method: 'DELETE' });
+            if (r.ok) {
+                this.loadMonth();
+            }
+        },
+
+        async init() {
+            await this.loadMonth();
+        }
+     }">
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-extrabold text-gray-900">{{ t('calendar.title') }}</h1>
+        <p class="text-gray-500 mt-2">{{ t('calendar.subtitle') }}</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1">
+        <button @click="tab = 'community'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
+                :class="tab === 'community' ? 'bg-white text-rose-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
+            <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            {{ t('calendar.tab_community') }}
+        </button>
+        <button @click="tab = 'my_events'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
+                :class="tab === 'my_events' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
+            <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            {{ t('calendar.tab_my_events') }}
+        </button>
+    </div>
+
+    <!-- Month Navigation -->
+    <div class="flex items-center justify-between mb-4">
+        <button @click="prevMonth()" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" :title="'{{ t('calendar.prev_month') }}'">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <h2 class="text-xl font-bold text-gray-900 capitalize" x-text="monthName"></h2>
+        <button @click="nextMonth()" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" :title="'{{ t('calendar.next_month') }}'">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+    </div>
+
+    <!-- Loading -->
+    <template x-if="loading">
+        <div class="text-center py-12">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto"></div>
+        </div>
+    </template>
+
+    <template x-if="!loading">
+        <div>
+            <!-- Calendar Grid -->
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden mb-8">
+                <!-- Day Headers (Mon-Sun) -->
+                <div class="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
+                    <template x-for="dayName in ['{{ t('calendar.mon') if t('calendar.mon') != 'calendar.mon' else 'Mon' }}','{{ t('calendar.tue') if t('calendar.tue') != 'calendar.tue' else 'Tue' }}','{{ t('calendar.wed') if t('calendar.wed') != 'calendar.wed' else 'Wed' }}','{{ t('calendar.thu') if t('calendar.thu') != 'calendar.thu' else 'Thu' }}','{{ t('calendar.fri') if t('calendar.fri') != 'calendar.fri' else 'Fri' }}','{{ t('calendar.sat') if t('calendar.sat') != 'calendar.sat' else 'Sat' }}','{{ t('calendar.sun') if t('calendar.sun') != 'calendar.sun' else 'Sun' }}']">
+                        <div class="py-2 text-center text-xs font-semibold text-gray-500 uppercase" x-text="dayName"></div>
+                    </template>
+                </div>
+
+                <!-- Calendar Days -->
+                <div class="grid grid-cols-7">
+                    <!-- Empty cells for offset -->
+                    <template x-for="_ in firstDayOffset">
+                        <div class="min-h-[56px] sm:min-h-[72px] border-b border-r border-gray-100"></div>
+                    </template>
+
+                    <!-- Actual days -->
+                    <template x-for="day in daysInMonth" :key="day">
+                        <div class="min-h-[56px] sm:min-h-[72px] border-b border-r border-gray-100 p-1 relative cursor-default"
+                             :class="isPast(day) ? 'bg-gray-50' : 'hover:bg-rose-50/30'">
+                            <!-- Day number -->
+                            <div class="text-xs font-medium mb-0.5"
+                                 :class="isToday(day) ? 'w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center mx-auto sm:mx-0' : isPast(day) ? 'text-gray-300' : 'text-gray-700'"
+                                 x-text="day"></div>
+
+                            <!-- Event dots -->
+                            <div class="flex flex-wrap gap-0.5 justify-center sm:justify-start">
+                                <template x-for="ev in eventsOnDay(day).slice(0, 3)" :key="ev.id">
+                                    <a :href="'/item/' + ev.item_id"
+                                       class="block w-full"
+                                       :title="ev.title">
+                                        <div class="hidden sm:block text-[10px] leading-tight px-1 py-0.5 rounded truncate"
+                                             :class="ev.user_rsvp ? 'bg-indigo-100 text-indigo-700' : ev.price ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'"
+                                             x-text="ev.title"></div>
+                                        <div class="sm:hidden w-2 h-2 rounded-full"
+                                             :class="ev.user_rsvp ? 'bg-indigo-500' : ev.price ? 'bg-amber-500' : 'bg-green-500'"></div>
+                                    </a>
+                                </template>
+                                <template x-if="eventsOnDay(day).length > 3">
+                                    <span class="text-[9px] text-gray-400" x-text="'+' + (eventsOnDay(day).length - 3)"></span>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Event List -->
+            <div class="space-y-3">
+                <template x-if="displayEvents.length === 0">
+                    <div class="text-center py-12 bg-white rounded-xl border border-gray-200">
+                        <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <p class="text-gray-400 text-lg font-medium"
+                           data-msg-none="{{ t('calendar.no_events') }}"
+                           data-msg-mine="{{ t('calendar.no_my_events') }}"
+                           x-text="tab === 'my_events' ? $el.dataset.msgMine : $el.dataset.msgNone"></p>
+                        <a href="/list" class="mt-3 inline-block text-rose-600 font-semibold hover:underline">{{ t('calendar.create_event') }}</a>
+                    </div>
+                </template>
+
+                <template x-for="ev in displayEvents" :key="ev.id">
+                    <a :href="'/item/' + ev.item_id"
+                       class="flex gap-4 p-4 bg-white rounded-xl border border-gray-200 hover:border-rose-300 hover:shadow-sm transition-all">
+                        <!-- Image -->
+                        <div class="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100">
+                            <img x-show="ev.image" :src="ev.image" :alt="ev.title"
+                                 class="w-full h-full object-cover">
+                            <div x-show="!ev.image" class="w-full h-full flex items-center justify-center">
+                                <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
+                        </div>
+
+                        <!-- Info -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-2">
+                                <h3 class="font-semibold text-gray-900 truncate" x-text="ev.title"></h3>
+                                <!-- RSVP badge -->
+                                <span x-show="ev.user_rsvp === 'registered'" class="flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">{{ t('calendar.you_registered') }}</span>
+                                <span x-show="ev.user_rsvp === 'waitlisted'" class="flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">{{ t('calendar.you_waitlisted') }}</span>
+                            </div>
+
+                            <!-- Date & Time -->
+                            <div class="flex items-center gap-1.5 mt-1 text-sm text-rose-600">
+                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span class="font-medium" x-text="formatTime(ev.event_start)"></span>
+                                <template x-if="ev.event_end">
+                                    <span class="text-gray-400" x-text="'- ' + formatTimeShort(ev.event_end)"></span>
+                                </template>
+                            </div>
+
+                            <!-- Venue -->
+                            <template x-if="ev.event_venue">
+                                <div class="flex items-center gap-1.5 mt-0.5 text-sm text-gray-500">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    <span class="truncate" x-text="ev.event_venue"></span>
+                                </div>
+                            </template>
+
+                            <!-- Bottom row: price + RSVP info + host -->
+                            <div class="flex items-center gap-3 mt-2 text-xs">
+                                <!-- Price -->
+                                <span x-show="ev.price" class="font-semibold text-gray-700" x-text="'EUR ' + ev.price"></span>
+                                <span x-show="!ev.price" class="font-semibold text-green-600">{{ t('calendar.free') }}</span>
+
+                                <!-- RSVP count -->
+                                <template x-if="ev.capacity">
+                                    <span class="text-gray-400" x-text="ev.rsvp_count + '/' + ev.capacity"></span>
+                                </template>
+                                <template x-if="!ev.capacity && ev.rsvp_count > 0">
+                                    <span class="text-gray-400"
+                                          data-label="{{ t('events.attendees') }}"
+                                          x-text="ev.rsvp_count + ' ' + $el.dataset.label"></span>
+                                </template>
+
+                                <!-- Host -->
+                                <template x-if="ev.owner_name">
+                                    <span class="text-gray-400 truncate">
+                                        <span class="text-gray-300">by</span>
+                                        <span x-text="ev.owner_name"></span>
+                                    </span>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- RSVP Action (click stops propagation) -->
+                        <div class="flex-shrink-0 flex items-center" @click.prevent.stop>
+                            <template x-if="!ev.user_rsvp && ev.status === 'active'">
+                                <button @click="rsvp(ev.id)"
+                                        class="px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors"
+                                        :class="ev.capacity && ev.rsvp_count >= ev.capacity ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-rose-500 text-white hover:bg-rose-600'"
+                                        :disabled="ev.capacity && ev.rsvp_count >= ev.capacity"
+                                        data-msg-full="{{ t('events.sold_out') }}"
+                                        data-msg-rsvp="{{ t('events.rsvp') }}"
+                                        x-text="ev.capacity && ev.rsvp_count >= ev.capacity ? $el.dataset.msgFull : $el.dataset.msgRsvp"
+                                </button>
+                            </template>
+                            <template x-if="ev.user_rsvp && ev.status === 'active'">
+                                <button @click="cancelRsvp(ev.id)"
+                                        class="px-3 py-1.5 text-sm font-semibold rounded-lg bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors">
+                                    {{ t('events.cancel_rsvp') }}
+                                </button>
+                            </template>
+                            <template x-if="ev.status !== 'active'">
+                                <span class="text-xs text-gray-400 italic">{{ t('calendar.past') }}</span>
+                            </template>
+                        </div>
+                    </a>
+                </template>
+            </div>
+
+            <!-- Create Event CTA -->
+            <div class="mt-8 text-center">
+                <a href="/list" class="inline-flex items-center gap-2 px-5 py-2.5 bg-rose-500 text-white font-semibold rounded-lg hover:bg-rose-600 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                    {{ t('calendar.create_event') }}
+                </a>
+            </div>
+        </div>
+    </template>
+</div>
+{% endblock %}

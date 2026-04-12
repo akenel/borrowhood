@@ -1073,6 +1073,16 @@ async def leaderboard_page(request: Request,
     return _render("pages/leaderboard.html", ctx)
 
 
+@router.get("/calendar", response_class=HTMLResponse)
+async def calendar_page(
+    request: Request,
+    token: Optional[dict] = Depends(get_current_user_token),
+):
+    """Community calendar with month view and event list."""
+    ctx = _ctx(request, token)
+    return _render("pages/calendar.html", ctx)
+
+
 @router.get("/members", response_class=HTMLResponse)
 async def members_directory(
     request: Request,

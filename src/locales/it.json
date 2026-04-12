@@ -22,7 +22,8 @@
     "notifications": "Notifiche",
     "mark_all_read": "Segna tutto letto",
     "orders": "Ordini",
-    "leaderboard": "Classifica"
+    "leaderboard": "Classifica",
+    "calendar": "Calendario"
   },
   "settings": {
     "font_size": "Dimensione Testo",
@@ -58,6 +59,33 @@
     "all_achievements": "Tutti gli Obiettivi",
     "best": "record",
     "quote": "Non temo l'uomo che ha praticato 10.000 calci una volta, ma temo l'uomo che ha praticato un calcio 10.000 volte."
+  },
+  "calendar": {
+    "title": "Calendario della Comunita",
+    "subtitle": "Eventi nel tuo quartiere",
+    "tab_community": "Comunita",
+    "tab_my_events": "I Miei Eventi",
+    "no_events": "Nessun evento questo mese",
+    "no_my_events": "Non ti sei ancora iscritto a nessun evento",
+    "today": "Oggi",
+    "free": "Gratuito",
+    "past": "Passato",
+    "spots_left": "posti disponibili",
+    "full": "Completo",
+    "you_registered": "Iscritto",
+    "you_waitlisted": "In Lista d'Attesa",
+    "create_event": "Organizza un Evento",
+    "view_all": "Vedi Tutti",
+    "this_month": "Questo Mese",
+    "prev_month": "Mese Precedente",
+    "next_month": "Mese Successivo",
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Mer",
+    "thu": "Gio",
+    "fri": "Ven",
+    "sat": "Sab",
+    "sun": "Dom"
   },
   "feedback": {
     "title": "Invia Feedback",

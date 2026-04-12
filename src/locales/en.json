@@ -22,7 +22,8 @@
     "notifications": "Notifications",
     "mark_all_read": "Mark all read",
     "orders": "Orders",
-    "leaderboard": "Leaderboard"
+    "leaderboard": "Leaderboard",
+    "calendar": "Calendar"
   },
   "settings": {
     "font_size": "Text Size",
@@ -58,6 +59,33 @@
     "all_achievements": "All Achievements",
     "best": "best",
     "quote": "I fear not the man who has practiced 10,000 kicks once, but I fear the man who has practiced one kick 10,000 times."
+  },
+  "calendar": {
+    "title": "Community Calendar",
+    "subtitle": "Events happening in your neighborhood",
+    "tab_community": "Community",
+    "tab_my_events": "My Events",
+    "no_events": "No events this month",
+    "no_my_events": "You haven't RSVP'd to any events yet",
+    "today": "Today",
+    "free": "Free",
+    "past": "Past",
+    "spots_left": "spots left",
+    "full": "Full",
+    "you_registered": "Registered",
+    "you_waitlisted": "Waitlisted",
+    "create_event": "Host an Event",
+    "view_all": "View All",
+    "this_month": "This Month",
+    "prev_month": "Previous Month",
+    "next_month": "Next Month",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
   },
   "feedback": {
     "title": "Send Feedback",
