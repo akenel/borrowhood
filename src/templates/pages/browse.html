@@ -377,7 +377,9 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="browse-grid"
              x-data="{
                 favIds: new Set(),
+                loggedIn: {{ 'true' if user else 'false' }},
                 async init() {
+                    if (!this.loggedIn) return;
                     try { var r = await fetch('/api/v1/items/me/favorite-ids'); if (r.ok) { var d = await r.json(); this.favIds = new Set(d.ids || []); } } catch(e) {}
                 },
                 isFav(id) { return this.favIds.has(String(id)); },
