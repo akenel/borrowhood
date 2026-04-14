@@ -287,13 +287,27 @@ async def browse(request: Request,
                  category_group: Optional[str] = None,
                  item_type: Optional[str] = None,
                  listing_type: Optional[str] = None,
-                 price_max: Optional[float] = None,
-                 free_only: Optional[bool] = None,
+                 price_max: Optional[str] = None,  # str -- empty values from live form
+                 free_only: Optional[str] = None,  # str -- checkbox sends "true" or absent
                  sort: str = "newest",
                  limit: int = 12,
                  offset: int = 0,
                  db: AsyncSession = Depends(get_db),
                  token: Optional[dict] = Depends(get_current_user_token)):
+    # Coerce empty-string query params (from live-submit form) to None/False
+    price_max_val: Optional[float] = None
+    if price_max:
+        try:
+            price_max_val = float(price_max)
+        except (TypeError, ValueError):
+            price_max_val = None
+    free_only_val: bool = bool(free_only and free_only.lower() in ("true", "1", "on"))
+    # Empty-string coercion for other text params
+    q = q or None
+    category = category or None
+    category_group = category_group or None
+    item_type = item_type or None
+    listing_type = listing_type or None
     """Browse and search items with filters."""
     # EXISTS avoids JOIN duplicates (items with multiple active listings)
     has_active_listing_clauses = [
@@ -302,15 +316,15 @@ async def browse(request: Request,
     ]
     if listing_type:
         has_active_listing_clauses.append(BHListing.listing_type == listing_type)
-    if free_only:
+    if free_only_val:
         # Free = either no price, price=0, or listing_type is giveaway/offer
         from sqlalchemy import or_ as _or
         has_active_listing_clauses.append(
             _or(BHListing.price.is_(None), BHListing.price == 0,
                 BHListing.listing_type.in_([ListingType.GIVEAWAY, ListingType.OFFER]))
         )
-    elif price_max is not None:
-        has_active_listing_clauses.append(BHListing.price <= price_max)
+    elif price_max_val is not None:
+        has_active_listing_clauses.append(BHListing.price <= price_max_val)
     has_active_listing = (
         select(BHListing.id)
         .where(*has_active_listing_clauses)
@@ -396,8 +410,8 @@ async def browse(request: Request,
         selected_category_group=category_group,
         selected_type=item_type,
         selected_listing_type=listing_type,
-        selected_price_max=price_max,
-        selected_free_only=free_only,
+        selected_price_max=price_max_val,
+        selected_free_only=free_only_val,
         selected_sort=sort,
         selected_limit=limit,
         selected_offset=offset,
