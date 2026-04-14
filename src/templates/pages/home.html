@@ -77,11 +77,12 @@
     </div>
 </section>
 
-<!-- Quick Start Strip -- the goldfish funnel -->
+<!-- Quick Start Strip -- only for logged-in users (hero handles anon) -->
+{% if user %}
 <section class="bg-gradient-to-r from-indigo-50 via-white to-emerald-50 py-6 border-b border-gray-200">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {% if not user %}
-        <!-- NOT LOGGED IN: show the journey -->
+        <!-- NOT LOGGED IN: show the journey (never reached -- kept for future) -->
         <div class="text-center mb-3">
             <p class="text-sm font-semibold text-gray-700 uppercase tracking-wider">{% if lang == 'it' %}Inizia in 60 secondi{% else %}Get started in 60 seconds{% endif %}</p>
         </div>
@@ -200,6 +201,7 @@
         {% endif %}
     </div>
 </section>
+{% endif %}
 
 <!-- How It Works -->
 <section class="py-16">
