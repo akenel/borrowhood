@@ -439,19 +439,22 @@
                         {% endif %}
                     </div>
                     {% elif active_listing and active_listing.listing_type.value == 'event' and active_listing.event_start %}
-                    <div class="mt-2 flex items-center gap-1.5">
-                        <svg class="w-4 h-4 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {% set is_past_event = active_listing.event_start < now_utc() %}
+                    <div class="mt-2 flex items-center gap-1.5 flex-wrap">
+                        <svg class="w-4 h-4 flex-shrink-0 {% if is_past_event %}text-gray-400{% else %}text-rose-500{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        <span class="text-sm font-semibold text-rose-700" data-event-utc="{{ active_listing.event_start.isoformat() }}">{{ active_listing.event_start.strftime('%b %d, %H:%M') }}</span>
-                        {% if active_listing.price %}
+                        <span class="text-sm font-semibold {% if is_past_event %}text-gray-400 line-through{% else %}text-rose-700{% endif %}" data-event-utc="{{ active_listing.event_start.isoformat() }}">{{ active_listing.event_start.strftime('%b %d, %H:%M') }}</span>
+                        {% if is_past_event %}
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 uppercase tracking-wider">{% if lang == 'it' %}Passato{% else %}Past{% endif %}</span>
+                        {% elif active_listing.price %}
                         <span class="text-sm text-gray-500 ml-1">&euro;{{ "%.0f" | format(active_listing.price) }}</span>
                         {% else %}
                         <span class="text-xs font-medium text-green-600 ml-1">{{ t('events.free_event') }}</span>
                         {% endif %}
                     </div>
                     {% if active_listing.event_venue %}
-                    <p class="text-xs text-gray-400 mt-0.5">{{ active_listing.event_venue }}</p>
+                    <p class="text-xs {% if is_past_event %}text-gray-300{% else %}text-gray-400{% endif %} mt-0.5">{{ active_listing.event_venue }}</p>
                     {% endif %}
                     {% elif active_listing and active_listing.listing_type.value in ('offer', 'giveaway') %}
                     <div class="mt-2">

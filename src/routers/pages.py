@@ -31,6 +31,7 @@ templates = Jinja2Templates(directory="src/templates")
 # Make datetime.now() available in templates for seasonal tag logic
 from datetime import datetime, timezone
 templates.env.globals["now"] = datetime.now
+templates.env.globals["now_utc"] = lambda: datetime.now(timezone.utc)
 
 
 def _last_seen(dt, lang="en"):

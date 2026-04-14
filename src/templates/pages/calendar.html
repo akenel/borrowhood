@@ -311,7 +311,7 @@
                                             :disabled="ev.capacity && ev.rsvp_count >= ev.capacity"
                                             data-msg-full="{{ t('events.sold_out') }}"
                                             data-msg-rsvp="{{ t('events.rsvp') }}"
-                                            x-text="ev.capacity && ev.rsvp_count >= ev.capacity ? $el.dataset.msgFull : $el.dataset.msgRsvp"
+                                            x-text="ev.capacity && ev.rsvp_count >= ev.capacity ? $el.dataset.msgFull : $el.dataset.msgRsvp">
                                     </button>
                                 </template>
                                 <template x-if="ev.user_rsvp && ev.status === 'active'">
