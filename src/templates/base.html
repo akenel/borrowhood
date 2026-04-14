@@ -118,20 +118,41 @@
                     <a href="/" class="flex items-center space-x-2">
                         <span class="text-xl font-bold text-indigo-600">{{ t('app.name') }}</span>
                     </a>
-                    <div class="hidden lg:flex lg:ml-8 lg:space-x-4">
-                        <a href="/browse" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.browse') }}</a>
-                        <a href="/chat" class="text-purple-600 hover:text-purple-800 px-3 py-2 text-sm font-semibold transition-colors inline-flex items-center gap-1" title="{{ t('nav.chat') }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    <div class="hidden lg:flex lg:ml-8 lg:space-x-1">
+                        <a href="/browse" class="text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M10 18a8 8 0 110-16 8 8 0 010 16z"/></svg>
+                            {{ t('nav.browse') }}
+                        </a>
+                        <a href="/chat" class="relative bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-3 py-2 text-sm font-semibold rounded-lg transition-all inline-flex items-center gap-1.5 shadow-sm hover:shadow-md" title="{{ t('nav.chat') }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18 7.5l.34 1.16a2 2 0 001.34 1.34L21 10l-1.32.34a2 2 0 00-1.34 1.34L18 13l-.34-1.32a2 2 0 00-1.34-1.34L15 10l1.32-.34a2 2 0 001.34-1.34L18 7.5zM18 19l.34 1.16a2 2 0 001.34 1.34L21 21.5l-1.32.34a2 2 0 00-1.34 1.34L18 24l-.34-1.32a2 2 0 00-1.34-1.34L15 21.5l1.32-.34a2 2 0 001.34-1.34L18 19z"/></svg>
                             {{ t('nav.chat') }}
                         </a>
-                        <a href="/helpboard" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.helpboard') }}</a>
-                        <a href="/calendar" class="text-gray-700 hover:text-rose-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.calendar') }}</a>
-                        <a href="/leaderboard" class="text-gray-700 hover:text-rose-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.leaderboard') }}</a>
-                        <a href="/members" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.members') }}</a>
+                        <a href="/helpboard" class="text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
+                            {{ t('nav.helpboard') }}
+                        </a>
+                        <a href="/calendar" class="text-gray-600 hover:text-rose-600 hover:bg-rose-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                            {{ t('nav.calendar') }}
+                        </a>
+                        <a href="/leaderboard" class="text-gray-600 hover:text-amber-600 hover:bg-amber-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0"/></svg>
+                            {{ t('nav.leaderboard') }}
+                        </a>
+                        <a href="/members" class="text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+                            {{ t('nav.members') }}
+                        </a>
                         {% if user %}
-                        <a href="/dashboard" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">{{ t('nav.dashboard') }}</a>
+                        <a href="/dashboard" class="text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+                            {{ t('nav.dashboard') }}
+                        </a>
                         {% endif %}
-                        <a href="/list" class="text-indigo-600 hover:text-indigo-800 px-3 py-2 text-sm font-semibold transition-colors">{{ t('nav.list_item') }}</a>
+                        <a href="/list" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 text-sm font-semibold rounded-lg transition-colors inline-flex items-center gap-1.5 shadow-sm ml-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                            {{ t('nav.list_item') }}
+                        </a>
                     </div>
                 </div>
 
