@@ -19,7 +19,7 @@ from src.database import get_db
 from src.dependencies import get_current_user_token, get_user
 from src.i18n import detect_language, get_translator, SUPPORTED_LANGUAGES
 from src.models.item import ATTRIBUTE_SCHEMAS, BHItem, CATEGORY_GROUPS
-from src.models.listing import BHListing, ListingStatus
+from src.models.listing import BHListing, ListingStatus, ListingType
 from src.models.rental import BHRental, RentalStatus
 from src.models.review import BHReview
 from src.models.badge import BADGE_INFO
@@ -286,6 +286,9 @@ async def browse(request: Request,
                  category: Optional[str] = None,
                  category_group: Optional[str] = None,
                  item_type: Optional[str] = None,
+                 listing_type: Optional[str] = None,
+                 price_max: Optional[float] = None,
+                 free_only: Optional[bool] = None,
                  sort: str = "newest",
                  limit: int = 12,
                  offset: int = 0,
@@ -293,10 +296,24 @@ async def browse(request: Request,
                  token: Optional[dict] = Depends(get_current_user_token)):
     """Browse and search items with filters."""
     # EXISTS avoids JOIN duplicates (items with multiple active listings)
+    has_active_listing_clauses = [
+        BHListing.item_id == BHItem.id,
+        BHListing.status == ListingStatus.ACTIVE,
+    ]
+    if listing_type:
+        has_active_listing_clauses.append(BHListing.listing_type == listing_type)
+    if free_only:
+        # Free = either no price, price=0, or listing_type is giveaway/offer
+        from sqlalchemy import or_ as _or
+        has_active_listing_clauses.append(
+            _or(BHListing.price.is_(None), BHListing.price == 0,
+                BHListing.listing_type.in_([ListingType.GIVEAWAY, ListingType.OFFER]))
+        )
+    elif price_max is not None:
+        has_active_listing_clauses.append(BHListing.price <= price_max)
     has_active_listing = (
         select(BHListing.id)
-        .where(BHListing.item_id == BHItem.id)
-        .where(BHListing.status == ListingStatus.ACTIVE)
+        .where(*has_active_listing_clauses)
         .exists()
     )
     query = (
@@ -378,6 +395,9 @@ async def browse(request: Request,
         selected_category=category,
         selected_category_group=category_group,
         selected_type=item_type,
+        selected_listing_type=listing_type,
+        selected_price_max=price_max,
+        selected_free_only=free_only,
         selected_sort=sort,
         selected_limit=limit,
         selected_offset=offset,
