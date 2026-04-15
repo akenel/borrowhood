@@ -760,7 +760,8 @@
     "no_badges": "Nessun badge guadagnato ancora. Inizia a noleggiare e recensire!",
     "about": "Chi Sono",
     "favorite_items": "Oggetti Preferiti",
-    "no_favorite_items": "Nessun oggetto preferito. Sfoglia e metti il cuore agli oggetti che ami!"
+    "no_favorite_items": "Nessun oggetto preferito. Sfoglia e metti il cuore agli oggetti che ami!",
+    "edit_profile": "Modifica Profilo"
   },
   "ai_image": {
     "prompt_label": "Prompt Immagine",

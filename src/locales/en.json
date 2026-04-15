@@ -760,7 +760,8 @@
     "no_badges": "No badges earned yet. Start renting and reviewing to earn your first!",
     "about": "About",
     "favorite_items": "Favorite Items",
-    "no_favorite_items": "No favorite items yet. Browse and heart the items you love!"
+    "no_favorite_items": "No favorite items yet. Browse and heart the items you love!",
+    "edit_profile": "Edit Profile"
   },
   "ai_image": {
     "prompt_label": "Image Prompt",
