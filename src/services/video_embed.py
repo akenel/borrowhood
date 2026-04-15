@@ -46,7 +46,8 @@ def parse_video_url(url: Optional[str]) -> Tuple[Optional[str], Optional[str]]:
         elif parsed.path.startswith("/shorts/"):
             video_id = parsed.path.split("/shorts/", 1)[1].split("/")[0] or None
         if video_id and re.fullmatch(r"[A-Za-z0-9_-]{6,20}", video_id):
-            return f"https://www.youtube.com/embed/{video_id}", "youtube"
+            # Privacy-enhanced mode -- no tracking cookies, GDPR-friendlier
+            return f"https://www.youtube-nocookie.com/embed/{video_id}", "youtube"
 
     # Vimeo
     if host in VIMEO_HOSTS:

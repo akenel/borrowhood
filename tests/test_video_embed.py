@@ -7,30 +7,30 @@ from src.services.video_embed import parse_video_url, is_supported_video_url
 
 def test_youtube_watch_url():
     embed, p = parse_video_url("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-    assert embed == "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    assert embed == "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"
     assert p == "youtube"
 
 
 def test_youtube_short_url():
     embed, p = parse_video_url("https://youtu.be/dQw4w9WgXcQ")
-    assert embed == "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    assert embed == "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"
     assert p == "youtube"
 
 
 def test_youtube_shorts():
     embed, p = parse_video_url("https://www.youtube.com/shorts/abc123DEF45")
-    assert embed == "https://www.youtube.com/embed/abc123DEF45"
+    assert embed == "https://www.youtube-nocookie.com/embed/abc123DEF45"
     assert p == "youtube"
 
 
 def test_youtube_embed_already():
     embed, p = parse_video_url("https://www.youtube.com/embed/dQw4w9WgXcQ")
-    assert embed == "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    assert embed == "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"
 
 
 def test_youtube_with_extra_params():
     embed, p = parse_video_url("https://youtube.com/watch?v=dQw4w9WgXcQ&t=42s&list=RDx")
-    assert embed == "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    assert embed == "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"
 
 
 # ── Vimeo ──────────────────────────────────────────────────────────────
