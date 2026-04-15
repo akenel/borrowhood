@@ -158,7 +158,7 @@ CANONICAL_MENTORSHIPS = [
      "mentor", "Workshop safety & hand tool basics", "repair",
      "Build a small birdhouse start to finish solo",
      "active", 8, 2),
-    ("mike@borrowhood.local", "nicolo@borrowhood.local",
+    ("mike@borrowhood.local", "roccamenanicolo@gmail.com",
      "mentor", "Welding fundamentals", "repair",
      "Weld a trailer hitch that passes the load test",
      "active", 12, 3),
