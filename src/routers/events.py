@@ -363,10 +363,14 @@ async def _check_achievements(db: AsyncSession, user_id: UUID):
 
 @router.get("/leaderboard")
 async def get_leaderboard(
-    token: dict = Depends(require_auth),
+    token: Optional[dict] = Depends(get_current_user_token),
     db: AsyncSession = Depends(get_db),
 ):
-    """Event leaderboard: top attendees, best streaks, top hosts."""
+    """Event leaderboard: top attendees, best streaks, top hosts.
+
+    Public endpoint -- anonymous visitors should see the community activity
+    without having to log in (social proof on first visit).
+    """
     from src.models.user import BHUserPoints
 
     # Top attendees
