@@ -77,6 +77,103 @@
     </div>
 </section>
 
+<!-- Live Activity Feed -- community heartbeat -->
+{% if activity %}
+{% set _accent = {
+    'amber':   {'bg': 'bg-amber-50',   'icon_bg': 'bg-amber-100',   'icon_text': 'text-amber-600',   'ring': 'ring-amber-200'},
+    'emerald': {'bg': 'bg-emerald-50', 'icon_bg': 'bg-emerald-100', 'icon_text': 'text-emerald-600', 'ring': 'ring-emerald-200'},
+    'blue':    {'bg': 'bg-blue-50',    'icon_bg': 'bg-blue-100',    'icon_text': 'text-blue-600',    'ring': 'ring-blue-200'},
+    'purple':  {'bg': 'bg-purple-50',  'icon_bg': 'bg-purple-100',  'icon_text': 'text-purple-600',  'ring': 'ring-purple-200'},
+    'indigo':  {'bg': 'bg-indigo-50',  'icon_bg': 'bg-indigo-100',  'icon_text': 'text-indigo-600',  'ring': 'ring-indigo-200'},
+} %}
+<section class="bg-gray-50 border-b border-gray-200 py-10">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-end justify-between mb-5">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    {% if lang == 'it' %}La piazza in diretta{% else %}Live on La Piazza{% endif %}
+                </h2>
+                <p class="text-sm text-gray-500 mt-1">
+                    {% if lang == 'it' %}Cosa sta succedendo nella community in questo momento.{% else %}What the neighborhood is doing right now.{% endif %}
+                </p>
+            </div>
+            <a href="/browse" class="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                {% if lang == 'it' %}Esplora{% else %}Explore{% endif %}
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </a>
+        </div>
+
+        <ol class="bg-white rounded-2xl border border-gray-200 divide-y divide-gray-100 overflow-hidden shadow-sm">
+            {% for e in activity %}
+            {% set colors = _accent.get(e.accent, _accent['indigo']) %}
+            <li class="flex items-center gap-3 px-4 sm:px-5 py-3 hover:bg-gray-50 transition-colors">
+                <!-- Avatar or colored initial -->
+                {% if e.avatar %}
+                <img src="{{ e.avatar }}" alt="" class="w-9 h-9 rounded-full object-cover flex-shrink-0 ring-2 {{ colors.ring }}">
+                {% else %}
+                <div class="w-9 h-9 rounded-full {{ colors.icon_bg }} {{ colors.icon_text }} flex items-center justify-center flex-shrink-0 ring-2 {{ colors.ring }}">
+                    <span class="text-sm font-bold">{{ (e.actor[:1] | upper) if e.actor else '?' }}</span>
+                </div>
+                {% endif %}
+
+                <!-- Sentence -->
+                <div class="flex-1 min-w-0 text-sm text-gray-700">
+                    <span class="font-semibold text-gray-900">{{ e.actor }}</span>
+                    <span class="text-gray-600">{{ e.verb }}</span>
+                    {% if e.target_href %}
+                    <a href="{{ e.target_href }}" class="font-medium text-indigo-600 hover:text-indigo-700 hover:underline">{{ e.target }}</a>
+                    {% else %}
+                    <span class="font-medium text-gray-900">{{ e.target }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Kind icon + timestamp -->
+                <div class="hidden sm:flex items-center gap-2 flex-shrink-0">
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full {{ colors.icon_bg }} {{ colors.icon_text }}">
+                        {% if e.icon == 'star' %}
+                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.366 2.446a1 1 0 00-.364 1.118l1.287 3.957c.299.921-.756 1.688-1.54 1.118l-3.366-2.446a1 1 0 00-1.175 0l-3.366 2.446c-.783.57-1.838-.197-1.539-1.118l1.286-3.957a1 1 0 00-.364-1.118L2.05 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z"/></svg>
+                        {% elif e.icon == 'hand' %}
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"/></svg>
+                        {% elif e.icon == 'reply' %}
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                        {% elif e.icon == 'mentor' %}
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        {% else %}
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                        {% endif %}
+                    </span>
+                    <time datetime="{{ e.when.isoformat() if e.when else '' }}" class="text-xs text-gray-400 whitespace-nowrap tabular-nums" data-timeago></time>
+                </div>
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+</section>
+
+<script>
+(function () {
+    function timeAgo(iso) {
+        if (!iso) return '';
+        var d = new Date(iso);
+        if (isNaN(d)) return '';
+        var s = Math.max(0, (Date.now() - d.getTime()) / 1000);
+        if (s < 60) return 'just now';
+        if (s < 3600) return Math.floor(s / 60) + 'm ago';
+        if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+        if (s < 2592000) return Math.floor(s / 86400) + 'd ago';
+        return d.toLocaleDateString();
+    }
+    document.querySelectorAll('[data-timeago]').forEach(function (el) {
+        el.textContent = timeAgo(el.getAttribute('datetime'));
+    });
+})();
+</script>
+{% endif %}
+
 <!-- Quick Start Strip -- only for logged-in users (hero handles anon) -->
 {% if user %}
 <section class="bg-gradient-to-r from-indigo-50 via-white to-emerald-50 py-6 border-b border-gray-200">

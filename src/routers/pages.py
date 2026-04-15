@@ -267,6 +267,9 @@ async def home(request: Request,
         except Exception:
             home_user = None
 
+    from src.services.activity_feed import get_activity_feed
+    activity = await get_activity_feed(db, limit=8)
+
     ctx = _ctx(request, token,
         listing_count=listing_count or 0,
         user_count=user_count or 0,
@@ -276,6 +279,7 @@ async def home(request: Request,
         home_user=home_user,
         user_item_count=user_item_count,
         user_skill_count=user_skill_count,
+        activity=activity,
     )
     return _render("pages/home.html", ctx)
 
