@@ -493,6 +493,39 @@
         <!-- Right sidebar -->
         <div class="space-y-6">
 
+            <!-- QR Code -- for postcards, business cards, shop window -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6" x-data="{
+                qrUrl: '',
+                init() {
+                    var workshopUrl = window.location.origin + '/workshop/{{ workshop.slug }}';
+                    this.qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=240x240&format=svg&margin=4&data=' + encodeURIComponent(workshopUrl);
+                }
+            }">
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">
+                    {{ t('i18n.qr_code') if t('i18n.qr_code') != 'i18n.qr_code' else ('QR Code' if lang != 'it' else 'Codice QR') }}
+                </h3>
+                <div class="flex flex-col items-center">
+                    <img :src="qrUrl" alt="Workshop QR" class="w-40 h-40 rounded">
+                    <p class="text-xs text-gray-500 mt-2 text-center">
+                        {% if lang == 'it' %}Scansiona per aprire questa bottega.{% else %}Scan to open this workshop.{% endif %}
+                    </p>
+                    <p class="text-[11px] text-gray-400 text-center mt-1">
+                        {% if lang == 'it' %}Scaricalo per stampare su cartoline, biglietti da visita, o vetrine.{% else %}Download it for postcards, business cards, or your shop window.{% endif %}
+                    </p>
+                    <button @click="
+                        let a = document.createElement('a');
+                        a.href = qrUrl.replace('format=svg', 'format=png').replace('size=240x240', 'size=600x600');
+                        a.download = '{{ workshop.slug }}-qr.png';
+                        a.click();
+                    " class="mt-3 inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        {% if lang == 'it' %}Scarica PNG 600×600{% else %}Download PNG 600×600{% endif %}
+                    </button>
+                </div>
+            </div>
+
             <!-- Contact -->
             <div class="bg-white rounded-lg border border-gray-200 p-6 space-y-3">
                 {% if user and user.id != workshop.id %}
