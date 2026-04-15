@@ -183,6 +183,11 @@ def create_app() -> FastAPI:
         app.state.expiry_task = asyncio.create_task(run_expiry_loop())
         logger.info("Commitment expiry loop started")
 
+        # Start event auto-attendance background task
+        from src.services.event_attendance import run_attendance_loop
+        app.state.attendance_task = asyncio.create_task(run_attendance_loop())
+        logger.info("Event auto-attendance loop started")
+
     @app.on_event("shutdown")
     async def shutdown():
         logger.info("BorrowHood shutting down...")
@@ -190,6 +195,10 @@ def create_app() -> FastAPI:
         if hasattr(app.state, "expiry_task"):
             app.state.expiry_task.cancel()
             logger.info("Commitment expiry loop stopped")
+        # Stop auto-attendance loop
+        if hasattr(app.state, "attendance_task"):
+            app.state.attendance_task.cancel()
+            logger.info("Event auto-attendance loop stopped")
         # Stop Telegram bot if running
         if hasattr(app.state, "telegram_bot_task"):
             from src.services.telegram_bot import bot
