@@ -2426,10 +2426,10 @@
                                             p.latitude = Math.round(pos.coords.latitude * 1000) / 1000;
                                             p.longitude = Math.round(pos.coords.longitude * 1000) / 1000;
                                             try {
-                                                var r = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + p.latitude + '&lon=' + p.longitude + '&zoom=14&addressdetails=1', { headers: { 'Accept-Language': '{{ lang }}' } });
+                                                const r = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + p.latitude + '&lon=' + p.longitude + '&zoom=14&addressdetails=1', { headers: { 'Accept-Language': '{{ lang }}' } });
                                                 if (r.ok) {
-                                                    var d = await r.json();
-                                                    var a = d.address || {};
+                                                    const d = await r.json();
+                                                    const a = d.address || {};
                                                     p.city = a.city || a.town || a.village || a.municipality || '';
                                                     p.state_region = a.state || a.county || a.region || '';
                                                     p.postal_code = a.postcode || '';
@@ -2467,7 +2467,7 @@
                                     <div class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                                         <template x-for="r in cityResults" :key="r.place_id">
                                             <button type="button" @click="
-                                                var a = r.address || {};
+                                                const a = r.address || {};
                                                 p.city = a.city || a.town || a.village || a.municipality || r.name || '';
                                                 p.state_region = a.state || a.county || a.region || '';
                                                 p.postal_code = a.postcode || '';
