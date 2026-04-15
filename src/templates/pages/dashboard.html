@@ -64,6 +64,8 @@
                 <option value="history">{{ t('dashboard.history') }}{% if history_count %} ({{ history_count }}){% endif %}</option>
                 <option value="favorites">{{ t('dashboard.favorites') }}</option>
                 <option value="analytics">{{ t('dashboard.analytics') }}</option>
+                <option value="day_summary">{% if lang == 'it' %}Riepilogo Giornaliero{% else %}Day Summary{% endif %}</option>
+                <option value="invoices">{% if lang == 'it' %}Fatture / Ricevute{% else %}Invoices{% endif %}</option>
                 <option value="mentorships">{{ t('dashboard.mentorships') }}</option>
                 <option value="saved_searches">{{ t('dashboard.saved_searches') }}</option>
                 <option value="disputes">{{ t('i18n.disputes') }}</option>
@@ -1579,6 +1581,171 @@
             </template>
         </div>
 
+        <!-- Day Summary tab -->
+        <div x-show="tab === 'day_summary'" x-cloak x-data="daySummary()" x-effect="if (tab === 'day_summary' && !loadedOnce) load()">
+            <!-- Date picker + nav -->
+            <div class="flex items-center justify-between flex-wrap gap-3 mb-5">
+                <div class="flex items-center gap-2">
+                    <button @click="shiftDay(-1)" class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50" title="Previous day">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+                    </button>
+                    <input type="date" x-model="day" @change="load()" class="px-3 py-2 border border-gray-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-indigo-500">
+                    <button @click="shiftDay(1)" class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50" :disabled="day === today" :class="day === today ? 'opacity-30 cursor-not-allowed' : ''" title="Next day">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                    </button>
+                    <button @click="day = today; load()" class="text-xs px-3 py-1.5 bg-white border border-gray-200 rounded-full hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-700 font-medium">
+                        {% if lang == 'it' %}Oggi{% else %}Today{% endif %}
+                    </button>
+                </div>
+                <p class="text-sm text-gray-500" x-text="prettyDate(day)"></p>
+            </div>
+
+            <!-- Stat cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+                <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    <div class="text-xs text-gray-500 uppercase tracking-wider font-semibold">{% if lang == 'it' %}Transazioni{% else %}Transactions{% endif %}</div>
+                    <div class="text-2xl font-bold text-gray-900 mt-1" x-text="summary.rentals_count || 0"></div>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    <div class="text-xs text-gray-500 uppercase tracking-wider font-semibold">{% if lang == 'it' %}Incasso{% else %}Earnings{% endif %}</div>
+                    <div class="text-2xl font-bold text-emerald-600 mt-1" x-text="'€' + (summary.earnings_eur || 0).toFixed(2)"></div>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    <div class="text-xs text-gray-500 uppercase tracking-wider font-semibold">{% if lang == 'it' %}Ore{% else %}Hours{% endif %}</div>
+                    <div class="text-2xl font-bold text-indigo-600 mt-1" x-text="(summary.hours_worked || 0).toFixed(1)"></div>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-xl p-4">
+                    <div class="text-xs text-gray-500 uppercase tracking-wider font-semibold">{% if lang == 'it' %}Fatture{% else %}Invoices{% endif %}</div>
+                    <div class="text-2xl font-bold text-purple-600 mt-1" x-text="summary.invoices_issued || 0"></div>
+                </div>
+            </div>
+
+            <!-- Loading spinner -->
+            <template x-if="loading">
+                <div class="text-center py-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mx-auto"></div></div>
+            </template>
+
+            <!-- Empty state -->
+            <template x-if="!loading && summary.rentals_count === 0">
+                <div class="text-center py-12 bg-white rounded-xl border border-gray-200 text-gray-400">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    <p class="text-lg font-medium">{% if lang == 'it' %}Nessuna transazione in questo giorno{% else %}No transactions on this day{% endif %}</p>
+                </div>
+            </template>
+
+            <!-- Transactions -->
+            <template x-if="!loading && summary.rentals_count > 0">
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200">
+                                <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{% if lang == 'it' %}Oggetto / Servizio{% else %}Item / Service{% endif %}</th>
+                                <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{% if lang == 'it' %}Cliente{% else %}Customer{% endif %}</th>
+                                <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{% if lang == 'it' %}Stato{% else %}Status{% endif %}</th>
+                                <th class="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{% if lang == 'it' %}Totale{% else %}Total{% endif %}</th>
+                                <th class="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{% if lang == 'it' %}Fattura{% else %}Invoice{% endif %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="tx in summary.transactions" :key="tx.rental_id">
+                                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                    <td class="px-4 py-3">
+                                        <a :href="tx.item_slug ? '/items/' + tx.item_slug : '#'" class="font-medium text-gray-900 hover:text-indigo-600" x-text="tx.item_name"></a>
+                                        <div class="text-xs text-gray-400 capitalize" x-text="tx.listing_type"></div>
+                                    </td>
+                                    <td class="px-4 py-3 text-gray-700" x-text="tx.customer_name"></td>
+                                    <td class="px-4 py-3">
+                                        <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                                              :class="tx.status === 'completed' || tx.status === 'payment_confirmed' ? 'bg-emerald-100 text-emerald-700' : tx.status === 'picked_up' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'"
+                                              x-text="tx.status.replace('_', ' ')"></span>
+                                    </td>
+                                    <td class="px-4 py-3 text-right font-semibold text-gray-900" x-text="'€' + tx.total_eur.toFixed(2)"></td>
+                                    <td class="px-4 py-3 text-right">
+                                        <template x-if="tx.invoiced">
+                                            <span class="inline-flex items-center gap-1 text-xs text-emerald-700 font-medium">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                                                {% if lang == 'it' %}Emessa{% else %}Issued{% endif %}
+                                            </span>
+                                        </template>
+                                        <template x-if="!tx.invoiced">
+                                            <button @click="generateInvoice(tx.rental_id)" :disabled="generating[tx.rental_id]"
+                                                    class="text-xs px-3 py-1 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                                                {% if lang == 'it' %}Genera{% else %}Generate{% endif %}
+                                            </button>
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+        </div>
+
+        <!-- Invoices tab (list of all invoices) -->
+        <div x-show="tab === 'invoices'" x-cloak x-data="invoicesTab()" x-effect="if (tab === 'invoices' && !loadedOnce) load()">
+            <div class="flex items-center justify-between flex-wrap gap-3 mb-5">
+                <div class="flex items-center gap-2">
+                    <select x-model="role" @change="load()" class="px-3 py-2 border border-gray-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-indigo-500">
+                        <option value="provider">{% if lang == 'it' %}Emesse da me{% else %}Issued by me{% endif %}</option>
+                        <option value="customer">{% if lang == 'it' %}Ricevute{% else %}Received{% endif %}</option>
+                    </select>
+                    <select x-model="year" @change="load()" class="px-3 py-2 border border-gray-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-indigo-500">
+                        <option :value="thisYear" x-text="thisYear"></option>
+                        <option :value="thisYear - 1" x-text="thisYear - 1"></option>
+                    </select>
+                </div>
+                <p class="text-sm text-gray-500"><span class="font-semibold text-gray-900" x-text="invoices.length"></span> {% if lang == 'it' %}fatture{% else %}invoices{% endif %}</p>
+            </div>
+
+            <template x-if="loading">
+                <div class="text-center py-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto"></div></div>
+            </template>
+            <template x-if="!loading && invoices.length === 0">
+                <div class="text-center py-12 bg-white rounded-xl border border-gray-200 text-gray-400">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    <p class="text-lg font-medium">{% if lang == 'it' %}Nessuna fattura{% else %}No invoices{% endif %}</p>
+                </div>
+            </template>
+            <template x-if="!loading && invoices.length > 0">
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200">
+                                <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{% if lang == 'it' %}Numero{% else %}Number{% endif %}</th>
+                                <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{% if lang == 'it' %}Data{% else %}Date{% endif %}</th>
+                                <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{% if lang == 'it' %}Cliente / Emittente{% else %}Counterparty{% endif %}</th>
+                                <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{% if lang == 'it' %}Stato{% else %}Status{% endif %}</th>
+                                <th class="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{% if lang == 'it' %}Totale{% else %}Total{% endif %}</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="inv in invoices" :key="inv.id">
+                                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                    <td class="px-4 py-3 font-mono font-semibold text-gray-900" x-text="inv.invoice_number"></td>
+                                    <td class="px-4 py-3 text-gray-700" x-text="new Date(inv.issue_date).toLocaleDateString('{{ lang }}')"></td>
+                                    <td class="px-4 py-3 text-gray-700" x-text="role === 'provider' ? (inv.customer_snapshot.business_name || inv.customer_snapshot.display_name) : (inv.provider_snapshot.business_name || inv.provider_snapshot.display_name)"></td>
+                                    <td class="px-4 py-3">
+                                        <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                                              :class="inv.status === 'paid' ? 'bg-emerald-100 text-emerald-700' : inv.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'"
+                                              x-text="inv.status"></span>
+                                    </td>
+                                    <td class="px-4 py-3 text-right font-semibold text-gray-900" x-text="'€' + inv.total_eur.toFixed(2)"></td>
+                                    <td class="px-4 py-3 text-right">
+                                        <a :href="'/invoices/' + inv.id + '/print'" target="_blank" class="text-xs px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full hover:bg-indigo-100 inline-flex items-center gap-1">
+                                            {% if lang == 'it' %}Apri{% else %}View{% endif %} &rarr;
+                                        </a>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+        </div>
+
         <!-- Mentorships tab -->
         <div x-show="tab === 'mentorships'" x-cloak x-data="{
             mentorships: [],
@@ -3049,6 +3216,81 @@
                 } catch(e) {
                     window.dispatchEvent(new CustomEvent('toast', {detail: {type: 'error', message: 'Network error'}}));
                 }
+            }
+        };
+    }
+
+    function daySummary() {
+        var today = new Date().toISOString().slice(0, 10);
+        return {
+            day: today,
+            today: today,
+            summary: { rentals_count: 0, earnings_eur: 0, hours_worked: 0, invoices_issued: 0, transactions: [] },
+            loading: false,
+            loadedOnce: false,
+            generating: {},
+            async load() {
+                this.loading = true;
+                try {
+                    var r = await fetch('/api/v1/invoices/day-summary/' + this.day);
+                    if (r.ok) this.summary = await r.json();
+                } catch(e) {}
+                this.loading = false;
+                this.loadedOnce = true;
+            },
+            shiftDay(delta) {
+                var d = new Date(this.day);
+                d.setDate(d.getDate() + delta);
+                var newDay = d.toISOString().slice(0, 10);
+                if (newDay > this.today) return;
+                this.day = newDay;
+                this.load();
+            },
+            prettyDate(d) {
+                if (!d) return '';
+                return new Date(d).toLocaleDateString('{{ lang }}', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            },
+            async generateInvoice(rentalId) {
+                this.generating[rentalId] = true;
+                try {
+                    var r = await fetch('/api/v1/invoices/from-rental/' + rentalId, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({})
+                    });
+                    if (r.ok || r.status === 201) {
+                        var inv = await r.json();
+                        window.dispatchEvent(new CustomEvent('toast', {detail: {type:'success', message: 'Invoice ' + inv.invoice_number + ' generated'}}));
+                        window.open('/invoices/' + inv.id + '/print', '_blank');
+                        this.load();
+                    } else {
+                        var err = await r.json();
+                        window.dispatchEvent(new CustomEvent('toast', {detail: {type:'error', message: err.detail || 'Failed'}}));
+                    }
+                } catch(e) {
+                    window.dispatchEvent(new CustomEvent('toast', {detail: {type:'error', message: 'Network error'}}));
+                }
+                this.generating[rentalId] = false;
+            }
+        };
+    }
+
+    function invoicesTab() {
+        return {
+            invoices: [],
+            loading: false,
+            loadedOnce: false,
+            role: 'provider',
+            year: new Date().getFullYear(),
+            thisYear: new Date().getFullYear(),
+            async load() {
+                this.loading = true;
+                try {
+                    var r = await fetch('/api/v1/invoices?role=' + this.role + '&year=' + this.year);
+                    if (r.ok) this.invoices = await r.json();
+                } catch(e) {}
+                this.loading = false;
+                this.loadedOnce = true;
             }
         };
     }

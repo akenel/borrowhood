@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ invoice.invoice_number }} -- {{ t('app.name') }}</title>
+    <link rel="stylesheet" href="/static/css/tailwind.css">
+    <style>
+        @page {
+            size: A4;
+            margin: 14mm 14mm 18mm 14mm;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #111827;
+            background: #f3f4f6;
+        }
+        .a4 {
+            max-width: 210mm;
+            min-height: 297mm;
+            margin: 24px auto;
+            padding: 18mm;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06);
+        }
+        @media print {
+            body { background: white; }
+            .a4 { margin: 0; padding: 0; box-shadow: none; max-width: none; min-height: 0; }
+            .no-print { display: none !important; }
+        }
+        .label { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; font-weight: 600; }
+        .value { font-size: 13px; color: #111827; }
+        h1.doc-title { font-size: 22px; font-weight: 700; letter-spacing: .03em; }
+        .num { font-variant-numeric: tabular-nums; }
+        table.lines { width: 100%; border-collapse: collapse; }
+        table.lines th { background: #f9fafb; text-align: left; padding: 8px 10px; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid #e5e7eb; }
+        table.lines td { padding: 10px; font-size: 13px; border-bottom: 1px solid #f3f4f6; }
+        table.lines td.qty, table.lines td.price, table.lines td.total { text-align: right; }
+        .totals-table { margin-left: auto; min-width: 280px; }
+        .totals-table td { padding: 4px 8px; font-size: 13px; }
+        .totals-table td.label { text-align: right; color: #6b7280; }
+        .totals-table td.value { text-align: right; font-variant-numeric: tabular-nums; }
+        .totals-table tr.grand td { padding-top: 10px; border-top: 2px solid #111827; font-weight: 700; font-size: 16px; color: #111827; }
+        .stamp-paid {
+            display: inline-block;
+            transform: rotate(-8deg);
+            padding: 6px 18px;
+            border: 3px solid #059669;
+            color: #059669;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            font-size: 18px;
+            opacity: .85;
+        }
+        .stamp-cancelled {
+            display: inline-block;
+            transform: rotate(-8deg);
+            padding: 6px 18px;
+            border: 3px solid #dc2626;
+            color: #dc2626;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            font-size: 18px;
+            opacity: .85;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top action bar (hidden when printing) -->
+<div class="no-print bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+    <div class="max-w-[210mm] mx-auto w-full flex items-center justify-between">
+        <a href="/dashboard?tab=invoices" class="text-sm text-gray-600 hover:text-indigo-600 inline-flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            {% if lang == 'it' %}Indietro{% else %}Back{% endif %}
+        </a>
+        <div class="flex items-center gap-2">
+            <a href="/invoices/{{ invoice.id }}.csv" class="text-sm px-3 py-1.5 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 inline-flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                CSV
+            </a>
+            <button onclick="window.print()" class="text-sm px-4 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 inline-flex items-center gap-1.5 font-semibold">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
+                {% if lang == 'it' %}Stampa / PDF{% else %}Print / PDF{% endif %}
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- A4 invoice page -->
+<div class="a4">
+
+    <!-- Header: brand left, invoice meta right -->
+    <div class="flex items-start justify-between border-b border-gray-200 pb-6 mb-8">
+        <div>
+            <div class="text-2xl font-bold text-indigo-600">{{ t('app.name') }}</div>
+            <div class="text-xs text-gray-500 mt-1">lapiazza.app</div>
+        </div>
+        <div class="text-right">
+            <h1 class="doc-title text-gray-900">
+                {% if invoice.invoice_type.value == 'fattura' %}
+                    {% if lang == 'it' %}FATTURA{% else %}INVOICE{% endif %}
+                {% else %}
+                    {% if lang == 'it' %}RICEVUTA{% else %}RECEIPT{% endif %}
+                {% endif %}
+            </h1>
+            <div class="mt-2">
+                <div class="text-2xl font-bold text-gray-900 num">{{ invoice.invoice_number }}</div>
+                <div class="text-xs text-gray-500 mt-0.5">
+                    {% if lang == 'it' %}Emessa il{% else %}Issued{% endif %}
+                    <span class="num">{{ invoice.issue_date.strftime('%d/%m/%Y') if invoice.issue_date else '' }}</span>
+                </div>
+            </div>
+            {% if invoice.status.value == 'paid' %}
+            <div class="mt-3"><span class="stamp-paid">{% if lang == 'it' %}Pagata{% else %}Paid{% endif %}</span></div>
+            {% elif invoice.status.value == 'cancelled' %}
+            <div class="mt-3"><span class="stamp-cancelled">{% if lang == 'it' %}Annullata{% else %}Cancelled{% endif %}</span></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Parties -->
+    <div class="grid grid-cols-2 gap-8 mb-8">
+        <!-- Provider (issuer) -->
+        <div>
+            <div class="label mb-2">{% if lang == 'it' %}Da (Emittente){% else %}From (Issuer){% endif %}</div>
+            {% set p = invoice.provider_snapshot %}
+            <div class="value font-semibold text-gray-900">
+                {{ p.business_name or p.display_name }}
+            </div>
+            {% if p.business_name and p.display_name and p.business_name != p.display_name %}
+            <div class="text-xs text-gray-500">{{ p.display_name }}</div>
+            {% endif %}
+            {% if p.vat_number %}
+            <div class="text-xs text-gray-700 mt-1">P.IVA / VAT: <span class="num font-medium">{{ p.vat_number }}</span></div>
+            {% endif %}
+            {% if p.city %}
+            <div class="text-xs text-gray-600 mt-1">{{ p.city }}{% if p.country_code %}, {{ p.country_code | upper }}{% endif %}</div>
+            {% endif %}
+            {% if p.email %}
+            <div class="text-xs text-gray-500 mt-1">{{ p.email }}</div>
+            {% endif %}
+        </div>
+        <!-- Customer -->
+        <div>
+            <div class="label mb-2">{% if lang == 'it' %}A (Cliente){% else %}To (Customer){% endif %}</div>
+            {% set c = invoice.customer_snapshot %}
+            <div class="value font-semibold text-gray-900">
+                {{ c.business_name or c.display_name }}
+            </div>
+            {% if c.business_name and c.display_name and c.business_name != c.display_name %}
+            <div class="text-xs text-gray-500">{{ c.display_name }}</div>
+            {% endif %}
+            {% if c.vat_number %}
+            <div class="text-xs text-gray-700 mt-1">P.IVA / VAT: <span class="num font-medium">{{ c.vat_number }}</span></div>
+            {% endif %}
+            {% if c.city %}
+            <div class="text-xs text-gray-600 mt-1">{{ c.city }}{% if c.country_code %}, {{ c.country_code | upper }}{% endif %}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Line items -->
+    <table class="lines mb-8">
+        <thead>
+            <tr>
+                <th>{% if lang == 'it' %}Descrizione{% else %}Description{% endif %}</th>
+                <th class="text-right" style="width:80px">{% if lang == 'it' %}Q.tà{% else %}Qty{% endif %}</th>
+                <th class="text-right" style="width:110px">{% if lang == 'it' %}Prezzo{% else %}Unit price{% endif %}</th>
+                <th class="text-right" style="width:110px">{% if lang == 'it' %}Totale{% else %}Total{% endif %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for li in invoice.line_items %}
+            <tr>
+                <td>{{ li.description }}</td>
+                <td class="qty num">{{ "%.0f" | format(li.quantity) if li.quantity == li.quantity|int else "%.2f" | format(li.quantity) }}</td>
+                <td class="price num">&euro; {{ "%.2f" | format(li.unit_price) }}</td>
+                <td class="total num">&euro; {{ "%.2f" | format(li.total) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Totals (right-aligned) -->
+    <div class="flex justify-end mb-8">
+        <table class="totals-table">
+            <tr>
+                <td class="label">{% if lang == 'it' %}Imponibile{% else %}Subtotal{% endif %}</td>
+                <td class="value">&euro; {{ "%.2f" | format(invoice.subtotal_eur) }}</td>
+            </tr>
+            <tr>
+                <td class="label">
+                    {% if invoice.vat_rate > 0 %}
+                        {% if lang == 'it' %}IVA{% else %}VAT{% endif %} ({{ "%.0f" | format(invoice.vat_rate) }}%)
+                    {% else %}
+                        {% if lang == 'it' %}IVA non applicata{% else %}VAT not applicable{% endif %}
+                    {% endif %}
+                </td>
+                <td class="value">&euro; {{ "%.2f" | format(invoice.vat_amount_eur) }}</td>
+            </tr>
+            <tr class="grand">
+                <td class="label" style="color:#111827">{% if lang == 'it' %}Totale dovuto{% else %}Total due{% endif %}</td>
+                <td class="value">&euro; {{ "%.2f" | format(invoice.total_eur) }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Payment + notes -->
+    <div class="grid grid-cols-2 gap-8 text-xs text-gray-700">
+        {% if invoice.payment_method or invoice.payment_reference %}
+        <div>
+            <div class="label mb-1">{% if lang == 'it' %}Metodo di pagamento{% else %}Payment{% endif %}</div>
+            {% if invoice.payment_method %}<div class="capitalize">{{ invoice.payment_method }}</div>{% endif %}
+            {% if invoice.payment_reference %}<div class="text-gray-500 num">{{ invoice.payment_reference }}</div>{% endif %}
+        </div>
+        {% endif %}
+        {% if invoice.notes %}
+        <div>
+            <div class="label mb-1">{% if lang == 'it' %}Note{% else %}Notes{% endif %}</div>
+            <div>{{ invoice.notes }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Legal notice (Italian compliance) -->
+    {% if invoice.legal_notice %}
+    <div class="mt-12 pt-6 border-t border-gray-200 text-[10px] text-gray-500 leading-relaxed">
+        {{ invoice.legal_notice }}
+    </div>
+    {% endif %}
+
+    <!-- Footer -->
+    <div class="mt-6 pt-4 border-t border-gray-100 text-[10px] text-gray-400 flex items-center justify-between">
+        <span>{% if lang == 'it' %}Generato da{% else %}Generated by{% endif %} {{ t('app.name') }} -- lapiazza.app</span>
+        <span class="num">{{ invoice.invoice_number }}</span>
+    </div>
+
+</div>
+
+</body>
+</html>
