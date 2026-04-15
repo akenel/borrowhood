@@ -115,6 +115,8 @@ async def run_migrations():
         "ALTER TABLE bh_user_points ADD COLUMN IF NOT EXISTS event_streak INTEGER DEFAULT 0",
         "ALTER TABLE bh_user_points ADD COLUMN IF NOT EXISTS best_streak INTEGER DEFAULT 0",
         "ALTER TABLE bh_user_points ADD COLUMN IF NOT EXISTS challenges_completed INTEGER DEFAULT 0",
+        # 2026-04-15: Featured video on workshop (YouTube/Vimeo/TikTok URL)
+        "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS featured_video_url VARCHAR(500)",
     ]
     # ALTER TYPE ... ADD VALUE -- SQLAlchemy uses enum .name (UPPERCASE) for PG enums
     enum_migrations = [

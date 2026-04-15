@@ -88,6 +88,8 @@ class BHUser(BHBase, Base):
     bio: Mapped[Optional[str]] = mapped_column(Text)
     avatar_url: Mapped[Optional[str]] = mapped_column(String(2000))
     banner_url: Mapped[Optional[str]] = mapped_column(String(500))
+    # Featured video -- YouTube / Vimeo / TikTok URL, embedded on workshop page
+    featured_video_url: Mapped[Optional[str]] = mapped_column(String(500))
 
     # Contact
     telegram_username: Mapped[Optional[str]] = mapped_column(String(100))

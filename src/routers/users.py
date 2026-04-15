@@ -92,6 +92,7 @@ async def get_current_user(
         "offers_repair": user.offers_repair,
         "notify_email": user.notify_email,
         "notify_telegram": user.notify_telegram,
+        "featured_video_url": user.featured_video_url or "",
     }
 
 
@@ -119,6 +120,7 @@ async def update_me(
         "offers_delivery", "offers_pickup", "offers_training",
         "offers_custom_orders", "offers_repair",
         "notify_telegram", "notify_email",
+        "featured_video_url",
     }
 
     # Fields backed by Postgres enums -- must convert string to enum or None
@@ -127,6 +129,19 @@ async def update_me(
         "workshop_type": WorkshopType,
         "seller_type": None,  # handled below
     }
+
+    # Validate featured_video_url -- only accept known providers
+    if "featured_video_url" in data:
+        raw = data.get("featured_video_url")
+        if raw in (None, ""):
+            data["featured_video_url"] = None
+        else:
+            from src.services.video_embed import is_supported_video_url
+            if not is_supported_video_url(raw):
+                raise HTTPException(
+                    status_code=400,
+                    detail="Video URL must be from YouTube, Vimeo, or TikTok",
+                )
 
     for field, value in data.items():
         if field in allowed:

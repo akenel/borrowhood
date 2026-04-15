@@ -2132,7 +2132,7 @@
                     profileLoaded: false,
                     saving: false,
                     saved: false,
-                    p: { display_name: '', tagline: '', bio: '', city: '', state_region: '', postal_code: '', address_line: '', country_code: '', latitude: null, longitude: null, workshop_name: '', workshop_type: '' },
+                    p: { display_name: '', tagline: '', bio: '', city: '', state_region: '', postal_code: '', address_line: '', country_code: '', latitude: null, longitude: null, workshop_name: '', workshop_type: '', featured_video_url: '' },
                     locating: false,
                     searchingCity: false,
                     cityResults: [],
@@ -2153,6 +2153,7 @@
                                 this.p.longitude = d.longitude || null;
                                 this.p.workshop_name = d.workshop_name || '';
                                 this.p.workshop_type = d.workshop_type || '';
+                                this.p.featured_video_url = d.featured_video_url || '';
                                 this.services.offers_delivery = d.offers_delivery || false;
                                 this.services.offers_pickup = d.offers_pickup || false;
                                 this.services.offers_training = d.offers_training || false;
@@ -2209,6 +2210,19 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.about_bio') }}</label>
                             <textarea x-model="p.bio" rows="5" maxlength="2000" placeholder="{{ t('i18n.bio_placeholder') }}" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base"></textarea>
                             <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Racconta la tua storia, le tue competenze, cosa offri. Supporta **grassetto** e - elenchi.{% else %}Tell your story, your skills, what you offer. Supports **bold** and - bullet lists.{% endif %}</p>
+                        </div>
+
+                        <!-- Featured video: YouTube / Vimeo / TikTok -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                {% if lang == 'it' %}Video in evidenza{% else %}Featured video{% endif %}
+                                <span class="text-gray-400 font-normal">{% if lang == 'it' %}(opzionale){% else %}(optional){% endif %}</span>
+                            </label>
+                            <input x-model="p.featured_video_url" type="url" maxlength="500" placeholder="https://youtu.be/... · https://vimeo.com/... · https://tiktok.com/@user/video/..."
+                                   class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base min-h-[48px]">
+                            <p class="text-xs text-gray-400 mt-1">
+                                {% if lang == 'it' %}Mostra chi sei in azione. Incolla un link YouTube, Vimeo o TikTok -- apparirà nella tua bottega.{% else %}Show who you are in action. Paste a YouTube, Vimeo, or TikTok link -- it'll appear on your workshop page.{% endif %}
+                            </p>
                         </div>
 
                         <!-- Skills (right below bio) -->

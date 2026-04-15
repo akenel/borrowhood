@@ -642,12 +642,18 @@ async def workshop_profile(slug: str, request: Request,
         except Exception:
             pass
 
+    # Featured video -- parse once server-side so the template stays dumb
+    from src.services.video_embed import parse_video_url
+    video_embed, video_provider = parse_video_url(workshop_owner.featured_video_url)
+
     ctx = _ctx(request, token,
         workshop=workshop_owner,
         workshop_badges=user_badges,
         mentorships=mentorships,
         badge_info=BADGE_INFO,
         viewer_tier=viewer_tier,
+        video_embed=video_embed,
+        video_provider=video_provider,
         og_title=f"{workshop_owner.workshop_name or workshop_owner.display_name} - La Piazza",
         og_description=_og_workshop_desc(workshop_owner),
         og_image=_abs_url(workshop_owner.banner_url or workshop_owner.avatar_url),
