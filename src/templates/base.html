@@ -218,9 +218,14 @@
                     {% if user %}
                     <!-- Notification bell -->
                     <div class="relative hidden lg:block"
-                         x-data="{ open: false, unread: 0, notifications: [],
+                         x-data="{ open: false, unread: 0, notifications: [], pollTimer: null, authLost: false,
                                    async loadSummary() {
-                                       try { const r = await fetch('/api/v1/notifications/summary'); if(r.ok) { const d = await r.json(); this.unread = d.unread; } } catch(e) {}
+                                       if (this.authLost) return;
+                                       try {
+                                           const r = await fetch('/api/v1/notifications/summary');
+                                           if (r.status === 401) { this.authLost = true; if (this.pollTimer) clearInterval(this.pollTimer); return; }
+                                           if (r.ok) { const d = await r.json(); this.unread = d.unread; }
+                                       } catch(e) {}
                                    },
                                    async loadNotifications() {
                                        try { const r = await fetch('/api/v1/notifications?limit=5'); if(r.ok) { this.notifications = await r.json(); } } catch(e) {}
@@ -229,7 +234,7 @@
                                        await fetch('/api/v1/notifications/read-all', { method: 'POST' }); this.unread = 0; this.notifications.forEach(n => n.read = true);
                                    }
                          }"
-                         x-init="loadSummary(); setInterval(() => loadSummary(), 30000)">
+                         x-init="loadSummary(); pollTimer = setInterval(() => loadSummary(), 30000)">
                         <button @click="open = !open; if(open) loadNotifications()"
                                 class="relative min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 hover:text-indigo-600 transition-colors">
                             <svg class="w-5 h-5" :class="unread > 0 ? 'text-indigo-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -264,8 +269,16 @@
                     </div>
                     <!-- Messages icon -->
                     <div class="relative hidden lg:block"
-                         x-data="{ msgUnread: 0, async loadMsgCount() { try { const r = await fetch('/api/v1/messages/summary'); if(r.ok) { const d = await r.json(); this.msgUnread = d.unread; } } catch(e) {} } }"
-                         x-init="loadMsgCount(); setInterval(() => loadMsgCount(), 30000)">
+                         x-data="{ msgUnread: 0, pollTimer: null, authLost: false,
+                                   async loadMsgCount() {
+                                       if (this.authLost) return;
+                                       try {
+                                           const r = await fetch('/api/v1/messages/summary');
+                                           if (r.status === 401) { this.authLost = true; if (this.pollTimer) clearInterval(this.pollTimer); return; }
+                                           if (r.ok) { const d = await r.json(); this.msgUnread = d.unread; }
+                                       } catch(e) {}
+                                   } }"
+                         x-init="loadMsgCount(); pollTimer = setInterval(() => loadMsgCount(), 30000)">
                         <a href="/messages"
                            class="relative min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 hover:text-indigo-600 transition-colors">
                             <svg class="w-5 h-5" :class="msgUnread > 0 ? 'text-blue-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
