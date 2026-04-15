@@ -3,7 +3,7 @@
 {% block title %}{{ t('app.name') }} - AI Concierge{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto px-4 py-6" x-data="chatApp()" x-init="$refs.input.focus()">
+<div class="max-w-3xl mx-auto px-4 py-6" x-data="chatApp()" x-init="init()">
 
     <!-- Header -->
     <div class="text-center mb-6">
@@ -153,6 +153,19 @@ function chatApp() {
         messages: [],
         query: '',
         loading: false,
+
+        init() {
+            this.$refs.input.focus();
+            const params = new URLSearchParams(window.location.search);
+            const seed = params.get('q');
+            if (seed && seed.trim()) {
+                this.sendQuery(seed.trim());
+                // Clean the URL so refresh doesn't re-send
+                const url = new URL(window.location);
+                url.searchParams.delete('q');
+                window.history.replaceState({}, '', url);
+            }
+        },
 
         async send() {
             const q = this.query.trim();

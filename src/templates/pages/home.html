@@ -22,12 +22,6 @@
                     {{ t('home.cta_browse') }}
                 </a>
 
-                <!-- Concierge teaser: try the AI -->
-                <a href="/chat" class="group inline-flex items-center gap-2 text-indigo-100 hover:text-white transition-colors text-sm sm:text-base">
-                    <svg class="w-4 h-4 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
-                    <span>{% if lang == 'it' %}Oppure chiedi all'AI: "Chi ha un trapano nel mio quartiere?"{% else %}Or ask our AI: "Who has a drill in my neighborhood?"{% endif %}</span>
-                    <span class="text-xs opacity-80">&rarr;</span>
-                </a>
             </div>
 
             <!-- Secondary links -->
@@ -50,6 +44,75 @@
             </div>
             {% endif %}
         </div>
+    </div>
+</section>
+
+<!-- AI Concierge -- LOUD, not whispered -->
+<section class="relative overflow-hidden bg-gradient-to-br from-violet-600 via-fuchsia-600 to-amber-500 text-white py-14 sm:py-16">
+    <!-- decorative glow -->
+    <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-white/10 blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-amber-300/20 blur-3xl pointer-events-none"></div>
+
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-semibold uppercase tracking-wider mb-4">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                </span>
+                {% if lang == 'it' %}AI Concierge · Beta{% else %}AI Concierge · Beta{% endif %}
+            </div>
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+                {% if lang == 'it' %}Chiedi e ricevi.{% else %}Just ask.{% endif %}
+            </h2>
+            <p class="mt-3 text-base sm:text-lg text-white/90 max-w-2xl mx-auto">
+                {% if lang == 'it' %}Descrivi cosa ti serve, l'AI trova la persona, l'oggetto o il servizio giusto nel tuo quartiere.{% else %}Describe what you need. The AI finds the person, the item, or the service in your neighborhood.{% endif %}
+            </p>
+        </div>
+
+        <!-- Input box -->
+        <form action="/chat" method="get" class="max-w-2xl mx-auto">
+            <div class="flex items-stretch bg-white rounded-2xl shadow-2xl overflow-hidden ring-1 ring-black/10 focus-within:ring-4 focus-within:ring-white/40 transition-all">
+                <div class="flex items-center pl-4 pr-2 text-violet-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18 4.5l.75 1.5L21 6.75l-1.5.75-.75 2.25-.75-2.25L16.5 6.75l1.5-.75L18 4.5z"/>
+                    </svg>
+                </div>
+                <input type="text"
+                       name="q"
+                       autocomplete="off"
+                       class="flex-1 px-2 py-4 text-gray-900 text-lg placeholder-gray-400 focus:outline-none"
+                       placeholder="{% if lang == 'it' %}Chi ha un trapano nel mio quartiere?{% else %}Who has a drill in my neighborhood?{% endif %}"
+                       aria-label="Ask the AI Concierge">
+                <button type="submit"
+                        class="px-6 sm:px-8 font-bold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 transition-colors">
+                    {% if lang == 'it' %}Chiedi{% else %}Ask{% endif %}
+                </button>
+            </div>
+
+            <!-- Example prompts -->
+            <div class="mt-5 flex flex-wrap justify-center gap-2">
+                {% set examples_en = [
+                    'Who can teach me sourdough?',
+                    'Need a pasta machine this Saturday',
+                    'Drone pilot in Erice',
+                    'Free fishing rods nearby',
+                ] %}
+                {% set examples_it = [
+                    'Chi può insegnarmi la pasta madre?',
+                    'Serve una macchina per la pasta sabato',
+                    'Pilota di droni a Erice',
+                    'Canne da pesca gratis vicino a me',
+                ] %}
+                {% for ex in (examples_it if lang == 'it' else examples_en) %}
+                <a href="/chat?q={{ ex | urlencode }}"
+                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 hover:bg-white/25 backdrop-blur-sm rounded-full text-sm text-white transition-colors border border-white/20">
+                    <svg class="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    {{ ex }}
+                </a>
+                {% endfor %}
+            </div>
+        </form>
     </div>
 </section>
 
