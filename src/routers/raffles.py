@@ -411,21 +411,16 @@ async def reserve_tickets(
             available = raffle.max_tickets - sold_and_reserved
             raise HTTPException(status_code=400, detail=f"Only {available} tickets remaining")
 
-    # Assign sequential ticket numbers
-    highest = await db.scalar(
-        select(func.max(func.array_length(BHRaffleTicket.ticket_numbers, 1)))
-        .where(BHRaffleTicket.raffle_id == raffle.id)
-    ) or 0
-    # Simple sequential from current max
-    next_start = await db.scalar(
-        select(func.coalesce(
-            select(func.max(func.unnest(BHRaffleTicket.ticket_numbers)))
-            .where(BHRaffleTicket.raffle_id == raffle.id)
-            .correlate(None)
-            .scalar_subquery(),
-            0
-        ))
-    ) or 0
+    # Assign sequential ticket numbers — unnest all existing, find max
+    from sqlalchemy import text
+    max_result = await db.execute(
+        text("""
+            SELECT COALESCE(MAX(n), 0)
+            FROM (SELECT unnest(ticket_numbers) AS n FROM bh_raffle_ticket WHERE raffle_id = :rid) sub
+        """),
+        {"rid": str(raffle.id)},
+    )
+    next_start = max_result.scalar() or 0
     ticket_numbers = list(range(next_start + 1, next_start + 1 + data.quantity))
 
     ticket = BHRaffleTicket(
