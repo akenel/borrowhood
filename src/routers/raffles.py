@@ -41,6 +41,7 @@ from src.models.raffle import (
 )
 from src.services.raffle_engine import (
     award_draw_points, award_ticket_purchase_points,
+    check_cooldown, check_one_active_raffle,
     completed_raffle_count, execute_draw, max_raffle_value_for,
     pre_draw_check, raffle_stats, submit_verification, validate_raffle_value,
 )
@@ -147,6 +148,16 @@ async def create_raffle(
     )
     if not item:
         raise HTTPException(status_code=404, detail="Item not found or not yours")
+
+    # One active raffle at a time
+    ok, msg = await check_one_active_raffle(db, user.id)
+    if not ok:
+        raise HTTPException(status_code=409, detail=msg)
+
+    # Cooldown between raffles
+    ok, msg = await check_cooldown(db, user.id)
+    if not ok:
+        raise HTTPException(status_code=429, detail=msg)
 
     # Validate draw trigger
     if data.draw_date is None and data.max_tickets is None:
@@ -351,6 +362,14 @@ async def publish_raffle(
         raise HTTPException(status_code=403, detail="Not your raffle")
     if raffle.status != RaffleStatus.DRAFT:
         raise HTTPException(status_code=400, detail="Already published")
+
+    # One active at a time + cooldown (re-check at publish, not just create)
+    ok, msg = await check_one_active_raffle(db, user.id, exclude_id=raffle.id)
+    if not ok:
+        raise HTTPException(status_code=409, detail=msg)
+    ok, msg = await check_cooldown(db, user.id)
+    if not ok:
+        raise HTTPException(status_code=429, detail=msg)
 
     # Validate completeness
     if not raffle.draw_date and not raffle.max_tickets:

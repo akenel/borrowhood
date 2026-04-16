@@ -105,6 +105,25 @@ def test_draw_single_ticket():
     assert len(proof) == 64  # sha256 hex
 
 
+# ── Anti-casino safeguards ─────────────────────────────────────────────
+
+def test_cooldown_constant():
+    from src.models.raffle import COOLDOWN_DAYS
+    assert COOLDOWN_DAYS == 7
+
+
+def test_one_active_raffle_check_exists():
+    """check_one_active_raffle function is importable."""
+    from src.services.raffle_engine import check_one_active_raffle
+    assert callable(check_one_active_raffle)
+
+
+def test_cooldown_check_exists():
+    """check_cooldown function is importable."""
+    from src.services.raffle_engine import check_cooldown
+    assert callable(check_cooldown)
+
+
 # ── Gamification tests ─────────────────────────────────────────────────
 
 def test_points_constants_defined():

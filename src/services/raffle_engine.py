@@ -22,7 +22,7 @@ from sqlalchemy.orm import selectinload
 from src.database import async_session
 from src.models.raffle import (
     BHRaffle, BHRaffleTicket, BHRaffleVerification,
-    DRAW_BUFFER_DAYS, ORGANIZER_INACTION_DAYS,
+    COOLDOWN_DAYS, DRAW_BUFFER_DAYS, ORGANIZER_INACTION_DAYS,
     POINTS_RAFFLE_ORGANIZER_COMPLETE, POINTS_RAFFLE_ORGANIZER_VERIFIED,
     POINTS_RAFFLE_TICKET_PURCHASE, POINTS_RAFFLE_WINNER,
     POINTS_RAFFLE_VERIFICATION, VERIFICATION_CLEAN_THRESHOLD,
@@ -59,6 +59,47 @@ async def validate_raffle_value(db: AsyncSession, user_id, ticket_price: float, 
             f"of EUR {limit:.2f} ({count} completed raffles). "
             f"Complete more raffles to unlock higher limits."
         )
+    return True, ""
+
+
+async def check_one_active_raffle(db: AsyncSession, user_id, exclude_id=None) -> tuple[bool, str]:
+    """Ensure organizer has no other active raffle running."""
+    q = (
+        select(func.count(BHRaffle.id))
+        .where(BHRaffle.organizer_id == user_id)
+        .where(BHRaffle.status.in_([
+            RaffleStatus.DRAFT, RaffleStatus.PUBLISHED, RaffleStatus.ACTIVE, RaffleStatus.DRAWN,
+        ]))
+        .where(BHRaffle.deleted_at.is_(None))
+    )
+    if exclude_id:
+        q = q.where(BHRaffle.id != exclude_id)
+    active = await db.scalar(q) or 0
+    if active > 0:
+        return False, "You already have an active raffle. Complete or cancel it before starting a new one."
+    return True, ""
+
+
+async def check_cooldown(db: AsyncSession, user_id) -> tuple[bool, str]:
+    """Enforce 7-day cooldown between raffle completions."""
+    last_completed = await db.scalar(
+        select(BHRaffle.updated_at)
+        .where(BHRaffle.organizer_id == user_id)
+        .where(BHRaffle.status.in_([RaffleStatus.COMPLETED, RaffleStatus.CANCELLED]))
+        .order_by(BHRaffle.updated_at.desc())
+        .limit(1)
+    )
+    if last_completed:
+        if last_completed.tzinfo is None:
+            last_completed = last_completed.replace(tzinfo=timezone.utc)
+        days_since = (datetime.now(timezone.utc) - last_completed).days
+        if days_since < COOLDOWN_DAYS:
+            remaining = COOLDOWN_DAYS - days_since
+            return False, (
+                f"Cooldown: {remaining} day{'s' if remaining != 1 else ''} remaining "
+                f"before you can publish a new raffle. This prevents the platform "
+                f"from looking like a casino."
+            )
     return True, ""
 
 
