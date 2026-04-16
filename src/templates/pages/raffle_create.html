@@ -74,7 +74,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Metodi accettati{% else %}Accepted Methods{% endif %}</label>
                 <div class="flex flex-wrap gap-2">
-                    {% for m in ['cash', 'paypal', 'bank_transfer', 'satispay', 'revolut', 'wise'] %}
+                    {% for m in ['cash', 'paypal', 'bank_transfer', 'satispay', 'revolut', 'wise', 'bitcoin'] %}
                     <label class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg cursor-pointer hover:bg-amber-50 hover:border-amber-200 transition-colors text-sm"
                            :class="form.payment_methods.includes('{{ m }}') && 'bg-amber-50 border-amber-300'">
                         <input type="checkbox" value="{{ m }}" class="rounded text-amber-500 focus:ring-amber-500"
