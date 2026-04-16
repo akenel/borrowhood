@@ -183,16 +183,25 @@
                 :class="tab === 'community' ? 'bg-white text-rose-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
             <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             {{ t('calendar.tab_community') }}
+            <template x-if="communityEvents.length + raffles.length > 0">
+                <span class="ml-1 px-1.5 py-0.5 bg-rose-100 text-rose-700 text-xs font-bold rounded-full" x-text="communityEvents.length + raffles.length"></span>
+            </template>
         </button>
         <button @click="tab = 'my_events'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
                 :class="tab === 'my_events' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
             <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             {{ t('calendar.tab_my_events') }}
+            <template x-if="myEvents.length > 0">
+                <span class="ml-1 px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full" x-text="myEvents.length"></span>
+            </template>
         </button>
         <button @click="tab = 'my_rentals'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
                 :class="tab === 'my_rentals' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
             <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
             {{ t('calendar.tab_my_rentals') }}
+            <template x-if="rentals.length > 0">
+                <span class="ml-1 px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full" x-text="rentals.length"></span>
+            </template>
         </button>
         <button @click="tab = 'raffles'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
                 :class="tab === 'raffles' ? 'bg-white text-amber-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
