@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('app.name') }} - {{ raffle.listing.item.name if raffle.listing and raffle.listing.item else 'Raffle' }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8" x-data="raffleDetail()" x-init="load()">
+
+    <!-- Back link -->
+    <a href="/raffles" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-indigo-600 mb-4">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+        {% if lang == 'it' %}Tutti i sorteggi{% else %}All Raffles{% endif %}
+    </a>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Left: main content (2/3) -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <!-- Title + status -->
+            <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                {% if raffle.listing and raffle.listing.item and raffle.listing.item.media %}
+                <img src="{{ raffle.listing.item.media[0].url }}" alt="{{ raffle.listing.item.name }}"
+                     class="w-full h-64 sm:h-80 object-cover">
+                {% endif %}
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        {% set status_colors = {
+                            'draft': 'bg-gray-100 text-gray-600',
+                            'published': 'bg-blue-100 text-blue-700',
+                            'active': 'bg-emerald-100 text-emerald-700',
+                            'drawn': 'bg-purple-100 text-purple-700',
+                            'completed': 'bg-gray-100 text-gray-600',
+                            'cancelled': 'bg-red-100 text-red-600',
+                        } %}
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider {{ status_colors.get(raffle.status.value, 'bg-gray-100 text-gray-600') }}">
+                            {{ raffle.status.value }}
+                        </span>
+                        {% if raffle.status.value in ('drawn', 'completed') %}
+                        <span class="text-lg">&#127942;</span>
+                        {% endif %}
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900">
+                        {{ raffle.listing.item.name if raffle.listing and raffle.listing.item else '' }}
+                    </h1>
+                    {% if raffle.listing and raffle.listing.item and raffle.listing.item.description %}
+                    <div class="mt-4 text-gray-700 prose prose-sm max-w-none" id="raffle-desc" data-raw="{{ raffle.listing.item.description | e }}"></div>
+                    <script>(function(){var el=document.getElementById('raffle-desc');if(el&&typeof marked!=='undefined'){try{el.innerHTML=marked.parse(el.dataset.raw||'')}catch(e){el.textContent=el.dataset.raw||''}}else if(el){el.textContent=el.dataset.raw||''}})()</script>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Payment instructions -->
+            {% if raffle.payment_instructions %}
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+                <h3 class="font-bold text-amber-900 flex items-center gap-2 mb-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+                    {% if lang == 'it' %}Come pagare{% else %}How to pay{% endif %}
+                </h3>
+                <p class="text-amber-800 text-sm">{{ raffle.payment_instructions }}</p>
+                {% if raffle.payment_methods %}
+                <div class="mt-3 flex flex-wrap gap-2">
+                    {% for m in raffle.payment_methods %}
+                    <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-medium capitalize">{{ m }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Draw result (shown after draw) -->
+            {% if raffle.status.value in ('drawn', 'completed') and raffle.winner_user_id %}
+            <div class="bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 border-2 border-amber-300 rounded-2xl p-8 text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400"></div>
+                <div class="text-5xl mb-3">&#127942;</div>
+                <h2 class="text-2xl font-extrabold text-gray-900 mb-2">{% if lang == 'it' %}Vincitore!{% else %}Winner!{% endif %}</h2>
+                <p class="text-gray-600 mb-4" x-text="winner_name || '...'"></p>
+
+                <!-- Provably fair proof -->
+                <div class="mt-6 bg-white/80 rounded-xl p-4 text-left text-xs space-y-1 font-mono">
+                    <p class="text-gray-500"><span class="font-bold text-gray-700">Seed:</span> <span class="break-all">{{ raffle.draw_seed or '' }}</span></p>
+                    <p class="text-gray-500"><span class="font-bold text-gray-700">Proof:</span> <span class="break-all">{{ raffle.draw_proof_hash or '' }}</span></p>
+                    <p class="text-gray-400 mt-2 text-[10px]">{% if lang == 'it' %}Chiunque puo verificare: SHA-256(seed + pool) = proof{% else %}Anyone can verify: SHA-256(seed + pool) = proof{% endif %}</p>
+                </div>
+            </div>
+
+            <!-- Community verification -->
+            <div class="bg-white rounded-2xl border border-gray-200 p-6" x-data="{ submitting: false, submitted: false, myFair: null, myComment: '' }">
+                <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                    {% if lang == 'it' %}Verifica comunitaria{% else %}Community Verification{% endif %}
+                </h3>
+                <p class="text-sm text-gray-500 mb-4">{% if lang == 'it' %}Avevi un biglietto? Dicci se il sorteggio è stato equo.{% else %}Had a ticket? Tell us if the raffle was fair.{% endif %}</p>
+
+                <div x-show="!submitted" class="space-y-3">
+                    <div class="flex gap-3">
+                        <button @click="myFair = true" :class="myFair === true ? 'ring-2 ring-emerald-500 bg-emerald-50' : 'bg-gray-50 hover:bg-gray-100'" class="flex-1 py-4 rounded-xl border border-gray-200 text-center transition-all">
+                            <div class="text-3xl mb-1">&#128077;</div>
+                            <div class="text-sm font-semibold" :class="myFair === true ? 'text-emerald-700' : 'text-gray-700'">{% if lang == 'it' %}Equo{% else %}Fair{% endif %}</div>
+                        </button>
+                        <button @click="myFair = false" :class="myFair === false ? 'ring-2 ring-red-500 bg-red-50' : 'bg-gray-50 hover:bg-gray-100'" class="flex-1 py-4 rounded-xl border border-gray-200 text-center transition-all">
+                            <div class="text-3xl mb-1">&#128078;</div>
+                            <div class="text-sm font-semibold" :class="myFair === false ? 'text-red-700' : 'text-gray-700'">{% if lang == 'it' %}Non equo{% else %}Not fair{% endif %}</div>
+                        </button>
+                    </div>
+                    <textarea x-model="myComment" rows="2" maxlength="500" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500" placeholder="{% if lang == 'it' %}Commento opzionale...{% else %}Optional comment...{% endif %}"></textarea>
+                    <button @click="
+                        if (myFair === null) return;
+                        submitting = true;
+                        fetch('/api/v1/raffles/{{ raffle.id }}/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ is_fair: myFair, comment: myComment || null })
+                        }).then(r => r.json()).then(d => {
+                            if (d.status === 'verified') {
+                                submitted = true;
+                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '+' + d.points_earned + ' points!' } }));
+                            } else {
+                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: d.detail || 'Could not submit' } }));
+                            }
+                            submitting = false;
+                        }).catch(() => { submitting = false; });
+                    " :disabled="myFair === null || submitting" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl disabled:opacity-50 transition-colors">
+                        <span x-show="!submitting">{% if lang == 'it' %}Invia verifica{% else %}Submit Verification{% endif %}</span>
+                        <span x-show="submitting">...</span>
+                    </button>
+                </div>
+                <div x-show="submitted" x-cloak class="text-center py-4">
+                    <div class="text-3xl mb-2">&#10004;&#65039;</div>
+                    <p class="font-semibold text-emerald-700">{% if lang == 'it' %}Grazie per la tua verifica!{% else %}Thanks for verifying!{% endif %}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Delivery info -->
+            {% if raffle.delivery_method %}
+            <div class="bg-white rounded-2xl border border-gray-200 p-6">
+                <h3 class="font-bold text-gray-900 mb-2">{% if lang == 'it' %}Consegna{% else %}Delivery{% endif %}</h3>
+                <p class="text-sm text-gray-600 capitalize">{{ raffle.delivery_method.value }}</p>
+                {% if raffle.shipping_notes %}
+                <p class="text-sm text-gray-500 mt-1">{{ raffle.shipping_notes }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Disclaimer -->
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-xs text-gray-500 leading-relaxed">
+                <p class="font-semibold text-gray-600 mb-1">&#9888;&#65039; {% if lang == 'it' %}Avviso{% else %}Notice{% endif %}</p>
+                {% if lang == 'it' %}Questo sorteggio è organizzato da {{ raffle.organizer.display_name if raffle.organizer else 'l\'organizzatore' }}, non da La Piazza. La Piazza non processa pagamenti né garantisce premi. Partecipa a tua discrezione.{% else %}This raffle is organized by {{ raffle.organizer.display_name if raffle.organizer else 'the organizer' }}, not by La Piazza. La Piazza does not process payments or guarantee prizes. Participate at your own discretion.{% endif %}
+            </div>
+        </div>
+
+        <!-- Right sidebar -->
+        <div class="space-y-6">
+
+            <!-- Live stats card -->
+            <div class="bg-white rounded-2xl border border-gray-200 p-6 sticky top-4">
+                <div class="text-center mb-4">
+                    <div class="text-4xl font-extrabold text-gray-900">&euro;{{ "%.2f" | format(raffle.ticket_price) }}</div>
+                    <div class="text-sm text-gray-500">{% if lang == 'it' %}per biglietto{% else %}per ticket{% endif %}</div>
+                </div>
+
+                <!-- Progress -->
+                <div x-show="stats.total_tickets" class="mb-4">
+                    <div class="relative h-4 bg-gray-100 rounded-full overflow-hidden">
+                        <div class="absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ease-out"
+                             :class="stats.percent_sold >= 80 ? 'bg-gradient-to-r from-amber-400 to-red-500' : 'bg-gradient-to-r from-emerald-400 to-emerald-500'"
+                             :style="'width: ' + Math.min(stats.percent_sold, 100) + '%'"></div>
+                    </div>
+                    <div class="flex justify-between mt-1.5 text-xs text-gray-500">
+                        <span><span class="font-bold text-gray-900" x-text="stats.tickets_confirmed"></span> {% if lang == 'it' %}venduti{% else %}sold{% endif %}</span>
+                        <span x-text="stats.tickets_available + ' {% if lang == 'it' %}disponibili{% else %}available{% endif %}'"></span>
+                    </div>
+                </div>
+
+                <!-- Countdown -->
+                <div x-show="stats.hours_remaining !== null && stats.hours_remaining > 0" class="mb-4 text-center">
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="bg-gray-50 rounded-lg p-2">
+                            <div class="text-2xl font-bold text-gray-900 tabular-nums" x-text="Math.floor((stats.hours_remaining || 0) / 24)"></div>
+                            <div class="text-[10px] text-gray-500 uppercase">{% if lang == 'it' %}giorni{% else %}days{% endif %}</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2">
+                            <div class="text-2xl font-bold text-gray-900 tabular-nums" x-text="Math.floor((stats.hours_remaining || 0) % 24)"></div>
+                            <div class="text-[10px] text-gray-500 uppercase">{% if lang == 'it' %}ore{% else %}hours{% endif %}</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2">
+                            <div class="text-2xl font-bold text-gray-900 tabular-nums" x-text="Math.floor(((stats.hours_remaining || 0) % 1) * 60)"></div>
+                            <div class="text-[10px] text-gray-500 uppercase">{% if lang == 'it' %}min{% else %}min{% endif %}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buy tickets button -->
+                {% if raffle.status.value in ('published', 'active') and user %}
+                <div x-data="{ qty: 1, reserving: false }" class="space-y-3">
+                    <div class="flex items-center gap-2">
+                        <button @click="qty = Math.max(1, qty - 1)" class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 hover:bg-gray-50">-</button>
+                        <input type="number" x-model.number="qty" min="1" max="{{ raffle.max_tickets_per_user or 50 }}" class="flex-1 text-center text-lg font-bold border border-gray-200 rounded-lg py-2">
+                        <button @click="qty = Math.min({{ raffle.max_tickets_per_user or 50 }}, qty + 1)" class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 hover:bg-gray-50">+</button>
+                    </div>
+                    <div class="text-center text-sm text-gray-500">
+                        {% if lang == 'it' %}Totale:{% else %}Total:{% endif %} <span class="font-bold text-gray-900">&euro;<span x-text="(qty * {{ raffle.ticket_price }}).toFixed(2)"></span></span>
+                    </div>
+                    <button @click="
+                        reserving = true;
+                        fetch('/api/v1/raffles/{{ raffle.id }}/tickets/reserve', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ quantity: qty })
+                        }).then(r => r.json()).then(d => {
+                            if (d.ticket_id) {
+                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '&#127915; Tickets #' + d.ticket_numbers.join(', #') + ' reserved!' } }));
+                                load();
+                            } else {
+                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: d.detail || 'Could not reserve' } }));
+                            }
+                            reserving = false;
+                        }).catch(() => { reserving = false; });
+                    " :disabled="reserving" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 text-lg">
+                        <span x-show="!reserving">{% if lang == 'it' %}Compra Biglietti{% else %}Buy Tickets{% endif %} &#127915;</span>
+                        <span x-show="reserving">{% if lang == 'it' %}Prenotazione...{% else %}Reserving...{% endif %}</span>
+                    </button>
+                    {% if raffle.max_tickets_per_user %}
+                    <p class="text-xs text-gray-400 text-center">{% if lang == 'it' %}Max {{ raffle.max_tickets_per_user }} per persona{% else %}Max {{ raffle.max_tickets_per_user }} per person{% endif %}</p>
+                    {% endif %}
+                </div>
+                {% elif raffle.status.value in ('published', 'active') and not user %}
+                <a href="/login" class="block w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl text-center shadow-lg text-lg">
+                    {% if lang == 'it' %}Accedi per partecipare{% else %}Log in to participate{% endif %}
+                </a>
+                {% endif %}
+
+                <!-- My tickets -->
+                <div x-show="myTickets.length > 0" x-cloak class="mt-4 space-y-2">
+                    <h4 class="text-sm font-semibold text-gray-900">{% if lang == 'it' %}I miei biglietti{% else %}My Tickets{% endif %}</h4>
+                    <template x-for="t in myTickets" :key="t.id">
+                        <div class="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 text-sm">
+                            <span class="font-mono font-bold text-gray-900" x-text="'#' + t.ticket_numbers.join(', #')"></span>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-medium"
+                                  :class="{
+                                      'bg-amber-100 text-amber-700': t.status === 'reserved',
+                                      'bg-emerald-100 text-emerald-700': t.status === 'confirmed',
+                                      'bg-gray-100 text-gray-500': t.status === 'expired' || t.status === 'cancelled',
+                                  }" x-text="t.status"></span>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Organizer info -->
+                <div class="mt-6 pt-4 border-t border-gray-100">
+                    <div class="flex items-center gap-3">
+                        {% if raffle.organizer and raffle.organizer.avatar_url %}
+                        <img src="{{ raffle.organizer.avatar_url }}" class="w-10 h-10 rounded-full object-cover ring-2 ring-amber-200">
+                        {% else %}
+                        <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold ring-2 ring-amber-200">
+                            {{ (raffle.organizer.display_name or '?')[0] | upper if raffle.organizer else '?' }}
+                        </div>
+                        {% endif %}
+                        <div>
+                            <a href="/workshop/{{ raffle.organizer.slug if raffle.organizer else '' }}" class="text-sm font-semibold text-gray-900 hover:text-indigo-600">
+                                {{ raffle.organizer.display_name if raffle.organizer else 'Organizer' }}
+                            </a>
+                            <p class="text-xs text-gray-500">{% if lang == 'it' %}Organizzatore{% else %}Organizer{% endif %}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guide link -->
+                <a href="/raffles/guide" class="mt-4 block text-center text-xs text-gray-400 hover:text-indigo-600 transition-colors">
+                    {% if lang == 'it' %}Come funzionano i sorteggi?{% else %}How do raffles work?{% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function raffleDetail() {
+    return {
+        stats: { total_tickets: null, tickets_confirmed: 0, tickets_reserved: 0, tickets_available: 0, percent_sold: 0, hours_remaining: null },
+        myTickets: [],
+        winner_name: null,
+        async load() {
+            try {
+                const sr = await fetch('/api/v1/raffles/{{ raffle.id }}/stats');
+                if (sr.ok) this.stats = await sr.json();
+            } catch(e) {}
+            {% if user %}
+            try {
+                const tr = await fetch('/api/v1/raffles/{{ raffle.id }}/tickets/mine');
+                if (tr.ok) this.myTickets = await tr.json();
+            } catch(e) {}
+            {% endif %}
+            {% if raffle.winner_user_id %}
+            try {
+                const wr = await fetch('/api/v1/users/{{ raffle.winner_user_id }}');
+                if (wr.ok) { const d = await wr.json(); this.winner_name = d.display_name; }
+            } catch(e) {}
+            {% endif %}
+        },
+    };
+}
+</script>
+{% endblock %}

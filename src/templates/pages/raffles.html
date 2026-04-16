@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('app.name') }} - {% if lang == 'it' %}Sorteggi{% else %}Raffles{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8" x-data="rafflesApp()" x-init="load()">
+
+    <!-- Hero banner -->
+    <div class="relative overflow-hidden bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-2xl p-8 sm:p-12 mb-8 text-white">
+        <div class="absolute -top-16 -right-16 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-yellow-300/10 rounded-full blur-3xl"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3 mb-3">
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+                </span>
+                <span class="text-xs font-bold uppercase tracking-widest text-white/80">{% if lang == 'it' %}Sorteggi Comunitari{% else %}Community Raffles{% endif %}</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+                {% if lang == 'it' %}Vinci. Sostieni. Condividi.{% else %}Win. Support. Share.{% endif %}
+            </h1>
+            <p class="mt-3 text-base sm:text-lg text-white/90 max-w-xl">
+                {% if lang == 'it' %}Compra un biglietto da EUR 2 e potresti vincere il premio. Tutti i proventi restano nella community. Zero commissioni.{% else %}Buy a EUR 2 ticket and you might win the prize. All proceeds stay in the community. Zero fees.{% endif %}
+            </p>
+            <div class="mt-6 flex flex-wrap gap-3">
+                {% if user %}
+                <a href="/raffles/create" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-orange-600 font-bold rounded-xl hover:bg-orange-50 shadow-lg transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                    {% if lang == 'it' %}Crea Sorteggio{% else %}Create Raffle{% endif %}
+                </a>
+                {% endif %}
+                <a href="/raffles/guide" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white/15 text-white font-semibold rounded-xl hover:bg-white/25 backdrop-blur-sm border border-white/20 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
+                    {% if lang == 'it' %}Come funziona{% else %}How it works{% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="flex flex-wrap items-center gap-3 mb-6">
+        <button @click="filter = 'all'; load()" :class="filter === 'all' ? 'bg-gray-900 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'" class="px-4 py-2 text-sm font-medium rounded-lg transition-colors">
+            {% if lang == 'it' %}Tutti{% else %}All{% endif %}
+        </button>
+        <button @click="filter = 'active'; load()" :class="filter === 'active' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'" class="px-4 py-2 text-sm font-medium rounded-lg transition-colors">
+            {% if lang == 'it' %}Attivi{% else %}Active{% endif %}
+        </button>
+        <button @click="filter = 'published'; load()" :class="filter === 'published' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'" class="px-4 py-2 text-sm font-medium rounded-lg transition-colors">
+            {% if lang == 'it' %}Nuovi{% else %}New{% endif %}
+        </button>
+        <button @click="filter = 'drawn'; load()" :class="filter === 'drawn' ? 'bg-purple-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'" class="px-4 py-2 text-sm font-medium rounded-lg transition-colors">
+            {% if lang == 'it' %}Estratti{% else %}Drawn{% endif %}
+        </button>
+        <span class="ml-auto text-sm text-gray-400" x-text="raffles.length + ' {% if lang == 'it' %}sorteggi{% else %}raffles{% endif %}'"></span>
+    </div>
+
+    <!-- Loading -->
+    <div x-show="loading" class="flex justify-center py-16">
+        <div class="w-8 h-8 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin"></div>
+    </div>
+
+    <!-- Empty state -->
+    <div x-show="!loading && raffles.length === 0" x-cloak class="text-center py-16">
+        <div class="w-20 h-20 mx-auto mb-4 bg-amber-100 rounded-full flex items-center justify-center">
+            <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900">{% if lang == 'it' %}Nessun sorteggio ancora{% else %}No raffles yet{% endif %}</h3>
+        <p class="text-gray-500 mt-1">{% if lang == 'it' %}Sii il primo a creare un sorteggio per la community!{% else %}Be the first to create a raffle for the community!{% endif %}</p>
+    </div>
+
+    <!-- Raffle cards grid -->
+    <div x-show="!loading && raffles.length > 0" x-cloak class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <template x-for="r in raffles" :key="r.id">
+            <a :href="'/raffles/' + r.id" class="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-amber-300 transition-all duration-300">
+                <!-- Status badge + ticket price header -->
+                <div class="relative px-5 pt-5 pb-3">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
+                              :class="{
+                                  'bg-emerald-100 text-emerald-700': r.status === 'active',
+                                  'bg-blue-100 text-blue-700': r.status === 'published',
+                                  'bg-purple-100 text-purple-700': r.status === 'drawn',
+                                  'bg-gray-100 text-gray-600': r.status === 'completed',
+                                  'bg-red-100 text-red-600': r.status === 'cancelled',
+                              }">
+                            <span class="w-1.5 h-1.5 rounded-full"
+                                  :class="{
+                                      'bg-emerald-500': r.status === 'active',
+                                      'bg-blue-500': r.status === 'published',
+                                      'bg-purple-500': r.status === 'drawn',
+                                      'bg-gray-400': r.status === 'completed',
+                                  }"></span>
+                            <span x-text="r.status"></span>
+                        </span>
+                        <span class="text-2xl font-extrabold text-gray-900">
+                            &euro;<span x-text="r.ticket_price.toFixed(2)"></span>
+                        </span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2" x-text="r.title"></h3>
+                    <p class="text-sm text-gray-500 mt-1 line-clamp-2" x-text="r.description || ''"></p>
+                </div>
+
+                <!-- Stats bar -->
+                <div class="px-5 pb-4">
+                    <template x-if="r.stats && r.stats.total_tickets">
+                        <div>
+                            <!-- Progress bar -->
+                            <div class="relative h-3 bg-gray-100 rounded-full overflow-hidden mt-2">
+                                <div class="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
+                                     :class="r.stats.percent_sold >= 80 ? 'bg-gradient-to-r from-amber-400 to-red-500' : r.stats.percent_sold >= 50 ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-gradient-to-r from-emerald-400 to-emerald-500'"
+                                     :style="'width: ' + Math.min(r.stats.percent_sold, 100) + '%'">
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-2 text-xs text-gray-500">
+                                <span><span class="font-semibold text-gray-900" x-text="r.stats.tickets_confirmed"></span> / <span x-text="r.stats.total_tickets"></span> {% if lang == 'it' %}venduti{% else %}sold{% endif %}</span>
+                                <span x-show="r.stats.percent_sold >= 80" class="text-red-600 font-bold animate-pulse">{% if lang == 'it' %}Quasi esaurito!{% else %}Almost sold out!{% endif %}</span>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Countdown -->
+                    <template x-if="r.stats && r.stats.hours_remaining !== null && r.status !== 'drawn' && r.status !== 'completed'">
+                        <div class="mt-3 flex items-center gap-2 text-sm">
+                            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span class="text-gray-600" x-text="r.stats.hours_remaining > 24 ? Math.floor(r.stats.hours_remaining / 24) + 'd ' + Math.floor(r.stats.hours_remaining % 24) + 'h' : Math.floor(r.stats.hours_remaining) + 'h ' + Math.floor((r.stats.hours_remaining % 1) * 60) + 'm'"></span>
+                            <span class="text-gray-400">{% if lang == 'it' %}rimanenti{% else %}remaining{% endif %}</span>
+                        </div>
+                    </template>
+
+                    <!-- Winner badge -->
+                    <template x-if="r.status === 'drawn' || r.status === 'completed'">
+                        <div class="mt-3 flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-lg">
+                            <span class="text-lg">&#127942;</span>
+                            <span class="text-sm font-semibold text-amber-800">{% if lang == 'it' %}Vincitore estratto!{% else %}Winner drawn!{% endif %}</span>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Footer: delivery + payment -->
+                <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+                    <span x-show="r.delivery_method" x-text="'&#128230; ' + (r.delivery_method || '')"></span>
+                    <span x-show="r.payment_methods && r.payment_methods.length" x-text="r.payment_methods.join(', ')"></span>
+                </div>
+            </a>
+        </template>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function rafflesApp() {
+    return {
+        raffles: [],
+        loading: false,
+        filter: 'all',
+        async load() {
+            this.loading = true;
+            try {
+                const status = this.filter === 'all' ? 'all' : this.filter;
+                const r = await fetch('/api/v1/raffles?status=' + status + '&limit=50');
+                if (r.ok) this.raffles = await r.json();
+            } catch(e) {}
+            this.loading = false;
+        },
+    };
+}
+</script>
+{% endblock %}
