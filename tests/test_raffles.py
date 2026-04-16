@@ -124,6 +124,47 @@ def test_cooldown_check_exists():
     assert callable(check_cooldown)
 
 
+def test_raffle_ban_check_exists():
+    from src.services.raffle_engine import check_raffle_ban
+    assert callable(check_raffle_ban)
+
+
+def test_raffle_ban_threshold():
+    from src.models.raffle import RAFFLE_BAN_AFTER_FAILURES
+    assert RAFFLE_BAN_AFTER_FAILURES == 2
+
+
+def test_grace_period_constant():
+    from src.models.raffle import ORGANIZER_GRACE_DAYS
+    assert ORGANIZER_GRACE_DAYS == 30
+
+
+def test_demote_function_exists():
+    from src.services.raffle_engine import demote_raffle_abandoners
+    assert callable(demote_raffle_abandoners)
+
+
+# ── Legend vouch system ─────────────────────────────────────────────────
+
+def test_vouch_reason_enum():
+    from src.models.raffle import VouchReason
+    assert {r.value for r in VouchReason} == {
+        "personal_emergency", "technical_issue", "honest_mistake",
+        "delivery_delay", "communication_failure", "known_personally",
+    }
+
+
+def test_vouch_model_exists():
+    from src.models.raffle import BHRaffleVouch
+    assert BHRaffleVouch.__tablename__ == "bh_raffle_vouch"
+
+
+def test_can_vouch_flag_default_false():
+    from src.models.user import BHUser
+    col = BHUser.__table__.columns["can_vouch_raffles"]
+    assert col.default.arg is False
+
+
 # ── Gamification tests ─────────────────────────────────────────────────
 
 def test_points_constants_defined():

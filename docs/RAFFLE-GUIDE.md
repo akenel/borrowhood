@@ -145,6 +145,9 @@ A: In an auction, the richest person wins. In a raffle, a EUR 2 ticket gives eve
 **Q: Why EUR 320 maximum?**
 A: To keep raffles at community scale. A church raffle, a school fundraiser, a neighborhood garage sale prize. Not high-value items that attract fraud. As the platform grows and trust systems mature, this ceiling may increase.
 
+**Q: What happens if I abandon a raffle?**
+A: If you don't draw a winner within 6 days of the draw date, the raffle auto-cancels and all ticket holders are notified. You have 30 days to resolve the situation. After 30 days with no resolution, your badge tier drops (e.g., Trusted → Active) and you receive a profile warning. Two abandoned raffles with confirmed ticket holders = raffle privileges permanently suspended. This is serious. Don't start a raffle you can't finish.
+
 ---
 
 ## Examples

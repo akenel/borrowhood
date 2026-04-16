@@ -80,6 +80,17 @@ DRAW_BUFFER_DAYS = 3
 COOLDOWN_DAYS = 7  # Minimum days between completed raffle and next publish
 WINNER_RESPONSE_HOURS = 72
 ORGANIZER_INACTION_DAYS = 6
+ORGANIZER_GRACE_DAYS = 30  # Days to resolve after auto-cancel before demotion
+RAFFLE_BAN_AFTER_FAILURES = 2  # Two abandoned raffles = banned from raffles
+
+
+class VouchReason(str, enum.Enum):
+    PERSONAL_EMERGENCY = "personal_emergency"   # Illness, family crisis
+    TECHNICAL_ISSUE = "technical_issue"          # Didn't understand the system
+    HONEST_MISTAKE = "honest_mistake"            # Forgot, miscounted, new user
+    DELIVERY_DELAY = "delivery_delay"            # Prize sent late but sent
+    COMMUNICATION_FAILURE = "communication_failure"  # Couldn't reach winner
+    KNOWN_PERSONALLY = "known_personally"        # Legend knows them IRL
 
 
 def max_raffle_value_for(completed_count: int) -> float:
@@ -244,6 +255,35 @@ class BHRaffleVerification(BHBase, Base):
 
     __table_args__ = (
         UniqueConstraint("raffle_id", "user_id", name="uq_raffle_verification_per_user"),
+    )
+
+
+class BHRaffleVouch(BHBase, Base):
+    """A Legend vouches for a suspended raffle organizer.
+
+    Only Legend-tier users can vouch. They select a reason from the
+    VouchReason enum and publicly attach their name to the rehabilitation.
+    The Legend puts their own reputation on the line — if the vouched user
+    abandons again, the Legend's credibility takes a hit too.
+    """
+
+    __tablename__ = "bh_raffle_vouch"
+
+    suspect_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_user.id"), nullable=False, index=True,
+    )
+    legend_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_user.id"), nullable=False, index=True,
+    )
+    reason: Mapped[VouchReason] = mapped_column(Enum(VouchReason), nullable=False)
+    explanation: Mapped[str] = mapped_column(String(500), nullable=False)
+
+    # Relationships
+    suspect: Mapped["BHUser"] = relationship(foreign_keys=[suspect_id])
+    legend: Mapped["BHUser"] = relationship(foreign_keys=[legend_id])
+
+    __table_args__ = (
+        UniqueConstraint("suspect_id", "legend_id", name="uq_raffle_vouch_per_legend"),
     )
 
 

@@ -80,6 +80,24 @@ async def check_one_active_raffle(db: AsyncSession, user_id, exclude_id=None) ->
     return True, ""
 
 
+async def check_raffle_ban(db: AsyncSession, user_id) -> tuple[bool, str]:
+    """Block organizers who abandoned 2+ raffles with confirmed ticket holders."""
+    abandon_count = await db.scalar(
+        select(func.count(BHRaffle.id))
+        .where(BHRaffle.organizer_id == user_id)
+        .where(BHRaffle.status == RaffleStatus.CANCELLED)
+        .where(BHRaffle.tickets_sold > 0)
+        .where(BHRaffle.draw_seed.in_(["ABANDONED_PROCESSED", None]))
+    ) or 0
+    if abandon_count >= RAFFLE_BAN_AFTER_FAILURES:
+        return False, (
+            f"Your raffle privileges are suspended. You have {abandon_count} "
+            f"abandoned raffle(s) with confirmed ticket holders. "
+            f"Contact the community to resolve outstanding issues."
+        )
+    return True, ""
+
+
 async def check_cooldown(db: AsyncSession, user_id) -> tuple[bool, str]:
     """Enforce 7-day cooldown between raffle completions."""
     last_completed = await db.scalar(
@@ -330,13 +348,75 @@ async def auto_cancel_abandoned_raffles():
         return count
 
 
+async def demote_raffle_abandoners():
+    """Demote organizers who abandoned raffles and didn't resolve within 30 days.
+
+    Consequence ladder:
+      * Auto-cancel fires at ORGANIZER_INACTION_DAYS (6 days)
+      * 30-day grace period to apologize/explain
+      * After 30 days: badge demotion + raffle ban flag
+      * 2 abandoned raffles = permanently blocked from raffle feature
+    """
+    from src.models.user import BHUser, BadgeTier
+    async with async_session() as db:
+        now = datetime.now(timezone.utc)
+        grace_cutoff = now - timedelta(days=ORGANIZER_GRACE_DAYS)
+
+        # Find cancelled-by-system raffles (abandoned) past grace period
+        # that had confirmed tickets (real participants were let down)
+        abandoned = (await db.execute(
+            select(BHRaffle)
+            .where(BHRaffle.status == RaffleStatus.CANCELLED)
+            .where(BHRaffle.tickets_sold > 0)
+            .where(BHRaffle.updated_at < grace_cutoff)
+            .where(BHRaffle.draw_seed.is_(None))  # Never drew = abandoned, not completed
+        )).scalars().all()
+
+        demoted = 0
+        for raffle in abandoned:
+            user = await db.scalar(select(BHUser).where(BHUser.id == raffle.organizer_id))
+            if not user:
+                continue
+
+            # Count total abandoned raffles for this user
+            abandon_count = await db.scalar(
+                select(func.count(BHRaffle.id))
+                .where(BHRaffle.organizer_id == user.id)
+                .where(BHRaffle.status == RaffleStatus.CANCELLED)
+                .where(BHRaffle.tickets_sold > 0)
+                .where(BHRaffle.draw_seed.is_(None))
+                .where(BHRaffle.updated_at < grace_cutoff)
+            ) or 0
+
+            # Demote badge tier (never below NEWCOMER)
+            tier_order = [BadgeTier.LEGEND, BadgeTier.PILLAR, BadgeTier.TRUSTED, BadgeTier.ACTIVE, BadgeTier.NEWCOMER]
+            current_idx = next((i for i, t in enumerate(tier_order) if t == user.badge_tier), len(tier_order) - 1)
+            if current_idx < len(tier_order) - 1:
+                new_tier = tier_order[current_idx + 1]
+                user.badge_tier = new_tier
+                logger.warning(
+                    "Demoted %s (%s) from %s to %s due to abandoned raffle %s",
+                    user.display_name, user.id, tier_order[current_idx].value, new_tier.value, raffle.id,
+                )
+
+            # Mark raffle as processed (set draw_seed to "ABANDONED" to prevent re-processing)
+            raffle.draw_seed = "ABANDONED_PROCESSED"
+            demoted += 1
+
+        if demoted:
+            await db.commit()
+            logger.info("Demoted %d raffle abandoners", demoted)
+        return demoted
+
+
 async def run_raffle_expiry_loop():
-    """Background loop: expire tickets + cancel abandoned raffles."""
+    """Background loop: expire tickets + cancel abandoned raffles + demote abandoners."""
     logger.info("Raffle expiry loop started (interval=%ds)", EXPIRY_INTERVAL_SECONDS)
     while True:
         try:
             await expire_stale_tickets()
             await auto_cancel_abandoned_raffles()
+            await demote_raffle_abandoners()
         except Exception as e:
             logger.error("Raffle expiry error: %s", e, exc_info=True)
         await asyncio.sleep(EXPIRY_INTERVAL_SECONDS)

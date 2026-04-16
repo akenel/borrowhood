@@ -118,6 +118,9 @@ class BHUser(BHBase, Base):
     # Composite trust score (0.0 to 1.0)
     trust_score: Mapped[Optional[float]] = mapped_column(Float, default=None)
 
+    # Raffle vouching privilege — only admin-granted, NOT from badge tier
+    can_vouch_raffles: Mapped[bool] = mapped_column(default=False)
+
     # Service declarations ("I offer...")
     offers_delivery: Mapped[bool] = mapped_column(default=False)
     offers_pickup: Mapped[bool] = mapped_column(default=False)

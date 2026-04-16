@@ -67,6 +67,16 @@ async def test_verifications_public(client):
     assert resp.status_code == 404
 
 
+@pytest.mark.asyncio
+async def test_vouch_requires_auth(client):
+    resp = await client.post("/api/v1/raffles/vouch", json={
+        "suspect_user_id": "00000000-0000-0000-0000-000000000000",
+        "reason": "honest_mistake",
+        "explanation": "I know this person, they just forgot."
+    })
+    assert resp.status_code == 401
+
+
 # ── Router registration ───────────────────────────────────────────────
 
 def test_raffle_routes_registered():
@@ -80,3 +90,4 @@ def test_raffle_routes_registered():
     assert "/api/v1/raffles/{raffle_id}/stats" in paths
     assert "/api/v1/raffles/{raffle_id}/verify" in paths
     assert "/api/v1/raffles/{raffle_id}/verifications" in paths
+    assert "/api/v1/raffles/vouch" in paths

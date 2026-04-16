@@ -34,14 +34,15 @@ from src.dependencies import get_current_user_token, get_user, require_auth
 from src.models.item import BHItem
 from src.models.listing import BHListing, ListingStatus, ListingType
 from src.models.raffle import (
-    BHRaffle, BHRaffleTicket,
+    BHRaffle, BHRaffleTicket, BHRaffleVouch,
     RAFFLE_MAX_DURATION_DAYS, RAFFLE_MIN_DURATION_HOURS,
     RAFFLE_MIN_TICKET_PRICE_EUR, TICKET_HOLD_HOURS_DEFAULT,
     RaffleDelivery, RaffleDrawType, RaffleStatus, RaffleTicketStatus,
+    VouchReason,
 )
 from src.services.raffle_engine import (
     award_draw_points, award_ticket_purchase_points,
-    check_cooldown, check_one_active_raffle,
+    check_cooldown, check_one_active_raffle, check_raffle_ban,
     completed_raffle_count, execute_draw, max_raffle_value_for,
     pre_draw_check, raffle_stats, submit_verification, validate_raffle_value,
 )
@@ -148,6 +149,11 @@ async def create_raffle(
     )
     if not item:
         raise HTTPException(status_code=404, detail="Item not found or not yours")
+
+    # Raffle ban check (2+ abandoned raffles with ticket holders)
+    ok, msg = await check_raffle_ban(db, user.id)
+    if not ok:
+        raise HTTPException(status_code=403, detail=msg)
 
     # One active raffle at a time
     ok, msg = await check_one_active_raffle(db, user.id)
@@ -789,4 +795,95 @@ async def get_verifications(
             }
             for v in verifications
         ],
+    }
+
+
+# ── Legend vouching ───────────────────────────────────────────────────
+
+
+class VouchSubmit(BaseModel):
+    suspect_user_id: UUID
+    reason: str
+    explanation: str = Field(min_length=10, max_length=500)
+
+
+@router.post("/vouch")
+async def vouch_for_user(
+    data: VouchSubmit,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Legend vouches for a suspended raffle organizer.
+
+    Only users with can_vouch_raffles=True (admin-granted) can do this.
+    The Legend publicly attaches their name and reputation to the
+    rehabilitation. If the vouched user abandons again, both suffer.
+    """
+    from src.models.user import BHUser
+
+    legend = await get_user(db, token)
+    if not legend.can_vouch_raffles:
+        raise HTTPException(
+            status_code=403,
+            detail="Vouch privilege not granted. Only designated community guardians can vouch for suspended users."
+        )
+
+    # Validate reason enum
+    try:
+        reason = VouchReason(data.reason)
+    except ValueError:
+        valid = [r.value for r in VouchReason]
+        raise HTTPException(status_code=400, detail=f"Invalid reason. Must be one of: {', '.join(valid)}")
+
+    # Find the suspect
+    suspect = await db.scalar(
+        select(BHUser).where(BHUser.id == data.suspect_user_id).where(BHUser.deleted_at.is_(None))
+    )
+    if not suspect:
+        raise HTTPException(status_code=404, detail="User not found")
+    if suspect.id == legend.id:
+        raise HTTPException(status_code=400, detail="Cannot vouch for yourself")
+
+    # Check they actually need vouching (have abandoned raffles)
+    from src.services.raffle_engine import check_raffle_ban
+    ok, _ = await check_raffle_ban(db, suspect.id)
+    if ok:
+        raise HTTPException(status_code=400, detail="This user is not suspended from raffles")
+
+    # Check not already vouched by this legend
+    existing = await db.scalar(
+        select(BHRaffleVouch.id)
+        .where(BHRaffleVouch.suspect_id == suspect.id)
+        .where(BHRaffleVouch.legend_id == legend.id)
+    )
+    if existing:
+        raise HTTPException(status_code=409, detail="You already vouched for this user")
+
+    # Create vouch record
+    vouch = BHRaffleVouch(
+        suspect_id=suspect.id,
+        legend_id=legend.id,
+        reason=reason,
+        explanation=data.explanation,
+    )
+    db.add(vouch)
+
+    # Clear the abandoned flags so they can raffle again
+    # Reset the ABANDONED_PROCESSED markers on their cancelled raffles
+    abandoned_raffles = (await db.execute(
+        select(BHRaffle)
+        .where(BHRaffle.organizer_id == suspect.id)
+        .where(BHRaffle.draw_seed == "ABANDONED_PROCESSED")
+    )).scalars().all()
+    for r in abandoned_raffles:
+        r.draw_seed = f"VOUCHED_BY_{legend.id}"
+
+    await db.commit()
+
+    return {
+        "status": "vouched",
+        "suspect": suspect.display_name,
+        "legend": legend.display_name,
+        "reason": reason.value,
+        "message": f"{legend.display_name} has vouched for {suspect.display_name}. Raffle privileges restored.",
     }
