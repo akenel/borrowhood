@@ -72,75 +72,87 @@
     <!-- Raffle cards grid -->
     <div x-show="!loading && raffles.length > 0" x-cloak class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <template x-for="r in raffles" :key="r.id">
-            <a :href="'/raffles/' + r.id" class="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-amber-300 transition-all duration-300">
-                <!-- Status badge + ticket price header -->
-                <div class="relative px-5 pt-5 pb-3">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
+            <a :href="'/raffles/' + r.id" class="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300"
+               :class="r.stats && r.stats.percent_sold >= 80 ? 'hover:border-red-300 ring-1 ring-amber-200' : 'hover:border-amber-300'">
+
+                <!-- Image / colorful placeholder -->
+                <div class="relative h-40 overflow-hidden"
+                     :class="{
+                         'bg-gradient-to-br from-amber-400 via-orange-400 to-red-400': r.stats && r.stats.percent_sold >= 80,
+                         'bg-gradient-to-br from-amber-300 via-orange-300 to-yellow-300': r.stats && r.stats.percent_sold >= 40 && r.stats.percent_sold < 80,
+                         'bg-gradient-to-br from-emerald-300 via-teal-300 to-cyan-300': !r.stats || r.stats.percent_sold < 40,
+                         'bg-gradient-to-br from-gray-300 to-gray-400': r.status === 'completed' || r.status === 'cancelled',
+                     }">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <svg class="w-20 h-20 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
+                    </div>
+                    <!-- Price badge -->
+                    <div class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-xl px-3 py-1.5 shadow-sm">
+                        <span class="text-xl font-extrabold text-gray-900">&euro;<span x-text="r.ticket_price.toFixed(2)"></span></span>
+                        <span class="text-[10px] text-gray-500 block text-center">{% if lang == 'it' %}biglietto{% else %}ticket{% endif %}</span>
+                    </div>
+                    <!-- Status badge -->
+                    <div class="absolute top-3 left-3">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm backdrop-blur-sm"
                               :class="{
-                                  'bg-emerald-100 text-emerald-700': r.status === 'active',
-                                  'bg-blue-100 text-blue-700': r.status === 'published',
-                                  'bg-purple-100 text-purple-700': r.status === 'drawn',
-                                  'bg-gray-100 text-gray-600': r.status === 'completed',
-                                  'bg-red-100 text-red-600': r.status === 'cancelled',
+                                  'bg-emerald-500/90 text-white': r.status === 'active',
+                                  'bg-blue-500/90 text-white': r.status === 'published',
+                                  'bg-purple-500/90 text-white': r.status === 'drawn',
+                                  'bg-gray-500/90 text-white': r.status === 'completed',
+                                  'bg-red-500/90 text-white': r.status === 'cancelled',
                               }">
-                            <span class="w-1.5 h-1.5 rounded-full"
-                                  :class="{
-                                      'bg-emerald-500': r.status === 'active',
-                                      'bg-blue-500': r.status === 'published',
-                                      'bg-purple-500': r.status === 'drawn',
-                                      'bg-gray-400': r.status === 'completed',
-                                  }"></span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-white/80"></span>
                             <span x-text="r.status"></span>
                         </span>
-                        <span class="text-2xl font-extrabold text-gray-900">
-                            &euro;<span x-text="r.ticket_price.toFixed(2)"></span>
-                        </span>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2" x-text="r.title"></h3>
-                    <p class="text-sm text-gray-500 mt-1 line-clamp-2" x-text="r.description || ''"></p>
+                    <!-- Sold out overlay -->
+                    <template x-if="r.stats && r.stats.percent_sold >= 100">
+                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <span class="text-white text-2xl font-black uppercase tracking-widest transform -rotate-12 border-4 border-white px-6 py-2">SOLD OUT</span>
+                        </div>
+                    </template>
                 </div>
 
-                <!-- Stats bar -->
-                <div class="px-5 pb-4">
+                <!-- Content -->
+                <div class="p-5">
+                    <h3 class="text-base font-bold text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2 leading-snug" x-text="r.title"></h3>
+
+                    <!-- Progress bar -->
                     <template x-if="r.stats && r.stats.total_tickets">
-                        <div>
-                            <!-- Progress bar -->
-                            <div class="relative h-3 bg-gray-100 rounded-full overflow-hidden mt-2">
+                        <div class="mt-3">
+                            <div class="relative h-2.5 bg-gray-100 rounded-full overflow-hidden">
                                 <div class="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
                                      :class="r.stats.percent_sold >= 80 ? 'bg-gradient-to-r from-amber-400 to-red-500' : r.stats.percent_sold >= 50 ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-gradient-to-r from-emerald-400 to-emerald-500'"
-                                     :style="'width: ' + Math.min(r.stats.percent_sold, 100) + '%'">
-                                </div>
+                                     :style="'width: ' + Math.min(r.stats.percent_sold, 100) + '%'"></div>
                             </div>
-                            <div class="flex items-center justify-between mt-2 text-xs text-gray-500">
-                                <span><span class="font-semibold text-gray-900" x-text="r.stats.tickets_confirmed"></span> / <span x-text="r.stats.total_tickets"></span> {% if lang == 'it' %}venduti{% else %}sold{% endif %}</span>
-                                <span x-show="r.stats.percent_sold >= 80" class="text-red-600 font-bold animate-pulse">{% if lang == 'it' %}Quasi esaurito!{% else %}Almost sold out!{% endif %}</span>
+                            <div class="flex items-center justify-between mt-1.5 text-xs">
+                                <span class="text-gray-500"><span class="font-bold text-gray-900" x-text="r.stats.tickets_confirmed"></span>/<span x-text="r.stats.total_tickets"></span> {% if lang == 'it' %}venduti{% else %}sold{% endif %}</span>
+                                <span x-show="r.stats.percent_sold >= 80 && r.stats.percent_sold < 100" class="text-red-600 font-bold animate-pulse text-[11px]">{% if lang == 'it' %}Quasi esaurito!{% else %}Almost gone!{% endif %}</span>
+                                <span x-show="r.stats.percent_sold < 80" class="text-gray-400" x-text="r.stats.percent_sold + '%'"></span>
                             </div>
                         </div>
                     </template>
 
-                    <!-- Countdown -->
-                    <template x-if="r.stats && r.stats.hours_remaining !== null && r.status !== 'drawn' && r.status !== 'completed'">
-                        <div class="mt-3 flex items-center gap-2 text-sm">
-                            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <span class="text-gray-600" x-text="r.stats.hours_remaining > 24 ? Math.floor(r.stats.hours_remaining / 24) + 'd ' + Math.floor(r.stats.hours_remaining % 24) + 'h' : Math.floor(r.stats.hours_remaining) + 'h ' + Math.floor((r.stats.hours_remaining % 1) * 60) + 'm'"></span>
-                            <span class="text-gray-400">{% if lang == 'it' %}rimanenti{% else %}remaining{% endif %}</span>
+                    <!-- Countdown + winner -->
+                    <div class="mt-3 flex items-center justify-between">
+                        <template x-if="r.stats && r.stats.hours_remaining !== null && r.status !== 'drawn' && r.status !== 'completed'">
+                            <div class="flex items-center gap-1.5 text-xs text-gray-500">
+                                <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span x-text="r.stats.hours_remaining > 24 ? Math.floor(r.stats.hours_remaining / 24) + 'd ' + Math.floor(r.stats.hours_remaining % 24) + 'h' : Math.floor(r.stats.hours_remaining) + 'h ' + Math.floor((r.stats.hours_remaining % 1) * 60) + 'm'"></span>
+                            </div>
+                        </template>
+                        <template x-if="r.status === 'drawn' || r.status === 'completed'">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-base">&#127942;</span>
+                                <span class="text-xs font-bold text-amber-700">{% if lang == 'it' %}Estratto{% else %}Drawn{% endif %}</span>
+                            </div>
+                        </template>
+                        <div class="flex items-center gap-1 text-[10px] text-gray-400">
+                            <template x-if="r.payment_methods && r.payment_methods.length">
+                                <span x-text="r.payment_methods.slice(0,2).join(' · ')"></span>
+                            </template>
                         </div>
-                    </template>
-
-                    <!-- Winner badge -->
-                    <template x-if="r.status === 'drawn' || r.status === 'completed'">
-                        <div class="mt-3 flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-lg">
-                            <span class="text-lg">&#127942;</span>
-                            <span class="text-sm font-semibold text-amber-800">{% if lang == 'it' %}Vincitore estratto!{% else %}Winner drawn!{% endif %}</span>
-                        </div>
-                    </template>
-                </div>
-
-                <!-- Footer: delivery + payment -->
-                <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
-                    <span x-show="r.delivery_method" x-text="'&#128230; ' + (r.delivery_method || '')"></span>
-                    <span x-show="r.payment_methods && r.payment_methods.length" x-text="r.payment_methods.join(', ')"></span>
+                    </div>
                 </div>
             </a>
         </template>
