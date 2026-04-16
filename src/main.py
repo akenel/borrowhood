@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.config import settings
 from src.database import async_session, create_tables, get_db
 from src.middleware.rate_limit import RateLimitMiddleware
-from src.routers import ai, analytics, auth, badges, bids, communities, delivery, deposits, disputes, events, health, helpboard, insurance, invoices, items, listing_qa, listings, lockbox, mentorships, messages, notifications, onboarding, pages, payments, rentals, reports, reviews, saved_searches, service_quotes, skills, telegram, translation, users
+from src.routers import ai, analytics, auth, badges, bids, communities, delivery, deposits, disputes, events, health, helpboard, insurance, invoices, items, listing_qa, listings, lockbox, mentorships, messages, notifications, onboarding, pages, payments, raffles, rentals, reports, reviews, saved_searches, service_quotes, skills, telegram, translation, users
 from src.routers import qa as qa_router_mod
 from src.routers import backlog as backlog_router_mod
 from src.services.seeding import seed_database, seed_new_users, seed_new_items, seed_default_community
@@ -114,6 +114,7 @@ def create_app() -> FastAPI:
     app.include_router(listing_qa.router)
     app.include_router(messages.router)
     app.include_router(mentorships.router)
+    app.include_router(raffles.router)
     app.include_router(analytics.router)
 
     # Demo login (debug only)
@@ -188,6 +189,11 @@ def create_app() -> FastAPI:
         app.state.attendance_task = asyncio.create_task(run_attendance_loop())
         logger.info("Event auto-attendance loop started")
 
+        # Start raffle ticket expiry background task
+        from src.services.raffle_engine import run_raffle_expiry_loop
+        app.state.raffle_expiry_task = asyncio.create_task(run_raffle_expiry_loop())
+        logger.info("Raffle expiry loop started")
+
     @app.on_event("shutdown")
     async def shutdown():
         logger.info("BorrowHood shutting down...")
@@ -199,6 +205,10 @@ def create_app() -> FastAPI:
         if hasattr(app.state, "attendance_task"):
             app.state.attendance_task.cancel()
             logger.info("Event auto-attendance loop stopped")
+        # Stop raffle expiry loop
+        if hasattr(app.state, "raffle_expiry_task"):
+            app.state.raffle_expiry_task.cancel()
+            logger.info("Raffle expiry loop stopped")
         # Stop Telegram bot if running
         if hasattr(app.state, "telegram_bot_task"):
             from src.services.telegram_bot import bot

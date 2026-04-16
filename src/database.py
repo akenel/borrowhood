@@ -144,6 +144,8 @@ async def run_migrations():
         "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'MARKET'",
         "ALTER TYPE itemcategory ADD VALUE IF NOT EXISTS 'FESTIVAL'",
         "ALTER TYPE rsvpstatus ADD VALUE IF NOT EXISTS 'NO_SHOW'",
+        # 2026-04-16: Raffle feature
+        "ALTER TYPE listingtype ADD VALUE IF NOT EXISTS 'RAFFLE'",
     ]
     # Fix any previously added lowercase values by renaming to UPPERCASE
     rename_fixes = [
