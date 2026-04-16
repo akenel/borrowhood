@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('app.name') }} - {% if lang == 'it' %}Guida Sorteggi{% else %}Raffle Guide{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-10">
+
+    <!-- Hero -->
+    <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-semibold uppercase tracking-wider mb-4">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zm7-10a1 1 0 01.993.883L13 3v1h1a1 1 0 01.117 1.993L14 6h-1v1a1 1 0 01-1.993.117L11 7V6h-1a1 1 0 01-.117-1.993L10 4h1V3a1 1 0 011-1z"/></svg>
+            {% if lang == 'it' %}Sorteggi Comunitari{% else %}Community Raffles{% endif %}
+        </div>
+        <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">
+            {% if lang == 'it' %}Come funziona un sorteggio{% else %}How Raffles Work{% endif %}
+        </h1>
+        <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+            {% if lang == 'it' %}Metti in palio qualcosa. La community compra i biglietti. Un biglietto fortunato vince. Nessuna commissione. Mai.{% else %}Put up a prize. The community buys tickets. One lucky ticket wins. No fees. Ever.{% endif %}
+        </p>
+    </div>
+
+    <!-- How It Works: Organizer -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                {% if lang == 'it' %}Per l'organizzatore{% else %}For the Organizer{% endif %}
+            </h2>
+        </div>
+        <div class="p-6">
+            <ol class="space-y-4">
+                {% set org_steps_en = [
+                    ('List your prize', 'Add photos, a description, and a story. What are you raffling? A painting? A cake? Old Lego sets?'),
+                    ('Set the ticket price', 'EUR 0.50? EUR 2? EUR 5? Keep it low — everyone should be able to play.'),
+                    ('Set the rules', 'How many tickets? When is the draw? Max tickets per person?'),
+                    ('Write payment instructions', '"Pay me cash at the bar" or "Send to my PayPal" — La Piazza never touches your money.'),
+                    ('Publish', 'Your raffle goes live. People can see it, share it, buy tickets.'),
+                    ('Confirm payments', 'When someone pays, click Confirm next to their ticket. Now they are in the draw.'),
+                    ('Draw the winner', 'Click "Draw Winner." The system picks one ticket at random — provably fair.'),
+                    ('Deliver the prize', 'Contact the winner, arrange pickup or shipping.'),
+                    ('Earn trust', 'Participants verify it was fair. You earn points. Next time, you can raffle something bigger.'),
+                ] %}
+                {% set org_steps_it = [
+                    ('Pubblica il tuo premio', 'Aggiungi foto, descrizione e la storia. Cosa metti in palio? Un quadro? Una torta? I vecchi Lego?'),
+                    ('Scegli il prezzo del biglietto', 'EUR 0,50? EUR 2? EUR 5? Tienilo basso — tutti devono poter partecipare.'),
+                    ('Imposta le regole', 'Quanti biglietti? Quando si estrae? Massimo per persona?'),
+                    ('Scrivi le istruzioni di pagamento', '"Pagami in contanti al bar" o "Invia al mio PayPal" — La Piazza non tocca i tuoi soldi.'),
+                    ('Pubblica', 'Il tuo sorteggio va online. Le persone possono vederlo, condividerlo, comprare biglietti.'),
+                    ('Conferma i pagamenti', 'Quando qualcuno paga, clicca Conferma. Ora è nel sorteggio.'),
+                    ('Estrai il vincitore', 'Clicca "Estrai vincitore." Il sistema sceglie un biglietto a caso — verificabile da tutti.'),
+                    ('Consegna il premio', 'Contatta il vincitore, organizza il ritiro o la spedizione.'),
+                    ('Guadagna fiducia', 'I partecipanti verificano che è stato equo. Guadagni punti. La prossima volta, puoi sorteggiare qualcosa di più grande.'),
+                ] %}
+                {% for title, desc in (org_steps_it if lang == 'it' else org_steps_en) %}
+                <li class="flex gap-4">
+                    <span class="flex-shrink-0 w-8 h-8 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-sm">{{ loop.index }}</span>
+                    <div>
+                        <p class="font-semibold text-gray-900">{{ title }}</p>
+                        <p class="text-sm text-gray-600 mt-0.5">{{ desc }}</p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+
+    <!-- How It Works: Buyer -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+        <div class="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                {% if lang == 'it' %}Per chi compra biglietti{% else %}For Ticket Buyers{% endif %}
+            </h2>
+        </div>
+        <div class="p-6">
+            <ol class="space-y-3">
+                {% set buy_steps_en = [
+                    ('Find a raffle you like', 'Browse the Raffles page or find one shared by a neighbor.'),
+                    ('Reserve tickets', 'Pick how many. You have 48 hours to pay.'),
+                    ('Pay the organizer', 'Cash, PayPal, bank transfer — whatever they listed.'),
+                    ('Wait for confirmation', 'The organizer marks your payment as received.'),
+                    ('Watch the countdown', 'When the draw happens, you will be notified.'),
+                    ('Win or lose gracefully', 'Win? Congratulations! Lose? You supported your community for the price of a coffee.'),
+                    ('Verify the raffle', 'Tell everyone if it was fair. Your vote builds community trust.'),
+                ] %}
+                {% set buy_steps_it = [
+                    ('Trova un sorteggio', 'Sfoglia la pagina Sorteggi o trovane uno condiviso da un vicino.'),
+                    ('Prenota i biglietti', 'Scegli quanti. Hai 48 ore per pagare.'),
+                    ('Paga l\'organizzatore', 'Contanti, PayPal, bonifico — quello che ha indicato.'),
+                    ('Attendi la conferma', 'L\'organizzatore segna il tuo pagamento come ricevuto.'),
+                    ('Guarda il conto alla rovescia', 'Quando avviene l\'estrazione, sarai avvisato.'),
+                    ('Vinci o perdi con eleganza', 'Vinci? Congratulazioni! Perdi? Hai supportato la community per il prezzo di un caffè.'),
+                    ('Verifica il sorteggio', 'Dì a tutti se è stato equo. Il tuo voto costruisce la fiducia.'),
+                ] %}
+                {% for title, desc in (buy_steps_it if lang == 'it' else buy_steps_en) %}
+                <li class="flex gap-4">
+                    <span class="flex-shrink-0 w-8 h-8 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold text-sm">{{ loop.index }}</span>
+                    <div>
+                        <p class="font-semibold text-gray-900">{{ title }}</p>
+                        <p class="text-sm text-gray-600 mt-0.5">{{ desc }}</p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+
+    <!-- Trust Tiers -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+        <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                {% if lang == 'it' %}Livelli di Fiducia{% else %}Trust Tiers{% endif %}
+            </h2>
+        </div>
+        <div class="p-6">
+            <p class="text-sm text-gray-600 mb-4">
+                {% if lang == 'it' %}Ogni sorteggio completato onestamente sblocca limiti più alti. Un truffatore dovrebbe completare 5 sorteggi legittimi prima di poter tentare qualcosa — il gioco non vale la candela.{% else %}Every honest raffle unlocks higher limits. A scammer would have to run 5 legitimate raffles before they could try anything — the math doesn't work for them.{% endif %}
+            </p>
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-gray-200">
+                        <th class="text-left py-2 text-gray-500 font-medium">{% if lang == 'it' %}Sorteggi completati{% else %}Completed Raffles{% endif %}</th>
+                        <th class="text-right py-2 text-gray-500 font-medium">{% if lang == 'it' %}Valore massimo{% else %}Max Total Value{% endif %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for count, limit in [(0, 10), (1, 20), (2, 40), (3, 80), (4, 160), (5, 320)] %}
+                    <tr class="border-b border-gray-100">
+                        <td class="py-2.5 text-gray-900">
+                            {% if count == 0 %}
+                                {% if lang == 'it' %}Prima volta{% else %}First time{% endif %}
+                            {% else %}
+                                {{ count }}
+                            {% endif %}
+                        </td>
+                        <td class="py-2.5 text-right font-semibold text-gray-900">&euro; {{ limit }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Points -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+        <div class="bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                {% if lang == 'it' %}Punti Reputazione{% else %}Reputation Points{% endif %}
+            </h2>
+        </div>
+        <div class="p-6">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-gray-200">
+                        <th class="text-left py-2 text-gray-500 font-medium">{% if lang == 'it' %}Azione{% else %}Action{% endif %}</th>
+                        <th class="text-right py-2 text-gray-500 font-medium">{% if lang == 'it' %}Punti{% else %}Points{% endif %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set points = [
+                        ('Ticket confirmed (buyer)|Biglietto confermato (acquirente)', '+3'),
+                        ('Win a raffle|Vincere un sorteggio', '+10'),
+                        ('Submit a verification|Lasciare una verifica', '+5'),
+                        ('Complete a raffle (organizer)|Completare un sorteggio (organizzatore)', '+25'),
+                        ('80%+ say fair (organizer bonus)|80%+ dice equo (bonus organizzatore)', '+15'),
+                    ] %}
+                    {% for labels, pts in points %}
+                    {% set label_parts = labels.split('|') %}
+                    <tr class="border-b border-gray-100">
+                        <td class="py-2.5 text-gray-900">{{ label_parts[1] if lang == 'it' else label_parts[0] }}</td>
+                        <td class="py-2.5 text-right font-bold text-indigo-600">{{ pts }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Provably Fair -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+        <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                {% if lang == 'it' %}Estrazione Verificabile{% else %}Provably Fair Draw{% endif %}
+            </h2>
+        </div>
+        <div class="p-6 space-y-3 text-sm text-gray-700">
+            <p>{% if lang == 'it' %}Quando l'organizzatore clicca "Estrai vincitore":{% else %}When the organizer clicks "Draw Winner":{% endif %}</p>
+            <ol class="list-decimal list-inside space-y-1.5 pl-2">
+                <li>{% if lang == 'it' %}Il sistema genera un codice segreto casuale (seed){% else %}The system generates a random secret code (seed){% endif %}</li>
+                <li>{% if lang == 'it' %}Elenca tutti i biglietti confermati in ordine{% else %}Lists all confirmed tickets in order{% endif %}</li>
+                <li>{% if lang == 'it' %}Combina seed + lista e calcola SHA-256 (una funzione matematica){% else %}Combines seed + list and runs SHA-256 (a math function){% endif %}</li>
+                <li>{% if lang == 'it' %}Il risultato determina il biglietto vincente{% else %}The result determines the winning ticket{% endif %}</li>
+            </ol>
+            <div class="mt-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <p class="font-semibold text-gray-900 mb-1">{% if lang == 'it' %}Perché conta:{% else %}Why it matters:{% endif %}</p>
+                <p class="text-gray-600">{% if lang == 'it' %}Dopo l'estrazione, il seed viene pubblicato. Chiunque può verificare che il vincitore è stato scelto in modo equo. Se l'organizzatore avesse provato a barare, la matematica non tornerebbe.{% else %}After the draw, the seed is published. Anyone can verify the winner was chosen fairly. If the organizer had tried to cheat, the math wouldn't match.{% endif %}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+        <div class="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                FAQ
+            </h2>
+        </div>
+        <div class="divide-y divide-gray-100" x-data="{ open: null }">
+            {% set faqs_en = [
+                ('Does La Piazza take a cut?', 'No. Zero. Nothing. La Piazza does not touch your money. Payments happen directly between you and the ticket buyers.'),
+                ('What can I raffle?', 'Anything legal. A painting, a cake, old Lego sets, a guitar lesson, a basket of local wine.'),
+                ('What if nobody buys tickets?', 'Cancel anytime before the draw. No tickets sold = nothing to refund.'),
+                ('Can the organizer rig the draw?', 'No. The draw uses provably fair cryptography. After the draw, a seed is published that anyone can verify. The math doesn\'t lie.'),
+                ('What if I win but the prize never arrives?', 'Leave a negative verification. This blocks the organizer from running bigger raffles. Other buyers will see the warning before buying tickets.'),
+                ('Is this gambling?', 'La Piazza is a listing platform. We don\'t organize or profit from raffles. Whether a specific raffle is \"gambling\" depends on your local laws. Our EUR 320 max keeps everything at community scale.'),
+                ('What\'s the difference between a raffle and an auction?', 'In an auction, the richest person wins. In a raffle, a EUR 2 ticket gives everyone the same chance.'),
+                ('What if the organizer disappears?', 'If no action is taken within 6 days of the draw date, the raffle auto-cancels and everyone is notified.'),
+            ] %}
+            {% set faqs_it = [
+                ('La Piazza prende una commissione?', 'No. Zero. Niente. La Piazza non tocca i tuoi soldi. I pagamenti avvengono direttamente tra te e gli acquirenti dei biglietti.'),
+                ('Cosa posso sorteggiare?', 'Qualsiasi cosa legale. Un quadro, una torta, vecchi Lego, una lezione di chitarra, un cesto di vino locale.'),
+                ('Se nessuno compra biglietti?', 'Cancella quando vuoi prima dell\'estrazione. Nessun biglietto venduto = niente da rimborsare.'),
+                ('L\'organizzatore può truccare l\'estrazione?', 'No. L\'estrazione usa crittografia verificabile. Dopo il sorteggio, viene pubblicato un codice che chiunque può verificare. La matematica non mente.'),
+                ('Se vinco ma il premio non arriva?', 'Lascia una verifica negativa. L\'organizzatore non potrà fare sorteggi più grandi. Gli altri vedranno l\'avviso prima di comprare biglietti.'),
+                ('Questo è gioco d\'azzardo?', 'La Piazza è una piattaforma di annunci. Non organizziamo né guadagniamo dai sorteggi. Il limite di EUR 320 tiene tutto a scala comunitaria.'),
+                ('Che differenza c\'è tra sorteggio e asta?', 'All\'asta vince chi ha più soldi. Al sorteggio, un biglietto da EUR 2 dà a tutti la stessa possibilità.'),
+                ('Se l\'organizzatore sparisce?', 'Se non fa nulla entro 6 giorni dalla data di estrazione, il sorteggio si cancella automaticamente e tutti vengono avvisati.'),
+            ] %}
+            {% for q, a in (faqs_it if lang == 'it' else faqs_en) %}
+            <button @click="open = open === {{ loop.index }} ? null : {{ loop.index }}" class="w-full text-left px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                <span class="font-medium text-gray-900 text-sm pr-4">{{ q }}</span>
+                <svg class="w-5 h-5 text-gray-400 flex-shrink-0 transition-transform" :class="open === {{ loop.index }} && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div x-show="open === {{ loop.index }}" x-collapse x-cloak class="px-6 pb-4 text-sm text-gray-600">
+                {{ a }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Quick Reference -->
+    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-200 p-6 mb-8">
+        <h3 class="font-bold text-gray-900 mb-3">{% if lang == 'it' %}Riferimento Rapido{% else %}Quick Reference{% endif %}</h3>
+        <div class="grid grid-cols-2 gap-3 text-sm">
+            {% set refs = [
+                ('Min ticket price|Prezzo min biglietto', 'EUR 0.10'),
+                ('Max raffle value|Valore max sorteggio', 'EUR 320'),
+                ('Min duration|Durata minima', '24h'),
+                ('Max duration|Durata massima', '30 days|30 giorni'),
+                ('Ticket hold|Tempo biglietto', '48h'),
+                ('Verification threshold|Soglia verifica', '80%'),
+                ('Platform fee|Commissione', 'EUR 0.00 ♾️'),
+            ] %}
+            {% for labels, values in refs %}
+            {% set lbl = labels.split('|') %}
+            {% set val = values.split('|') %}
+            <div class="flex justify-between bg-white rounded-lg px-3 py-2 border border-gray-100">
+                <span class="text-gray-600">{{ lbl[1] if lang == 'it' and lbl|length > 1 else lbl[0] }}</span>
+                <span class="font-semibold text-gray-900">{{ val[1] if lang == 'it' and val|length > 1 else val[0] }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mt-10">
+        <p class="text-gray-500 text-sm mb-4 italic">
+            {% if lang == 'it' %}"Invece di comprare biglietti della lotteria e perdere con un'azienda, compra biglietti del sorteggio e sostieni la tua community."{% else %}"Instead of buying lottery tickets and losing to a company, buy raffle tickets and support your community."{% endif %}
+        </p>
+        <div class="flex flex-wrap justify-center gap-3">
+            <a href="/raffles" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
+                {% if lang == 'it' %}Sfoglia Sorteggi{% else %}Browse Raffles{% endif %}
+            </a>
+            {% if user %}
+            <a href="/list?type=raffle" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-indigo-600 font-semibold rounded-lg border border-indigo-200 hover:bg-indigo-50 transition-colors">
+                {% if lang == 'it' %}Crea un Sorteggio{% else %}Create a Raffle{% endif %}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

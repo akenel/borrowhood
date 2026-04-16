@@ -1406,6 +1406,14 @@ async def demo_login_page(
     return _render("pages/demo_login.html", ctx)
 
 
+@router.get("/raffles/guide", response_class=HTMLResponse)
+async def raffle_guide(request: Request,
+                       token: Optional[dict] = Depends(get_current_user_token)):
+    """Raffle guide page — how raffles work, trust tiers, FAQ."""
+    ctx = _ctx(request, token)
+    return _render("pages/raffle_guide.html", ctx)
+
+
 @router.get("/chat", response_class=HTMLResponse)
 async def chat_page(request: Request,
                     token: Optional[dict] = Depends(get_current_user_token)):
