@@ -21,8 +21,11 @@ from sqlalchemy.orm import selectinload
 
 from src.database import async_session
 from src.models.raffle import (
-    BHRaffle, BHRaffleTicket,
+    BHRaffle, BHRaffleTicket, BHRaffleVerification,
     DRAW_BUFFER_DAYS, ORGANIZER_INACTION_DAYS,
+    POINTS_RAFFLE_ORGANIZER_COMPLETE, POINTS_RAFFLE_ORGANIZER_VERIFIED,
+    POINTS_RAFFLE_TICKET_PURCHASE, POINTS_RAFFLE_WINNER,
+    POINTS_RAFFLE_VERIFICATION, VERIFICATION_CLEAN_THRESHOLD,
     RaffleDrawType, RaffleStatus, RaffleTicketStatus,
     max_raffle_value_for,
 )
@@ -296,3 +299,107 @@ async def run_raffle_expiry_loop():
         except Exception as e:
             logger.error("Raffle expiry error: %s", e, exc_info=True)
         await asyncio.sleep(EXPIRY_INTERVAL_SECONDS)
+
+
+# ── Gamification: points + verification ───────────────────────────────
+
+async def _award_points(db: AsyncSession, user_id, points: int):
+    """Add points to a user's total. Creates BHUserPoints row if missing."""
+    from src.models.user import BHUserPoints
+    pts = await db.scalar(
+        select(BHUserPoints).where(BHUserPoints.user_id == user_id)
+    )
+    if not pts:
+        pts = BHUserPoints(user_id=user_id, total_points=0)
+        db.add(pts)
+    pts.total_points = (pts.total_points or 0) + points
+
+
+async def award_ticket_purchase_points(db: AsyncSession, user_id):
+    """Buyer earns points when their ticket is confirmed."""
+    await _award_points(db, user_id, POINTS_RAFFLE_TICKET_PURCHASE)
+
+
+async def award_draw_points(db: AsyncSession, raffle: BHRaffle):
+    """Award points on draw: organizer + winner."""
+    await _award_points(db, raffle.organizer_id, POINTS_RAFFLE_ORGANIZER_COMPLETE)
+    if raffle.winner_user_id:
+        await _award_points(db, raffle.winner_user_id, POINTS_RAFFLE_WINNER)
+
+
+async def submit_verification(
+    db: AsyncSession,
+    raffle: BHRaffle,
+    user_id,
+    is_fair: bool,
+    prize_delivered: Optional[bool] = None,
+    comment: Optional[str] = None,
+) -> dict:
+    """Ticket holder verifies the raffle was fair. Returns verification stats."""
+    # Check user had a confirmed ticket
+    had_ticket = await db.scalar(
+        select(BHRaffleTicket.id)
+        .where(BHRaffleTicket.raffle_id == raffle.id)
+        .where(BHRaffleTicket.user_id == user_id)
+        .where(BHRaffleTicket.status == RaffleTicketStatus.CONFIRMED)
+    )
+    if not had_ticket:
+        return {"error": "Only confirmed ticket holders can verify"}
+
+    # Check not already verified
+    existing = await db.scalar(
+        select(BHRaffleVerification.id)
+        .where(BHRaffleVerification.raffle_id == raffle.id)
+        .where(BHRaffleVerification.user_id == user_id)
+    )
+    if existing:
+        return {"error": "Already verified this raffle"}
+
+    # Save verification
+    v = BHRaffleVerification(
+        raffle_id=raffle.id,
+        user_id=user_id,
+        is_fair=is_fair,
+        prize_delivered=prize_delivered,
+        comment=comment,
+    )
+    db.add(v)
+
+    # Update cached counts
+    if is_fair:
+        raffle.verifications_positive = (raffle.verifications_positive or 0) + 1
+    else:
+        raffle.verifications_negative = (raffle.verifications_negative or 0) + 1
+
+    # Award points for submitting a verification (positive or negative)
+    await _award_points(db, user_id, POINTS_RAFFLE_VERIFICATION)
+
+    # Check if organizer earns the verified bonus (80%+ positive)
+    total_v = (raffle.verifications_positive or 0) + (raffle.verifications_negative or 0)
+    if total_v >= 2 and raffle.verification_rate >= VERIFICATION_CLEAN_THRESHOLD * 100:
+        # Only award once — check if already awarded by looking at points history
+        # Simple approach: award on crossing the threshold for the first time
+        if total_v == 2 or (total_v > 2 and raffle.verifications_positive == int(total_v * VERIFICATION_CLEAN_THRESHOLD)):
+            await _award_points(db, raffle.organizer_id, POINTS_RAFFLE_ORGANIZER_VERIFIED)
+            logger.info("Organizer %s earned verified bonus for raffle %s", raffle.organizer_id, raffle.id)
+
+    await db.flush()
+
+    return {
+        "status": "verified",
+        "is_fair": is_fair,
+        "raffle_verification_rate": raffle.verification_rate,
+        "verifications_positive": raffle.verifications_positive,
+        "verifications_negative": raffle.verifications_negative,
+        "points_earned": POINTS_RAFFLE_VERIFICATION,
+    }
+
+
+def is_cleanly_completed(raffle: BHRaffle) -> bool:
+    """Does this raffle count as 'completed cleanly' for trust tier progression?"""
+    if raffle.status != RaffleStatus.COMPLETED:
+        return False
+    total = (raffle.verifications_positive or 0) + (raffle.verifications_negative or 0)
+    if total < 1:
+        return True  # No verifications yet — benefit of the doubt
+    return raffle.verification_rate >= VERIFICATION_CLEAN_THRESHOLD * 100

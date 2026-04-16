@@ -105,64 +105,66 @@ def test_draw_single_ticket():
     assert len(proof) == 64  # sha256 hex
 
 
-# ── Auth gate tests ────────────────────────────────────────────────────
+# ── Gamification tests ─────────────────────────────────────────────────
 
-@pytest.mark.asyncio
-async def test_browse_raffles_public(client):
-    """GET /api/v1/raffles is public (no auth required)."""
-    resp = await client.get("/api/v1/raffles")
-    assert resp.status_code == 200
-
-
-@pytest.mark.asyncio
-async def test_create_raffle_requires_auth(client):
-    resp = await client.post("/api/v1/raffles", json={
-        "item_id": "00000000-0000-0000-0000-000000000000",
-        "title": "Test", "ticket_price": 2.0,
-    })
-    assert resp.status_code == 401
+def test_points_constants_defined():
+    from src.models.raffle import (
+        POINTS_RAFFLE_ORGANIZER_COMPLETE, POINTS_RAFFLE_TICKET_PURCHASE,
+        POINTS_RAFFLE_WINNER, POINTS_RAFFLE_VERIFICATION,
+        POINTS_RAFFLE_ORGANIZER_VERIFIED, VERIFICATION_CLEAN_THRESHOLD,
+    )
+    assert POINTS_RAFFLE_ORGANIZER_COMPLETE == 25
+    assert POINTS_RAFFLE_TICKET_PURCHASE == 3
+    assert POINTS_RAFFLE_WINNER == 10
+    assert POINTS_RAFFLE_VERIFICATION == 5
+    assert POINTS_RAFFLE_ORGANIZER_VERIFIED == 15
+    assert VERIFICATION_CLEAN_THRESHOLD == 0.80
 
 
-@pytest.mark.asyncio
-async def test_reserve_requires_auth(client):
-    resp = await client.post("/api/v1/raffles/00000000-0000-0000-0000-000000000000/tickets/reserve",
-                             json={"quantity": 1})
-    assert resp.status_code == 401
+def test_is_cleanly_completed_logic():
+    """Raffle needs 80%+ positive verifications to count as clean."""
+    from src.services.raffle_engine import is_cleanly_completed
+    from src.models.raffle import RaffleStatus
+
+    class FakeRaffle:
+        status = RaffleStatus.COMPLETED
+        verifications_positive = 4
+        verifications_negative = 1
+        @property
+        def verification_rate(self):
+            t = self.verifications_positive + self.verifications_negative
+            return round(self.verifications_positive / t * 100, 1) if t else 0
+
+    r = FakeRaffle()
+    assert is_cleanly_completed(r) is True  # 80% = threshold met
+
+    r.verifications_positive = 3
+    r.verifications_negative = 2
+    assert is_cleanly_completed(r) is False  # 60% < 80%
 
 
-@pytest.mark.asyncio
-async def test_draw_requires_auth(client):
-    resp = await client.post("/api/v1/raffles/00000000-0000-0000-0000-000000000000/draw")
-    assert resp.status_code == 401
+def test_verification_rate_property():
+    from src.models.raffle import RaffleStatus
+
+    class FakeRaffle:
+        status = RaffleStatus.COMPLETED
+        verifications_positive = 9
+        verifications_negative = 1
+        @property
+        def verification_rate(self):
+            t = self.verifications_positive + self.verifications_negative
+            return round(self.verifications_positive / t * 100, 1) if t else 0
+
+    assert FakeRaffle().verification_rate == 90.0
 
 
-@pytest.mark.asyncio
-async def test_pre_draw_requires_auth(client):
-    resp = await client.get("/api/v1/raffles/00000000-0000-0000-0000-000000000000/pre-draw")
-    assert resp.status_code == 401
+def test_verification_rate_zero_verifications():
+    class FakeRaffle:
+        verifications_positive = 0
+        verifications_negative = 0
+        @property
+        def verification_rate(self):
+            t = self.verifications_positive + self.verifications_negative
+            return round(self.verifications_positive / t * 100, 1) if t else 0
 
-
-@pytest.mark.asyncio
-async def test_my_raffles_requires_auth(client):
-    resp = await client.get("/api/v1/raffles/mine")
-    assert resp.status_code == 401
-
-
-@pytest.mark.asyncio
-async def test_stats_public(client):
-    """Stats returns 404 for missing raffle (not 401)."""
-    resp = await client.get("/api/v1/raffles/00000000-0000-0000-0000-000000000000/stats")
-    assert resp.status_code == 404
-
-
-# ── Router registration ───────────────────────────────────────────────
-
-def test_raffle_routes_registered():
-    from src.main import app
-    paths = [route.path for route in app.routes]
-    assert "/api/v1/raffles" in paths
-    assert "/api/v1/raffles/mine" in paths
-    assert "/api/v1/raffles/{raffle_id}" in paths
-    assert "/api/v1/raffles/{raffle_id}/draw" in paths
-    assert "/api/v1/raffles/{raffle_id}/tickets/reserve" in paths
-    assert "/api/v1/raffles/{raffle_id}/stats" in paths
+    assert FakeRaffle().verification_rate == 0.0

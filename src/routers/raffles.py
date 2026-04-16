@@ -40,8 +40,9 @@ from src.models.raffle import (
     RaffleDelivery, RaffleDrawType, RaffleStatus, RaffleTicketStatus,
 )
 from src.services.raffle_engine import (
+    award_draw_points, award_ticket_purchase_points,
     completed_raffle_count, execute_draw, max_raffle_value_for,
-    pre_draw_check, raffle_stats, validate_raffle_value,
+    pre_draw_check, raffle_stats, submit_verification, validate_raffle_value,
 )
 
 router = APIRouter(prefix="/api/v1/raffles", tags=["raffles"])
@@ -482,6 +483,9 @@ async def confirm_ticket(
     raffle.tickets_reserved = max(0, (raffle.tickets_reserved or 0) - ticket.quantity)
     raffle.tickets_sold = (raffle.tickets_sold or 0) + ticket.quantity
 
+    # Gamification: buyer earns points for confirmed ticket
+    await award_ticket_purchase_points(db, ticket.user_id)
+
     await db.commit()
     return {"ticket_id": str(ticket.id), "status": "confirmed"}
 
@@ -622,6 +626,9 @@ async def draw_raffle(
     if "error" in result:
         raise HTTPException(status_code=400, detail=result["error"])
 
+    # Gamification: organizer + winner earn points on draw
+    await award_draw_points(db, raffle)
+
     await db.commit()
     return result
 
@@ -687,3 +694,80 @@ async def get_stats(
     if raffle.status == RaffleStatus.DRAFT:
         raise HTTPException(status_code=404, detail="Raffle not found")
     return await raffle_stats(db, raffle)
+
+
+# ── Community verification ────────────────────────────────────────────
+
+
+class VerificationSubmit(BaseModel):
+    is_fair: bool
+    prize_delivered: Optional[bool] = None
+    comment: Optional[str] = Field(default=None, max_length=500)
+
+
+@router.post("/{raffle_id}/verify")
+async def verify_raffle(
+    raffle_id: UUID,
+    data: VerificationSubmit,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Ticket holder verifies: was this raffle fair? Prize delivered?
+
+    Awards points to the verifier. If 80%+ say 'fair', organizer earns
+    a trust bonus and the raffle counts as 'completed cleanly' for
+    progressive tier unlocks.
+    """
+    user = await get_user(db, token)
+    raffle = await _get_raffle(db, raffle_id)
+
+    if raffle.status not in (RaffleStatus.DRAWN, RaffleStatus.COMPLETED):
+        raise HTTPException(status_code=400, detail="Raffle must be drawn before verification")
+
+    result = await submit_verification(
+        db, raffle, user.id,
+        is_fair=data.is_fair,
+        prize_delivered=data.prize_delivered,
+        comment=data.comment,
+    )
+    if "error" in result:
+        raise HTTPException(status_code=400, detail=result["error"])
+
+    await db.commit()
+    return result
+
+
+@router.get("/{raffle_id}/verifications")
+async def get_verifications(
+    raffle_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    token: Optional[dict] = Depends(get_current_user_token),
+):
+    """View all verifications for a raffle. Public after draw."""
+    from src.models.raffle import BHRaffleVerification
+    raffle = await _get_raffle(db, raffle_id)
+    if raffle.status not in (RaffleStatus.DRAWN, RaffleStatus.COMPLETED):
+        raise HTTPException(status_code=400, detail="Not drawn yet")
+
+    verifications = (await db.execute(
+        select(BHRaffleVerification)
+        .options(selectinload(BHRaffleVerification.user))
+        .where(BHRaffleVerification.raffle_id == raffle.id)
+        .order_by(BHRaffleVerification.created_at.desc())
+    )).scalars().all()
+
+    return {
+        "verification_rate": raffle.verification_rate,
+        "positive": raffle.verifications_positive,
+        "negative": raffle.verifications_negative,
+        "verifications": [
+            {
+                "user_name": v.user.display_name if v.user else "Unknown",
+                "is_fair": v.is_fair,
+                "prize_delivered": v.prize_delivered,
+                "comment": v.comment,
+                "created_at": v.created_at.isoformat(),
+            }
+            for v in verifications
+        ],
+    }

@@ -147,10 +147,18 @@ class BHRaffle(BHBase, Base):
     tos_accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
 
     # Relationships
+    # Verification stats (cached, rebuilt from BHRaffleVerification)
+    verifications_positive: Mapped[int] = mapped_column(Integer, default=0)
+    verifications_negative: Mapped[int] = mapped_column(Integer, default=0)
+
+    # Relationships
     listing: Mapped["BHListing"] = relationship()
     organizer: Mapped["BHUser"] = relationship(foreign_keys=[organizer_id])
     winner: Mapped[Optional["BHUser"]] = relationship(foreign_keys=[winner_user_id])
     tickets: Mapped[list["BHRaffleTicket"]] = relationship(
+        back_populates="raffle", cascade="all, delete-orphan"
+    )
+    verifications: Mapped[list["BHRaffleVerification"]] = relationship(
         back_populates="raffle", cascade="all, delete-orphan"
     )
 
@@ -164,6 +172,13 @@ class BHRaffle(BHBase, Base):
             name="ck_raffle_draw_trigger_required",
         ),
     )
+
+    @property
+    def verification_rate(self) -> float:
+        total = self.verifications_positive + self.verifications_negative
+        if total == 0:
+            return 0.0
+        return round(self.verifications_positive / total * 100, 1)
 
 
 class BHRaffleTicket(BHBase, Base):
@@ -197,3 +212,45 @@ class BHRaffleTicket(BHBase, Base):
     __table_args__ = (
         CheckConstraint("quantity >= 1", name="ck_ticket_min_quantity"),
     )
+
+
+class BHRaffleVerification(BHBase, Base):
+    """Post-draw community verification: was this raffle fair?
+
+    Every confirmed ticket holder can verify once. Their vote feeds
+    into the organizer's trust profile and determines whether the
+    raffle counts as "completed cleanly" for progressive tier unlocks.
+    """
+
+    __tablename__ = "bh_raffle_verification"
+
+    raffle_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_raffle.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_user.id"), nullable=False, index=True,
+    )
+
+    # The vote
+    is_fair: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    prize_delivered: Mapped[Optional[bool]] = mapped_column(Boolean)
+    comment: Mapped[Optional[str]] = mapped_column(String(500))
+
+    # Relationships
+    raffle: Mapped["BHRaffle"] = relationship(back_populates="verifications")
+    user: Mapped["BHUser"] = relationship()
+
+    __table_args__ = (
+        UniqueConstraint("raffle_id", "user_id", name="uq_raffle_verification_per_user"),
+    )
+
+
+# ── Points awards ──────────────────────────────────────────────────────
+
+POINTS_RAFFLE_ORGANIZER_COMPLETE = 25      # Organizer ran a clean raffle
+POINTS_RAFFLE_ORGANIZER_VERIFIED = 15      # Bonus when 80%+ positive verifications
+POINTS_RAFFLE_TICKET_PURCHASE = 3          # Buyer confirmed ticket
+POINTS_RAFFLE_WINNER = 10                  # Winner bonus
+POINTS_RAFFLE_VERIFICATION = 5             # Participant submitted a verification
+VERIFICATION_CLEAN_THRESHOLD = 0.80        # 80% positive = "completed cleanly"
