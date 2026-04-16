@@ -119,6 +119,9 @@ async def run_migrations():
         "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS featured_video_url VARCHAR(500)",
         # 2026-04-17: Raffle vouch privilege (admin-granted, not from badge tier)
         "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS can_vouch_raffles BOOLEAN DEFAULT FALSE",
+        # 2026-04-17: Raffle gamification columns (added after initial table creation)
+        "ALTER TABLE bh_raffle ADD COLUMN IF NOT EXISTS verifications_positive INTEGER DEFAULT 0",
+        "ALTER TABLE bh_raffle ADD COLUMN IF NOT EXISTS verifications_negative INTEGER DEFAULT 0",
     ]
     # ALTER TYPE ... ADD VALUE -- SQLAlchemy uses enum .name (UPPERCASE) for PG enums
     enum_migrations = [
