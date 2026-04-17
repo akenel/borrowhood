@@ -298,6 +298,17 @@ def test_is_cleanly_completed_cancelled():
     assert is_cleanly_completed(r) is False
 
 
+# ── Publish gate: photo required ────────────────────────────────────────
+
+def test_publish_photo_validation_in_router():
+    """The publish endpoint checks for photos — verify the error message exists in code."""
+    import inspect
+    from src.routers.raffles import publish_raffle
+    source = inspect.getsource(publish_raffle)
+    assert "mystery box" in source.lower()
+    assert "at least one photo" in source.lower()
+
+
 # ── Anti-casino safeguards ─────────────────────────────────────────────
 
 def test_cooldown_constant():

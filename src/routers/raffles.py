@@ -384,6 +384,17 @@ async def publish_raffle(
     if not ok:
         raise HTTPException(status_code=429, detail=msg)
 
+    # Prize must have at least one photo — no mystery boxes
+    item = raffle.listing.item if raffle.listing else None
+    has_photo = False
+    if item and hasattr(item, 'media') and item.media:
+        has_photo = any(m for m in item.media if not m.deleted_at)
+    if not has_photo:
+        raise HTTPException(
+            status_code=400,
+            detail="Add at least one photo of your prize before publishing. No one buys tickets for a mystery box."
+        )
+
     # Validate completeness
     if not raffle.draw_date and not raffle.max_tickets:
         raise HTTPException(status_code=400, detail="Set either a draw date or max tickets before publishing")
