@@ -445,6 +445,17 @@ async def item_detail(slug: str, request: Request,
         ctx = _ctx(request, token)
         return _render("errors/404.html", ctx, status_code=404)
 
+    # Raffle items redirect to the raffle detail page
+    if item.listings:
+        for listing in item.listings:
+            if listing.listing_type == ListingType.RAFFLE and not listing.deleted_at:
+                from src.models.raffle import BHRaffle
+                raffle = await db.scalar(
+                    select(BHRaffle).where(BHRaffle.listing_id == listing.id)
+                )
+                if raffle:
+                    return RedirectResponse(url=f"/raffles/{raffle.id}", status_code=302)
+
     # Resolve viewer's badge tier for progressive disclosure
     viewer_tier = "anonymous"
     if token:
@@ -1404,6 +1415,66 @@ async def demo_login_page(
 
     ctx = _ctx(request, token, demo_users=demo_users)
     return _render("pages/demo_login.html", ctx)
+
+
+@router.get("/raffles", response_class=HTMLResponse)
+async def raffles_page(request: Request,
+                       token: Optional[dict] = Depends(get_current_user_token)):
+    """Raffle browse page."""
+    ctx = _ctx(request, token)
+    return _render("pages/raffles.html", ctx)
+
+
+@router.get("/raffles/create", response_class=HTMLResponse)
+async def raffle_create_page(request: Request,
+                             token: Optional[dict] = Depends(get_current_user_token)):
+    """Raffle creation form. Requires login."""
+    if not token:
+        return RedirectResponse(url="/login", status_code=302)
+    ctx = _ctx(request, token)
+    return _render("pages/raffle_create.html", ctx)
+
+
+@router.get("/raffles/guide", response_class=HTMLResponse)
+async def raffle_guide(request: Request,
+                       token: Optional[dict] = Depends(get_current_user_token)):
+    """Raffle guide page — how raffles work, trust tiers, FAQ."""
+    ctx = _ctx(request, token)
+    return _render("pages/raffle_guide.html", ctx)
+
+
+@router.get("/raffles/{raffle_id}", response_class=HTMLResponse)
+async def raffle_detail_page(raffle_id: str, request: Request,
+                             db: AsyncSession = Depends(get_db),
+                             token: Optional[dict] = Depends(get_current_user_token)):
+    """Raffle detail page with ticket purchase, stats, draw result."""
+    from uuid import UUID as PyUUID
+    from src.models.raffle import BHRaffle
+    from sqlalchemy.orm import selectinload
+    from src.models.listing import BHListing
+    from src.models.item import BHItem
+
+    try:
+        rid = PyUUID(raffle_id)
+    except ValueError:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Invalid raffle ID")
+
+    raffle = await db.scalar(
+        select(BHRaffle)
+        .options(
+            selectinload(BHRaffle.listing).selectinload(BHListing.item).selectinload(BHItem.media),
+            selectinload(BHRaffle.organizer),
+        )
+        .where(BHRaffle.id == rid)
+        .where(BHRaffle.deleted_at.is_(None))
+    )
+    if not raffle:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Raffle not found")
+
+    ctx = _ctx(request, token, raffle=raffle)
+    return _render("pages/raffle_detail.html", ctx)
 
 
 @router.get("/chat", response_class=HTMLResponse)

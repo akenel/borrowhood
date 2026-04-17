@@ -105,6 +105,7 @@ def pytest_collection_modifyitems(items):
         "test_api_badges.py",
         "test_api_bids.py",
         "test_api_edge_cases.py",
+        "test_raffles_api.py",
     }
 
     skip_marker = pytest.mark.skip(reason="Database not reachable -- skipping DB-dependent test")

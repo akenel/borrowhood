@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('app.name') }} - {% if lang == 'it' %}Sorteggi{% else %}Raffles{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8" x-data="rafflesApp()" x-init="load()">
+
+    <!-- Hero banner -->
+    <div class="relative overflow-hidden bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-2xl p-8 sm:p-12 mb-8 text-white">
+        <div class="absolute -top-16 -right-16 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-yellow-300/10 rounded-full blur-3xl"></div>
+        <div class="relative">
+            <div class="flex items-center gap-3 mb-3">
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+                </span>
+                <span class="text-xs font-bold uppercase tracking-widest text-white/80">{% if lang == 'it' %}Sorteggi Comunitari{% else %}Community Raffles{% endif %}</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+                {% if lang == 'it' %}Vinci. Sostieni. Condividi.{% else %}Win. Support. Share.{% endif %}
+            </h1>
+            <p class="mt-3 text-base sm:text-lg text-white/90 max-w-xl">
+                {% if lang == 'it' %}Compra un biglietto da EUR 2 e potresti vincere il premio. Tutti i proventi restano nella community. Zero commissioni.{% else %}Buy a EUR 2 ticket and you might win the prize. All proceeds stay in the community. Zero fees.{% endif %}
+            </p>
+            <div class="mt-6 flex flex-wrap gap-3">
+                {% if user %}
+                <a href="/raffles/create" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-orange-600 font-bold rounded-xl hover:bg-orange-50 shadow-lg transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                    {% if lang == 'it' %}Crea Sorteggio{% else %}Create Raffle{% endif %}
+                </a>
+                {% endif %}
+                <a href="/raffles/guide" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white/15 text-white font-semibold rounded-xl hover:bg-white/25 backdrop-blur-sm border border-white/20 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
+                    {% if lang == 'it' %}Come funziona{% else %}How it works{% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search + filter bar -->
+    <div class="space-y-3 mb-6">
+        <!-- Search -->
+        <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M10 18a8 8 0 110-16 8 8 0 010 16z"/></svg>
+            <input type="text" x-model="search" @input.debounce.300ms="filterResults()"
+                   class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                   placeholder="{% if lang == 'it' %}Cerca sorteggi o organizzatori...{% else %}Search raffles or organizers...{% endif %}">
+        </div>
+        <!-- Pills + sort -->
+        <div class="flex flex-wrap items-center gap-2">
+            <button @click="filter = 'all'; load()" :class="filter === 'all' ? 'bg-gray-900 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'" class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors">
+                {% if lang == 'it' %}Tutti{% else %}All{% endif %}
+            </button>
+            <button @click="filter = 'active'; load()" :class="filter === 'active' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'" class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors">
+                {% if lang == 'it' %}Attivi{% else %}Active{% endif %}
+            </button>
+            <button @click="filter = 'published'; load()" :class="filter === 'published' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'" class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors">
+                {% if lang == 'it' %}Nuovi{% else %}New{% endif %}
+            </button>
+            <button @click="filter = 'drawn'; load()" :class="filter === 'drawn' ? 'bg-purple-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'" class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors">
+                {% if lang == 'it' %}Estratti{% else %}Drawn{% endif %}
+            </button>
+            <div class="ml-auto flex items-center gap-2">
+                <select x-model="sortBy" @change="filterResults()" class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 focus:ring-amber-500">
+                    <option value="ending_soon">{% if lang == 'it' %}Scade prima{% else %}Ending soon{% endif %}</option>
+                    <option value="most_sold">{% if lang == 'it' %}Più venduti{% else %}Most sold{% endif %}</option>
+                    <option value="cheapest">{% if lang == 'it' %}Più economici{% else %}Cheapest{% endif %}</option>
+                    <option value="newest">{% if lang == 'it' %}Più recenti{% else %}Newest{% endif %}</option>
+                </select>
+                <span class="text-xs text-gray-400" x-text="filtered.length + ' {% if lang == 'it' %}sorteggi{% else %}raffles{% endif %}'"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div x-show="loading" class="flex justify-center py-16">
+        <div class="w-8 h-8 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin"></div>
+    </div>
+
+    <!-- Empty state -->
+    <div x-show="!loading && filtered.length === 0" x-cloak class="text-center py-16">
+        <div class="w-20 h-20 mx-auto mb-4 bg-amber-100 rounded-full flex items-center justify-center">
+            <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900">{% if lang == 'it' %}Nessun sorteggio ancora{% else %}No raffles yet{% endif %}</h3>
+        <p class="text-gray-500 mt-1">{% if lang == 'it' %}Sii il primo a creare un sorteggio per la community!{% else %}Be the first to create a raffle for the community!{% endif %}</p>
+    </div>
+
+    <!-- Raffle cards grid — 2 columns for bigger, richer cards -->
+    <div x-show="!loading && filtered.length > 0" x-cloak class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <template x-for="r in filtered" :key="r.id">
+            <div class="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300"
+                 :class="r.stats && r.stats.percent_sold >= 80 ? 'ring-2 ring-amber-300 hover:ring-red-300' : 'hover:border-amber-300'">
+
+                <!-- Image — taller for impact -->
+                <a :href="'/raffles/' + r.id" class="block relative h-52 sm:h-56 overflow-hidden"
+                   :class="{
+                       'bg-gradient-to-br from-amber-400 via-orange-400 to-red-400': !r.image && r.stats && r.stats.percent_sold >= 80,
+                       'bg-gradient-to-br from-amber-300 via-orange-300 to-yellow-300': !r.image && r.stats && r.stats.percent_sold >= 40 && r.stats.percent_sold < 80,
+                       'bg-gradient-to-br from-emerald-300 via-teal-300 to-cyan-300': !r.image && (!r.stats || r.stats.percent_sold < 40),
+                       'bg-gradient-to-br from-gray-300 to-gray-400': !r.image && (r.status === 'completed' || r.status === 'cancelled'),
+                       'bg-gray-100': r.image,
+                   }">
+                    <img x-show="r.image" :src="r.image" :alt="r.title"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                    <div x-show="!r.image" class="absolute inset-0 flex items-center justify-center">
+                        <svg class="w-24 h-24 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.8"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
+                    </div>
+                    <!-- Price pill -->
+                    <div class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2 shadow-lg">
+                        <span class="text-2xl font-extrabold text-gray-900">&euro;<span x-text="r.ticket_price.toFixed(2)"></span></span>
+                        <span class="text-[10px] text-gray-500 block text-center">{% if lang == 'it' %}biglietto{% else %}ticket{% endif %}</span>
+                    </div>
+                    <!-- Status -->
+                    <div class="absolute top-3 left-3">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg backdrop-blur-sm"
+                              :class="{'bg-emerald-500/90 text-white': r.status==='active', 'bg-blue-500/90 text-white': r.status==='published', 'bg-purple-500/90 text-white': r.status==='drawn', 'bg-gray-600/90 text-white': r.status==='completed', 'bg-red-500/90 text-white': r.status==='cancelled'}">
+                            <span class="w-2 h-2 rounded-full bg-white/80" :class="r.status==='active' && 'animate-pulse'"></span>
+                            <span x-text="r.status"></span>
+                        </span>
+                    </div>
+                    <!-- SOLD OUT stamp -->
+                    <template x-if="r.stats && r.stats.percent_sold >= 100">
+                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <span class="text-white text-3xl font-black uppercase tracking-widest transform -rotate-12 border-4 border-white px-8 py-3 shadow-2xl">SOLD OUT</span>
+                        </div>
+                    </template>
+                </a>
+
+                <!-- Content -->
+                <div class="p-5">
+                    <!-- Title -->
+                    <a :href="'/raffles/' + r.id">
+                        <h3 class="text-lg font-bold text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2 leading-snug" x-text="r.title"></h3>
+                    </a>
+
+                    <!-- Description preview -->
+                    <p class="text-sm text-gray-500 mt-1.5 line-clamp-2" x-text="r.description || ''"></p>
+
+                    <!-- Progress bar -->
+                    <template x-if="r.stats && r.stats.total_tickets">
+                        <div class="mt-4">
+                            <div class="relative h-3 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
+                                     :class="r.stats.percent_sold >= 80 ? 'bg-gradient-to-r from-amber-400 to-red-500' : r.stats.percent_sold >= 50 ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-gradient-to-r from-emerald-400 to-emerald-500'"
+                                     :style="'width: ' + Math.min(r.stats.percent_sold, 100) + '%'"></div>
+                            </div>
+                            <div class="flex items-center justify-between mt-2 text-xs">
+                                <span class="text-gray-500"><span class="font-bold text-gray-900" x-text="r.stats.tickets_confirmed"></span> / <span x-text="r.stats.total_tickets"></span> {% if lang == 'it' %}venduti{% else %}sold{% endif %}</span>
+                                <span x-show="r.stats.percent_sold >= 80 && r.stats.percent_sold < 100" class="text-red-600 font-bold animate-pulse">&#128293; {% if lang == 'it' %}Quasi esaurito!{% else %}Almost gone!{% endif %}</span>
+                                <span x-show="r.stats.percent_sold < 80" class="font-semibold text-gray-600" x-text="r.stats.percent_sold + '%'"></span>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Countdown -->
+                    <template x-if="r.stats && r.stats.hours_remaining !== null && r.status !== 'drawn' && r.status !== 'completed'">
+                        <div class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-xs">
+                            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span class="text-amber-800">{% if lang == 'it' %}Estrazione tra{% else %}Draw in{% endif %}</span>
+                            <span class="font-bold text-amber-900" x-text="r.stats.hours_remaining > 24 ? Math.floor(r.stats.hours_remaining / 24) + 'd ' + Math.floor(r.stats.hours_remaining % 24) + 'h' : Math.floor(r.stats.hours_remaining) + 'h ' + Math.floor((r.stats.hours_remaining % 1) * 60) + 'm'"></span>
+                        </div>
+                    </template>
+                    <template x-if="r.status === 'drawn' || r.status === 'completed'">
+                        <div class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-purple-50 border border-purple-200 rounded-lg text-xs">
+                            <span class="text-lg">&#127942;</span>
+                            <span class="font-bold text-purple-800">{% if lang == 'it' %}Vincitore estratto{% else %}Winner drawn{% endif %}</span>
+                        </div>
+                    </template>
+
+                    <!-- Organizer + actions footer -->
+                    <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                        <!-- Organizer -->
+                        <a :href="r.organizer_slug ? '/workshop/' + r.organizer_slug : '#'" class="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity" @click.stop>
+                            <template x-if="r.organizer_avatar">
+                                <img :src="r.organizer_avatar" class="w-8 h-8 rounded-full object-cover ring-2 ring-amber-200 flex-shrink-0">
+                            </template>
+                            <template x-if="!r.organizer_avatar">
+                                <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-bold ring-2 ring-amber-200 flex-shrink-0" x-text="(r.organizer_name || '?')[0]"></div>
+                            </template>
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-gray-900 truncate" x-text="r.organizer_name || 'Organizer'"></p>
+                                <p class="text-[10px] text-gray-400">{% if lang == 'it' %}Organizzatore{% else %}Organizer{% endif %}</p>
+                            </div>
+                        </a>
+                        <!-- Action buttons -->
+                        <div class="flex items-center gap-0.5 flex-shrink-0" @click.stop>
+                            <!-- Heart / favorite -->
+                            <button class="p-2 rounded-full hover:bg-red-50 transition-colors group/heart" title="{% if lang == 'it' %}Preferito{% else %}Favorite{% endif %}">
+                                <svg class="w-5 h-5 text-gray-300 group-hover/heart:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+                            </button>
+                            <!-- Share -->
+                            <button @click="if(navigator.share){navigator.share({title:r.title,url:'https://lapiazza.app/raffles/'+r.id})}else{navigator.clipboard.writeText('https://lapiazza.app/raffles/'+r.id);window.dispatchEvent(new CustomEvent('toast',{detail:{type:'success',message:'Link copied!'}}))}"
+                                    class="p-2 rounded-full hover:bg-indigo-50 transition-colors" title="Share">
+                                <svg class="w-5 h-5 text-gray-400 hover:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                            </button>
+                            <!-- WhatsApp -->
+                            <a :href="'https://wa.me/?text=' + encodeURIComponent(r.title + ' -- https://lapiazza.app/raffles/' + r.id)"
+                               target="_blank" rel="noopener" @click.stop
+                               class="p-2 rounded-full hover:bg-green-50 transition-colors" title="WhatsApp">
+                                <svg class="w-5 h-5 text-gray-400 hover:text-[#25D366]" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            </a>
+                            <!-- Telegram -->
+                            <a :href="'https://t.me/share/url?url=' + encodeURIComponent('https://lapiazza.app/raffles/' + r.id) + '&text=' + encodeURIComponent(r.title)"
+                               target="_blank" rel="noopener" @click.stop
+                               class="p-2 rounded-full hover:bg-blue-50 transition-colors" title="Telegram">
+                                <svg class="w-5 h-5 text-gray-400 hover:text-[#0088cc]" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function rafflesApp() {
+    return {
+        raffles: [],
+        filtered: [],
+        loading: false,
+        filter: 'all',
+        search: '',
+        sortBy: 'ending_soon',
+        async load() {
+            this.loading = true;
+            try {
+                const status = this.filter === 'all' ? 'all' : this.filter;
+                const r = await fetch('/api/v1/raffles?status=' + status + '&limit=50');
+                if (r.ok) this.raffles = await r.json();
+            } catch(e) {}
+            this.filterResults();
+            this.loading = false;
+        },
+        filterResults() {
+            var q = this.search.toLowerCase().trim();
+            var results = this.raffles;
+            if (q) {
+                results = results.filter(function(r) {
+                    return (r.title || '').toLowerCase().indexOf(q) >= 0
+                        || (r.organizer_name || '').toLowerCase().indexOf(q) >= 0
+                        || (r.description || '').toLowerCase().indexOf(q) >= 0;
+                });
+            }
+            var sort = this.sortBy;
+            results = results.slice().sort(function(a, b) {
+                if (sort === 'ending_soon') {
+                    var ah = a.stats ? a.stats.hours_remaining : 9999;
+                    var bh = b.stats ? b.stats.hours_remaining : 9999;
+                    if (ah === null) ah = 9999;
+                    if (bh === null) bh = 9999;
+                    return ah - bh;
+                }
+                if (sort === 'most_sold') {
+                    var as = a.stats ? a.stats.percent_sold : 0;
+                    var bs = b.stats ? b.stats.percent_sold : 0;
+                    return bs - as;
+                }
+                if (sort === 'cheapest') return (a.ticket_price || 0) - (b.ticket_price || 0);
+                return 0;
+            });
+            this.filtered = results;
+        },
+    };
+}
+</script>
+{% endblock %}

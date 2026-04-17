@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('app.name') }} - {% if lang == 'it' %}Crea Sorteggio{% else %}Create Raffle{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8" x-data="raffleForm()" x-init="loadItems()">
+
+    <a href="/raffles" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-indigo-600 mb-4">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+        {% if lang == 'it' %}Tutti i sorteggi{% else %}All Raffles{% endif %}
+    </a>
+
+    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-5">
+            <h1 class="text-2xl font-extrabold text-white flex items-center gap-3">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
+                {% if lang == 'it' %}Nuovo Sorteggio{% else %}New Raffle{% endif %}
+            </h1>
+            <p class="text-white/80 text-sm mt-1">{% if lang == 'it' %}Metti in palio qualcosa di bello per la community.{% else %}Put up something great for the community.{% endif %}</p>
+        </div>
+
+        <div class="p-6 space-y-5">
+            <!-- Item picker -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Cosa metti in palio?{% else %}What's the prize?{% endif %} *</label>
+                <select x-model="form.item_id" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-base min-h-[48px]">
+                    <option value="">{% if lang == 'it' %}Scegli un oggetto...{% else %}Pick an item...{% endif %}</option>
+                    <template x-for="item in items" :key="item.id">
+                        <option :value="item.id" x-text="item.name"></option>
+                    </template>
+                </select>
+                <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Scegli dalla lista dei tuoi oggetti. Se non lo vedi, aggiungilo prima.{% else %}Pick from your items. If you don't see it, add it first.{% endif %}</p>
+            </div>
+
+            <!-- Ticket price + max tickets -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Prezzo biglietto (EUR){% else %}Ticket Price (EUR){% endif %} *</label>
+                    <input x-model.number="form.ticket_price" type="number" min="0.10" step="0.10" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-base min-h-[48px]" placeholder="2.00">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Max biglietti{% else %}Max Tickets{% endif %} *</label>
+                    <input x-model.number="form.max_tickets" type="number" min="1" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-base min-h-[48px]" placeholder="50">
+                </div>
+            </div>
+
+            <!-- Total value indicator -->
+            <div x-show="form.ticket_price > 0 && form.max_tickets > 0" class="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 flex items-center justify-between">
+                <span class="text-sm text-amber-800">{% if lang == 'it' %}Valore totale:{% else %}Total value:{% endif %}</span>
+                <span class="font-bold text-amber-900">&euro;<span x-text="(form.ticket_price * form.max_tickets).toFixed(2)"></span></span>
+            </div>
+
+            <!-- Max per user -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Max per persona{% else %}Max per Person{% endif %}</label>
+                <input x-model.number="form.max_tickets_per_user" type="number" min="1" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-base min-h-[48px]" placeholder="{% if lang == 'it' %}Opzionale{% else %}Optional{% endif %}">
+            </div>
+
+            <!-- Draw date -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Data estrazione{% else %}Draw Date{% endif %} *</label>
+                <input x-model="form.draw_date" type="datetime-local" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-base min-h-[48px]">
+                <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Minimo 24 ore da ora. Massimo 30 giorni.{% else %}Minimum 24h from now. Maximum 30 days.{% endif %}</p>
+            </div>
+
+            <!-- Payment instructions -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Istruzioni di pagamento{% else %}Payment Instructions{% endif %} *</label>
+                <textarea x-model="form.payment_instructions" rows="3" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-base" placeholder="{% if lang == 'it' %}Es: Pagami EUR 2 in contanti al bar, oppure PayPal: mio@email.com{% else %}E.g. Pay me EUR 2 cash at the bar, or PayPal: my@email.com{% endif %}"></textarea>
+            </div>
+
+            <!-- Payment methods -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Metodi accettati{% else %}Accepted Methods{% endif %}</label>
+                <div class="flex flex-wrap gap-2">
+                    {% for m in ['cash', 'paypal', 'bank_transfer', 'satispay', 'revolut', 'wise', 'bitcoin', 'stripe'] %}
+                    <label class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg cursor-pointer hover:bg-amber-50 hover:border-amber-200 transition-colors text-sm"
+                           :class="form.payment_methods.includes('{{ m }}') && 'bg-amber-50 border-amber-300'">
+                        <input type="checkbox" value="{{ m }}" class="rounded text-amber-500 focus:ring-amber-500"
+                               @change="$event.target.checked ? form.payment_methods.push('{{ m }}') : form.payment_methods.splice(form.payment_methods.indexOf('{{ m }}'), 1)">
+                        <span class="capitalize">{{ m | replace('_', ' ') }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Delivery -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Consegna{% else %}Delivery{% endif %}</label>
+                <select x-model="form.delivery_method" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-base min-h-[48px]">
+                    <option value="pickup">{% if lang == 'it' %}Ritiro in loco{% else %}Local pickup{% endif %}</option>
+                    <option value="shipping">{% if lang == 'it' %}Spedizione{% else %}Shipping{% endif %}</option>
+                    <option value="digital">{% if lang == 'it' %}Digitale{% else %}Digital{% endif %}</option>
+                </select>
+            </div>
+
+            <!-- TOS checkbox -->
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                <label class="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" x-model="tosAccepted" class="mt-0.5 rounded text-amber-500 focus:ring-amber-500">
+                    <span class="text-xs text-gray-600 leading-relaxed">
+                        {% if lang == 'it' %}
+                        Capisco di essere interamente responsabile per: la consegna del premio come descritto, il rispetto delle leggi locali su sorteggi e lotterie, la gestione di tutti i pagamenti al di fuori di questa piattaforma, e la comunicazione con gli acquirenti dei biglietti. <strong>Se non completo questo sorteggio (estrazione + consegna), il mio livello di fiducia sulla piattaforma sara declassato.</strong> La Piazza e solo una piattaforma di annunci e non si assume responsabilita per questo sorteggio.
+                        {% else %}
+                        I understand that I am solely responsible for: delivering the prize as described, complying with local raffle and lottery laws, handling all payments outside this platform, and communicating with ticket holders. <strong>If I fail to complete this raffle (draw + delivery), my platform trust tier will be demoted.</strong> La Piazza is a listing platform only and bears no responsibility for this raffle.
+                        {% endif %}
+                    </span>
+                </label>
+            </div>
+
+            <!-- Error message -->
+            <div x-show="error" x-cloak class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm" x-text="error"></div>
+
+            <!-- Submit buttons -->
+            <div class="flex gap-3">
+                <button @click="saveDraft()" :disabled="saving" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50">
+                    <span x-show="!saving">{% if lang == 'it' %}Salva Bozza{% else %}Save Draft{% endif %}</span>
+                    <span x-show="saving">...</span>
+                </button>
+                <button @click="publish()" :disabled="saving || !tosAccepted || !form.item_id" class="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-600 shadow-lg transition-all disabled:opacity-50 disabled:shadow-none">
+                    <span x-show="!saving">{% if lang == 'it' %}Pubblica Sorteggio{% else %}Publish Raffle{% endif %} &#127915;</span>
+                    <span x-show="saving">...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function raffleForm() {
+    return {
+        items: [],
+        form: {
+            item_id: '',
+            ticket_price: 2.00,
+            max_tickets: 10,
+            max_tickets_per_user: null,
+            draw_date: '',
+            draw_type: 'date',
+            payment_methods: [],
+            payment_instructions: '',
+            delivery_method: 'pickup',
+        },
+        tosAccepted: false,
+        saving: false,
+        error: null,
+        async loadItems() {
+            try {
+                // Get my user ID first, then only show MY items
+                const me = await fetch('/api/v1/users/me');
+                if (!me.ok) return;
+                const user = await me.json();
+                const r = await fetch('/api/v1/items?owner_id=' + user.id + '&limit=100');
+                if (r.ok) {
+                    const all = await r.json();
+                    this.items = all.filter(i => i.owner_id === user.id);
+                }
+            } catch(e) {}
+        },
+        async saveDraft() {
+            this.saving = true; this.error = null;
+            try {
+                const body = { ...this.form };
+                if (body.draw_date) body.draw_date = new Date(body.draw_date).toISOString();
+                if (!body.max_tickets_per_user) delete body.max_tickets_per_user;
+                body.title = (this.items.find(i => i.id === body.item_id) || {}).name || 'Raffle';
+                const r = await fetch('/api/v1/raffles', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                });
+                const d = await r.json();
+                if (r.ok) {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{% if lang == "it" %}Bozza salvata!{% else %}Draft saved!{% endif %}' } }));
+                    window.location.href = '/raffles/' + d.id;
+                } else {
+                    this.error = d.detail || 'Failed to create raffle';
+                }
+            } catch(e) { this.error = 'Network error'; }
+            this.saving = false;
+        },
+        async publish() {
+            this.saving = true; this.error = null;
+            try {
+                const body = { ...this.form };
+                if (body.draw_date) body.draw_date = new Date(body.draw_date).toISOString();
+                if (!body.max_tickets_per_user) delete body.max_tickets_per_user;
+                body.title = (this.items.find(i => i.id === body.item_id) || {}).name || 'Raffle';
+                // Create draft first
+                const cr = await fetch('/api/v1/raffles', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                });
+                const cd = await cr.json();
+                if (!cr.ok) { this.error = cd.detail || 'Failed to create'; this.saving = false; return; }
+                // Then publish
+                const pr = await fetch('/api/v1/raffles/' + cd.id + '/publish', { method: 'POST' });
+                const pd = await pr.json();
+                if (pr.ok) {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{% if lang == "it" %}Sorteggio pubblicato!{% else %}Raffle published!{% endif %} &#127915;' } }));
+                    window.location.href = '/raffles/' + cd.id;
+                } else {
+                    this.error = pd.detail || 'Created as draft but could not publish';
+                    setTimeout(() => { window.location.href = '/raffles/' + cd.id; }, 2000);
+                }
+            } catch(e) { this.error = 'Network error'; }
+            this.saving = false;
+        },
+    };
+}
+</script>
+{% endblock %}

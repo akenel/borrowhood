@@ -25,6 +25,7 @@ class ListingType(str, enum.Enum):
     AUCTION = "auction"       # Timed bidding
     GIVEAWAY = "giveaway"     # Free, take it, no return
     EVENT = "event"           # Workshop, concert, meetup, garage sale
+    RAFFLE = "raffle"         # Community fundraising, ticket-based draw
 
 
 class ListingStatus(str, enum.Enum):
