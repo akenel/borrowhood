@@ -113,13 +113,18 @@ def _raffle_out(raffle: BHRaffle, stats: Optional[dict] = None) -> dict:
             if not m.deleted_at:
                 image = m.url
                 break
+    organizer = raffle.organizer if hasattr(raffle, 'organizer') and raffle.organizer else None
     return {
         "id": str(raffle.id),
         "listing_id": str(raffle.listing_id),
         "organizer_id": str(raffle.organizer_id),
+        "organizer_name": organizer.display_name if organizer else None,
+        "organizer_slug": organizer.slug if organizer else None,
+        "organizer_avatar": organizer.avatar_url if organizer else None,
         "status": raffle.status.value,
         "title": item.name if item else "",
         "description": item.description if item else "",
+        "item_slug": item.slug if item else None,
         "image": image,
         "ticket_price": raffle.ticket_price,
         "currency": raffle.currency,
@@ -239,7 +244,10 @@ async def browse_raffles(
     """Browse active raffles. Public endpoint."""
     q = (
         select(BHRaffle)
-        .options(selectinload(BHRaffle.listing).selectinload(BHListing.item).selectinload(BHItem.media))
+        .options(
+            selectinload(BHRaffle.listing).selectinload(BHListing.item).selectinload(BHItem.media),
+            selectinload(BHRaffle.organizer),
+        )
         .where(BHRaffle.deleted_at.is_(None))
     )
     if status == "all":
