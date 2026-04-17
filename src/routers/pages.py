@@ -445,6 +445,17 @@ async def item_detail(slug: str, request: Request,
         ctx = _ctx(request, token)
         return _render("errors/404.html", ctx, status_code=404)
 
+    # Raffle items redirect to the raffle detail page
+    if item.listings:
+        for listing in item.listings:
+            if listing.listing_type == ListingType.RAFFLE and not listing.deleted_at:
+                from src.models.raffle import BHRaffle
+                raffle = await db.scalar(
+                    select(BHRaffle).where(BHRaffle.listing_id == listing.id)
+                )
+                if raffle:
+                    return RedirectResponse(url=f"/raffles/{raffle.id}", status_code=302)
+
     # Resolve viewer's badge tier for progressive disclosure
     viewer_tier = "anonymous"
     if token:
