@@ -76,14 +76,19 @@
                :class="r.stats && r.stats.percent_sold >= 80 ? 'hover:border-red-300 ring-1 ring-amber-200' : 'hover:border-amber-300'">
 
                 <!-- Image / colorful placeholder -->
-                <div class="relative h-40 overflow-hidden"
+                <div class="relative h-44 overflow-hidden"
                      :class="{
-                         'bg-gradient-to-br from-amber-400 via-orange-400 to-red-400': r.stats && r.stats.percent_sold >= 80,
-                         'bg-gradient-to-br from-amber-300 via-orange-300 to-yellow-300': r.stats && r.stats.percent_sold >= 40 && r.stats.percent_sold < 80,
-                         'bg-gradient-to-br from-emerald-300 via-teal-300 to-cyan-300': !r.stats || r.stats.percent_sold < 40,
-                         'bg-gradient-to-br from-gray-300 to-gray-400': r.status === 'completed' || r.status === 'cancelled',
+                         'bg-gradient-to-br from-amber-400 via-orange-400 to-red-400': !r.image && r.stats && r.stats.percent_sold >= 80,
+                         'bg-gradient-to-br from-amber-300 via-orange-300 to-yellow-300': !r.image && r.stats && r.stats.percent_sold >= 40 && r.stats.percent_sold < 80,
+                         'bg-gradient-to-br from-emerald-300 via-teal-300 to-cyan-300': !r.image && (!r.stats || r.stats.percent_sold < 40),
+                         'bg-gradient-to-br from-gray-300 to-gray-400': !r.image && (r.status === 'completed' || r.status === 'cancelled'),
+                         'bg-gray-100': r.image,
                      }">
-                    <div class="absolute inset-0 flex items-center justify-center">
+                    <!-- Real image -->
+                    <img x-show="r.image" :src="r.image" :alt="r.title"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                    <!-- Placeholder icon when no image -->
+                    <div x-show="!r.image" class="absolute inset-0 flex items-center justify-center">
                         <svg class="w-20 h-20 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
                     </div>
                     <!-- Price badge -->

@@ -107,6 +107,12 @@ async def _get_raffle(db: AsyncSession, raffle_id: UUID) -> BHRaffle:
 
 def _raffle_out(raffle: BHRaffle, stats: Optional[dict] = None) -> dict:
     item = raffle.listing.item if raffle.listing else None
+    image = None
+    if item and hasattr(item, 'media') and item.media:
+        for m in item.media:
+            if not m.deleted_at:
+                image = m.url
+                break
     return {
         "id": str(raffle.id),
         "listing_id": str(raffle.listing_id),
@@ -114,6 +120,7 @@ def _raffle_out(raffle: BHRaffle, stats: Optional[dict] = None) -> dict:
         "status": raffle.status.value,
         "title": item.name if item else "",
         "description": item.description if item else "",
+        "image": image,
         "ticket_price": raffle.ticket_price,
         "currency": raffle.currency,
         "max_tickets": raffle.max_tickets,
