@@ -459,6 +459,77 @@
     </div>
 </section>
 
+<!-- Live Raffles — community fundraising -->
+<section class="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 py-14 border-b border-amber-200" x-data="{ raffles: [], loaded: false }" x-init="
+    fetch('/api/v1/raffles?status=active&limit=3').then(r=>r.ok?r.json():[]).then(d=>{raffles=d;loaded=true}).catch(()=>{loaded=true})
+">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-show="loaded && raffles.length > 0" x-cloak>
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-amber-200 text-amber-900 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
+                    {% if lang == 'it' %}Sorteggi attivi{% else %}Live Raffles{% endif %}
+                </div>
+                <h2 class="text-3xl font-extrabold text-gray-900">
+                    {% if lang == 'it' %}Vinci qualcosa. Sostieni qualcuno.{% else %}Win something. Support someone.{% endif %}
+                </h2>
+                <p class="text-gray-600 mt-2 max-w-lg">
+                    {% if lang == 'it' %}Compra un biglietto da pochi euro e potresti vincere il premio. Tutti i proventi restano nella community.{% else %}Buy a ticket for a few euros and you might win the prize. All proceeds stay in the community.{% endif %}
+                </p>
+            </div>
+            <a href="/raffles" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-amber-500 text-white font-semibold rounded-lg hover:bg-amber-600 transition-colors text-sm">
+                {% if lang == 'it' %}Tutti i sorteggi{% else %}All Raffles{% endif %}
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <template x-for="r in raffles" :key="r.id">
+                <a :href="'/raffles/' + r.id" class="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-amber-300 transition-all group">
+                    <!-- Image -->
+                    <div class="relative h-40 overflow-hidden" :class="r.image ? 'bg-gray-100' : 'bg-gradient-to-br from-amber-300 to-orange-300'">
+                        <img x-show="r.image" :src="r.image" :alt="r.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                        <div x-show="!r.image" class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
+                        </div>
+                        <div class="absolute top-2 right-2 bg-white/95 backdrop-blur-sm rounded-lg px-2.5 py-1 shadow-sm">
+                            <span class="text-lg font-extrabold text-gray-900">&euro;<span x-text="r.ticket_price.toFixed(2)"></span></span>
+                        </div>
+                    </div>
+                    <!-- Content -->
+                    <div class="p-4">
+                        <h3 class="font-bold text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-1" x-text="r.title"></h3>
+                        <template x-if="r.stats && r.stats.total_tickets">
+                            <div class="mt-2">
+                                <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                    <div class="h-full rounded-full transition-all" :class="r.stats.percent_sold >= 80 ? 'bg-gradient-to-r from-amber-400 to-red-500' : 'bg-gradient-to-r from-emerald-400 to-emerald-500'" :style="'width:' + r.stats.percent_sold + '%'"></div>
+                                </div>
+                                <div class="flex justify-between mt-1 text-xs text-gray-500">
+                                    <span x-text="r.stats.tickets_confirmed + '/' + r.stats.total_tickets"></span>
+                                    <span x-text="r.stats.percent_sold + '%'"></span>
+                                </div>
+                            </div>
+                        </template>
+                        <div class="mt-2 flex items-center gap-2 text-xs text-gray-400">
+                            <template x-if="r.organizer_avatar">
+                                <img :src="r.organizer_avatar" class="w-4 h-4 rounded-full">
+                            </template>
+                            <span x-text="r.organizer_name || 'Organizer'"></span>
+                        </div>
+                    </div>
+                </a>
+            </template>
+        </div>
+
+        <div class="mt-6 text-center sm:hidden">
+            <a href="/raffles" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-amber-500 text-white font-semibold rounded-lg hover:bg-amber-600 transition-colors">
+                {% if lang == 'it' %}Tutti i sorteggi{% else %}All Raffles{% endif %}
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </a>
+        </div>
+    </div>
+</section>
+
 <!-- Featured Items -->
 {% if featured_items %}
 <section class="bg-white py-16">
