@@ -286,7 +286,8 @@ class TestEventsRouter:
 class TestLeaderboardPage:
     def test_leaderboard_route_exists(self):
         import inspect
-        source = inspect.getsource(__import__("src.routers.pages", fromlist=["leaderboard_page"]))
+        from src.routers.pages import discover
+        source = inspect.getsource(discover)
         assert "leaderboard" in source
 
     def test_leaderboard_template_exists(self):
@@ -440,12 +441,14 @@ class TestNicKeycloak:
 class TestDemoLogin:
     def test_demo_login_has_15_users(self):
         import inspect
-        source = inspect.getsource(__import__("src.routers.pages", fromlist=["demo_login"]))
+        from src.routers.pages import static_pages  # demo_login lives in static_pages after split
+        source = inspect.getsource(static_pages)
         assert "nicolo" in source
 
     def test_nic_demo_has_ambassador_role(self):
         import inspect
-        source = inspect.getsource(__import__("src.routers.pages", fromlist=["demo_login"]))
+        from src.routers.pages import static_pages
+        source = inspect.getsource(static_pages)
         assert "ambassador" in source
 
 

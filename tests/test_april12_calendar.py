@@ -25,7 +25,18 @@ import pytest
 
 # ── Paths ──
 
-PAGES_PY = Path("src/routers/pages.py")
+# PAGES_PY: read the whole pages/ package as one string (after split refactor).
+class _PagesContent:
+    def read_text(self):
+        import os
+        root = "src/routers/pages"
+        out = []
+        for name in sorted(os.listdir(root)):
+            if name.endswith(".py"):
+                with open(os.path.join(root, name)) as f:
+                    out.append(f.read())
+        return "\n".join(out)
+PAGES_PY = _PagesContent()
 EVENTS_PY = Path("src/routers/events.py")
 CALENDAR_HTML = Path("src/templates/pages/calendar.html")
 BASE_HTML = Path("src/templates/base.html")
@@ -562,7 +573,18 @@ class TestSeedDataScript:
 # ── 22. Share button on calendar cards ──
 
 ITEM_DETAIL_HTML = Path("src/templates/pages/item_detail.html")
-PAGES_PY = Path("src/routers/pages.py")
+# PAGES_PY: read the whole pages/ package as one string (after split refactor).
+class _PagesContent:
+    def read_text(self):
+        import os
+        root = "src/routers/pages"
+        out = []
+        for name in sorted(os.listdir(root)):
+            if name.endswith(".py"):
+                with open(os.path.join(root, name)) as f:
+                    out.append(f.read())
+        return "\n".join(out)
+PAGES_PY = _PagesContent()
 
 
 class TestCalendarShareButton:
