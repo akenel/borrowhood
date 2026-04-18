@@ -523,39 +523,39 @@ class TestI18nEvents:
 class TestGDPRCleanup:
     def test_cleanup_uses_savepoints(self):
         import inspect
-        source = inspect.getsource(__import__("src.routers.users", fromlist=["delete_my_account"]))
+        source = inspect.getsource(__import__("src.routers.users.gdpr", fromlist=["delete_my_account"]))
         assert "begin_nested" in source
 
     def test_cleanup_includes_event_rsvp(self):
         import inspect
-        source = inspect.getsource(__import__("src.routers.users", fromlist=["delete_my_account"]))
+        source = inspect.getsource(__import__("src.routers.users.gdpr", fromlist=["delete_my_account"]))
         assert "bh_event_rsvp" in source
 
     def test_cleanup_includes_achievement(self):
         import inspect
-        source = inspect.getsource(__import__("src.routers.users", fromlist=["delete_my_account"]))
+        source = inspect.getsource(__import__("src.routers.users.gdpr", fromlist=["delete_my_account"]))
         assert "bh_achievement" in source
 
     def test_cleanup_includes_saved_search(self):
         import inspect
-        source = inspect.getsource(__import__("src.routers.users", fromlist=["delete_my_account"]))
+        source = inspect.getsource(__import__("src.routers.users.gdpr", fromlist=["delete_my_account"]))
         assert "bh_saved_search" in source
 
     def test_cleanup_includes_item_vote(self):
         import inspect
-        source = inspect.getsource(__import__("src.routers.users", fromlist=["delete_my_account"]))
+        source = inspect.getsource(__import__("src.routers.users.gdpr", fromlist=["delete_my_account"]))
         assert "bh_item_vote" in source
 
     def test_cleanup_deletes_others_replies_on_user_posts(self):
         """Must delete ALL replies on user's posts, not just user's own replies."""
         import inspect
-        source = inspect.getsource(__import__("src.routers.users", fromlist=["delete_my_account"]))
+        source = inspect.getsource(__import__("src.routers.users.gdpr", fromlist=["delete_my_account"]))
         assert "bh_help_reply WHERE post_id IN" in source
 
     def test_cleanup_deletes_others_data_on_user_items(self):
         """Must delete bids/rentals/RSVPs from other users on this user's listings."""
         import inspect
-        source = inspect.getsource(__import__("src.routers.users", fromlist=["delete_my_account"]))
+        source = inspect.getsource(__import__("src.routers.users.gdpr", fromlist=["delete_my_account"]))
         assert "bh_bid WHERE listing_id IN" in source
         assert "bh_rental WHERE listing_id IN" in source
 
