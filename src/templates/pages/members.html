@@ -416,76 +416,12 @@
 
 {% block scripts %}
 <script>
-function membersFilter() {
-    return {
-        filtersOpen: false,
-        locating: false,
-        lat: null,
-        lng: null,
-        detectLocation() {
-            if (!navigator.geolocation) {
-                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Geolocation not supported' } }));
-                return;
-            }
-            this.locating = true;
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    this.lat = pos.coords.latitude.toFixed(6);
-                    this.lng = pos.coords.longitude.toFixed(6);
-                    this.locating = false;
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Location detected' } }));
-                },
-                (err) => {
-                    // Fallback to Trapani centro when browser denies geolocation (e.g. HTTP, no domain)
-                    this.lat = '38.0174';
-                    this.lng = '12.5144';
-                    this.locating = false;
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: '{{ t("i18n.default_location_trapani") }}' } }));
-                },
-                { enableHighAccuracy: true, timeout: 10000 }
-            );
-        }
-    };
-}
-
-function membersFavorites() {
-    return {
-        favoriteIds: new Set(),
-        async init() {
-            {% if user %}
-            try {
-                var resp = await fetch('/api/v1/users/me/favorite-ids');
-                if (resp.ok) {
-                    var data = await resp.json();
-                    this.favoriteIds = new Set(data.ids);
-                }
-            } catch(e) {}
-            {% endif %}
-        },
-        isFavorited(userId) {
-            return this.favoriteIds.has(String(userId));
-        },
-        async toggleFavorite(userId) {
-            var uid = String(userId);
-            if (this.isFavorited(uid)) {
-                var resp = await fetch('/api/v1/users/' + uid + '/favorite', { method: 'DELETE' });
-                if (resp.ok) {
-                    this.favoriteIds.delete(uid);
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: '{{ t("favorites.removed") }}' } }));
-                }
-            } else {
-                var resp = await fetch('/api/v1/users/' + uid + '/favorite', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({})
-                });
-                if (resp.ok) {
-                    this.favoriteIds.add(uid);
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{{ t("favorites.added") }}' } }));
-                }
-            }
-        }
-    };
-}
+  window.LP = window.LP || {};
+  window.LP.isAuthenticated = {% if user %}true{% else %}false{% endif %};
+  window.LP.t = window.LP.t || {};
+  window.LP.t.defaultLocationTrapani = "{{ t('i18n.default_location_trapani') }}";
+  window.LP.t.favoritesRemoved = "{{ t('favorites.removed') }}";
+  window.LP.t.favoritesAdded = "{{ t('favorites.added') }}";
 </script>
+<script src="/static/js/app/members.js"></script>
 {% endblock %}
