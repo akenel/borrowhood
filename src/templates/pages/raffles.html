@@ -107,9 +107,9 @@
                     <div x-show="!r.image" class="absolute inset-0 flex items-center justify-center">
                         <svg class="w-24 h-24 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.8"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
                     </div>
-                    <!-- Price pill -->
-                    <div class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2 shadow-lg">
-                        <span class="text-2xl font-extrabold text-gray-900">&euro;<span x-text="r.ticket_price.toFixed(2)"></span></span>
+                    <!-- Price pill — bottom-right on mobile so it never collides with the status pill; top-right on sm+ -->
+                    <div class="absolute bottom-3 right-3 sm:top-3 sm:bottom-auto bg-white/95 backdrop-blur-sm rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 shadow-lg">
+                        <span class="text-lg sm:text-2xl font-extrabold text-gray-900">&euro;<span x-text="r.ticket_price.toFixed(2)"></span></span>
                         <span class="text-[10px] text-gray-500 block text-center">{% if lang == 'it' %}biglietto{% else %}ticket{% endif %}</span>
                     </div>
                     <!-- Status -->
