@@ -167,16 +167,14 @@ class TestOrdersQuotesTab:
 
 class TestOrdersRouterQuotes:
     def test_orders_page_accepts_tab_param(self):
-        source = inspect.getsource(
-            __import__("src.routers.pages", fromlist=["orders_page"]).orders_page
-        )
+        from src.routers.pages.account import orders_page
+        source = inspect.getsource(orders_page)
         assert "tab" in source
         assert "quotes" in source
 
     def test_orders_page_fetches_service_quotes(self):
-        source = inspect.getsource(
-            __import__("src.routers.pages", fromlist=["orders_page"]).orders_page
-        )
+        from src.routers.pages.account import orders_page
+        source = inspect.getsource(orders_page)
         assert "BHServiceQuote" in source
         assert "selected_tab" in source
 

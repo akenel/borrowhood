@@ -15,7 +15,18 @@ MENTORSHIPS_PY = Path("src/routers/mentorships.py")
 ANALYTICS_PY = Path("src/routers/analytics.py")
 ANALYTICS_MODEL = Path("src/models/analytics.py")
 PRICING_PY = Path("src/services/pricing.py")
-PAGES_PY = Path("src/routers/pages.py")
+# PAGES_PY: read the whole pages/ package as one string (after split refactor).
+class _PagesContent:
+    def read_text(self):
+        import os
+        root = "src/routers/pages"
+        out = []
+        for name in sorted(os.listdir(root)):
+            if name.endswith(".py"):
+                with open(os.path.join(root, name)) as f:
+                    out.append(f.read())
+        return "\n".join(out)
+PAGES_PY = _PagesContent()
 DASHBOARD_HTML = Path("src/templates/pages/dashboard.html")
 ITEM_DETAIL_HTML = Path("src/templates/pages/item_detail.html")
 DELIVERY_HTML = Path("src/templates/pages/delivery_tracking.html")
