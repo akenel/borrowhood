@@ -162,8 +162,8 @@
 
                 <!-- Right side: lang switch + auth -->
                 <div class="flex items-center space-x-3">
-                    <!-- Text size control (always visible) -->
-                    <div class="flex items-center gap-0.5" x-data="{
+                    <!-- Text size control — hidden on mobile (lives in hamburger / settings); visible on lg+ -->
+                    <div class="hidden lg:flex items-center gap-0.5" x-data="{
                         scales: [16, 20, 24, 28, 32, 40, 48],
                         idx: 0,
                         init() {
