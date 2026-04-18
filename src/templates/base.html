@@ -803,10 +803,11 @@
         reset() { this.open = false; this.submitted = false; this.blNumber = null; this.message = ''; }
     }">
         <!-- Floating button -->
-        <!-- bottom: clears the mobile bottom-nav (4rem + safe-area-inset) + 2rem gap;
-             lg:bottom-6 restores the original 1.5rem offset once the bottom nav hides. -->
+        <!-- Mobile: 40px, right-4, cleared above bottom-nav (4rem + safe-area);
+             Desktop (lg+): 48px, right-6, bottom-6 (nav hidden there). -->
         <button @click="open = !open; submitted = false"
-                class="fixed right-6 bottom-[calc(6rem+env(safe-area-inset-bottom))] lg:bottom-6 z-40 w-12 h-12 bg-rose-600 hover:bg-rose-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 min-h-[48px] min-w-[48px]"
+                aria-label="Feedback"
+                class="fixed right-4 lg:right-6 bottom-[calc(6rem+env(safe-area-inset-bottom))] lg:bottom-6 z-40 w-10 h-10 lg:w-12 lg:h-12 bg-rose-600 hover:bg-rose-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 opacity-80 hover:opacity-100"
                 :class="open ? 'rotate-45' : ''">
             <svg x-show="!open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
