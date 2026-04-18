@@ -571,7 +571,8 @@
     "training": "Training",
     "auction": "Auction",
     "giveaway": "Give Away",
-    "event": "Event"
+    "event": "Event",
+    "raffle": "Raffle"
   },
   "item_types": {
     "physical": "Physical",

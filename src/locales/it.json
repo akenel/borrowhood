@@ -571,7 +571,8 @@
     "training": "Formazione",
     "auction": "Asta",
     "giveaway": "Regalo",
-    "event": "Evento"
+    "event": "Evento",
+    "raffle": "Sorteggio"
   },
   "item_types": {
     "physical": "Fisico",
