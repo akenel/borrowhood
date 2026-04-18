@@ -242,7 +242,7 @@ class TestDeleteWarningCompleteness:
 
 class TestGDPRCleanupCompleteness:
     def test_cleanup_has_all_critical_tables(self):
-        source = inspect.getsource(__import__("src.routers.users", fromlist=["delete_my_account"]))
+        source = inspect.getsource(__import__("src.routers.users.gdpr", fromlist=["delete_my_account"]))
         critical_tables = [
             "bh_event_rsvp", "bh_achievement", "bh_saved_search", "bh_item_vote",
             "bh_help_upvote", "bh_help_reply", "bh_help_post", "bh_help_media",
@@ -254,7 +254,7 @@ class TestGDPRCleanupCompleteness:
             assert table in source, f"GDPR cleanup missing {table}"
 
     def test_cleanup_uses_savepoints(self):
-        source = inspect.getsource(__import__("src.routers.users", fromlist=["delete_my_account"]))
+        source = inspect.getsource(__import__("src.routers.users.gdpr", fromlist=["delete_my_account"]))
         assert "begin_nested" in source
 
     def test_delete_preview_endpoint_exists(self):
