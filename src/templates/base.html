@@ -482,8 +482,9 @@
     </footer>
 
     <!-- Auto-translate toggle (hidden until needed) -->
+    <!-- Raised on mobile to clear the bottom-nav + feedback FAB stack. -->
     <div id="bh-translate-toggle" style="display: none;"
-         class="fixed bottom-4 right-4 z-40 flex items-center gap-2 px-4 py-2.5 bg-white rounded-full shadow-lg border border-gray-200 cursor-pointer hover:shadow-xl transition-shadow"
+         class="fixed right-4 bottom-[calc(10rem+env(safe-area-inset-bottom))] lg:bottom-4 z-40 flex items-center gap-2 px-4 py-2.5 bg-white rounded-full shadow-lg border border-gray-200 cursor-pointer hover:shadow-xl transition-shadow"
          onclick="BHTranslate.toggleOriginals(); var lbl = this.querySelector('span'); lbl.textContent = BHTranslate.showingOriginals ? lbl.getAttribute('data-show-translated') : lbl.getAttribute('data-show-original');">
         <svg class="w-4 h-4 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
@@ -797,8 +798,10 @@
         reset() { this.open = false; this.submitted = false; this.blNumber = null; this.message = ''; }
     }">
         <!-- Floating button -->
+        <!-- bottom: clears the mobile bottom-nav (4rem + safe-area-inset) + 2rem gap;
+             lg:bottom-6 restores the original 1.5rem offset once the bottom nav hides. -->
         <button @click="open = !open; submitted = false"
-                class="fixed bottom-6 right-6 z-40 w-12 h-12 bg-rose-600 hover:bg-rose-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 min-h-[48px] min-w-[48px]"
+                class="fixed right-6 bottom-[calc(6rem+env(safe-area-inset-bottom))] lg:bottom-6 z-40 w-12 h-12 bg-rose-600 hover:bg-rose-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 min-h-[48px] min-w-[48px]"
                 :class="open ? 'rotate-45' : ''">
             <svg x-show="!open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
@@ -816,7 +819,7 @@
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="opacity-100 translate-y-0 scale-100"
              x-transition:leave-end="opacity-0 translate-y-4 scale-95"
-             class="fixed top-4 bottom-20 left-4 right-4 sm:top-auto sm:bottom-20 sm:left-auto sm:right-6 sm:w-80 sm:max-h-[80vh] z-40 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-y-auto">
+             class="fixed top-4 left-4 right-4 bottom-[calc(7rem+env(safe-area-inset-bottom))] sm:top-auto sm:bottom-[calc(11rem+env(safe-area-inset-bottom))] sm:left-auto sm:right-6 sm:w-80 sm:max-h-[75vh] lg:bottom-20 z-40 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-y-auto">
 
             <!-- Header -->
             <div class="bg-gradient-to-r from-rose-500 to-amber-500 px-4 py-3">
