@@ -149,86 +149,11 @@
 
 {% block scripts %}
 <script>
-function chatApp() {
-    return {
-        messages: [],
-        query: '',
-        loading: false,
-
-        init() {
-            this.$refs.input.focus();
-            const params = new URLSearchParams(window.location.search);
-            const seed = params.get('q');
-            if (seed && seed.trim()) {
-                this.sendQuery(seed.trim());
-                // Clean the URL so refresh doesn't re-send
-                const url = new URL(window.location);
-                url.searchParams.delete('q');
-                window.history.replaceState({}, '', url);
-            }
-        },
-
-        async send() {
-            const q = this.query.trim();
-            if (!q || this.loading) return;
-            this.sendQuery(q);
-        },
-
-        async sendQuery(q) {
-            this.query = '';
-            this.messages.push({ role: 'user', text: q });
-            this.scrollToBottom();
-            this.loading = true;
-
-            try {
-                const resp = await fetch('/api/v1/ai/concierge', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        query: q,
-                        language: '{{ lang }}'
-                    }),
-                });
-
-                if (!resp.ok) {
-                    if (resp.status === 401 || resp.status === 403) {
-                        this.messages.push({
-                            role: 'bot',
-                            text: '{{ "Effettua il login per usare il concierge." if lang == "it" else "Please log in to use the concierge." }}',
-                        });
-                    } else {
-                        throw new Error('API error');
-                    }
-                } else {
-                    const data = await resp.json();
-                    this.messages.push({
-                        role: 'bot',
-                        text: data.response || data.interpretation || 'No response.',
-                        items: data.items || [],
-                        members: data.members || [],
-                        suggestions: data.suggestions || [],
-                        provider: data.ai_provider || '',
-                    });
-                }
-            } catch (e) {
-                this.messages.push({
-                    role: 'bot',
-                    text: '{{ "Si è verificato un errore. Riprova." if lang == "it" else "Something went wrong. Please try again." }}',
-                });
-            }
-
-            this.loading = false;
-            this.scrollToBottom();
-            this.$refs.input.focus();
-        },
-
-        scrollToBottom() {
-            this.$nextTick(() => {
-                const el = this.$refs.messages;
-                if (el) el.scrollTop = el.scrollHeight;
-            });
-        }
-    };
-}
+  window.LP = window.LP || {};
+  window.LP.lang = "{{ lang }}";
+  window.LP.t = window.LP.t || {};
+  window.LP.t.loginRequired = "{% if lang == 'it' %}Effettua il login per usare il concierge.{% else %}Please log in to use the concierge.{% endif %}";
+  window.LP.t.genericError = "{% if lang == 'it' %}Si è verificato un errore. Riprova.{% else %}Something went wrong. Please try again.{% endif %}";
 </script>
+<script src="/static/js/app/chat.js"></script>
 {% endblock %}
