@@ -25,19 +25,20 @@ import pytest
 
 # ── Paths ──
 
-# PAGES_PY: read the whole pages/ package as one string (after split refactor).
-class _PagesContent:
+# PAGES_PY/EVENTS_PY: read whole package as one string (after split refactor).
+class _PackageContent:
+    def __init__(self, root):
+        self.root = root
     def read_text(self):
         import os
-        root = "src/routers/pages"
         out = []
-        for name in sorted(os.listdir(root)):
+        for name in sorted(os.listdir(self.root)):
             if name.endswith(".py"):
-                with open(os.path.join(root, name)) as f:
+                with open(os.path.join(self.root, name)) as f:
                     out.append(f.read())
         return "\n".join(out)
-PAGES_PY = _PagesContent()
-EVENTS_PY = Path("src/routers/events.py")
+PAGES_PY = _PackageContent("src/routers/pages")
+EVENTS_PY = _PackageContent("src/routers/events")
 CALENDAR_HTML = Path("src/templates/pages/calendar.html")
 BASE_HTML = Path("src/templates/base.html")
 EN_JSON = Path("src/locales/en.json")
