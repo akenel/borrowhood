@@ -178,8 +178,8 @@
     </div>
 
     <!-- Tabs -->
-    <div class="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1">
-        <button @click="tab = 'community'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
+    <div class="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 overflow-x-auto sm:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <button @click="tab = 'community'" class="flex-shrink-0 sm:flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors whitespace-nowrap"
                 :class="tab === 'community' ? 'bg-white text-rose-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
             <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             {{ t('calendar.tab_community') }}
@@ -187,7 +187,7 @@
                 <span class="ml-1 px-1.5 py-0.5 bg-rose-100 text-rose-700 text-xs font-bold rounded-full" x-text="communityEvents.length + raffles.length"></span>
             </template>
         </button>
-        <button @click="tab = 'my_events'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
+        <button @click="tab = 'my_events'" class="flex-shrink-0 sm:flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors whitespace-nowrap"
                 :class="tab === 'my_events' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
             <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             {{ t('calendar.tab_my_events') }}
@@ -195,7 +195,7 @@
                 <span class="ml-1 px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full" x-text="myEvents.length"></span>
             </template>
         </button>
-        <button @click="tab = 'my_rentals'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
+        <button @click="tab = 'my_rentals'" class="flex-shrink-0 sm:flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors whitespace-nowrap"
                 :class="tab === 'my_rentals' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
             <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
             {{ t('calendar.tab_my_rentals') }}
@@ -203,7 +203,7 @@
                 <span class="ml-1 px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full" x-text="rentals.length"></span>
             </template>
         </button>
-        <button @click="tab = 'raffles'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
+        <button @click="tab = 'raffles'" class="flex-shrink-0 sm:flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors whitespace-nowrap"
                 :class="tab === 'raffles' ? 'bg-white text-amber-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
             <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
             {% if lang == 'it' %}Sorteggi{% else %}Raffles{% endif %}

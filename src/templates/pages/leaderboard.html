@@ -99,16 +99,16 @@
     </template>
 
     <!-- Tabs -->
-    <div class="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1">
-        <button @click="tab = 'rankings'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
+    <div class="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 overflow-x-auto sm:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <button @click="tab = 'rankings'" class="flex-shrink-0 sm:flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors whitespace-nowrap"
                 :class="tab === 'rankings' ? 'bg-white text-rose-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
             {{  t('leaderboard.tab_rankings') }}
         </button>
-        <button @click="tab = 'streaks'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
+        <button @click="tab = 'streaks'" class="flex-shrink-0 sm:flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors whitespace-nowrap"
                 :class="tab === 'streaks' ? 'bg-white text-amber-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
             {{  t('leaderboard.tab_streaks') }}
         </button>
-        <button @click="tab = 'coaches'" class="flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors"
+        <button @click="tab = 'coaches'" class="flex-shrink-0 sm:flex-1 py-2 px-4 text-sm font-semibold rounded-md transition-colors whitespace-nowrap"
                 :class="tab === 'coaches' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
             {{  t('leaderboard.tab_coaches') }}
         </button>
@@ -137,16 +137,16 @@
                          :class="idx === 0 ? 'border-amber-400' : idx === 1 ? 'border-gray-300' : idx === 2 ? 'border-orange-400' : 'border-gray-200'">
                     <!-- Info -->
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 min-w-0">
                             <span class="font-semibold text-gray-900 truncate" x-text="user.display_name"></span>
-                            <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+                            <span class="hidden sm:inline-flex text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0"
                                   :class="user.badge_tier === 'legend' ? 'bg-amber-100 text-amber-700' : user.badge_tier === 'pillar' ? 'bg-purple-100 text-purple-700' : user.badge_tier === 'trusted' ? 'bg-emerald-100 text-emerald-700' : user.badge_tier === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'"
                                   x-text="user.badge_tier"></span>
                         </div>
-                        <div class="flex items-center gap-3 mt-0.5 text-xs text-gray-400">
-                            <span x-text="user.events_attended + ' events'"></span>
-                            <span x-show="user.event_streak > 0" class="text-orange-500 font-medium" x-text="user.event_streak + ' streak'"></span>
-                            <span x-show="user.no_show_count > 0" class="text-red-400" x-text="user.no_show_count + ' no-shows'"></span>
+                        <div class="flex items-center flex-wrap gap-x-3 gap-y-0 mt-0.5 text-xs text-gray-400">
+                            <span x-text="user.events_attended + ' events'" class="whitespace-nowrap"></span>
+                            <span x-show="user.event_streak > 0" class="text-orange-500 font-medium whitespace-nowrap" x-text="user.event_streak + ' streak'"></span>
+                            <span x-show="user.no_show_count > 0" class="text-red-400 whitespace-nowrap" x-text="user.no_show_count + ' no-shows'"></span>
                         </div>
                     </div>
                     <!-- Points -->
