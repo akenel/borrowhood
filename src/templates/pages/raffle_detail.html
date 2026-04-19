@@ -100,7 +100,8 @@
                 </div>
             </div>
 
-            <!-- Community verification -->
+            <!-- Community verification — only shown to confirmed ticket holders -->
+            {% if user_had_ticket %}
             <div class="bg-white rounded-2xl border border-gray-200 p-6" x-data="{ submitting: false, submitted: false, myFair: null, myComment: '' }">
                 <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
                     <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
@@ -146,7 +147,8 @@
                     <p class="font-semibold text-emerald-700">{% if lang == 'it' %}Grazie per la tua verifica!{% else %}Thanks for verifying!{% endif %}</p>
                 </div>
             </div>
-            {% endif %}
+            {% endif %}{# user_had_ticket #}
+            {% endif %}{# drawn/completed #}
 
             <!-- Delivery info -->
             {% if raffle.delivery_method %}

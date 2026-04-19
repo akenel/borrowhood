@@ -109,7 +109,23 @@ async def raffle_detail_page(raffle_id: str, request: Request,
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Raffle not found")
 
-    ctx = _ctx(request, token, raffle=raffle)
+    # Only confirmed ticket holders can verify a drawn/completed raffle --
+    # gate the Fair/Not-fair UI to them so anonymous viewers don't hit 400s.
+    user_had_ticket = False
+    if token and raffle.status.value in ("drawn", "completed"):
+        from sqlalchemy import func as sa_func
+        from src.dependencies import get_user
+        from src.models.raffle import BHRaffleTicket, RaffleTicketStatus
+        user = await get_user(db, token)
+        count = await db.scalar(
+            select(sa_func.count(BHRaffleTicket.id))
+            .where(BHRaffleTicket.raffle_id == raffle.id)
+            .where(BHRaffleTicket.user_id == user.id)
+            .where(BHRaffleTicket.status == RaffleTicketStatus.CONFIRMED)
+        )
+        user_had_ticket = (count or 0) > 0
+
+    ctx = _ctx(request, token, raffle=raffle, user_had_ticket=user_had_ticket)
     return _render("pages/raffle_detail.html", ctx)
 
 
