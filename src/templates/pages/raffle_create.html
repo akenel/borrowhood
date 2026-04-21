@@ -20,7 +20,42 @@
             <p class="text-white/80 text-sm mt-1">{% if lang == 'it' %}Metti in palio qualcosa di bello per la community.{% else %}Put up something great for the community.{% endif %}</p>
         </div>
 
-        <div class="p-6 space-y-5">
+        <!-- Empty state: user has no items yet -->
+        <div x-show="itemsLoaded && items.length === 0" x-cloak class="p-6 sm:p-10 text-center">
+            <div class="mx-auto w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/>
+                </svg>
+            </div>
+            <h2 class="text-xl font-bold text-gray-900 mb-2">{% if lang == 'it' %}Niente da mettere in palio... ancora{% else %}Nothing to raffle... yet{% endif %}</h2>
+            <p class="text-gray-600 text-sm mb-6 max-w-md mx-auto">
+                {% if lang == 'it' %}
+                Per creare un sorteggio devi prima avere un oggetto. Aggiungi foto, descrizione e dettagli, poi torna qui per metterlo in palio.
+                {% else %}
+                To run a raffle you need an item first. Add photos, a description, and details, then come back here to put it up as a prize.
+                {% endif %}
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <a href="/list" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-600 shadow-lg transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                    {% if lang == 'it' %}Crea un oggetto{% else %}Create an Item{% endif %}
+                </a>
+                <a href="/raffles" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors">
+                    {% if lang == 'it' %}Torna ai sorteggi{% else %}Back to raffles{% endif %}
+                </a>
+            </div>
+        </div>
+
+        <!-- Loading spinner (while we fetch items) -->
+        <div x-show="!itemsLoaded" x-cloak class="p-10 text-center">
+            <svg class="animate-spin w-8 h-8 text-amber-500 mx-auto" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+
+        <!-- Form body: only shown when user has items -->
+        <div x-show="itemsLoaded && items.length > 0" x-cloak class="p-6 space-y-5">
             <!-- Item picker -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Cosa metti in palio?{% else %}What's the prize?{% endif %} *</label>

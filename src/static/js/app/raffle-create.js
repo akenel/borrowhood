@@ -8,6 +8,7 @@
 function raffleForm() {
     return {
         items: [],
+        itemsLoaded: false,
         form: {
             item_id: '',
             ticket_price: 2.00,
@@ -33,7 +34,10 @@ function raffleForm() {
                     const all = await r.json();
                     this.items = all.filter(i => i.owner_id === user.id);
                 }
-            } catch(e) {}
+            } catch(e) {
+            } finally {
+                this.itemsLoaded = true;
+            }
         },
         async saveDraft() {
             this.saving = true; this.error = null;
