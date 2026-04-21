@@ -18,6 +18,7 @@ from ._common import (
     _parse_json_from_text,
     _ollama_generate,
     _pollinations_generate,
+    CATEGORIES,
 )
 
 logger = logging.getLogger(__name__)
