@@ -1,9 +1,11 @@
 """Item-related pages: detail, edit, list-a-new-item form."""
 
+import json
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
+from markupsafe import Markup
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
