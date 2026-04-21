@@ -22,3 +22,18 @@ router.include_router(crud.router)
 router.include_router(media.router)
 router.include_router(whatsapp.router)
 router.include_router(votes.router)
+
+# BL-121: mobile Chrome fetch() drops POST body on 307 redirect. Register the
+# collection endpoints at empty path too so /api/v1/items (no slash) doesn't
+# 307-redirect to /api/v1/items/ (with slash). Same pattern used for payments.
+from typing import List  # noqa: E402
+from src.schemas.item import ItemOut  # noqa: E402
+
+router.add_api_route(
+    "", crud.list_items, methods=["GET"],
+    response_model=List[ItemOut], include_in_schema=False,
+)
+router.add_api_route(
+    "", crud.create_item, methods=["POST"],
+    response_model=ItemOut, status_code=201, include_in_schema=False,
+)
