@@ -6,7 +6,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, ConfigDict
 
-from src.models.backlog import BacklogItemType, BacklogStatus, BacklogPriority
+from src.models.backlog import BacklogItemType, BacklogStatus, BacklogPriority, FeedbackMediaType
 
 
 # ================================================================
@@ -72,6 +72,23 @@ class BacklogActivityRead(BaseModel):
     old_value: Optional[str] = None
     new_value: Optional[str] = None
     comment: Optional[str] = None
+    created_at: datetime
+
+
+# ================================================================
+# Feedback Media
+# ================================================================
+class FeedbackMediaRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    item_id: UUID
+    media_type: FeedbackMediaType
+    url: str
+    filename: Optional[str] = None
+    mime_type: Optional[str] = None
+    file_size: Optional[int] = None
+    uploader: Optional[str] = None
     created_at: datetime
 
 

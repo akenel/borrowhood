@@ -10,6 +10,7 @@ function backlogBoard() {
         items: [],
         selectedItem: null,
         activities: [],
+        itemMedia: [],
         showCreateModal: false,
         filterStatus: '',
         filterPriority: '',
@@ -54,10 +55,17 @@ function backlogBoard() {
 
         async openDetail(item) {
             this.selectedItem = item;
+            this.activities = [];
+            this.itemMedia = [];
             try {
-                this.activities = await this.api(`/api/v1/backlog/items/${item.id}/activities`);
+                const [acts, media] = await Promise.all([
+                    this.api(`/api/v1/backlog/items/${item.id}/activities`),
+                    this.api(`/api/v1/backlog/items/${item.id}/media`).catch(() => []),
+                ]);
+                this.activities = acts;
+                this.itemMedia = media;
             } catch (e) {
-                this.activities = [];
+                // activities failure already leaves empty array
             }
         },
 

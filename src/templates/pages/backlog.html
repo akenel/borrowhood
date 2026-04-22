@@ -237,6 +237,37 @@
                     </template>
                 </div>
 
+                <!-- Attachments (feedback media) -->
+                <div x-show="itemMedia && itemMedia.length > 0" class="border-t border-gray-200 pt-4 mb-4">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Attachments <span class="text-xs text-gray-400" x-text="'(' + itemMedia.length + ')'"></span></h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <template x-for="m in itemMedia" :key="m.id">
+                            <div class="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                                <template x-if="m.media_type === 'image'">
+                                    <a :href="m.url" target="_blank" class="block">
+                                        <img :src="m.url" :alt="m.filename" class="w-full h-24 object-cover">
+                                    </a>
+                                </template>
+                                <template x-if="m.media_type === 'video' || m.media_type === 'screen_capture'">
+                                    <video :src="m.url" controls class="w-full h-24 bg-black"></video>
+                                </template>
+                                <template x-if="m.media_type === 'document' || m.media_type === 'session_report'">
+                                    <a :href="m.url" target="_blank" class="flex items-center justify-center h-24 bg-white hover:bg-gray-100 transition-colors">
+                                        <div class="text-center">
+                                            <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                            <span class="text-[10px] text-gray-600" x-text="m.media_type === 'session_report' ? 'Session report' : 'Document'"></span>
+                                        </div>
+                                    </a>
+                                </template>
+                                <div class="px-2 py-1 bg-white border-t border-gray-100">
+                                    <p class="text-[10px] text-gray-600 truncate" x-text="m.filename || m.media_type"></p>
+                                    <p class="text-[9px] text-gray-400" x-text="Math.round((m.file_size || 0)/1024) + ' KB · ' + (m.uploader || '?')"></p>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
                 <!-- Activity Trail -->
                 <div class="border-t border-gray-200 pt-4">
                     <h3 class="text-sm font-semibold text-gray-700 mb-3">Activity</h3>

@@ -5,27 +5,36 @@ No HelixApplication filtering -- single app.
 """
 
 import logging
-from datetime import datetime, timezone
+import uuid as uuid_mod
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.database import get_db
 from src.dependencies import get_current_user_token, require_auth
 from src.i18n import detect_language, get_translator, SUPPORTED_LANGUAGES
 from src.models.backlog import (
+    ALLOWED_FEEDBACK_MIME_TYPES, MAX_FEEDBACK_FILE_SIZE,
     BHBacklogItem, BacklogItemType, BacklogStatus, BacklogPriority,
     BHBacklogActivity, BacklogActivityType,
+    BHFeedbackMedia, FeedbackMediaType,
 )
 from src.schemas.backlog import (
     BacklogItemCreate, BacklogItemUpdate, BacklogItemRead,
-    BacklogActivityRead, BacklogSummary,
+    BacklogActivityRead, BacklogSummary, FeedbackMediaRead,
 )
+
+FEEDBACK_UPLOAD_DIR = Path(__file__).resolve().parent.parent / "static" / "uploads" / "feedback"
+MAX_ATTACHMENTS_PER_ITEM = 5  # 3 user files + session_report + optional screen_capture
+FEEDBACK_UPLOAD_WINDOW = timedelta(hours=1)
 
 logger = logging.getLogger("bh.backlog_router")
 
@@ -285,7 +294,116 @@ async def submit_feedback(
     await db.commit()
 
     logger.info(f"BL-{next_number:03d} feedback from {submitter}: {title}")
-    return {"detail": "Feedback received", "item_number": next_number}
+    return {"detail": "Feedback received", "item_number": next_number, "item_id": str(new_item.id)}
+
+
+# ================================================================
+# API: Feedback Media (attach to a recent feedback -- public)
+# ================================================================
+def _classify_media(mime: str) -> FeedbackMediaType:
+    if mime == "application/json":
+        return FeedbackMediaType.SESSION_REPORT
+    if mime == "application/pdf":
+        return FeedbackMediaType.DOCUMENT
+    if mime.startswith("video/"):
+        return FeedbackMediaType.VIDEO
+    return FeedbackMediaType.IMAGE
+
+
+_EXT_BY_MIME = {
+    "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif",
+    "video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov",
+    "application/pdf": "pdf", "application/json": "json",
+}
+
+
+@router.post("/feedback/{item_number}/media", response_model=FeedbackMediaRead, status_code=201)
+async def upload_feedback_media(
+    item_number: int,
+    file: UploadFile = File(...),
+    kind: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+    token: Optional[dict] = Depends(get_current_user_token),
+):
+    """Attach a file to a feedback backlog item.
+
+    Public (no auth). Only allowed within FEEDBACK_UPLOAD_WINDOW of item creation
+    and capped at MAX_ATTACHMENTS_PER_ITEM files per item to prevent drive-by abuse.
+    """
+    if file.content_type not in ALLOWED_FEEDBACK_MIME_TYPES:
+        raise HTTPException(status_code=400, detail=f"Unsupported type: {file.content_type}")
+
+    item = (await db.execute(
+        select(BHBacklogItem).where(BHBacklogItem.item_number == item_number)
+    )).scalar_one_or_none()
+    if not item:
+        raise HTTPException(status_code=404, detail="Feedback item not found")
+
+    if "user-feedback" not in (item.tags or ""):
+        raise HTTPException(status_code=400, detail="Not a user-feedback item")
+
+    age = datetime.now(timezone.utc) - item.created_at
+    if age > FEEDBACK_UPLOAD_WINDOW:
+        raise HTTPException(status_code=410, detail="Upload window closed (1 hour after submission)")
+
+    existing = (await db.execute(
+        select(func.count()).select_from(BHFeedbackMedia).where(BHFeedbackMedia.item_id == item.id)
+    )).scalar()
+    if existing >= MAX_ATTACHMENTS_PER_ITEM:
+        raise HTTPException(status_code=409, detail="Attachment limit reached")
+
+    contents = await file.read()
+    if len(contents) > MAX_FEEDBACK_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="File too large (max 10 MB)")
+
+    if kind == "screen_capture":
+        media_type = FeedbackMediaType.SCREEN_CAPTURE
+    else:
+        media_type = _classify_media(file.content_type)
+
+    ext = _EXT_BY_MIME.get(file.content_type, "bin")
+    filename = f"{uuid_mod.uuid4().hex}.{ext}"
+    FEEDBACK_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    (FEEDBACK_UPLOAD_DIR / filename).write_bytes(contents)
+
+    uploader = item.created_by
+    if token:
+        try:
+            from src.dependencies import get_user as _gu
+            u = await _gu(db, token)
+            uploader = u.display_name or u.username or uploader
+        except Exception:
+            pass
+
+    media = BHFeedbackMedia(
+        item_id=item.id,
+        media_type=media_type,
+        url=f"/static/uploads/feedback/{filename}",
+        filename=file.filename or filename,
+        mime_type=file.content_type,
+        file_size=len(contents),
+        uploader=uploader,
+    )
+    db.add(media)
+    await db.commit()
+    await db.refresh(media)
+    logger.info(f"BL-{item.item_number:03d} attachment: {media_type.value} ({len(contents)} bytes)")
+    return media
+
+
+@router.get("/items/{item_id}/media", response_model=list[FeedbackMediaRead])
+async def list_item_media(
+    item_id: UUID,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """List all media attachments on a backlog item."""
+    result = await db.execute(
+        select(BHFeedbackMedia)
+        .where(BHFeedbackMedia.item_id == item_id)
+        .order_by(BHFeedbackMedia.created_at.asc())
+    )
+    return result.scalars().all()
 
 
 # ================================================================

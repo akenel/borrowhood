@@ -50,6 +50,24 @@ class BacklogActivityType(str, enum.Enum):
     COMMENT = "comment"
 
 
+class FeedbackMediaType(str, enum.Enum):
+    IMAGE = "image"
+    VIDEO = "video"
+    DOCUMENT = "document"
+    SCREEN_CAPTURE = "screen_capture"
+    SESSION_REPORT = "session_report"
+
+
+ALLOWED_FEEDBACK_MIME_TYPES = {
+    "image/jpeg", "image/png", "image/webp", "image/gif",
+    "video/mp4", "video/webm", "video/quicktime",
+    "application/pdf",
+    "application/json",
+}
+
+MAX_FEEDBACK_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+
+
 # ================================================================
 # Backlog Item
 # ================================================================
@@ -90,6 +108,10 @@ class BHBacklogItem(BHBase, Base):
         back_populates="item", cascade="all, delete-orphan",
         order_by="BHBacklogActivity.created_at",
     )
+    media: Mapped[List["BHFeedbackMedia"]] = relationship(
+        back_populates="item", cascade="all, delete-orphan",
+        order_by="BHFeedbackMedia.created_at",
+    )
 
 
 # ================================================================
@@ -117,4 +139,33 @@ class BHBacklogActivity(BHBase, Base):
     # Relationship
     item: Mapped["BHBacklogItem"] = relationship(
         back_populates="activities", foreign_keys=[item_id],
+    )
+
+
+# ================================================================
+# Feedback Media (screenshots, clips, docs, session reports)
+# ================================================================
+class BHFeedbackMedia(BHBase, Base):
+    """Attachment on a backlog item. Images/video/PDF uploaded by the
+    reporter, plus the auto-captured session-report JSON."""
+
+    __tablename__ = "bh_feedback_media"
+
+    item_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_backlog_item.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
+    media_type: Mapped[FeedbackMediaType] = mapped_column(
+        SQLEnum(FeedbackMediaType, name="bh_feedback_media_type", create_constraint=True,
+                values_callable=lambda x: [e.value for e in x]),
+        nullable=False,
+    )
+    url: Mapped[str] = mapped_column(String(500), nullable=False)
+    filename: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    mime_type: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    file_size: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    uploader: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+
+    item: Mapped["BHBacklogItem"] = relationship(
+        back_populates="media", foreign_keys=[item_id],
     )
