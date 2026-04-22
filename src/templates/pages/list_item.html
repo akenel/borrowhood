@@ -316,7 +316,7 @@
                         const baseVal = base[key] == null ? '' : base[key];
                         const curVal = this.form[key] == null ? '' : this.form[key];
                         if (curVal !== baseVal) {
-                            // Empty string means "user explicitly cleared" -> send null
+                            // Empty string = user cleared the field -> send null
                             changes[key] = curVal === '' ? null : curVal;
                         }
                     }
