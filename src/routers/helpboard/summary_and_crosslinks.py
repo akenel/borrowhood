@@ -26,7 +26,7 @@ from src.schemas.helpboard import (
     HelpDraftRequest, HelpDraftResponse,
 )
 
-from ._shared import UPLOAD_DIR, _enrich_post, _enrich_reply, _build_reply_tree
+from ._shared import UPLOAD_DIR, POST_EAGER, _enrich_post, _enrich_reply, _build_reply_tree
 
 router = APIRouter()
 
