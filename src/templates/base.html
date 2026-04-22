@@ -867,14 +867,21 @@
         submitting: false,
         submitted: false,
         blNumber: null,
-        attachments: [],
-        uploading: false,
+        queue: [],
+        uploadedCount: 0,
         recording: false,
         recorder: null,
         recordStream: null,
         recordChunks: [],
         recordSeconds: 0,
         recordTimer: null,
+
+        get canAddMore() { return this.queue.length < 3; },
+        get sendLabel() {
+            if (this.submitting) return '{{ t("feedback.sending") }}';
+            if (this.queue.length === 0) return '{{ t("feedback.send") }}';
+            return '{{ t("feedback.send") }} + ' + this.queue.length + (this.queue.length === 1 ? ' file' : ' files');
+        },
 
         buildDiagnostics() {
             try {
@@ -891,21 +898,17 @@
                         time_on_page_s: Math.round((Date.now() - (diag.startedAt || Date.now())) / 1000)
                     },
                     viewport: {
-                        innerWidth: window.innerWidth,
-                        innerHeight: window.innerHeight,
+                        innerWidth: window.innerWidth, innerHeight: window.innerHeight,
                         dpr: window.devicePixelRatio || 1,
                         orientation: (screen.orientation && screen.orientation.type) || null
                     },
                     scroll: { x: window.scrollX, y: window.scrollY, maxY: document.documentElement.scrollHeight },
                     screen: { width: screen.width, height: screen.height, colorDepth: screen.colorDepth },
                     browser: {
-                        userAgent: navigator.userAgent,
-                        language: navigator.language,
+                        userAgent: navigator.userAgent, language: navigator.language,
                         languages: (navigator.languages || []).slice(0, 3),
-                        platform: navigator.platform,
-                        online: navigator.onLine,
-                        cookieEnabled: navigator.cookieEnabled,
-                        timezone: tz
+                        platform: navigator.platform, online: navigator.onLine,
+                        cookieEnabled: navigator.cookieEnabled, timezone: tz
                     },
                     recent_errors: diag.errors || [],
                     recent_fetch_failures: diag.fetchFailures || []
@@ -915,79 +918,27 @@
             }
         },
 
-        async uploadDiagnostics() {
-            if (!this.blNumber) return;
-            try {
-                var diag = this.buildDiagnostics();
-                var blob = new Blob([JSON.stringify(diag, null, 2)], { type: 'application/json' });
-                var fd = new FormData();
-                fd.append('file', blob, 'session_report.json');
-                await fetch('/api/v1/backlog/feedback/' + this.blNumber + '/media', { method: 'POST', body: fd });
-            } catch (e) { /* silent */ }
-        },
-
-        async submitFeedback() {
-            if (this.message.length < 5) return;
-            this.submitting = true;
-            try {
-                const resp = await fetch('/api/v1/backlog/feedback', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: this.message,
-                        page_url: window.location.href,
-                        feedback_type: this.feedbackType,
-                        email: this.email || null,
-                    })
-                });
-                if (!resp.ok) { const e = await resp.json(); throw new Error(e.detail || 'Failed'); }
-                const data = await resp.json();
-                this.blNumber = data.item_number;
-                this.submitted = true;
-                this.message = '';
-                // Fire-and-forget: auto-capture session diagnostics
-                this.uploadDiagnostics();
-            } catch (e) {
-                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } }));
-            } finally {
-                this.submitting = false;
-            }
-        },
-
-        async pickFiles(event) {
+        pickFiles(event) {
             var files = Array.from(event.target.files || []);
             event.target.value = '';
-            if (!files.length || !this.blNumber) return;
-            this.uploading = true;
-            for (var i = 0; i < files.length && this.attachments.length < 3; i++) {
+            for (var i = 0; i < files.length && this.queue.length < 3; i++) {
                 var f = files[i];
                 if (f.size > 10 * 1024 * 1024) {
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: f.name + ': file too large (max 10 MB)' } }));
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: f.name + ': too large (max 10 MB)' } }));
                     continue;
                 }
-                try {
-                    var fd = new FormData();
-                    fd.append('file', f, f.name);
-                    var r = await fetch('/api/v1/backlog/feedback/' + this.blNumber + '/media', { method: 'POST', body: fd });
-                    if (r.ok) {
-                        var m = await r.json();
-                        this.attachments.push(m);
-                    } else {
-                        var err = await r.json().catch(function(){ return { detail: 'Upload failed' }; });
-                        window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: f.name + ': ' + err.detail } }));
-                    }
-                } catch (e) {
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Upload failed: ' + e.message } }));
-                }
+                this.queue.push({ kind: 'file', name: f.name, size: f.size, mime: f.type, blob: f });
             }
-            this.uploading = false;
         },
+
+        removeQueued(idx) { this.queue.splice(idx, 1); },
 
         async startRecording() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
                 window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Screen capture not supported in this browser' } }));
                 return;
             }
+            if (!this.canAddMore) return;
             try {
                 var stream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 15 }, audio: false });
                 this.recordStream = stream;
@@ -996,7 +947,7 @@
                 this.recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 1_500_000 });
                 var self = this;
                 this.recorder.ondataavailable = function (e) { if (e.data && e.data.size > 0) self.recordChunks.push(e.data); };
-                this.recorder.onstop = async function () {
+                this.recorder.onstop = function () {
                     var blob = new Blob(self.recordChunks, { type: 'video/webm' });
                     stream.getTracks().forEach(function (t) { t.stop(); });
                     self.recordStream = null;
@@ -1004,19 +955,7 @@
                         window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Recording too large (max 10 MB). Try a shorter clip.' } }));
                         return;
                     }
-                    self.uploading = true;
-                    try {
-                        var fd = new FormData();
-                        fd.append('file', blob, 'screen_capture.webm');
-                        var r = await fetch('/api/v1/backlog/feedback/' + self.blNumber + '/media?kind=screen_capture', { method: 'POST', body: fd });
-                        if (r.ok) {
-                            self.attachments.push(await r.json());
-                        } else {
-                            window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Recording upload failed' } }));
-                        }
-                    } finally {
-                        self.uploading = false;
-                    }
+                    self.queue.push({ kind: 'screen_capture', name: 'screen_capture.webm', size: blob.size, mime: 'video/webm', blob: blob });
                 };
                 this.recorder.start();
                 this.recording = true;
@@ -1041,14 +980,67 @@
             this.recording = false;
         },
 
+        async uploadOne(item, blNumber) {
+            var fd = new FormData();
+            fd.append('file', item.blob, item.name);
+            var url = '/api/v1/backlog/feedback/' + blNumber + '/media';
+            if (item.kind === 'screen_capture') url += '?kind=screen_capture';
+            var r = await fetch(url, { method: 'POST', body: fd });
+            return r.ok;
+        },
+
+        async submitFeedback() {
+            if (this.message.length < 5) return;
+            if (this.recording) this.stopRecording();
+            this.submitting = true;
+            try {
+                const resp = await fetch('/api/v1/backlog/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: this.message,
+                        page_url: window.location.href,
+                        feedback_type: this.feedbackType,
+                        email: this.email || null,
+                    })
+                });
+                if (!resp.ok) { const e = await resp.json(); throw new Error(e.detail || 'Failed'); }
+                const data = await resp.json();
+                this.blNumber = data.item_number;
+
+                // Upload diagnostics silently
+                try {
+                    var diag = this.buildDiagnostics();
+                    var diagBlob = new Blob([JSON.stringify(diag, null, 2)], { type: 'application/json' });
+                    var diagFd = new FormData();
+                    diagFd.append('file', diagBlob, 'session_report.json');
+                    fetch('/api/v1/backlog/feedback/' + this.blNumber + '/media', { method: 'POST', body: diagFd });
+                } catch (e) {}
+
+                // Upload queued files sequentially
+                this.uploadedCount = 0;
+                for (var i = 0; i < this.queue.length; i++) {
+                    var ok = await this.uploadOne(this.queue[i], this.blNumber);
+                    if (ok) this.uploadedCount += 1;
+                }
+
+                this.submitted = true;
+                this.message = '';
+            } catch (e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } }));
+            } finally {
+                this.submitting = false;
+            }
+        },
+
         reset() {
             this.stopRecording();
             this.open = false;
             this.submitted = false;
             this.blNumber = null;
             this.message = '';
-            this.attachments = [];
-            this.uploading = false;
+            this.queue = [];
+            this.uploadedCount = 0;
         }
     }">
         <!-- Floating button -->
@@ -1084,66 +1076,19 @@
 
             <!-- Success state -->
             <template x-if="submitted">
-                <div class="p-5 space-y-4">
-                    <div class="text-center">
-                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                            </svg>
-                        </div>
+                <div class="p-5 text-center space-y-3">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <div>
                         <p class="font-semibold text-gray-900 text-sm">{{  t('feedback.thanks') }}</p>
                         <p class="text-xs text-gray-500 mt-0.5"><span x-text="'BL-' + String(blNumber).padStart(3, '0')"></span> {{ t('feedback.created') }}</p>
+                        <p x-show="uploadedCount > 0" class="text-xs text-gray-500 mt-1"
+                           x-text="uploadedCount + (uploadedCount === 1 ? ' attachment sent' : ' attachments sent')"></p>
                     </div>
-
-                    <!-- Attachment controls -->
-                    <div class="border-t border-gray-100 pt-3 space-y-2">
-                        <p class="text-xs font-semibold text-gray-700">Help us see it</p>
-                        <p class="text-[11px] text-gray-500 leading-snug">Optional -- attach a screenshot, short clip, or PDF. Up to 3 files, 10 MB each.</p>
-
-                        <!-- Record screen -->
-                        <template x-if="!recording">
-                            <button @click="startRecording()" :disabled="uploading || attachments.length >= 3"
-                                    class="w-full py-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-medium rounded-lg text-xs flex items-center justify-center gap-1.5 disabled:opacity-50">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                Record this screen (up to 30s)
-                            </button>
-                        </template>
-                        <template x-if="recording">
-                            <button @click="stopRecording()"
-                                    class="w-full py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg text-xs flex items-center justify-center gap-1.5 animate-pulse">
-                                <span class="w-2 h-2 bg-white rounded-sm"></span>
-                                Stop recording <span x-text="'(' + recordSeconds + 's / 30s)'"></span>
-                            </button>
-                        </template>
-
-                        <!-- File picker -->
-                        <label class="block">
-                            <input type="file" class="hidden" multiple
-                                   accept="image/*,video/*,application/pdf"
-                                   @change="pickFiles($event)"
-                                   :disabled="uploading || recording || attachments.length >= 3">
-                            <span class="w-full py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-medium rounded-lg text-xs flex items-center justify-center gap-1.5 cursor-pointer"
-                                  :class="(uploading || recording || attachments.length >= 3) ? 'opacity-50 pointer-events-none' : ''">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                                Attach files <span x-show="attachments.length > 0" x-text="'(' + attachments.length + '/3)'" class="text-gray-400"></span>
-                            </span>
-                        </label>
-
-                        <p x-show="uploading" class="text-[11px] text-gray-500 text-center animate-pulse">Uploading…</p>
-
-                        <!-- Uploaded list -->
-                        <div x-show="attachments.length > 0" class="space-y-1">
-                            <template x-for="a in attachments" :key="a.id">
-                                <div class="flex items-center gap-2 text-[11px] text-gray-600 bg-gray-50 rounded px-2 py-1">
-                                    <svg class="w-3 h-3 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                    <span class="truncate" x-text="a.filename || a.media_type"></span>
-                                    <span class="text-gray-400 flex-shrink-0" x-text="Math.round((a.file_size || 0)/1024) + ' KB'"></span>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-
-                    <button @click="reset()" class="w-full text-sm text-rose-600 font-semibold hover:underline py-1">{{  t('feedback.close') }}</button>
+                    <button @click="reset()" class="w-full py-2 text-sm text-rose-600 font-semibold hover:underline">{{  t('feedback.close') }}</button>
                 </div>
             </template>
 
@@ -1177,13 +1122,67 @@
                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500">
                     {% endif %}
 
+                    <!-- Attachments: file picker + screen record -->
+                    <div class="border-t border-gray-100 pt-3 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-semibold text-gray-700 uppercase tracking-wide">Attach evidence</span>
+                            <span x-show="queue.length > 0" class="text-[10px] text-gray-400" x-text="queue.length + '/3'"></span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <!-- File picker -->
+                            <label class="relative">
+                                <input type="file" class="hidden" multiple
+                                       accept="image/*,video/*,application/pdf"
+                                       @change="pickFiles($event)"
+                                       :disabled="!canAddMore || recording || submitting">
+                                <span class="w-full py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-medium rounded-lg text-xs flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px]"
+                                      :class="(!canAddMore || recording || submitting) ? 'opacity-40 pointer-events-none' : ''">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                    Files
+                                </span>
+                            </label>
+
+                            <!-- Screen record -->
+                            <template x-if="!recording">
+                                <button @click="startRecording()" :disabled="!canAddMore || submitting"
+                                        class="w-full py-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-medium rounded-lg text-xs flex items-center justify-center gap-1.5 disabled:opacity-40 min-h-[38px]">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Record
+                                </button>
+                            </template>
+                            <template x-if="recording">
+                                <button @click="stopRecording()"
+                                        class="w-full py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg text-xs flex items-center justify-center gap-1.5 animate-pulse min-h-[38px]">
+                                    <span class="w-2 h-2 bg-white rounded-sm"></span>
+                                    <span x-text="'Stop (' + recordSeconds + 's)'"></span>
+                                </button>
+                            </template>
+                        </div>
+
+                        <p class="text-[10px] text-gray-400 leading-snug">Screenshots, short clips, or PDFs. Up to 3 files, 10 MB each. Your page URL and a diagnostic snapshot (viewport, recent errors) are attached automatically.</p>
+
+                        <!-- Queue list -->
+                        <div x-show="queue.length > 0" class="space-y-1">
+                            <template x-for="(q, idx) in queue" :key="idx">
+                                <div class="flex items-center gap-2 text-[11px] text-gray-600 bg-gray-50 rounded px-2 py-1">
+                                    <svg x-show="q.kind === 'screen_capture'" class="w-3 h-3 text-rose-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5"/></svg>
+                                    <svg x-show="q.kind === 'file' && (q.mime || '').startsWith('image/')" class="w-3 h-3 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    <svg x-show="q.kind === 'file' && (q.mime || '').startsWith('video/')" class="w-3 h-3 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                    <svg x-show="q.kind === 'file' && q.mime === 'application/pdf'" class="w-3 h-3 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    <span class="truncate flex-1" x-text="q.name"></span>
+                                    <span class="text-gray-400 flex-shrink-0" x-text="Math.round(q.size/1024) + ' KB'"></span>
+                                    <button @click="removeQueued(idx)" :disabled="submitting" class="text-gray-400 hover:text-red-500 flex-shrink-0 text-sm leading-none disabled:opacity-30">&times;</button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
                     <!-- Submit -->
-                    <button @click="submitFeedback()" :disabled="submitting || message.length < 5"
+                    <button @click="submitFeedback()" :disabled="submitting || message.length < 5 || recording"
                             class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg text-sm disabled:opacity-50 transition-colors min-h-[44px]">
-                        <template x-if="submitting"><span>{{ t('feedback.sending') }}</span></template>
-                        <template x-if="!submitting"><span>{{ t('feedback.send') }}</span></template>
+                        <span x-text="sendLabel"></span>
                     </button>
-                    <p class="text-xs text-gray-400 text-center">{{  t('feedback.page_captured') }}</p>
                 </div>
             </template>
         </div>
