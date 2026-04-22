@@ -302,6 +302,8 @@
                             <div class="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden"
                                  :class="ev.is_raffle ? 'bg-gradient-to-br from-amber-100 to-orange-100' : 'bg-gray-100'">
                                 <img x-show="ev.image" :src="ev.image" :alt="ev.title"
+                                     loading="lazy" decoding="async"
+                                     @error="ev.image = null"
                                      class="w-full h-full object-cover">
                                 <div x-show="!ev.image && !ev.is_raffle" class="w-full h-full flex items-center justify-center">
                                     <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
