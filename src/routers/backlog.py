@@ -44,6 +44,10 @@ logger = logging.getLogger("bh.backlog_router")
 router = APIRouter(prefix="/api/v1/backlog", tags=["Backlog"])
 html_router = APIRouter(tags=["Backlog - Web UI"])
 templates = Jinja2Templates(directory="src/templates")
+# base.html footer uses {{ now().year }} -- register the same Jinja globals
+# the pages router exposes so shared templates don't blow up here.
+templates.env.globals["now"] = lambda: datetime.now(timezone.utc)
+templates.env.globals["now_utc"] = lambda: datetime.now(timezone.utc)
 
 
 def _ctx(request: Request, token: Optional[dict] = None, **kwargs) -> dict:
