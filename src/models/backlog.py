@@ -102,6 +102,15 @@ class BHBacklogItem(BHBase, Base):
     blocked_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     tags: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     created_by: Mapped[str] = mapped_column(String(100), nullable=False, default="Angel")
+    reporter_user_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("bh_user.id", ondelete="SET NULL"),
+        nullable=True, index=True,
+    )
+    reporter_rewarded_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True,
+    )
+    resolution_sha: Mapped[Optional[str]] = mapped_column(String(40), nullable=True)
+    resolution_note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # Relationships
     activities: Mapped[List["BHBacklogActivity"]] = relationship(

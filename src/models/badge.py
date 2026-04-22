@@ -31,6 +31,9 @@ class BadgeCode(str, enum.Enum):
     WORKSHOP_PRO = "workshop_pro"             # Complete profile + banner + bio
     GENEROUS_NEIGHBOR = "generous_neighbor"   # Gave away 3+ items
     ORIGINATOR = "originator"                 # First to list in a category
+    BUG_SPOTTER = "bug_spotter"               # First confirmed feedback fix
+    QUALITY_GUARDIAN = "quality_guardian"     # 10 confirmed feedback fixes
+    CODE_WHISPERER = "code_whisperer"         # 25 confirmed feedback fixes
 
 
 # Badge metadata (display info)
@@ -130,6 +133,24 @@ BADGE_INFO = {
         "description": "First person to list an item in a category",
         "icon": "flag",
         "color": "indigo",
+    },
+    BadgeCode.BUG_SPOTTER: {
+        "name": "Bug Spotter",
+        "description": "Reported your first issue that got fixed",
+        "icon": "bug-ant",
+        "color": "rose",
+    },
+    BadgeCode.QUALITY_GUARDIAN: {
+        "name": "Quality Guardian",
+        "description": "10 confirmed fixes from your feedback",
+        "icon": "shield-check",
+        "color": "amber",
+    },
+    BadgeCode.CODE_WHISPERER: {
+        "name": "Code Whisperer",
+        "description": "25 confirmed fixes -- a legend of the help loop",
+        "icon": "sparkles",
+        "color": "violet",
     },
 }
 

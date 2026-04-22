@@ -242,15 +242,34 @@ async def submit_feedback(
     """Submit user feedback -- creates a backlog item tagged 'user-feedback'.
 
     Works for both logged-in and anonymous users.
-    Rate limited by IP via the global rate limiter.
+    Rate limited: 6/hour per logged-in user (anti-spam), IP rate limit always.
+    Logged-in users get reporter_user_id set so we can reward them when fixed.
     """
-    # Determine who submitted
+    # Determine who submitted + capture reporter id for reward loop
     submitter = "Anonymous"
+    reporter_user_id = None
     if token:
-        from src.dependencies import get_user
+        from src.dependencies import _cleanup_user_actions, _user_actions, get_user
+        import time as _time
         try:
             user = await get_user(db, token)
             submitter = user.display_name or user.username or user.email
+            reporter_user_id = user.id
+            # Per-user anti-spam: 6 feedback submits per hour
+            key = f"{user.id}:feedback"
+            now = _time.monotonic()
+            _cleanup_user_actions(now)
+            cutoff = now - 3600
+            timestamps = [t for t in _user_actions[key] if t > cutoff]
+            if len(timestamps) >= 6:
+                raise HTTPException(
+                    status_code=429,
+                    detail="You're on a feedback roll. Try again in an hour -- our engineers need time to catch up.",
+                )
+            timestamps.append(now)
+            _user_actions[key] = timestamps
+        except HTTPException:
+            raise
         except Exception:
             pass
     elif data.email:
@@ -293,6 +312,7 @@ async def submit_feedback(
         priority=priority,
         tags="user-feedback",
         created_by=submitter,
+        reporter_user_id=reporter_user_id,
     )
     db.add(new_item)
     await db.commit()
@@ -506,6 +526,14 @@ async def update_item(
 
     for activity in activities:
         db.add(activity)
+
+    # Feedback reward hook: item just flipped to DONE
+    if update.status == BacklogStatus.DONE and item.status == BacklogStatus.DONE:
+        from src.services.backlog_rewards import reward_reporter_on_done
+        try:
+            await reward_reporter_on_done(db, item)
+        except Exception as exc:
+            logger.warning("reward_reporter_on_done failed for BL-%d: %s", item.item_number, exc)
 
     await db.commit()
     await db.refresh(item)

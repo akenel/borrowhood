@@ -935,6 +935,8 @@
         recordChunks: [],
         recordSeconds: 0,
         recordTimer: null,
+        tipShow: false,
+        tipTimer: null,
 
         get canAddMore() { return this.queue.length < 3; },
         get sendLabel() {
@@ -1106,7 +1108,9 @@
         <!-- Floating button -->
         <!-- Mobile: 40px, right-4, cleared above bottom-nav (4rem + safe-area);
              Desktop (lg+): 48px, right-6, bottom-6 (nav hidden there). -->
-        <button @click="open = !open; submitted = false"
+        <button @click="open = !open; submitted = false; tipShow = false"
+                @mouseenter="if (!open) tipTimer = setTimeout(() => tipShow = true, 400)"
+                @mouseleave="clearTimeout(tipTimer); tipShow = false"
                 aria-label="Feedback"
                 class="fixed right-4 lg:right-6 bottom-[calc(6rem+env(safe-area-inset-bottom))] lg:bottom-6 z-40 w-10 h-10 lg:w-12 lg:h-12 bg-rose-600 hover:bg-rose-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 opacity-80 hover:opacity-100"
                 :class="open ? 'rotate-45' : ''">
@@ -1117,6 +1121,18 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
         </button>
+
+        <!-- Hover tooltip: contributor pitch -->
+        <div x-show="tipShow && !open" x-cloak
+             x-transition:enter="transition ease-out duration-150"
+             x-transition:enter-start="opacity-0 translate-y-1"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             class="hidden lg:block fixed right-20 bottom-6 z-40 w-64 p-3 bg-gray-900 text-white rounded-lg shadow-xl pointer-events-none">
+            <p class="font-semibold text-sm">{{ t('feedback.tooltip_title') }}</p>
+            <p class="text-xs text-gray-300 mt-1">{{ t('feedback.tooltip_body') }}</p>
+            <p class="text-xs text-amber-300 mt-2 font-medium">{{ t('feedback.tooltip_reward') }}</p>
+            <div class="absolute top-1/2 -right-1 w-2 h-2 bg-gray-900 transform rotate-45 -translate-y-1/2"></div>
+        </div>
 
         <!-- Feedback panel -->
         <div x-show="open" x-cloak
@@ -1155,6 +1171,12 @@
             <!-- Form -->
             <template x-if="!submitted">
                 <div class="p-4 space-y-3">
+                    <!-- Contributor pitch: how the loop works -->
+                    <div class="bg-gradient-to-br from-rose-50 to-amber-50 border border-rose-200 rounded-lg p-3 text-xs text-gray-700 space-y-1">
+                        <p class="font-semibold text-rose-700">{{ t('feedback.how_it_works_title') }}</p>
+                        <p>{{ t('feedback.how_it_works_body') }}</p>
+                        <p class="text-amber-700 font-medium">{{ t('feedback.how_it_works_reward') }}</p>
+                    </div>
                     <!-- Type selector -->
                     <div class="flex gap-1 bg-gray-100 rounded-lg p-0.5">
                         <button @click="feedbackType = 'bug'" class="flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors"
