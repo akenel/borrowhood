@@ -431,6 +431,14 @@
 
                 // Step 2a: Edit mode -- PATCH existing listings
                 if (this.editMode && window._editData && window._editData.listings) {
+                    // Hydrated from first listing; if unchanged, don't send (preserves per-listing values)
+                    const firstListing = window._editData.listings[0] || {};
+                    const hydratedNotes = firstListing.notes || '';
+                    const hydratedReturnPolicy = firstListing.return_policy || '';
+                    const curNotes = this.form.notes || '';
+                    const curReturnPolicy = this.form.return_policy || '';
+                    const notesChanged = curNotes !== hydratedNotes;
+                    const returnPolicyChanged = curReturnPolicy !== hydratedReturnPolicy;
                     for (const existing of window._editData.listings) {
                         const lt = existing.listing_type;
                         const terms = this.listingPrices[lt];
@@ -443,9 +451,9 @@
                             deposit: (isGiveaway || isSvcType) ? null : (terms.deposit ? parseFloat(terms.deposit) : null),
                             delivery_available: isGiveaway ? false : this.form.delivery_available,
                             pickup_only: isGiveaway ? true : !this.form.delivery_available,
-                            notes: this.form.notes || null,
-                            return_policy: this.form.return_policy || null
                         };
+                        if (notesChanged) payload.notes = curNotes === '' ? null : curNotes;
+                        if (returnPolicyChanged) payload.return_policy = curReturnPolicy === '' ? null : curReturnPolicy;
                         if (isSvcType) {
                             if (terms.minimum_charge) payload.minimum_charge = parseFloat(terms.minimum_charge);
                             if (terms.per_person_rate) payload.per_person_rate = parseFloat(terms.per_person_rate);

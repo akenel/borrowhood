@@ -469,7 +469,9 @@
     "community_meetup": "Incontro Comunitario",
     "sports_event": "Evento Sportivo",
     "market": "Mercato",
-    "festival": "Festival"
+    "festival": "Festival",
+    "cooking": "Cucina",
+    "tech": "Tecnologia"
   },
   "attributes": {
     "year": "Anno",

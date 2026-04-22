@@ -469,7 +469,9 @@
     "community_meetup": "Community Meetup",
     "sports_event": "Sports Event",
     "market": "Market",
-    "festival": "Festival"
+    "festival": "Festival",
+    "cooking": "Cooking",
+    "tech": "Tech"
   },
   "attributes": {
     "year": "Year",
