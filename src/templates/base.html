@@ -151,86 +151,40 @@
     <!-- Navigation -->
     <nav class="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 lg:h-16">
-                <!-- Logo + Desktop Nav -->
-                <div class="flex items-center">
-                    <a href="/" class="flex items-center space-x-2">
-                        <span class="text-xl font-bold text-indigo-600">{{ t('app.name') }}</span>
+            <div class="flex items-center justify-between h-16 gap-4">
+                <!-- Logo + primary nav -->
+                <div class="flex items-center gap-6 min-w-0">
+                    <a href="/" class="flex items-center flex-shrink-0">
+                        <span class="text-xl font-bold text-indigo-600 whitespace-nowrap">{{ t('app.name') }}</span>
                     </a>
-                    <div class="hidden lg:flex lg:ml-8 lg:space-x-1">
-                        <a href="/browse" class="text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5">
+                    <div class="hidden lg:flex items-center gap-1">
+                        <a href="/browse" class="text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5 whitespace-nowrap">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M10 18a8 8 0 110-16 8 8 0 010 16z"/></svg>
                             {{ t('nav.browse') }}
                         </a>
-                        <a href="/chat" class="relative bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-3 py-2 text-sm font-semibold rounded-lg transition-all inline-flex items-center gap-1.5 shadow-sm hover:shadow-md" title="{{ t('nav.chat') }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18 7.5l.34 1.16a2 2 0 001.34 1.34L21 10l-1.32.34a2 2 0 00-1.34 1.34L18 13l-.34-1.32a2 2 0 00-1.34-1.34L15 10l1.32-.34a2 2 0 001.34-1.34L18 7.5zM18 19l.34 1.16a2 2 0 001.34 1.34L21 21.5l-1.32.34a2 2 0 00-1.34 1.34L18 24l-.34-1.32a2 2 0 00-1.34-1.34L15 21.5l1.32-.34a2 2 0 001.34-1.34L18 19z"/></svg>
-                            {{ t('nav.chat') }}
-                        </a>
-                        <a href="/helpboard" class="text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
-                            {{ t('nav.helpboard') }}
-                        </a>
-                        <a href="/calendar" class="text-gray-600 hover:text-rose-600 hover:bg-rose-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                            {{ t('nav.calendar') }}
-                        </a>
-                        <a href="/leaderboard" class="hidden xl:inline-flex text-gray-600 hover:text-amber-600 hover:bg-amber-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors items-center gap-1.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0"/></svg>
-                            {{ t('nav.leaderboard') }}
-                        </a>
-                        <a href="/raffles" class="text-gray-600 hover:text-amber-600 hover:bg-amber-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5">
+                        <a href="/raffles" class="text-gray-600 hover:text-amber-600 hover:bg-amber-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5 whitespace-nowrap">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
                             {% if lang == 'it' %}Sorteggi{% else %}Raffles{% endif %}
                         </a>
-                        <a href="/members" class="hidden xl:inline-flex text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors items-center gap-1.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
-                            {{ t('nav.members') }}
+                        <a href="/calendar" class="text-gray-600 hover:text-rose-600 hover:bg-rose-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5 whitespace-nowrap">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                            {{ t('nav.calendar') }}
                         </a>
-                        {% if user %}
-                        <a href="/dashboard" class="text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
-                            {{ t('nav.dashboard') }}
+                        {% if not user %}
+                        <a href="/helpboard" class="text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5 whitespace-nowrap">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
+                            {{ t('nav.helpboard') }}
                         </a>
                         {% endif %}
-                        <a href="/list" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 text-sm font-semibold rounded-lg transition-colors inline-flex items-center gap-1.5 shadow-sm ml-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                            {{ t('nav.list_item') }}
-                        </a>
                     </div>
                 </div>
 
-                <!-- Right side: lang switch + auth -->
-                <div class="flex items-center space-x-3">
-                    <!-- Text size control — hidden on mobile (lives in hamburger / settings); visible on lg+ -->
-                    <div class="hidden lg:flex items-center gap-0.5" x-data="{
-                        scales: [16, 20, 24, 28, 32, 40, 48],
-                        idx: 0,
-                        init() {
-                            var saved = parseInt(localStorage.getItem('lp-text-scale') || 16);
-                            this.idx = Math.max(0, this.scales.indexOf(saved));
-                            this.apply();
-                        },
-                        smaller() { this.idx = Math.max(0, this.idx - 1); this.apply(); },
-                        larger() { this.idx = Math.min(this.scales.length - 1, this.idx + 1); this.apply(); },
-                        apply() {
-                            var val = this.scales[this.idx];
-                            if (val === 16) { document.body.removeAttribute('data-text-scale'); }
-                            else { document.body.setAttribute('data-text-scale', val); }
-                            localStorage.setItem('lp-text-scale', val);
-                        }
-                    }">
-                        <button @click="smaller()"
-                                title="{{ t('settings.font_size') }}: {{ t('settings.smaller') }}"
-                                class="w-8 h-8 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 font-bold text-xs flex items-center justify-center transition-colors">A-</button>
-                        <button @click="larger()"
-                                title="{{ t('settings.font_size') }}: {{ t('settings.larger') }}"
-                                class="w-8 h-8 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 font-bold text-sm flex items-center justify-center transition-colors">A+</button>
-                    </div>
-
-                    <!-- Language dropdown with flags -->
+                <!-- Right side -->
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <!-- Language dropdown -->
                     <div class="relative hidden lg:block" x-data="{ langOpen: false }">
                         <button @click="langOpen = !langOpen"
-                                class="flex items-center space-x-1.5 px-3 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 rounded-lg hover:bg-gray-50 transition-colors min-h-[44px]">
+                                class="flex items-center gap-1.5 px-2.5 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 rounded-lg hover:bg-gray-50 transition-colors min-h-[44px]">
                             <span class="text-base leading-none">{% if lang == 'it' %}&#127470;&#127481;{% else %}&#127468;&#127463;{% endif %}</span>
                             <span>{{ lang | upper }}</span>
                             <svg class="w-3.5 h-3.5 transition-transform" :class="langOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,14 +198,12 @@
                              class="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg border border-gray-200 shadow-lg z-50 py-1">
                             {% for supported_lang in supported_languages %}
                             <a href="?lang={{ supported_lang }}"
-                               class="flex items-center space-x-2.5 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors
+                               class="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors
                                       {% if supported_lang == lang %}text-indigo-600 font-semibold bg-indigo-50/50{% else %}text-gray-700{% endif %}">
                                 <span class="text-base leading-none">{% if supported_lang == 'it' %}&#127470;&#127481;{% elif supported_lang == 'en' %}&#127468;&#127463;{% endif %}</span>
                                 <span>{% if supported_lang == 'en' %}English{% elif supported_lang == 'it' %}Italiano{% else %}{{ supported_lang | upper }}{% endif %}</span>
                                 {% if supported_lang == lang %}
-                                <svg class="w-4 h-4 ml-auto text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
+                                <svg class="w-4 h-4 ml-auto text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                 {% endif %}
                             </a>
                             {% endfor %}
@@ -279,20 +231,16 @@
                          }"
                          x-init="loadSummary(); pollTimer = setInterval(() => loadSummary(), 30000)">
                         <button @click="open = !open; if(open) loadNotifications()"
-                                class="relative min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 hover:text-indigo-600 transition-colors">
-                            <svg class="w-5 h-5" :class="unread > 0 ? 'text-indigo-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                            </svg>
-                            <!-- Modern notification badge with pulsing ring -->
+                                aria-label="{{ t('nav.notifications') }}"
+                                class="relative min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 hover:text-indigo-600 hover:bg-gray-50 rounded-lg transition-colors">
+                            <svg class="w-5 h-5" :class="unread > 0 ? 'text-indigo-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                             <template x-if="unread > 0">
-                                <span class="absolute -top-1 -right-1 flex items-center justify-center">
+                                <span class="absolute top-1 right-1 flex items-center justify-center">
                                     <span class="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>
-                                    <span class="relative inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-xs font-bold rounded-full ring-2 ring-white shadow-sm"
-                                          x-text="unread > 99 ? '99+' : unread"></span>
+                                    <span class="relative inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-white" x-text="unread > 99 ? '99+' : unread"></span>
                                 </span>
                             </template>
                         </button>
-                        <!-- Dropdown -->
                         <div x-show="open" x-cloak @click.outside="open = false"
                              class="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg border border-gray-200 shadow-lg z-50">
                             <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
@@ -310,6 +258,7 @@
                             </div>
                         </div>
                     </div>
+
                     <!-- Messages icon -->
                     <div class="relative hidden lg:block"
                          x-data="{ msgUnread: 0, pollTimer: null, authLost: false,
@@ -323,33 +272,137 @@
                                    } }"
                          x-init="loadMsgCount(); pollTimer = setInterval(() => loadMsgCount(), 30000)">
                         <a href="/messages"
-                           class="relative min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 hover:text-indigo-600 transition-colors">
-                            <svg class="w-5 h-5" :class="msgUnread > 0 ? 'text-blue-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                            </svg>
+                           aria-label="{{ t('nav.messages') }}"
+                           class="relative min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 hover:text-indigo-600 hover:bg-gray-50 rounded-lg transition-colors">
+                            <svg class="w-5 h-5" :class="msgUnread > 0 ? 'text-blue-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                             <template x-if="msgUnread > 0">
-                                <span class="absolute -top-1 -right-1 flex items-center justify-center">
+                                <span class="absolute top-1 right-1 flex items-center justify-center">
                                     <span class="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping"></span>
-                                    <span class="relative inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-blue-500 text-white text-xs font-bold rounded-full ring-2 ring-white shadow-sm"
-                                          x-text="msgUnread > 99 ? '99+' : msgUnread"></span>
+                                    <span class="relative inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-blue-500 text-white text-[10px] font-bold rounded-full ring-2 ring-white" x-text="msgUnread > 99 ? '99+' : msgUnread"></span>
                                 </span>
                             </template>
                         </a>
                     </div>
-                    <a href="/orders" class="text-sm text-gray-700 hover:text-indigo-600 hidden xl:block">{{ t('nav.orders') }}</a>
-                    <div class="hidden lg:block" x-data="{ u: null }" x-init="fetch('/api/v1/users/me').then(r=>r.ok?r.json():null).then(d=>u=d).catch(()=>{})">
-                        <a href="/profile" class="inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">
+
+                    <!-- Avatar dropdown: primary mental model for "my stuff" -->
+                    <div class="relative hidden lg:block"
+                         x-data="{
+                             open: false,
+                             u: null,
+                             async load() {
+                                 try { const r = await fetch('/api/v1/users/me'); if (r.ok) this.u = await r.json(); } catch(e) {}
+                             }
+                         }"
+                         x-init="load()"
+                         @keydown.escape.window="open = false">
+                        <button @click="open = !open"
+                                :aria-expanded="open"
+                                aria-label="{{ t('nav.profile') }}"
+                                class="flex items-center gap-1 p-1 rounded-lg hover:bg-gray-50 transition-colors min-h-[44px]">
                             <div class="w-9 h-9 rounded-full bg-indigo-100 ring-2 ring-indigo-200 hover:ring-indigo-400 transition-all relative overflow-hidden flex items-center justify-center flex-shrink-0">
                                 <span class="text-sm font-bold text-indigo-600" data-fallback="{{ user.get('preferred_username', '?')[0] | upper }}" x-text="u ? (u.display_name||'?')[0] : $el.dataset.fallback"></span>
                                 <img x-show="u && u.avatar_url" :src="u ? u.avatar_url : ''" @error="$el.style.display='none'" class="absolute inset-0 w-full h-full object-cover rounded-full">
                             </div>
-                            <span class="max-w-[120px] truncate">{{ user.get('preferred_username', '') }}</span>
-                        </a>
+                            <svg class="w-3.5 h-3.5 text-gray-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div x-show="open" x-cloak @click.outside="open = false"
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             class="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl border border-gray-200 shadow-xl z-50 py-1.5 overflow-hidden">
+                            <!-- User header -->
+                            <div class="px-4 py-3 border-b border-gray-100">
+                                <p class="text-sm font-semibold text-gray-900 truncate" x-text="u ? (u.display_name || u.username || '{{ user.get('preferred_username', '') }}') : '{{ user.get('preferred_username', '') }}'"></p>
+                                <p class="text-xs text-gray-500 truncate" x-text="u && u.username ? '@' + u.username : ''"></p>
+                            </div>
+
+                            <!-- Core actions -->
+                            <a href="/dashboard" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+                                {{ t('nav.dashboard') }}
+                            </a>
+                            <a href="/profile" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                                {{ t('nav.profile') }}
+                            </a>
+                            <a href="/orders" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>
+                                {{ t('nav.orders') }}
+                            </a>
+
+                            <div class="border-t border-gray-100 my-1"></div>
+
+                            <!-- Community -->
+                            <a href="/helpboard" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
+                                {{ t('nav.helpboard') }}
+                            </a>
+                            <a href="/leaderboard" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497"/></svg>
+                                {{ t('nav.leaderboard') }}
+                            </a>
+                            <a href="/members" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07"/></svg>
+                                {{ t('nav.members') }}
+                            </a>
+                            <a href="/chat" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                                {{ t('nav.chat') }}
+                            </a>
+
+                            <div class="border-t border-gray-100 my-1"></div>
+
+                            <!-- Text size control -->
+                            <div class="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700" x-data="{
+                                scales: [16, 20, 24, 28, 32, 40, 48],
+                                idx: 0,
+                                init() {
+                                    var saved = parseInt(localStorage.getItem('lp-text-scale') || 16);
+                                    this.idx = Math.max(0, this.scales.indexOf(saved));
+                                    this.apply();
+                                },
+                                smaller() { this.idx = Math.max(0, this.idx - 1); this.apply(); },
+                                larger() { this.idx = Math.min(this.scales.length - 1, this.idx + 1); this.apply(); },
+                                apply() {
+                                    var val = this.scales[this.idx];
+                                    if (val === 16) { document.body.removeAttribute('data-text-scale'); }
+                                    else { document.body.setAttribute('data-text-scale', val); }
+                                    localStorage.setItem('lp-text-scale', val);
+                                }
+                            }" @click.stop>
+                                <span class="text-xs text-gray-500">{{ t('settings.font_size') }}</span>
+                                <div class="flex items-center gap-1">
+                                    <button @click="smaller()" class="w-7 h-7 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs flex items-center justify-center">A-</button>
+                                    <button @click="larger()" class="w-7 h-7 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm flex items-center justify-center">A+</button>
+                                </div>
+                            </div>
+                            <a href="/dashboard?tab=settings" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                {{ t('nav.settings') }}
+                            </a>
+
+                            <div class="border-t border-gray-100 my-1"></div>
+
+                            <a href="/logout" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/></svg>
+                                {{ t('nav.logout') }}
+                            </a>
+                        </div>
                     </div>
-                    <a href="/logout" class="px-3 py-1.5 text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg hidden lg:block whitespace-nowrap transition-colors">{{ t('nav.logout') }}</a>
+
+                    <!-- Primary CTA: List Your Stuff -->
+                    <a href="/list" class="hidden lg:inline-flex bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 text-sm font-semibold rounded-lg transition-colors items-center gap-1.5 shadow-sm whitespace-nowrap min-h-[44px]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                        {{ t('nav.list_item') }}
+                    </a>
                     {% else %}
-                    <a href="/login" class="hidden lg:inline-flex px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors min-h-[44px] items-center">
+                    <!-- Anon: Log in + Sign up CTAs -->
+                    <a href="/login" class="hidden lg:inline-flex px-3 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 rounded-lg hover:bg-gray-50 transition-colors min-h-[44px] items-center whitespace-nowrap">
                         {{ t('nav.login') }}
+                    </a>
+                    <a href="/login" class="hidden lg:inline-flex px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors min-h-[44px] items-center gap-1.5 whitespace-nowrap">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                        {{ t('nav.sign_up') }}
                     </a>
                     {% endif %}
 
