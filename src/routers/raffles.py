@@ -96,7 +96,10 @@ class DrawRequest(BaseModel):
 async def _get_raffle(db: AsyncSession, raffle_id: UUID) -> BHRaffle:
     raffle = await db.scalar(
         select(BHRaffle)
-        .options(selectinload(BHRaffle.listing).selectinload(BHListing.item))
+        .options(
+            selectinload(BHRaffle.listing).selectinload(BHListing.item).selectinload(BHItem.media),
+            selectinload(BHRaffle.organizer),
+        )
         .where(BHRaffle.id == raffle_id)
         .where(BHRaffle.deleted_at.is_(None))
     )
@@ -230,7 +233,17 @@ async def create_raffle(
     )
     db.add(raffle)
     await db.commit()
-    await db.refresh(raffle)
+
+    # Re-fetch with relationships eager-loaded so _raffle_out doesn't trigger
+    # lazy loads (would raise MissingGreenlet in async context).
+    raffle = await db.scalar(
+        select(BHRaffle)
+        .options(
+            selectinload(BHRaffle.listing).selectinload(BHListing.item).selectinload(BHItem.media),
+            selectinload(BHRaffle.organizer),
+        )
+        .where(BHRaffle.id == raffle.id)
+    )
     return _raffle_out(raffle)
 
 
@@ -280,7 +293,10 @@ async def my_raffles(
     # As organizer
     organized = (await db.execute(
         select(BHRaffle)
-        .options(selectinload(BHRaffle.listing).selectinload(BHListing.item))
+        .options(
+            selectinload(BHRaffle.listing).selectinload(BHListing.item).selectinload(BHItem.media),
+            selectinload(BHRaffle.organizer),
+        )
         .where(BHRaffle.organizer_id == user.id)
         .where(BHRaffle.deleted_at.is_(None))
         .order_by(BHRaffle.created_at.desc())
@@ -297,7 +313,10 @@ async def my_raffles(
     if ticket_raffle_ids:
         participating = (await db.execute(
             select(BHRaffle)
-            .options(selectinload(BHRaffle.listing).selectinload(BHListing.item))
+            .options(
+            selectinload(BHRaffle.listing).selectinload(BHListing.item).selectinload(BHItem.media),
+            selectinload(BHRaffle.organizer),
+        )
             .where(BHRaffle.id.in_(ticket_raffle_ids))
             .where(BHRaffle.deleted_at.is_(None))
         )).scalars().unique().all()
