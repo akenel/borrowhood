@@ -589,6 +589,9 @@
     "event": "Evento",
     "raffle": "Sorteggio"
   },
+  "raffle": {
+    "random_winner": "Sorteggio casuale"
+  },
   "item_types": {
     "physical": "Fisico",
     "digital": "Digitale",

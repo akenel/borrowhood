@@ -33,6 +33,11 @@ function raffleForm() {
                 if (r.ok) {
                     const all = await r.json();
                     this.items = all.filter(i => i.owner_id === user.id);
+                    // Preselect item from ?item_id=... URL param (coming from /list flow)
+                    const preselect = new URLSearchParams(window.location.search).get('item_id');
+                    if (preselect && this.items.some(i => i.id === preselect)) {
+                        this.form.item_id = preselect;
+                    }
                 }
             } catch(e) {
             } finally {

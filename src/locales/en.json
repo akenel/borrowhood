@@ -589,6 +589,9 @@
     "event": "Event",
     "raffle": "Raffle"
   },
+  "raffle": {
+    "random_winner": "Draw at random"
+  },
   "item_types": {
     "physical": "Physical",
     "digital": "Digital",

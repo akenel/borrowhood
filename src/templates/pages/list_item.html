@@ -479,8 +479,11 @@
                 }
 
                 // Step 2b: Create mode -- create new listings
+                // Raffle is handled as a redirect to /raffles/create (not a standard listing)
+                const wantsRaffle = !this.editMode && this.selectedTypes.includes('raffle');
                 if (!this.editMode)
                 for (const lt of this.selectedTypes) {
+                    if (lt === 'raffle') continue;
                     const terms = this.listingPrices[lt];
                     const isGiveaway = lt === 'giveaway';
                     const isSvcType = (lt === 'service' || lt === 'training');
@@ -532,7 +535,10 @@
                 }
 
                 window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: this.editMode ? 'Item updated!' : '{{ t('list_item.success') }}' } }));
-                setTimeout(() => window.location.href = '/items/' + item.slug, 1000);
+                const nextUrl = wantsRaffle
+                    ? '/raffles/create?item_id=' + item.id
+                    : '/items/' + item.slug;
+                setTimeout(() => window.location.href = nextUrl, 1000);
 
             } catch (err) {
                 window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: err.message } }));
@@ -1151,6 +1157,16 @@
                         </svg>
                         <span class="text-sm font-semibold" :class="selectedTypes.includes('auction') ? 'text-indigo-700' : 'text-gray-700'">{{ t('i18n.auction') }}</span>
                         <span class="text-[10px] text-gray-400">{{ t('i18n.highest_bid_wins') }}</span>
+                    </button>
+                    <!-- Raffle -->
+                    <button type="button" @click="selectedTypes = ['raffle']"
+                            class="flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all min-h-[90px]"
+                            :class="selectedTypes.includes('raffle') ? 'border-amber-500 bg-amber-50 shadow-md' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'">
+                        <svg class="w-7 h-7" :class="selectedTypes.includes('raffle') ? 'text-amber-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/>
+                        </svg>
+                        <span class="text-sm font-semibold" :class="selectedTypes.includes('raffle') ? 'text-amber-700' : 'text-gray-700'">{{ t('listing_types.raffle') }}</span>
+                        <span class="text-[10px] text-gray-400">{{ t('raffle.random_winner') }}</span>
                     </button>
                     <!-- Give Away -->
                     <button type="button" @click="selectedTypes = ['giveaway']"
