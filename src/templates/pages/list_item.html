@@ -108,32 +108,26 @@
         uploadFiles: [],
         uploadPreviews: [],
         dragging: false,
-        form: {
-            name: '', description: '', story: '', category: 'power_tools',
-            item_type: 'physical', condition: 'good', brand: '',
-            age_restricted: false, safety_notes: '', tags: '',
-            content_language: '{{ lang }}', currency: 'EUR',
-            delivery_available: false, delivery_fee: '', notes: '', return_policy: ''
-        },
-        itemAttributes: {},
+        form: window._editForm
+            ? Object.assign({
+                  content_language: '{{ lang }}', currency: 'EUR',
+                  delivery_available: false, delivery_fee: '', notes: '', return_policy: ''
+              }, window._editForm)
+            : {
+                  name: '', description: '', story: '', category: 'power_tools',
+                  item_type: 'physical', condition: 'good', brand: '',
+                  age_restricted: false, safety_notes: '', tags: '',
+                  content_language: '{{ lang }}', currency: 'EUR',
+                  delivery_available: false, delivery_fee: '', notes: '', return_policy: ''
+              },
+        itemAttributes: window._editData && window._editData.attributes ? window._editData.attributes : {},
         attributeSchema: {},
         selectedTypes: ['rent'],
         init() {
             if (window._editData) {
                 var d = window._editData;
-                this.form.name = d.name || '';
-                this.form.description = d.description || '';
-                this.form.story = d.story || '';
-                this.form.category = d.category || 'power_tools';
-                this.form.item_type = d.item_type || 'physical';
-                this.form.condition = d.condition || 'good';
-                this.form.brand = d.brand || '';
-                this.form.age_restricted = d.age_restricted || false;
-                this.form.safety_notes = d.safety_notes || '';
-                this.form.tags = d.tags || '';
                 this.existingMedia = d.media || [];
                 this.editItemId = d.itemId || '';
-                if (d.attributes) this.itemAttributes = d.attributes;
                 if (d.listings && d.listings.length) {
                     this.selectedTypes = d.listings.map(function(l) { return l.listing_type; });
                     var self = this;
@@ -311,22 +305,31 @@
             try {
                 var item;
                 if (this.editMode) {
-                    // Edit mode: PATCH existing item
-                    const cleanAttrs = Object.keys(this.itemAttributes).length > 0 ? this.itemAttributes : null;
-                    const itemResp = await fetch('/api/v1/items/' + this.editItemId, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            name: this.form.name,
-                            description: this.form.description,
-                            story: this.form.story || null,
-                            category: this.form.category,
-                            condition: this.form.condition || null,
-                            brand: this.form.brand || null,
-                            tags: this.form.tags || null,
-                            attributes: cleanAttrs,
-                        })
-                    });
+                    // Edit mode: PATCH only fields that actually changed.
+                    // Prevents empty form state from wiping DB values when
+                    // hydration is partial or the user never touched a field.
+                    const base = window._editData || {};
+                    const baseAttrs = base.attributes || {};
+                    const changes = {};
+                    const textFields = ['name', 'description', 'story', 'brand', 'tags', 'condition', 'category'];
+                    for (const key of textFields) {
+                        const baseVal = base[key] == null ? '' : base[key];
+                        const curVal = this.form[key] == null ? '' : this.form[key];
+                        if (curVal !== baseVal) {
+                            // Empty string means "user explicitly cleared" -> send null
+                            changes[key] = curVal === '' ? null : curVal;
+                        }
+                    }
+                    if (JSON.stringify(this.itemAttributes || {}) !== JSON.stringify(baseAttrs)) {
+                        changes.attributes = Object.keys(this.itemAttributes || {}).length > 0 ? this.itemAttributes : null;
+                    }
+                    const itemResp = Object.keys(changes).length === 0
+                        ? { ok: true, json: async () => ({ id: this.editItemId }) }
+                        : await fetch('/api/v1/items/' + this.editItemId, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(changes)
+                        });
                     if (!itemResp.ok) {
                         try { const err = await itemResp.json(); throw new Error(err.detail || 'Failed to update item'); }
                         catch(e) { throw new Error('Failed to update item (status ' + itemResp.status + ')'); }
