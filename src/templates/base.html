@@ -937,6 +937,7 @@
         recordTimer: null,
         tipShow: false,
         tipTimer: null,
+        contributorStats: null,
 
         get canAddMore() { return this.queue.length < 3; },
         get sendLabel() {
@@ -1069,6 +1070,7 @@
                 if (!resp.ok) { const e = await resp.json(); throw new Error(e.detail || 'Failed'); }
                 const data = await resp.json();
                 this.blNumber = data.item_number;
+                this.contributorStats = data.contributor_stats || null;
 
                 // Upload diagnostics silently
                 try {
@@ -1103,6 +1105,7 @@
             this.message = '';
             this.queue = [];
             this.uploadedCount = 0;
+            this.contributorStats = null;
         }
     }">
         <!-- Floating button -->
@@ -1164,6 +1167,27 @@
                         <p x-show="uploadedCount > 0" class="text-xs text-gray-500 mt-1"
                            x-text="uploadedCount + (uploadedCount === 1 ? ' attachment sent' : ' attachments sent')"></p>
                     </div>
+
+                    <!-- Contributor score card (logged-in users only) -->
+                    <template x-if="contributorStats">
+                        <div class="bg-gradient-to-br from-amber-50 to-rose-50 border border-amber-200 rounded-lg p-3 text-left text-xs">
+                            <p class="font-semibold text-amber-800">{{ t('feedback.score_title') }}</p>
+                            <div class="mt-1 flex items-center justify-between gap-2">
+                                <span class="text-gray-600">{{ t('feedback.score_points') }}</span>
+                                <span class="font-bold text-gray-900" x-text="contributorStats.total_points + ' pts'"></span>
+                            </div>
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-gray-600">{{ t('feedback.score_fixes') }}</span>
+                                <span class="font-bold text-gray-900" x-text="contributorStats.confirmed_fixes"></span>
+                            </div>
+                            <div x-show="contributorStats.next_badge_name" class="mt-2 pt-2 border-t border-amber-200 text-amber-800"
+                                 x-text="contributorStats.reports_to_next_badge + ' {{ t('feedback.score_to_next') }} ' + contributorStats.next_badge_name"></div>
+                            <div x-show="!contributorStats.next_badge_name" class="mt-2 pt-2 border-t border-amber-200 text-amber-800 font-semibold">
+                                {{ t('feedback.score_legend') }}
+                            </div>
+                        </div>
+                    </template>
+
                     <button @click="reset()" class="w-full py-2 text-sm text-rose-600 font-semibold hover:underline">{{  t('feedback.close') }}</button>
                 </div>
             </template>

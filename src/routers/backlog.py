@@ -318,7 +318,72 @@ async def submit_feedback(
     await db.commit()
 
     logger.info(f"BL-{next_number:03d} feedback from {submitter}: {title}")
-    return {"detail": "Feedback received", "item_number": next_number, "item_id": str(new_item.id)}
+
+    # Contributor stats for the success reminder (logged-in users only)
+    stats = None
+    if reporter_user_id is not None:
+        try:
+            stats = await _get_contributor_stats(db, reporter_user_id)
+        except Exception as exc:
+            logger.warning("contributor stats lookup failed: %s", exc)
+
+    return {
+        "detail": "Feedback received",
+        "item_number": next_number,
+        "item_id": str(new_item.id),
+        "contributor_stats": stats,
+    }
+
+
+async def _get_contributor_stats(db: AsyncSession, user_id: UUID) -> dict:
+    """Compute points + confirmed fix count + next-badge distance for a user."""
+    from src.models.badge import BadgeCode
+    from src.models.user import BHUserPoints
+
+    points_row = await db.execute(
+        select(BHUserPoints).where(BHUserPoints.user_id == user_id)
+    )
+    points = points_row.scalars().first()
+    total_points = points.total_points if points else 0
+
+    confirmed_fixes = await db.scalar(
+        select(func.count(BHBacklogItem.id))
+        .where(BHBacklogItem.reporter_user_id == user_id)
+        .where(BHBacklogItem.reporter_rewarded_at.isnot(None))
+    ) or 0
+
+    # Badge milestones aligned with services/backlog_rewards._BADGE_MILESTONES
+    milestones = [
+        (1, "Bug Spotter"),
+        (10, "Quality Guardian"),
+        (25, "Code Whisperer"),
+    ]
+    next_name, next_threshold, to_go = None, None, None
+    for threshold, name in milestones:
+        if confirmed_fixes < threshold:
+            next_name = name
+            next_threshold = threshold
+            to_go = threshold - confirmed_fixes
+            break
+
+    return {
+        "total_points": total_points,
+        "confirmed_fixes": confirmed_fixes,
+        "next_badge_name": next_name,
+        "next_badge_threshold": next_threshold,
+        "reports_to_next_badge": to_go,
+    }
+
+
+@router.get("/me/contributor-stats")
+async def my_contributor_stats(
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Contributor score snapshot for the current user."""
+    from src.dependencies import get_user
+    user = await get_user(db, token)
+    return await _get_contributor_stats(db, user.id)
 
 
 # ================================================================

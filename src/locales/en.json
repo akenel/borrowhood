@@ -130,7 +130,12 @@
     "tooltip_reward": "Shipped = +10 points (bugs) or +25 (ideas) + badges",
     "how_it_works_title": "How this works",
     "how_it_works_body": "You report → we fix (or explain why we wont) → you get notified with the commit SHA. The piazza ships together.",
-    "how_it_works_reward": "+10 for bugs, +25 for ideas shipped. 3 fixes = Bug Spotter badge."
+    "how_it_works_reward": "+10 for bugs, +25 for ideas shipped. 3 fixes = Bug Spotter badge.",
+    "score_title": "Your contributor score",
+    "score_points": "Points",
+    "score_fixes": "Confirmed fixes",
+    "score_to_next": "more until",
+    "score_legend": "Code Whisperer tier unlocked. Thank you."
   },
   "home": {
     "hero_title": "The Town Square is Open",

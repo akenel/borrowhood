@@ -130,7 +130,12 @@
     "tooltip_reward": "Risolto = +10 punti (bug) o +25 (idee) + badge",
     "how_it_works_title": "Come funziona",
     "how_it_works_body": "Tu segnali → noi risolviamo (o spieghiamo perche no) → ricevi notifica con il commit SHA. La piazza cresce insieme.",
-    "how_it_works_reward": "+10 per bug, +25 per idee realizzate. 3 risolti = badge Bug Spotter."
+    "how_it_works_reward": "+10 per bug, +25 per idee realizzate. 3 risolti = badge Bug Spotter.",
+    "score_title": "Il tuo punteggio contributore",
+    "score_points": "Punti",
+    "score_fixes": "Risolti confermati",
+    "score_to_next": "ancora al livello",
+    "score_legend": "Tier Code Whisperer sbloccato. Grazie."
   },
   "home": {
     "hero_title": "La Piazza è Aperta",
