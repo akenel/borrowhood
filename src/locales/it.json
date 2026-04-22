@@ -23,8 +23,20 @@
     "mark_all_read": "Segna tutto letto",
     "orders": "Ordini",
     "leaderboard": "Classifica",
-    "calendar": "Calendario",
+    "calendar": "Eventi",
     "sign_up": "Registrati"
+  },
+  "nav_tips": {
+    "browse_title": "Scopri cosa si condivide",
+    "browse_body": "Strumenti, abilita, laboratori, oggetti che i tuoi vicini offrono ora.",
+    "raffles_title": "Vinci dalla comunita",
+    "raffles_body": "Compra un biglietto, sostieni un vicino, magari porti a casa qualcosa di bello.",
+    "events_title": "Cosa succede questo mese",
+    "events_body": "Laboratori, incontri, estrazioni -- tutto in un unico calendario della comunita.",
+    "helpboard_title": "Chiedi al quartiere",
+    "helpboard_body": "C'e sempre qualcuno che conosce qualcuno. Chiedi aiuto, offri una mano.",
+    "list_title": "Condividi cio che hai, sai o fai",
+    "list_body": "Un oggetto da noleggiare, un'abilita da insegnare, uno spazio da ospitare. Niente commissioni."
   },
   "settings": {
     "font_size": "Dimensione Testo",
