@@ -30,6 +30,7 @@
             media: {{ edit_media_json }},
             listings: {{ edit_listings_json }},
             itemId: {{ edit_item_id | tojson }},
+            slug: {{ edit_item.slug | tojson }},
             attributes: {{ (edit_item.attributes or {}) | tojson }}
         };
         // Pre-build form and listing data for Alpine x-data
@@ -324,7 +325,7 @@
                         changes.attributes = Object.keys(this.itemAttributes || {}).length > 0 ? this.itemAttributes : null;
                     }
                     const itemResp = Object.keys(changes).length === 0
-                        ? { ok: true, json: async () => ({ id: this.editItemId }) }
+                        ? { ok: true, json: async () => ({ id: this.editItemId, slug: base.slug }) }
                         : await fetch('/api/v1/items/' + this.editItemId, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
