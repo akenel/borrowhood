@@ -65,7 +65,7 @@ ALLOWED_FEEDBACK_MIME_TYPES = {
     "application/json",
 }
 
-MAX_FEEDBACK_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+MAX_FEEDBACK_FILE_SIZE = 25 * 1024 * 1024  # 25 MB (safety net; client should compress first)
 
 
 # ================================================================

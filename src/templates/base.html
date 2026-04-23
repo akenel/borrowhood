@@ -1035,17 +1035,64 @@
             }
         },
 
-        pickFiles(event) {
+        async pickFiles(event) {
             var files = Array.from(event.target.files || []);
             event.target.value = '';
             for (var i = 0; i < files.length && this.queue.length < 3; i++) {
                 var f = files[i];
-                if (f.size > 10 * 1024 * 1024) {
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: f.name + ': too large (max 10 MB)' } }));
+                // Shrink large images client-side so modern phone cams (12-20 MB HEIC/JPEG) just work
+                if (f.type && f.type.startsWith('image/') && f.size > 1_500_000) {
+                    try {
+                        var originalSize = f.size;
+                        f = await this.shrinkImage(f);
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: 'Photo compressed: ' + (originalSize / 1024 / 1024).toFixed(1) + ' MB -> ' + (f.size / 1024 / 1024).toFixed(1) + ' MB' } }));
+                    } catch (e) {
+                        // Compression failed -- fall through to size check below
+                    }
+                }
+                if (f.size > 25 * 1024 * 1024) {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: f.name + ': too large (max 25 MB)' } }));
                     continue;
                 }
                 this.queue.push({ kind: 'file', name: f.name, size: f.size, mime: f.type, blob: f });
             }
+        },
+
+        shrinkImage(file, maxPx, quality) {
+            maxPx = maxPx || 1920;
+            quality = quality || 0.85;
+            return new Promise(function (resolve, reject) {
+                var url = URL.createObjectURL(file);
+                var img = new Image();
+                img.onload = function () {
+                    try {
+                        var w = img.naturalWidth, h = img.naturalHeight;
+                        if (w > maxPx || h > maxPx) {
+                            var scale = Math.min(maxPx / w, maxPx / h);
+                            w = Math.round(w * scale);
+                            h = Math.round(h * scale);
+                        }
+                        var canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        var ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        canvas.toBlob(function (blob) {
+                            URL.revokeObjectURL(url);
+                            if (!blob) { reject(new Error('Compression failed')); return; }
+                            // Rename to .jpg since we output JPEG
+                            var newName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+                            var compressed = new File([blob], newName, { type: 'image/jpeg' });
+                            resolve(compressed);
+                        }, 'image/jpeg', quality);
+                    } catch (e) {
+                        URL.revokeObjectURL(url);
+                        reject(e);
+                    }
+                };
+                img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('Not a loadable image')); };
+                img.src = url;
+            });
         },
 
         removeQueued(idx) { this.queue.splice(idx, 1); },
@@ -1068,8 +1115,8 @@
                     var blob = new Blob(self.recordChunks, { type: 'video/webm' });
                     stream.getTracks().forEach(function (t) { t.stop(); });
                     self.recordStream = null;
-                    if (blob.size > 10 * 1024 * 1024) {
-                        window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Recording too large (max 10 MB). Try a shorter clip.' } }));
+                    if (blob.size > 25 * 1024 * 1024) {
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Recording too large (max 25 MB). Try a shorter clip.' } }));
                         return;
                     }
                     self.queue.push({ kind: 'screen_capture', name: 'screen_capture.webm', size: blob.size, mime: 'video/webm', blob: blob });
@@ -1320,7 +1367,7 @@
                             </template>
                         </div>
 
-                        <p class="text-[10px] text-gray-400 leading-snug">Screenshots, short clips, or PDFs. Up to 3 files, 10 MB each. Your page URL and a diagnostic snapshot (viewport, recent errors) are attached automatically.</p>
+                        <p class="text-[10px] text-gray-400 leading-snug">Screenshots, short clips, or PDFs. Up to 3 files, 25 MB each. Photos are compressed automatically before upload so your phone pics always fit. Page URL + diagnostics attached automatically.</p>
 
                         <!-- Queue list -->
                         <div x-show="queue.length > 0" class="space-y-1">
