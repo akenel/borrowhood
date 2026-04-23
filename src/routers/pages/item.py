@@ -74,9 +74,14 @@ async def item_detail(slug: str, request: Request,
     is_owner = bool(token and item.owner and item.owner.keycloak_id == token.get("sub", ""))
 
     # Similar items: same category, different item, limit 4
+    # Load listings + owner so the card can render type badge, price, owner avatar
     similar_result = await db.execute(
         select(BHItem)
-        .options(selectinload(BHItem.media))
+        .options(
+            selectinload(BHItem.media),
+            selectinload(BHItem.listings),
+            selectinload(BHItem.owner),
+        )
         .where(BHItem.category == item.category)
         .where(BHItem.id != item.id)
         .where(BHItem.deleted_at.is_(None))
