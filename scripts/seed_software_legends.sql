@@ -17,23 +17,23 @@ BEGIN;
 -- ============================================================
 INSERT INTO bh_user (id, keycloak_id, email, display_name, slug, bio, tagline,
                      workshop_name, workshop_type, telegram_username,
-                     city, address, country_code, latitude, longitude,
+                     city, country_code, latitude, longitude,
                      date_of_birth, mother_name, father_name,
-                     badge_tier, account_status, onboarding_completed,
+                     badge_tier, account_status, notify_telegram, notify_email,
                      offers_training, offers_custom_orders, offers_repair,
                      avatar_url, banner_url, created_at, updated_at)
 SELECT gen_random_uuid(),
        'seed-antirez-' || gen_random_uuid()::text,
-       'antirez@borrowhood.local',
+       'antirez@antirezs-keybase.local',
        'Salvatore Sanfilippo',
        'antirezs-keybase',
        'Born in Catania, Sicily. Wrote Redis in a weekend in 2009 because my startup was bleeding throughput and I could not wait for someone else to fix it. 300 lines of C turned into one of the most-deployed databases on Earth. I stepped away in 2020 -- the code was done, it did not need me. I write now. Essays, mostly. About code, about retirement, about the difference between making a thing and being the thing. If you are Italian and you are coding alone in a kitchen at 2am, call me. I know the feeling.',
        '300 lines of C can change the backend.',
-       'antirez''s Keybase', 'studio'::workshoptype,
+       'antirez''s Keybase', 'STUDIO'::workshoptype,
        'antirez',
-       'Catania', 'Via Etnea, Catania', 'IT', 37.5079, 15.0830,
+       'Catania', 'IT', 37.5079, 15.0830,
        '1977-03-14', 'Ignazia Sanfilippo', 'Sebastiano Sanfilippo',
-       'legend'::badgetier, 'ACTIVE'::accountstatus, true,
+       'LEGEND'::badgetier, 'ACTIVE'::accountstatus, false, false,
        true, true, false,
        'https://image.pollinations.ai/prompt/oil%20painting%20portrait%20italian%20programmer%20bearded%20glasses%20warm%20light%20sicily?width=400&height=400&nologo=true&seed=101',
        'https://image.pollinations.ai/prompt/catania%20etna%20volcano%20sunset%20sicily%20cityscape?width=1200&height=400&nologo=true&seed=102',
@@ -43,8 +43,8 @@ WHERE NOT EXISTS (SELECT 1 FROM bh_user WHERE slug = 'antirezs-keybase');
 -- Languages + skills + points + items for antirez
 WITH u AS (SELECT id FROM bh_user WHERE slug = 'antirezs-keybase')
 INSERT INTO bh_user_language (id, user_id, language_code, proficiency, created_at, updated_at)
-SELECT gen_random_uuid(), u.id, lang, lvl::ceferlevel, NOW(), NOW()
-FROM u, (VALUES ('it','native'), ('en','C2'), ('la','B1')) AS l(lang, lvl)
+SELECT gen_random_uuid(), u.id, lang, lvl::cefrlevel, NOW(), NOW()
+FROM u, (VALUES ('it','NATIVE'), ('en','C2'), ('la','B1')) AS l(lang, lvl)
 WHERE NOT EXISTS (SELECT 1 FROM bh_user_language WHERE user_id = u.id AND language_code = l.lang);
 
 WITH u AS (SELECT id FROM bh_user WHERE slug = 'antirezs-keybase')
@@ -70,21 +70,21 @@ INSERT INTO bh_user (id, keycloak_id, email, display_name, slug, bio, tagline,
                      workshop_name, workshop_type, telegram_username,
                      city, country_code, latitude, longitude,
                      date_of_birth, mother_name, father_name,
-                     badge_tier, account_status, onboarding_completed,
+                     badge_tier, account_status, notify_telegram, notify_email,
                      offers_training, offers_custom_orders, offers_repair,
                      avatar_url, banner_url, created_at, updated_at)
 SELECT gen_random_uuid(),
        'seed-carmack-' || gen_random_uuid()::text,
-       'carmack@borrowhood.local',
+       'carmack@carmacks-inner-loop.local',
        'John Carmack',
        'carmacks-inner-loop',
        'Kansas kid. Built my first game engine in high school. Founded id Software in 1991 with a handful of pizza-fueled programmers. Wrote Commander Keen, Wolfenstein 3D, Doom, Quake -- each one a little further into the 3D rabbit hole. The BSP tree idea in Doom came to me in bed at 2am. I spent two years tuning 30 lines of inner loop because on a 486, those 30 lines were the difference between 15 and 35 frames per second. Now I work on AI. Probably too much of it. The simple rule I keep forgetting and re-learning: ship it, then generalize. The thing nobody can ship is not a thing.',
        'Make the inner loop fast. Everything else follows.',
-       'Carmack''s Inner Loop', 'studio'::workshoptype,
+       'Carmack''s Inner Loop', 'STUDIO'::workshoptype,
        NULL,
        'Plano, TX', 'US', 33.0198, -96.6989,
        '1970-08-20', 'Inga Mae Carmack', 'Stan Carmack',
-       'legend'::badgetier, 'ACTIVE'::accountstatus, true,
+       'LEGEND'::badgetier, 'ACTIVE'::accountstatus, false, false,
        true, false, false,
        'https://image.pollinations.ai/prompt/oil%20painting%20portrait%20american%20programmer%20long%20hair%20glasses%20focused%20stare?width=400&height=400&nologo=true&seed=201',
        'https://image.pollinations.ai/prompt/retro%20crt%20monitors%20green%20phosphor%20code%20terminal%20programmer%20workshop?width=1200&height=400&nologo=true&seed=202',
@@ -93,8 +93,8 @@ WHERE NOT EXISTS (SELECT 1 FROM bh_user WHERE slug = 'carmacks-inner-loop');
 
 WITH u AS (SELECT id FROM bh_user WHERE slug = 'carmacks-inner-loop')
 INSERT INTO bh_user_language (id, user_id, language_code, proficiency, created_at, updated_at)
-SELECT gen_random_uuid(), u.id, lang, lvl::ceferlevel, NOW(), NOW()
-FROM u, (VALUES ('en','native')) AS l(lang, lvl)
+SELECT gen_random_uuid(), u.id, lang, lvl::cefrlevel, NOW(), NOW()
+FROM u, (VALUES ('en','NATIVE')) AS l(lang, lvl)
 WHERE NOT EXISTS (SELECT 1 FROM bh_user_language WHERE user_id = u.id AND language_code = l.lang);
 
 WITH u AS (SELECT id FROM bh_user WHERE slug = 'carmacks-inner-loop')
@@ -120,21 +120,21 @@ INSERT INTO bh_user (id, keycloak_id, email, display_name, slug, bio, tagline,
                      workshop_name, workshop_type, telegram_username,
                      city, country_code, latitude, longitude,
                      date_of_birth, mother_name, father_name,
-                     badge_tier, account_status, onboarding_completed,
+                     badge_tier, account_status, notify_telegram, notify_email,
                      offers_training, offers_custom_orders, offers_repair,
                      avatar_url, banner_url, created_at, updated_at)
 SELECT gen_random_uuid(),
        'seed-dhh-' || gen_random_uuid()::text,
-       'dhh@borrowhood.local',
+       'dhh@dhhs-extraction-shop.local',
        'David Heinemeier Hansson',
        'dhhs-extraction-shop',
        'Danish. Built Basecamp, then extracted Rails from it in 2004. That is the move: build a real product, notice the patterns, pull the framework out of the product. Do NOT sit down to build a framework. Shipped It Does Not Have to be Crazy at Work, Rework, Remote -- opinionated books that made a bunch of managers mad because they removed excuses. Race cars on weekends. Yell on the internet sometimes and regret it, sometimes do not. The principle I live by: convention over configuration. If you need to configure it, you probably have not decided yet.',
        'Extract from real use. Do not abstract from imagination.',
-       'DHH''s Extraction Shop', 'studio'::workshoptype,
+       'DHH''s Extraction Shop', 'STUDIO'::workshoptype,
        'dhh',
        'Marbella', 'ES', 36.5099, -4.8860,
        '1979-10-15', 'Gerd Heinemeier', 'Ole Hansson',
-       'legend'::badgetier, 'ACTIVE'::accountstatus, true,
+       'LEGEND'::badgetier, 'ACTIVE'::accountstatus, false, false,
        true, true, false,
        'https://image.pollinations.ai/prompt/oil%20painting%20portrait%20danish%20programmer%20black%20glasses%20confident%20smile%20mediterranean?width=400&height=400&nologo=true&seed=301',
        'https://image.pollinations.ai/prompt/le%20mans%20race%20car%20track%20afternoon%20sun%20stockholm?width=1200&height=400&nologo=true&seed=302',
@@ -143,8 +143,8 @@ WHERE NOT EXISTS (SELECT 1 FROM bh_user WHERE slug = 'dhhs-extraction-shop');
 
 WITH u AS (SELECT id FROM bh_user WHERE slug = 'dhhs-extraction-shop')
 INSERT INTO bh_user_language (id, user_id, language_code, proficiency, created_at, updated_at)
-SELECT gen_random_uuid(), u.id, lang, lvl::ceferlevel, NOW(), NOW()
-FROM u, (VALUES ('da','native'), ('en','C2'), ('es','B2')) AS l(lang, lvl)
+SELECT gen_random_uuid(), u.id, lang, lvl::cefrlevel, NOW(), NOW()
+FROM u, (VALUES ('da','NATIVE'), ('en','C2'), ('es','B2')) AS l(lang, lvl)
 WHERE NOT EXISTS (SELECT 1 FROM bh_user_language WHERE user_id = u.id AND language_code = l.lang);
 
 WITH u AS (SELECT id FROM bh_user WHERE slug = 'dhhs-extraction-shop')
@@ -170,21 +170,21 @@ INSERT INTO bh_user (id, keycloak_id, email, display_name, slug, bio, tagline,
                      workshop_name, workshop_type, telegram_username,
                      city, country_code, latitude, longitude,
                      date_of_birth, mother_name, father_name,
-                     badge_tier, account_status, onboarding_completed,
+                     badge_tier, account_status, notify_telegram, notify_email,
                      offers_training, offers_custom_orders, offers_repair,
                      avatar_url, banner_url, created_at, updated_at)
 SELECT gen_random_uuid(),
        'seed-linus-' || gen_random_uuid()::text,
-       'linus@borrowhood.local',
+       'linus@linus-kernel-corner.local',
        'Linus Torvalds',
        'linus-kernel-corner',
        'Finnish kid. Wrote a little kernel in 1991 because Minix was not free. Did not plan to run the world''s compute infrastructure. That just happened. Wrote Git in ten days in 2005 because BitKeeper revoked our license -- I needed source control, and I picked the primitive I wanted: a content-addressable file system, not a diff engine. The primitive turned out to be right. That is most of what picking the right primitive early gets you: twenty years of people still using your thing. I have been an asshole to contributors. I stepped back in 2018 and got therapy. I am working on being better. The code can be right and the person can be wrong -- both are real.',
        'Good taste is knowing which special case is not special.',
-       'Linus''s Kernel Corner', 'studio'::workshoptype,
+       'Linus''s Kernel Corner', 'STUDIO'::workshoptype,
        NULL,
        'Portland, OR', 'US', 45.5152, -122.6784,
        '1969-12-28', 'Anna Torvalds', 'Nils Torvalds',
-       'legend'::badgetier, 'ACTIVE'::accountstatus, true,
+       'LEGEND'::badgetier, 'ACTIVE'::accountstatus, false, false,
        true, false, true,
        'https://image.pollinations.ai/prompt/oil%20painting%20portrait%20finnish%20programmer%20round%20glasses%20thoughtful%20gray%20hair?width=400&height=400&nologo=true&seed=401',
        'https://image.pollinations.ai/prompt/oregon%20forest%20pine%20trees%20overcast%20cabin%20warm%20light?width=1200&height=400&nologo=true&seed=402',
@@ -193,8 +193,8 @@ WHERE NOT EXISTS (SELECT 1 FROM bh_user WHERE slug = 'linus-kernel-corner');
 
 WITH u AS (SELECT id FROM bh_user WHERE slug = 'linus-kernel-corner')
 INSERT INTO bh_user_language (id, user_id, language_code, proficiency, created_at, updated_at)
-SELECT gen_random_uuid(), u.id, lang, lvl::ceferlevel, NOW(), NOW()
-FROM u, (VALUES ('fi','native'), ('sv','C1'), ('en','C2')) AS l(lang, lvl)
+SELECT gen_random_uuid(), u.id, lang, lvl::cefrlevel, NOW(), NOW()
+FROM u, (VALUES ('fi','NATIVE'), ('sv','C1'), ('en','C2')) AS l(lang, lvl)
 WHERE NOT EXISTS (SELECT 1 FROM bh_user_language WHERE user_id = u.id AND language_code = l.lang);
 
 WITH u AS (SELECT id FROM bh_user WHERE slug = 'linus-kernel-corner')
@@ -220,21 +220,21 @@ INSERT INTO bh_user (id, keycloak_id, email, display_name, slug, bio, tagline,
                      workshop_name, workshop_type, telegram_username,
                      city, country_code, latitude, longitude,
                      date_of_birth, mother_name, father_name,
-                     badge_tier, account_status, onboarding_completed,
+                     badge_tier, account_status, notify_telegram, notify_email,
                      offers_training, offers_custom_orders, offers_repair,
                      avatar_url, banner_url, created_at, updated_at)
 SELECT gen_random_uuid(),
        'seed-bellard-' || gen_random_uuid()::text,
-       'bellard@borrowhood.local',
+       'bellard@bellards-quiet-forge.local',
        'Fabrice Bellard',
        'bellards-quiet-forge',
        'French. I wrote FFmpeg in 2000 because I wanted to play with video codecs. It turned out to be the thing that runs every video on the internet. I wrote QEMU in 2003 because I wanted to understand how CPUs really work. It turned out to be how we run every virtual machine. I wrote TinyCC (a 300KB C compiler) and JSLinux (a Linux that runs in your browser tab) because I was bored one weekend. I do not want to be famous. I do not want to sell companies. I want to pick problems that compound forever and then work on them quietly. The world needs more quiet forges.',
        'Pick problems that compound. Then pick one.',
-       'Bellard''s Quiet Forge', 'studio'::workshoptype,
+       'Bellard''s Quiet Forge', 'STUDIO'::workshoptype,
        NULL,
        'Paris', 'FR', 48.8566, 2.3522,
        '1972-05-17', 'Madeleine Bellard', 'Pierre Bellard',
-       'legend'::badgetier, 'ACTIVE'::accountstatus, true,
+       'LEGEND'::badgetier, 'ACTIVE'::accountstatus, false, false,
        true, false, false,
        'https://image.pollinations.ai/prompt/oil%20painting%20portrait%20french%20programmer%20short%20hair%20quiet%20intensity%20library%20background?width=400&height=400&nologo=true&seed=501',
        'https://image.pollinations.ai/prompt/paris%20bookshelf%20old%20books%20desk%20green%20lamp%20warm%20quiet?width=1200&height=400&nologo=true&seed=502',
@@ -243,8 +243,8 @@ WHERE NOT EXISTS (SELECT 1 FROM bh_user WHERE slug = 'bellards-quiet-forge');
 
 WITH u AS (SELECT id FROM bh_user WHERE slug = 'bellards-quiet-forge')
 INSERT INTO bh_user_language (id, user_id, language_code, proficiency, created_at, updated_at)
-SELECT gen_random_uuid(), u.id, lang, lvl::ceferlevel, NOW(), NOW()
-FROM u, (VALUES ('fr','native'), ('en','C2')) AS l(lang, lvl)
+SELECT gen_random_uuid(), u.id, lang, lvl::cefrlevel, NOW(), NOW()
+FROM u, (VALUES ('fr','NATIVE'), ('en','C2')) AS l(lang, lvl)
 WHERE NOT EXISTS (SELECT 1 FROM bh_user_language WHERE user_id = u.id AND language_code = l.lang);
 
 WITH u AS (SELECT id FROM bh_user WHERE slug = 'bellards-quiet-forge')
@@ -270,21 +270,21 @@ INSERT INTO bh_user (id, keycloak_id, email, display_name, slug, bio, tagline,
                      workshop_name, workshop_type, telegram_username,
                      city, country_code, latitude, longitude,
                      date_of_birth, mother_name, father_name,
-                     badge_tier, account_status, onboarding_completed,
+                     badge_tier, account_status, notify_telegram, notify_email,
                      offers_training, offers_custom_orders, offers_repair,
                      avatar_url, banner_url, created_at, updated_at)
 SELECT gen_random_uuid(),
        'seed-acton-' || gen_random_uuid()::text,
-       'acton@borrowhood.local',
+       'acton@actons-sticky-note.local',
        'Brian Acton',
        'actons-sticky-note',
        'American. Yahoo engineer for twelve years. Co-founded WhatsApp with Jan Koum in 2009 after we both got rejected from Facebook and Twitter. Wrote one rule on a sticky note next to the desk: "No Ads. No Games. No Gimmicks." Ran the whole thing on that rule. Fifty engineers, four hundred and fifty million users. Sold to Facebook in 2014 for nineteen billion dollars and watched them violate every sentence of the sticky note one by one. Walked away in 2017. Used the payout to fund Signal -- encrypted messaging with no ads, no corporate owner, just the rule. Lesson I keep: the values you bake in get unbaked when someone else owns the code.',
        'No Ads. No Games. No Gimmicks.',
-       'Acton''s Sticky Note', 'studio'::workshoptype,
+       'Acton''s Sticky Note', 'STUDIO'::workshoptype,
        NULL,
        'Palo Alto, CA', 'US', 37.4419, -122.1430,
        '1972-02-17', 'Pamela Acton', 'Robert Acton',
-       'legend'::badgetier, 'ACTIVE'::accountstatus, true,
+       'LEGEND'::badgetier, 'ACTIVE'::accountstatus, false, false,
        true, false, false,
        'https://image.pollinations.ai/prompt/oil%20painting%20portrait%20american%20software%20engineer%20beard%20silver%20hair%20quiet%20california?width=400&height=400&nologo=true&seed=601',
        'https://image.pollinations.ai/prompt/sticky%20note%20desk%20no%20ads%20no%20games%20no%20gimmicks%20handwritten?width=1200&height=400&nologo=true&seed=602',
@@ -293,8 +293,8 @@ WHERE NOT EXISTS (SELECT 1 FROM bh_user WHERE slug = 'actons-sticky-note');
 
 WITH u AS (SELECT id FROM bh_user WHERE slug = 'actons-sticky-note')
 INSERT INTO bh_user_language (id, user_id, language_code, proficiency, created_at, updated_at)
-SELECT gen_random_uuid(), u.id, lang, lvl::ceferlevel, NOW(), NOW()
-FROM u, (VALUES ('en','native')) AS l(lang, lvl)
+SELECT gen_random_uuid(), u.id, lang, lvl::cefrlevel, NOW(), NOW()
+FROM u, (VALUES ('en','NATIVE')) AS l(lang, lvl)
 WHERE NOT EXISTS (SELECT 1 FROM bh_user_language WHERE user_id = u.id AND language_code = l.lang);
 
 WITH u AS (SELECT id FROM bh_user WHERE slug = 'actons-sticky-note')
