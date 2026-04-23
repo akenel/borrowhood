@@ -48,6 +48,9 @@ templates = Jinja2Templates(directory="src/templates")
 # the pages router exposes so shared templates don't blow up here.
 templates.env.globals["now"] = lambda: datetime.now(timezone.utc)
 templates.env.globals["now_utc"] = lambda: datetime.now(timezone.utc)
+# Environment awareness for the staging badge
+from src.config import settings as _bl_settings
+templates.env.globals["environment"] = _bl_settings.environment
 
 
 def _ctx(request: Request, token: Optional[dict] = None, **kwargs) -> dict:

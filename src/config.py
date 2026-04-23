@@ -16,6 +16,9 @@ class BHSettings(BaseSettings):
     secret_key: str = "change-me-in-production"
     debug: bool = False
     log_level: str = "INFO"
+    # Deployment environment: "dev" | "staging" | "prod".
+    # Drives the staging badge in the footer, default notifications, etc.
+    environment: str = "dev"
 
     # Community (local-global: change these per deployment)
     community_name: str = "Trapani, Sicily"  # e.g. "Portland, Oregon" or "Zurich"

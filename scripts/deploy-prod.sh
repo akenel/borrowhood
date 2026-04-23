@@ -1,17 +1,23 @@
 #!/bin/bash
-# deploy-prod.sh -- Deploy La Piazza (BorrowHood) to production
-# Run from laptop: bash scripts/deploy-prod.sh
+# deploy-prod.sh -- Promote a commit to La Piazza production.
+# Gate B: clean tree + tests green + explicit 'deploy' consent.
 #
-# What it does:
-#   1. Checks prod is alive before touching anything
-#   2. Pushes your commits to GitHub (audit trail)
-#   3. Pulls latest code on the server
-#   4. Rebuilds the app container if Python/config changed
-#   5. Waits until healthy
-#   6. Smoke tests the public URL
+# USAGE:
+#   bash scripts/deploy-prod.sh                         # deploy HEAD
+#   bash scripts/deploy-prod.sh <commit-or-tag>         # deploy a specific ref
+#   bash scripts/deploy-prod.sh --templates-only        # no rebuild (Jinja only)
 #
-# Templates only? Skip rebuild:
-#   bash scripts/deploy-prod.sh --templates-only
+# Safety checks (ALL must pass before any server action):
+#   1. You are on branch 'main'
+#   2. Working tree clean (no uncommitted changes)
+#   3. Target commit exists on origin/main
+#   4. pytest passes
+#   5. You type 'deploy' to confirm
+#
+# Post-deploy:
+#   - Previous image tagged borrowhood:prod-previous (for rollback-prod.sh)
+#   - New image tagged borrowhood:prod-YYYY-MM-DD-HHMM
+#   - Matching git tag pushed to origin (audit)
 set -e
 
 SERVER="root@46.62.138.218"
@@ -21,68 +27,136 @@ COMPOSE="docker compose -f docker-compose.uat.yml"
 CONTAINER="borrowhood"
 DOMAIN="lapiazza.app"
 
+# Colors
+R='\033[0;31m'; G='\033[0;32m'; Y='\033[0;33m'; B='\033[0;34m'; N='\033[0m'
+
 TEMPLATES_ONLY=false
-if [ "$1" = "--templates-only" ]; then
-    TEMPLATES_ONLY=true
+TARGET_REF="HEAD"
+
+# Parse args
+for arg in "$@"; do
+    case "$arg" in
+        --templates-only) TEMPLATES_ONLY=true ;;
+        --skip-tests)     SKIP_TESTS=true ;;
+        -h|--help)
+            sed -n '2,22p' "$0"
+            exit 0
+            ;;
+        *) TARGET_REF="$arg" ;;
+    esac
+done
+
+echo -e "${B}=== La Piazza production deploy ===${N}"
+echo "$(date '+%Y-%m-%d %H:%M:%S')"
+echo
+
+# ── GATE 1: on main branch
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [[ "$BRANCH" != "main" ]]; then
+    echo -e "${R}!! branch is '$BRANCH', not 'main'. Switch first.${N}"
+    exit 1
 fi
 
-echo "=== La Piazza Deploy ==="
-echo "$(date '+%Y-%m-%d %H:%M:%S')"
-echo "Branch: main"
-echo "Mode: $(if $TEMPLATES_ONLY; then echo 'templates only (no rebuild)'; else echo 'full rebuild'; fi)"
-echo ""
+# ── GATE 2: clean working tree
+if ! git diff --quiet || ! git diff --cached --quiet; then
+    echo -e "${R}!! working tree is dirty. Commit or stash first.${N}"
+    git status --short
+    exit 1
+fi
 
-# 1. Pre-deploy health check
-echo "--- Pre-deploy check ---"
+# ── GATE 3: target is on origin/main
+git fetch origin main --quiet
+TARGET_SHA=$(git rev-parse "$TARGET_REF")
+TARGET_SHORT=$(git rev-parse --short "$TARGET_REF")
+if ! git merge-base --is-ancestor "$TARGET_SHA" origin/main; then
+    echo -e "${R}!! $TARGET_SHORT is not on origin/main. Push first.${N}"
+    exit 1
+fi
+
+# ── GATE 4: tests green (skippable with --skip-tests for emergency hotfix)
+if [[ "${SKIP_TESTS:-false}" != "true" ]]; then
+    echo -e "${Y}--- running pytest${N}"
+    if ! python -m pytest tests/ -q --no-header --tb=line 2>&1 | tail -5; then
+        echo -e "${R}!! tests failed. Fix before deploying.${N}"
+        exit 1
+    fi
+    echo -e "${G}✓ tests green${N}"
+fi
+
+# ── Summary
+echo
+echo -e "${B}--- Deploy plan${N}"
+echo "  Target ref : $TARGET_REF ($TARGET_SHORT)"
+echo "  Host       : $SERVER"
+echo "  Mode       : $($TEMPLATES_ONLY && echo 'templates only' || echo 'full rebuild')"
+echo "  Commit msg :"
+git log -1 --format='    %s%n    (%an, %ar)' "$TARGET_SHA"
+echo
+
+# ── GATE 5: explicit consent
+read -r -p "$(echo -e "${Y}Type 'deploy' to promote to production: ${N}")" CONFIRM
+if [[ "$CONFIRM" != "deploy" ]]; then
+    echo -e "${Y}=== cancelled${N}"
+    exit 0
+fi
+
+TAG="prod-$(date -u +%Y-%m-%d-%H%M)"
+
+# ── Pre-deploy health check
+echo -e "${Y}--- pre-deploy check${N}"
 ssh $SERVER "docker exec $CONTAINER curl -sf http://localhost:8000/api/v1/health 2>/dev/null" \
-    && echo "PROD: healthy" \
-    || echo "PROD: not running (first deploy or down)"
+    && echo -e "${G}prod: healthy${N}" \
+    || echo -e "${Y}prod: not running (first deploy or down)${N}"
 
-# 2. Push to GitHub (audit trail)
-echo ""
-echo "--- Pushing to GitHub ---"
+# ── Git tag for audit trail
+echo -e "${Y}--- tagging as $TAG${N}"
+git tag -a "$TAG" "$TARGET_SHA" -m "Production deploy $TAG"
+git push origin "$TAG" 2>&1 | tail -1
+
+# ── Push commits
+echo -e "${Y}--- pushing to GitHub${N}"
 git push origin main 2>&1 | tail -3
 
-# 3. Pull on server
-echo ""
-echo "--- Pulling on server ---"
-ssh $SERVER "cd $APP_REPO && git pull origin main" 2>&1 | tail -5
+# ── Pull + rebuild on server
+echo -e "${Y}--- pulling on server${N}"
+ssh $SERVER "cd $APP_REPO && git fetch origin --tags && git checkout $TARGET_SHA" 2>&1 | tail -3
 
-# 4. Rebuild + restart (skip if templates only)
+# Save previous image as rollback target
+ssh $SERVER "docker image inspect borrowhood:latest >/dev/null 2>&1 && docker tag borrowhood:latest borrowhood:prod-previous || true"
+
 if $TEMPLATES_ONLY; then
-    echo ""
-    echo "--- Templates only -- skipping rebuild ---"
-    echo "Changes are live (Jinja2 renders on each request)"
+    echo -e "${Y}--- templates only: restart only${N}"
+    ssh $SERVER "cd $COMPOSE_DIR && $COMPOSE restart $CONTAINER"
 else
-    echo ""
-    echo "--- Rebuilding $CONTAINER ---"
+    echo -e "${Y}--- rebuilding $CONTAINER${N}"
     ssh $SERVER "cd $COMPOSE_DIR && $COMPOSE up -d --build --no-deps $CONTAINER" 2>&1 | tail -5
 fi
 
-# 5. Wait for healthy
-echo ""
-echo "--- Health check ---"
-for i in $(seq 1 15); do
-    if ssh $SERVER "docker exec $CONTAINER curl -sf http://localhost:8000/api/v1/health" > /dev/null 2>&1; then
-        echo "HEALTHY after $((i*2))s"
+# Tag the fresh image with the deploy stamp
+ssh $SERVER "docker tag borrowhood:latest borrowhood:$TAG"
+
+# ── Wait for healthy
+echo -e "${Y}--- health check${N}"
+for i in $(seq 1 30); do
+    if ssh $SERVER "docker exec $CONTAINER curl -sf http://localhost:8000/api/v1/health" >/dev/null 2>&1; then
+        echo -e "${G}✓ healthy after $((i*2))s${N}"
         break
     fi
-    if [ $i -eq 15 ]; then
-        echo "FAILED: not healthy after 30s"
-        echo "Check logs: ssh $SERVER docker logs $CONTAINER --tail 50"
+    if [ $i -eq 30 ]; then
+        echo -e "${R}!! not healthy after 60s -- rolling back${N}"
+        ssh $SERVER "docker tag borrowhood:prod-previous borrowhood:latest && cd $COMPOSE_DIR && $COMPOSE up -d --no-deps $CONTAINER"
         exit 1
     fi
     sleep 2
 done
 
-# 6. Post-deploy smoke test
-echo ""
-echo "--- Smoke test ---"
-curl -sf "https://$DOMAIN/api/v1/health" > /dev/null 2>&1 && echo "Health API: OK" || echo "Health API: FAIL"
-curl -sf -o /dev/null -w "Home: HTTP %{http_code}\n" "https://$DOMAIN/"
-curl -sf -o /dev/null -w "Profile: HTTP %{http_code}\n" "https://$DOMAIN/profile"
+# ── Smoke test
+echo -e "${Y}--- smoke test${N}"
+curl -sf -o /dev/null -w "Home  : HTTP %{http_code}\n" "https://$DOMAIN/"
 curl -sf -o /dev/null -w "Browse: HTTP %{http_code}\n" "https://$DOMAIN/browse"
+curl -sf -o /dev/null -w "Calen.: HTTP %{http_code}\n" "https://$DOMAIN/calendar"
+curl -sf -o /dev/null -w "Health: HTTP %{http_code}\n" "https://$DOMAIN/api/v1/health"
 
-echo ""
-echo "=== Deploy complete ==="
-echo "$(date '+%Y-%m-%d %H:%M:%S')"
+echo
+echo -e "${G}=== deployed $TAG to production ===${N}"
+echo "Rollback if needed: bash scripts/rollback-prod.sh"

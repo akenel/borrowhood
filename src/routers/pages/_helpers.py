@@ -32,6 +32,10 @@ from datetime import datetime, timezone
 templates.env.globals["now"] = datetime.now
 templates.env.globals["now_utc"] = lambda: datetime.now(timezone.utc)
 
+# Environment awareness for the staging badge
+from src.config import settings as _settings
+templates.env.globals["environment"] = _settings.environment
+
 
 def _last_seen(dt, lang="en"):
     """Human-readable 'last seen' from a datetime."""

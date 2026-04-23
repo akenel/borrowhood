@@ -148,6 +148,13 @@
         Skip to content
     </a>
 
+    {% if environment and environment != 'prod' %}
+    <!-- Environment badge (staging/dev): impossible to miss -->
+    <div class="bg-amber-500 text-black text-xs font-bold text-center py-1 tracking-wide">
+        {{ environment | upper }} -- {% if environment == 'staging' %}not production data. changes reset periodically.{% else %}local dev{% endif %}
+    </div>
+    {% endif %}
+
     <!-- Navigation -->
     <nav class="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
