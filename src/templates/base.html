@@ -663,6 +663,37 @@
         </template>
     </div>
 
+    <!-- Mobile sticky back button (hidden on home / login / register) -->
+    <div x-data="{
+            currentPath: window.location.pathname,
+            get showBack() {
+                // Hide on root-level pages that have bottom nav instead
+                var hideOn = ['/', '/browse', '/raffles', '/calendar', '/helpboard', '/login', '/register', '/messages'];
+                return hideOn.indexOf(this.currentPath) === -1;
+            },
+            goBack() {
+                // Prefer same-origin referrer, else fall back to home
+                try {
+                    if (document.referrer && new URL(document.referrer).origin === window.location.origin && document.referrer !== window.location.href) {
+                        history.back();
+                        return;
+                    }
+                } catch(e) {}
+                window.location.href = '/';
+            }
+         }"
+         x-show="showBack"
+         x-cloak
+         class="lg:hidden sticky top-[56px] z-20 bg-white/95 backdrop-blur border-b border-gray-100">
+        <button @click="goBack()"
+                class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-gray-700 active:bg-gray-100 w-full text-left">
+            <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+            </svg>
+            <span>{{ t('nav.back') }}</span>
+        </button>
+    </div>
+
     <!-- Main content -->
     <main id="main-content" class="min-h-[calc(100vh-8rem)]">
         {% block content %}{% endblock %}

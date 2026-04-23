@@ -14,6 +14,12 @@
         today: new Date(),
         daysInMonth: [],
         firstDayOffset: 0,
+        // BL-calendar-upgrade: filters + sort + day-sheet
+        priceFilter: 'any',
+        scopeFilter: 'all',
+        sort: 'earliest',
+        selectedDay: null,
+        showLegend: false,
 
         get monthName() {
             return new Date(this.year, this.month - 1).toLocaleString('{{ lang }}', { month: 'long', year: 'numeric' });
@@ -27,11 +33,40 @@
             return this.events.filter(e => e.user_rsvp);
         },
 
+        applyFilters(list) {
+            var self = this;
+            return list.filter(function (e) {
+                if (self.priceFilter === 'free' && e.price) return false;
+                if (self.priceFilter === 'paid' && !e.price) return false;
+                if (self.scopeFilter === 'mine' && !e.user_rsvp) return false;
+                if (self.scopeFilter === 'rsvped' && e.user_rsvp !== 'registered' && e.user_rsvp !== 'waitlisted') return false;
+                return true;
+            });
+        },
+
+        applySort(list) {
+            var self = this;
+            var copy = list.slice();
+            copy.sort(function (a, b) {
+                var da = new Date(a.event_start || a.draw_date || 0).getTime();
+                var db = new Date(b.event_start || b.draw_date || 0).getTime();
+                return self.sort === 'latest' ? db - da : da - db;
+            });
+            return copy;
+        },
+
         get displayEvents() {
-            if (this.tab === 'my_events') return this.myEvents;
-            if (this.tab === 'my_rentals') return [];
-            if (this.tab === 'raffles') return this.raffles;
-            return this.communityEvents.concat(this.raffles);
+            var base;
+            if (this.tab === 'my_events') base = this.myEvents;
+            else if (this.tab === 'my_rentals') base = [];
+            else if (this.tab === 'raffles') base = this.raffles;
+            else base = this.communityEvents.concat(this.raffles);
+            return this.applySort(this.applyFilters(base));
+        },
+
+        daySheetEvents() {
+            if (!this.selectedDay) return [];
+            return this.applySort(this.eventsOnDay(this.selectedDay));
         },
 
         eventsOnDay(day) {
@@ -217,6 +252,63 @@
         </button>
     </div>
 
+    <!-- Legend + Filters + Sort -->
+    <div class="mb-4 bg-white border border-gray-200 rounded-xl p-3 space-y-2">
+        <!-- Legend row: colored dots + labels -->
+        <div class="flex items-center gap-3 flex-wrap text-xs">
+            <button type="button" @click="showLegend = !showLegend"
+                    class="flex items-center gap-1 text-gray-500 hover:text-gray-700 font-medium lg:hidden">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>{{ t('calendar.legend') }}</span>
+            </button>
+            <div class="hidden lg:flex items-center gap-4 flex-wrap">
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-green-500"></span><span class="text-gray-700">{{ t('calendar.legend_free') }}</span></span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500"></span><span class="text-gray-700">{{ t('calendar.legend_paid') }}</span></span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-indigo-500"></span><span class="text-gray-700">{{ t('calendar.legend_rsvped') }}</span></span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500 ring-2 ring-amber-300"></span><span class="text-gray-700">{{ t('calendar.legend_raffle') }}</span></span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500"></span><span class="text-gray-700">{{ t('calendar.legend_rental') }}</span></span>
+            </div>
+            <div x-show="showLegend" x-cloak class="flex lg:hidden items-center gap-3 flex-wrap w-full">
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-green-500"></span>{{ t('calendar.legend_free') }}</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500"></span>{{ t('calendar.legend_paid') }}</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-indigo-500"></span>{{ t('calendar.legend_rsvped') }}</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500 ring-2 ring-amber-300"></span>{{ t('calendar.legend_raffle') }}</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500"></span>{{ t('calendar.legend_rental') }}</span>
+            </div>
+        </div>
+
+        <!-- Filter chips -->
+        <div class="flex items-center gap-2 flex-wrap pt-2 border-t border-gray-100">
+            <!-- Scope -->
+            <button @click="scopeFilter = 'all'" class="px-3 py-1 rounded-full text-xs font-semibold transition-colors"
+                    :class="scopeFilter === 'all' ? 'bg-rose-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
+                {{ t('calendar.filter_all') }}
+            </button>
+            <button @click="scopeFilter = 'mine'" class="px-3 py-1 rounded-full text-xs font-semibold transition-colors"
+                    :class="scopeFilter === 'mine' ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
+                {{ t('calendar.filter_mine') }}
+            </button>
+            <!-- Price -->
+            <span class="w-px h-4 bg-gray-200 mx-1"></span>
+            <button @click="priceFilter = (priceFilter === 'free' ? 'any' : 'free')"
+                    class="px-3 py-1 rounded-full text-xs font-semibold transition-colors"
+                    :class="priceFilter === 'free' ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
+                🎁 {{ t('calendar.filter_free') }}
+            </button>
+            <button @click="priceFilter = (priceFilter === 'paid' ? 'any' : 'paid')"
+                    class="px-3 py-1 rounded-full text-xs font-semibold transition-colors"
+                    :class="priceFilter === 'paid' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
+                💶 {{ t('calendar.filter_paid') }}
+            </button>
+            <!-- Sort -->
+            <span class="w-px h-4 bg-gray-200 mx-1"></span>
+            <select x-model="sort" class="text-xs font-semibold bg-gray-100 border-0 rounded-full px-3 py-1 focus:ring-2 focus:ring-rose-500">
+                <option value="earliest">{{ t('calendar.sort_earliest') }}</option>
+                <option value="latest">{{ t('calendar.sort_latest') }}</option>
+            </select>
+        </div>
+    </div>
+
     <!-- Month Navigation -->
     <div class="flex items-center justify-between mb-4">
         <button @click="prevMonth()" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" :title="'{{ t('calendar.prev_month') }}'">
@@ -255,32 +347,93 @@
 
                     <!-- Actual days -->
                     <template x-for="day in daysInMonth" :key="day">
-                        <div class="min-h-[56px] sm:min-h-[72px] border-b border-r border-gray-100 p-1 relative cursor-default"
-                             :class="isPast(day) ? 'bg-gray-50' : 'hover:bg-rose-50/30'">
+                        <button type="button"
+                                @click="if (eventsOnDay(day).length > 0) selectedDay = day"
+                                class="min-h-[56px] sm:min-h-[72px] border-b border-r border-gray-100 p-1 relative text-left transition-colors"
+                                :class="[
+                                    isPast(day) ? 'bg-gray-50' : '',
+                                    eventsOnDay(day).length > 0 ? 'hover:bg-rose-50/50 active:bg-rose-100/60' : 'cursor-default',
+                                    selectedDay === day ? 'ring-2 ring-rose-400 z-10' : ''
+                                ]">
                             <!-- Day number -->
                             <div class="text-xs font-medium mb-0.5"
                                  :class="isToday(day) ? 'w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center mx-auto sm:mx-0' : isPast(day) ? 'text-gray-300' : 'text-gray-700'"
                                  x-text="day"></div>
 
-                            <!-- Event + Rental dots -->
-                            <div class="flex flex-wrap gap-0.5 justify-center sm:justify-start">
+                            <!-- Desktop: show up to 3 titled pill links -->
+                            <div class="hidden sm:flex flex-col gap-0.5">
                                 <template x-for="ev in eventsOnDay(day).slice(0, 3)" :key="ev.id">
                                     <a :href="ev.is_raffle ? '/raffles/' + ev.raffle_id : '/items/' + ev.item_slug"
-                                       class="block w-full"
-                                       :title="ev.title">
-                                        <div class="hidden sm:block text-[10px] leading-tight px-1 py-0.5 rounded truncate"
-                                             :class="ev.is_raffle ? 'bg-amber-200 text-amber-800 font-bold' : ev.is_rental ? (ev.role === 'owner' ? 'bg-emerald-100 text-emerald-700' : 'bg-teal-100 text-teal-700') : ev.user_rsvp ? 'bg-indigo-100 text-indigo-700' : ev.price ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'"
-                                             x-text="ev.title"></div>
-                                        <div class="sm:hidden w-2 h-2 rounded-full"
-                                             :class="ev.is_raffle ? 'bg-amber-500 ring-2 ring-amber-300' : ev.is_rental ? 'bg-emerald-500' : ev.user_rsvp ? 'bg-indigo-500' : ev.price ? 'bg-amber-500' : 'bg-green-500'"></div>
-                                    </a>
+                                       @click.stop
+                                       class="text-[10px] leading-tight px-1 py-0.5 rounded truncate hover:underline"
+                                       :class="ev.is_raffle ? 'bg-amber-200 text-amber-800 font-bold' : ev.is_rental ? (ev.role === 'owner' ? 'bg-emerald-100 text-emerald-700' : 'bg-teal-100 text-teal-700') : ev.user_rsvp ? 'bg-indigo-100 text-indigo-700' : ev.price ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'"
+                                       x-text="ev.title"></a>
                                 </template>
                                 <template x-if="eventsOnDay(day).length > 3">
-                                    <span class="text-[9px] text-gray-400" x-text="'+' + (eventsOnDay(day).length - 3)"></span>
+                                    <span class="text-[9px] text-gray-400" x-text="'+' + (eventsOnDay(day).length - 3) + ' more'"></span>
                                 </template>
                             </div>
-                        </div>
+
+                            <!-- Mobile: dots + count pill, all tappable via parent button -->
+                            <div class="sm:hidden flex items-center justify-center gap-0.5 mt-1 flex-wrap">
+                                <template x-for="ev in eventsOnDay(day).slice(0, 3)" :key="'m' + ev.id">
+                                    <span class="w-2.5 h-2.5 rounded-full"
+                                          :class="ev.is_raffle ? 'bg-amber-500 ring-2 ring-amber-300' : ev.is_rental ? 'bg-emerald-500' : ev.user_rsvp ? 'bg-indigo-500' : ev.price ? 'bg-amber-500' : 'bg-green-500'"></span>
+                                </template>
+                                <template x-if="eventsOnDay(day).length > 3">
+                                    <span class="text-[9px] text-gray-500 ml-0.5" x-text="'+' + (eventsOnDay(day).length - 3)"></span>
+                                </template>
+                            </div>
+                        </button>
                     </template>
+                </div>
+            </div>
+
+            <!-- Day-selected sheet: opens when user taps a day cell with events -->
+            <div x-show="selectedDay" x-cloak
+                 x-transition.opacity
+                 @click.self="selectedDay = null"
+                 @keydown.escape.window="selectedDay = null"
+                 class="fixed inset-0 z-40 bg-black/40 flex items-end sm:items-center justify-center sm:p-4">
+                <div @click.stop
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="translate-y-full sm:translate-y-4 opacity-0"
+                     x-transition:enter-end="translate-y-0 opacity-100"
+                     class="w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+                    <div class="px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-rose-500 to-amber-500 text-white flex items-center justify-between"
+                         data-lang="{{ lang }}"
+                         data-lbl-event="{{ t('calendar.event_singular') }}"
+                         data-lbl-events="{{ t('calendar.event_plural') }}">
+                        <div>
+                            <p class="font-bold text-lg" x-text="new Date(year, month - 1, selectedDay).toLocaleDateString($el.parentElement.dataset.lang, { weekday: 'long', day: 'numeric', month: 'long' })"></p>
+                            <p class="text-xs text-white/80" x-text="daySheetEvents().length + ' ' + (daySheetEvents().length === 1 ? $el.parentElement.parentElement.dataset.lblEvent : $el.parentElement.parentElement.dataset.lblEvents)"></p>
+                        </div>
+                        <button @click="selectedDay = null" class="text-white/90 hover:text-white text-3xl leading-none" aria-label="Close">&times;</button>
+                    </div>
+                    <div class="overflow-y-auto">
+                        <template x-for="ev in daySheetEvents()" :key="'s' + ev.id">
+                            <a :href="ev.is_raffle ? '/raffles/' + ev.raffle_id : '/items/' + ev.item_slug"
+                               class="flex items-start gap-3 px-4 py-3 border-b border-gray-100 hover:bg-gray-50 active:bg-gray-100">
+                                <span class="w-3 h-3 rounded-full mt-1.5 flex-shrink-0"
+                                      :class="ev.is_raffle ? 'bg-amber-500 ring-2 ring-amber-300' : ev.is_rental ? 'bg-emerald-500' : ev.user_rsvp ? 'bg-indigo-500' : ev.price ? 'bg-amber-500' : 'bg-green-500'"></span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-semibold text-gray-900" x-text="ev.title"></p>
+                                    <p class="text-xs text-gray-500 mt-0.5">
+                                        <span x-show="ev.event_start" x-text="formatTime(ev.event_start)"></span>
+                                        <span x-show="ev.event_venue" x-text="' · ' + ev.event_venue"></span>
+                                    </p>
+                                    <p class="text-xs mt-0.5">
+                                        <span x-show="ev.is_raffle" class="text-amber-700 font-semibold">🎟️ {{ t('calendar.legend_raffle') }}</span>
+                                        <span x-show="!ev.is_raffle && !ev.price" class="text-green-600 font-semibold">{{ t('calendar.free') }}</span>
+                                        <span x-show="!ev.is_raffle && ev.price" class="text-gray-700 font-semibold" x-text="'EUR ' + ev.price"></span>
+                                        <span x-show="ev.user_rsvp === 'registered'" class="ml-2 text-indigo-600">✓ {{ t('calendar.you_registered') }}</span>
+                                        <span x-show="ev.user_rsvp === 'waitlisted'" class="ml-2 text-amber-600">{{ t('calendar.you_waitlisted') }}</span>
+                                    </p>
+                                </div>
+                                <svg class="w-4 h-4 text-gray-400 mt-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </a>
+                        </template>
+                    </div>
                 </div>
             </div>
 

@@ -503,8 +503,11 @@ class TestCalendarAccessibility:
         assert "@click.prevent.stop" in content
 
     def test_mobile_dots_desktop_chips(self):
+        """Calendar must have a desktop-only view AND a mobile-only view for day cells."""
         content = CALENDAR_HTML.read_text()
-        assert "hidden sm:block" in content
+        # Desktop-only (BL-calendar-upgrade uses sm:flex for the pill stack)
+        assert ("hidden sm:block" in content) or ("hidden sm:flex" in content)
+        # Mobile-only (dots row + legend collapsible both use sm:hidden)
         assert "sm:hidden" in content
 
     def test_event_overflow_indicator(self):
