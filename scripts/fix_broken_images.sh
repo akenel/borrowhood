@@ -18,6 +18,8 @@
 set -eu
 
 PSQL="docker exec -i postgres psql -U helix_user -d borrowhood"
+# For calls inside a read-loop: same command, no -i so it doesn't slurp the loop's stdin
+PSQL_NOIN="docker exec postgres psql -U helix_user -d borrowhood"
 
 say() { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 
@@ -84,7 +86,7 @@ while IFS=$(printf '\t') read -r media_id url item_id name category; do
     prompt=$(printf '%s' "$prompt_raw" | sed -e 's/ /%20/g' -e 's/,/%2C/g' -e "s/'/%27/g" -e 's/&/%26/g')
     seed=$(printf '%s' "$item_id" | cksum | cut -d' ' -f1)
     new_url="https://image.pollinations.ai/prompt/${prompt}?width=800&height=600&nologo=true&seed=${seed}"
-    $PSQL -c "UPDATE bh_item_media SET url = '${new_url}', updated_at = NOW() WHERE id = '${media_id}';" > /dev/null
+    $PSQL_NOIN -c "UPDATE bh_item_media SET url = '${new_url}', updated_at = NOW() WHERE id = '${media_id}';" > /dev/null
     FIXED=$((FIXED + 1))
     say "  [$COUNTER/$TOTAL] DEAD($status) -> fixed: $name"
   fi
