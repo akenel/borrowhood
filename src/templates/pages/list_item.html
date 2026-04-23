@@ -1202,11 +1202,10 @@
                 {% for ltype in ['rent','sell','commission','offer','service','training','auction','giveaway','event'] %}
                 <div>
                     <div x-show="selectedTypes.includes('{{ ltype }}')" x-cloak
-                        <div x-show="selectedTypes.includes('{{ ltype }}')" x-cloak
-                             x-transition:enter="transition ease-out duration-150"
-                             x-transition:enter-start="opacity-0 -translate-y-1"
-                             x-transition:enter-end="opacity-100 translate-y-0"
-                             class="ml-7 mt-2 p-3 bg-gray-50 rounded-lg">
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 -translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="ml-7 mt-2 p-3 bg-gray-50 rounded-lg">
                             {% if ltype == 'event' %}
                             <!-- Event details -->
                             <div class="space-y-3">

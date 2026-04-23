@@ -188,7 +188,7 @@ function messagesApp() {
                     body: this.newMessage.trim()
                 };
                 if (this.activeRentalId) payload.rental_id = this.activeRentalId;
-                var resp = await fetch('/api/v1/messages', {
+                var resp = await fetch('/api/v1/messages/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -197,14 +197,19 @@ function messagesApp() {
                     var msg = await resp.json();
                     this.messages.push(msg);
                     this.newMessage = '';
-                    // Refresh thread list so new conversation appears in sidebar
                     await this.loadThreads();
                     this.$nextTick(() => {
                         var el = document.getElementById('msg-scroll');
                         if (el) el.scrollTop = el.scrollHeight;
                     });
+                } else {
+                    var errText = 'Send failed (status ' + resp.status + ')';
+                    try { var err = await resp.json(); if (err.detail) errText = err.detail; } catch(e) {}
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: errText } }));
                 }
-            } catch(e) {}
+            } catch(e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Network error -- message not sent' } }));
+            }
             this.sending = false;
         },
 
