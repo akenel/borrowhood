@@ -197,6 +197,7 @@
     "clear": "Cancella",
     "no_results_title": "Nessun oggetto trovato",
     "no_results": "Prova ad ampliare la ricerca o a cambiare i filtri.",
+    "no_matches_for": "Nessun oggetto corrisponde a",
     "no_description": "Nessuna descrizione",
     "clear_filters": "Cancella Tutti i Filtri",
     "all_categories": "Tutte le Categorie",
@@ -205,6 +206,16 @@
     "hide_map": "Nascondi Mappa",
     "load_more": "Carica Altri",
     "showing_items": "Mostrando {shown} di {total} oggetti"
+  },
+  "search_elsewhere": {
+    "heading": "Stai cercando nel posto sbagliato?",
+    "subhead": "Prova un'altra sezione di La Piazza:",
+    "items": "Oggetti",
+    "members": "Membri",
+    "events": "Eventi",
+    "helpboard": "Bacheca Aiuto",
+    "raffles": "Sorteggi",
+    "for_query": "per"
   },
   "item": {
     "details": "Dettagli",
@@ -395,6 +406,7 @@
     "need_label": "Ho Bisogno",
     "offer_label": "Posso Aiutare",
     "no_posts": "Nessun post ancora",
+    "no_matches_for": "Nessun post corrisponde a",
     "be_first": "Sii il primo a pubblicare sulla Bacheca Aiuto!",
     "i_need": "Ho Bisogno di Aiuto",
     "i_offer": "Posso Aiutare",
@@ -848,6 +860,7 @@
     "sort_badge": "Reputazione",
     "no_results_title": "Nessun membro trovato",
     "no_results": "Prova ad ampliare la ricerca o a cambiare i filtri.",
+    "no_matches_for": "Nessun membro corrisponde a",
     "clear_filters": "Cancella Filtri",
     "load_more": "Carica Altri",
     "showing_members": "Mostrando {shown} di {total} membri",

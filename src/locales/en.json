@@ -197,6 +197,7 @@
     "clear": "Clear",
     "no_results_title": "No items found",
     "no_results": "Try broadening your search or changing your filters.",
+    "no_matches_for": "No items match",
     "no_description": "No description",
     "clear_filters": "Clear All Filters",
     "all_categories": "All Categories",
@@ -205,6 +206,16 @@
     "hide_map": "Hide Map",
     "load_more": "Load More",
     "showing_items": "Showing {shown} of {total} items"
+  },
+  "search_elsewhere": {
+    "heading": "Searching in the wrong place?",
+    "subhead": "Try another section of La Piazza:",
+    "items": "Items",
+    "members": "Members",
+    "events": "Events",
+    "helpboard": "Help Board",
+    "raffles": "Raffles",
+    "for_query": "for"
   },
   "item": {
     "details": "Details",
@@ -395,6 +406,7 @@
     "need_label": "Need Help",
     "offer_label": "Can Help",
     "no_posts": "No posts yet",
+    "no_matches_for": "No posts match",
     "be_first": "Be the first to post on the Help Board!",
     "i_need": "I Need Help",
     "i_offer": "I Can Help",
@@ -848,6 +860,7 @@
     "sort_badge": "Reputation",
     "no_results_title": "No members found",
     "no_results": "Try broadening your search or changing your filters.",
+    "no_matches_for": "No members match",
     "clear_filters": "Clear Filters",
     "load_more": "Load More",
     "showing_members": "Showing {shown} of {total} members",

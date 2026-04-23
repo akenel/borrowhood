@@ -563,17 +563,40 @@
             {% endif %}
         </div>
         {% else %}
-        <!-- Empty state (Rule 24) -->
+        <!-- Empty state (Rule 24) — echoes query + offers sibling surfaces -->
         <div class="text-center py-16">
             <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
+            {% if q %}
+            <h3 class="mt-4 text-lg font-semibold text-gray-900">{{ t('browse.no_matches_for') }} &ldquo;{{ q }}&rdquo;</h3>
+            {% else %}
             <h3 class="mt-4 text-lg font-semibold text-gray-900">{{ t('browse.no_results_title') }}</h3>
+            {% endif %}
             <p class="mt-2 text-sm text-gray-500">{{ t('browse.no_results') }}</p>
             <a href="/browse"
                class="mt-6 inline-flex px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors min-h-[44px]">
                 {{ t('browse.clear_filters') }}
             </a>
+            <!-- Sibling surfaces — maybe they're searching in the wrong place -->
+            <div class="mt-10 pt-8 border-t border-gray-200 max-w-xl mx-auto">
+                <p class="text-sm font-semibold text-gray-700">{{ t('search_elsewhere.heading') }}</p>
+                <p class="text-xs text-gray-500 mt-1">{{ t('search_elsewhere.subhead') }}</p>
+                <div class="mt-4 flex flex-wrap justify-center gap-2">
+                    <a href="/members{% if q %}?q={{ q|urlencode }}{% endif %}" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-indigo-50 hover:border-indigo-300 transition-colors min-h-[40px]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        {{ t('search_elsewhere.members') }}{% if q %} <span class="text-xs text-gray-500">{{ t('search_elsewhere.for_query') }} &ldquo;{{ q }}&rdquo;</span>{% endif %}
+                    </a>
+                    <a href="/calendar" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-rose-50 hover:border-rose-300 transition-colors min-h-[40px]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        {{ t('search_elsewhere.events') }}
+                    </a>
+                    <a href="/helpboard" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-purple-50 hover:border-purple-300 transition-colors min-h-[40px]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        {{ t('search_elsewhere.helpboard') }}
+                    </a>
+                </div>
+            </div>
         </div>
         {% endif %}
     </div>

@@ -78,13 +78,39 @@
         <div class="w-8 h-8 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin"></div>
     </div>
 
-    <!-- Empty state -->
+    <!-- Empty state — echoes query + offers sibling surfaces -->
     <div x-show="!loading && filtered.length === 0" x-cloak class="text-center py-16">
         <div class="w-20 h-20 mx-auto mb-4 bg-amber-100 rounded-full flex items-center justify-center">
             <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900">{% if lang == 'it' %}Nessun sorteggio ancora{% else %}No raffles yet{% endif %}</h3>
+        <h3 class="text-lg font-semibold text-gray-900"
+            x-text="search && search.trim() ? ('{% if lang == 'it' %}Nessun sorteggio corrisponde a{% else %}No raffles match{% endif %} “' + search.trim() + '”') : '{% if lang == 'it' %}Nessun sorteggio ancora{% else %}No raffles yet{% endif %}'"></h3>
         <p class="text-gray-500 mt-1">{% if lang == 'it' %}Sii il primo a creare un sorteggio per la community!{% else %}Be the first to create a raffle for the community!{% endif %}</p>
+        <!-- Sibling surfaces -->
+        <div class="mt-8 pt-6 border-t border-gray-200 max-w-xl mx-auto px-4">
+            <p class="text-sm font-semibold text-gray-700">{{ t('search_elsewhere.heading') }}</p>
+            <p class="text-xs text-gray-500 mt-1">{{ t('search_elsewhere.subhead') }}</p>
+            <div class="mt-4 flex flex-wrap justify-center gap-2">
+                <a :href="'/browse' + (search && search.trim() ? '?q=' + encodeURIComponent(search.trim()) : '')"
+                   class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-indigo-50 hover:border-indigo-300 transition-colors min-h-[40px]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    <span>{{ t('search_elsewhere.items') }}</span>
+                    <span class="text-xs text-gray-500" x-show="search && search.trim()"
+                          x-text="'{{ t('search_elsewhere.for_query') }} “' + (search || '').trim() + '”'"></span>
+                </a>
+                <a :href="'/members' + (search && search.trim() ? '?q=' + encodeURIComponent(search.trim()) : '')"
+                   class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-indigo-50 hover:border-indigo-300 transition-colors min-h-[40px]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span>{{ t('search_elsewhere.members') }}</span>
+                    <span class="text-xs text-gray-500" x-show="search && search.trim()"
+                          x-text="'{{ t('search_elsewhere.for_query') }} “' + (search || '').trim() + '”'"></span>
+                </a>
+                <a href="/calendar" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-rose-50 hover:border-rose-300 transition-colors min-h-[40px]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    {{ t('search_elsewhere.events') }}
+                </a>
+            </div>
+        </div>
     </div>
 
     <!-- Raffle cards grid — 2 columns for bigger, richer cards -->
