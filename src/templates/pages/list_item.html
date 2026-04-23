@@ -312,7 +312,7 @@
                     const base = window._editData || {};
                     const baseAttrs = base.attributes || {};
                     const changes = {};
-                    const textFields = ['name', 'description', 'story', 'brand', 'tags', 'condition', 'category'];
+                    const textFields = ['name', 'description', 'story', 'brand', 'tags', 'condition', 'category', 'safety_notes'];
                     for (const key of textFields) {
                         const baseVal = base[key] == null ? '' : base[key];
                         const curVal = this.form[key] == null ? '' : this.form[key];
@@ -320,6 +320,12 @@
                             // Empty string = user cleared the field -> send null
                             changes[key] = curVal === '' ? null : curVal;
                         }
+                    }
+                    // Booleans: always sent on change, no null coercion
+                    const baseAgeRestricted = !!base.age_restricted;
+                    const curAgeRestricted = !!this.form.age_restricted;
+                    if (curAgeRestricted !== baseAgeRestricted) {
+                        changes.age_restricted = curAgeRestricted;
                     }
                     if (JSON.stringify(this.itemAttributes || {}) !== JSON.stringify(baseAttrs)) {
                         changes.attributes = Object.keys(this.itemAttributes || {}).length > 0 ? this.itemAttributes : null;

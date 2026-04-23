@@ -79,3 +79,5 @@ class ItemUpdate(BaseModel):
     needs_equipment: Optional[str] = None
     compatible_with: Optional[str] = None
     attributes: Optional[dict] = None
+    age_restricted: Optional[bool] = None
+    safety_notes: Optional[str] = None
