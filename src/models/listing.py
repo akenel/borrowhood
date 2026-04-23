@@ -67,6 +67,9 @@ class BHListing(BHBase, Base):
     pickup_only: Mapped[bool] = mapped_column(default=True)
     notes: Mapped[Optional[str]] = mapped_column(Text)
     return_policy: Mapped[Optional[str]] = mapped_column(String(500))  # Seller-defined return terms
+    # MVP availability note (free text). Signals preferred hours / days off / vacation.
+    # Full rule-based availability will replace this -- see docs/AVAILABILITY-DESIGN.md.
+    availability_note: Mapped[Optional[str]] = mapped_column(String(500))
 
     # Minimum charge + team pricing (service/training listings)
     minimum_charge: Mapped[Optional[float]] = mapped_column(Float)     # Floor price regardless of hours/days

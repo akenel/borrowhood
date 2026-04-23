@@ -75,6 +75,12 @@
     "best": "record",
     "quote": "Non temo l'uomo che ha praticato 10.000 calci una volta, ma temo l'uomo che ha praticato un calcio 10.000 volte."
   },
+  "availability": {
+    "note_label": "Quando sei disponibile (opzionale)",
+    "note_placeholder": "es. Lun-Ven 18:00-21:00, niente weekend. Chiuso dal 25 al 30 aprile per viaggio.",
+    "note_hint": "Testo libero per ora. Contattami prima di prenotare -- il calendario con regole arriva presto.",
+    "host_prefers": "Orari dell'host:"
+  },
   "calendar": {
     "title": "Calendario della Comunita",
     "subtitle": "Eventi nel tuo quartiere",

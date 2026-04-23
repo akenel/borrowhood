@@ -112,14 +112,14 @@
         form: window._editForm
             ? Object.assign({
                   content_language: '{{ lang }}', currency: 'EUR',
-                  delivery_available: false, delivery_fee: '', notes: '', return_policy: ''
+                  delivery_available: false, delivery_fee: '', notes: '', return_policy: '', availability_note: ''
               }, window._editForm)
             : {
                   name: '', description: '', story: '', category: 'power_tools',
                   item_type: 'physical', condition: 'good', brand: '',
                   age_restricted: false, safety_notes: '', tags: '',
                   content_language: '{{ lang }}', currency: 'EUR',
-                  delivery_available: false, delivery_fee: '', notes: '', return_policy: ''
+                  delivery_available: false, delivery_fee: '', notes: '', return_policy: '', availability_note: ''
               },
         itemAttributes: window._editData && window._editData.attributes ? window._editData.attributes : {},
         attributeSchema: {},
@@ -156,6 +156,7 @@
                     var first = d.listings[0];
                     this.form.notes = first.notes || '';
                     this.form.return_policy = first.return_policy || '';
+                    this.form.availability_note = first.availability_note || '';
                     this.form.delivery_available = first.delivery_available || false;
                 }
             }
@@ -441,10 +442,13 @@
                     const firstListing = window._editData.listings[0] || {};
                     const hydratedNotes = firstListing.notes || '';
                     const hydratedReturnPolicy = firstListing.return_policy || '';
+                    const hydratedAvailability = firstListing.availability_note || '';
                     const curNotes = this.form.notes || '';
                     const curReturnPolicy = this.form.return_policy || '';
+                    const curAvailability = this.form.availability_note || '';
                     const notesChanged = curNotes !== hydratedNotes;
                     const returnPolicyChanged = curReturnPolicy !== hydratedReturnPolicy;
+                    const availabilityChanged = curAvailability !== hydratedAvailability;
                     for (const existing of window._editData.listings) {
                         const lt = existing.listing_type;
                         const terms = this.listingPrices[lt];
@@ -460,6 +464,7 @@
                         };
                         if (notesChanged) payload.notes = curNotes === '' ? null : curNotes;
                         if (returnPolicyChanged) payload.return_policy = curReturnPolicy === '' ? null : curReturnPolicy;
+                        if (availabilityChanged) payload.availability_note = curAvailability === '' ? null : curAvailability;
                         if (isSvcType) {
                             if (terms.minimum_charge) payload.minimum_charge = parseFloat(terms.minimum_charge);
                             if (terms.per_person_rate) payload.per_person_rate = parseFloat(terms.per_person_rate);
@@ -504,7 +509,8 @@
                         delivery_available: isGiveaway ? false : this.form.delivery_available,
                         pickup_only: isGiveaway ? true : !this.form.delivery_available,
                         notes: this.form.notes || null,
-                        return_policy: this.form.return_policy || null
+                        return_policy: this.form.return_policy || null,
+                        availability_note: this.form.availability_note || null
                     };
                     if (isSvcType) {
                         if (terms.minimum_charge) payload.minimum_charge = parseFloat(terms.minimum_charge);
@@ -1437,6 +1443,17 @@
                           placeholder="{{ t('i18n.return_policy_placeholder') }}"
                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
                 <p class="text-xs text-gray-400 mt-1">{{ t('i18n.return_policy_hint') }}</p>
+            </div>
+
+            <!-- MVP availability note: free text signal so buyers know your hours -->
+            <div>
+                <label for="availability_note" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ t('availability.note_label') }}
+                </label>
+                <textarea id="availability_note" x-model="form.availability_note" rows="2" maxlength="500"
+                          placeholder="{{ t('availability.note_placeholder') }}"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
+                <p class="text-xs text-gray-400 mt-1">{{ t('availability.note_hint') }}</p>
             </div>
 
             <div class="flex justify-between pt-4">

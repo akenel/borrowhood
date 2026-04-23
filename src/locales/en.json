@@ -75,6 +75,12 @@
     "best": "best",
     "quote": "I fear not the man who has practiced 10,000 kicks once, but I fear the man who has practiced one kick 10,000 times."
   },
+  "availability": {
+    "note_label": "When you're available (optional)",
+    "note_placeholder": "e.g. Mon-Fri 18:00-21:00, no weekends. Closed April 25-30 for travel.",
+    "note_hint": "Free text for now. Ping me before booking -- rule-based calendar is coming.",
+    "host_prefers": "Host's hours:"
+  },
   "calendar": {
     "title": "Community Calendar",
     "subtitle": "Events happening in your neighborhood",

@@ -172,6 +172,7 @@ async def edit_item_page(slug: str, request: Request,
                 "event_venue": l.event_venue or "",
                 "event_address": l.event_address or "",
                 "event_link": l.event_link or "",
+                "availability_note": l.availability_note or "",
             })
 
     ctx = _ctx(request, token,
