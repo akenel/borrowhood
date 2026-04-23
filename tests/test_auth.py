@@ -208,7 +208,7 @@ async def test_demo_login_endpoint_exists(client):
 @pytest.mark.asyncio
 async def test_lang_cookie_set_on_switch(client):
     """Language switch should set bh_lang cookie on page routes."""
-    resp = await client.get("/list?lang=it")
+    resp = await client.get("/terms?lang=it")
     set_cookie = resp.headers.get("set-cookie", "")
     assert "bh_lang=it" in set_cookie
 
@@ -216,7 +216,7 @@ async def test_lang_cookie_set_on_switch(client):
 @pytest.mark.asyncio
 async def test_lang_switch_to_english(client):
     """Language switch to English should set bh_lang=en."""
-    resp = await client.get("/list?lang=en")
+    resp = await client.get("/terms?lang=en")
     set_cookie = resp.headers.get("set-cookie", "")
     assert "bh_lang=en" in set_cookie
 

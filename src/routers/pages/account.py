@@ -31,6 +31,9 @@ async def dashboard(request: Request,
                     db: AsyncSession = Depends(get_db),
                     token: Optional[dict] = Depends(get_current_user_token)):
     """User dashboard with items, rentals, and incoming requests."""
+    if not token:
+        from starlette.responses import RedirectResponse
+        return RedirectResponse(url="/login", status_code=302)
     items = []
     item_count = 0
     renter_rentals = []
@@ -160,6 +163,9 @@ async def orders_page(
     token: Optional[dict] = Depends(get_current_user_token),
 ):
     """Full order history -- all rentals as buyer and seller."""
+    if not token:
+        from starlette.responses import RedirectResponse
+        return RedirectResponse(url="/login", status_code=302)
     orders = []
     total_count = 0
     earnings_total = 0.0

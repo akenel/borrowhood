@@ -163,6 +163,9 @@ async def export_workshop(slug: str, request: Request,
 async def onboarding_page(request: Request,
                           token: Optional[dict] = Depends(get_current_user_token)):
     """Onboarding wizard for new users."""
+    if not token:
+        from starlette.responses import RedirectResponse
+        return RedirectResponse(url="/login", status_code=302)
     ctx = _ctx(request, token)
     return _render("pages/onboarding.html", ctx)
 
@@ -173,6 +176,9 @@ async def profile(request: Request,
                   db: AsyncSession = Depends(get_db),
                   token: Optional[dict] = Depends(get_current_user_token)):
     """User profile page with stats, badges, languages, skills."""
+    if not token:
+        from starlette.responses import RedirectResponse
+        return RedirectResponse(url="/login", status_code=302)
     profile_user = None
     languages = []
     skills = []

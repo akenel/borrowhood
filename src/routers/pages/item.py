@@ -189,7 +189,10 @@ async def edit_item_page(slug: str, request: Request,
 @router.get("/list", response_class=HTMLResponse)
 async def list_item_page(request: Request,
                          token: Optional[dict] = Depends(get_current_user_token)):
-    """Form to list a new item. Requires authentication (enforced client-side)."""
+    """Form to list a new item. Requires authentication."""
+    if not token:
+        from starlette.responses import RedirectResponse
+        return RedirectResponse(url="/login", status_code=302)
     ctx = _ctx(request, token, category_groups=CATEGORY_GROUPS)
     return _render("pages/list_item.html", ctx)
 

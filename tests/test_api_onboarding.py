@@ -4,19 +4,11 @@ import pytest
 
 
 @pytest.mark.asyncio
-async def test_onboarding_page_returns_200(client):
-    """GET /onboarding should return 200."""
-    resp = await client.get("/onboarding")
-    assert resp.status_code == 200
-    assert "La Piazza" in resp.text or "Piazza" in resp.text
-
-
-@pytest.mark.asyncio
-async def test_onboarding_has_steps(client):
-    """Onboarding page should have all 3 steps."""
-    resp = await client.get("/onboarding")
-    text = resp.text
-    assert "step" in text.lower()
+async def test_onboarding_redirects_anon(client):
+    """Onboarding redirects unauthenticated users to /login."""
+    resp = await client.get("/onboarding", follow_redirects=False)
+    assert resp.status_code == 302
+    assert "/login" in resp.headers.get("location", "")
 
 
 @pytest.mark.asyncio

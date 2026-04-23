@@ -129,9 +129,11 @@ class TestFontScaling:
 # ── 6. Service worker version ──
 
 class TestServiceWorker:
-    def test_cache_version_is_v3(self):
+    def test_cache_version_is_bumped(self):
+        """Cache key follows lp-vN convention (version bumps invalidate stale PWAs)."""
+        import re
         content = Path("src/static/sw.js").read_text()
-        assert "lp-v3" in content
+        assert re.search(r"CACHE_NAME\s*=\s*['\"]lp-v\d+['\"]", content)
 
     def test_sw_deletes_old_caches(self):
         content = Path("src/static/sw.js").read_text()

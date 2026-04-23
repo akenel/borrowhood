@@ -133,7 +133,10 @@ async def raffle_detail_page(raffle_id: str, request: Request,
 @router.get("/chat", response_class=HTMLResponse)
 async def chat_page(request: Request,
                     token: Optional[dict] = Depends(get_current_user_token)):
-    """AI Concierge chat page. Backend: POST /api/v1/ai/concierge."""
+    """AI Concierge chat page. Backend: POST /api/v1/ai/concierge (auth)."""
+    if not token:
+        from starlette.responses import RedirectResponse
+        return RedirectResponse(url="/login", status_code=302)
     ctx = _ctx(request, token)
     return _render("pages/chat.html", ctx)
 
