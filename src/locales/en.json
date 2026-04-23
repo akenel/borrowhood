@@ -38,7 +38,16 @@
     "helpboard_title": "Ask the neighborhood",
     "helpboard_body": "Someone always knows someone. Post a help request, offer a hand.",
     "list_title": "Share something you own, know, or make",
-    "list_body": "An item to rent, a skill to teach, a space to host. No fees, no middlemen."
+    "list_body": "An item to rent, a skill to teach, a space to host. No fees, no middlemen.",
+    "dashboard_hint": "Your workshop overview -- listings, earnings, stats at a glance",
+    "profile_hint": "How the community sees you -- bio, languages, reputation",
+    "orders_hint": "Things you rented and things rented from you",
+    "leaderboard_hint": "Top community members by points and streaks",
+    "members_hint": "Browse people in the neighborhood",
+    "chat_hint": "AI Concierge -- ask anything, find anything",
+    "settings_hint": "Account preferences, notifications, payment setup",
+    "logout_hint": "Sign out of this device",
+    "text_size_hint": "Make text larger or smaller for the whole app"
   },
   "settings": {
     "font_size": "Text Size",

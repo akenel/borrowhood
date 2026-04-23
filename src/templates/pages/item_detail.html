@@ -1592,37 +1592,46 @@
                     </div>
                 </a>
 
-                <!-- Badge -->
+                <!-- Badge -- clickable to browse members at same tier -->
                 <div class="mt-4">
-                    <span class="text-xs px-2.5 py-1 rounded-full font-medium
-                        {% if item.owner.badge_tier.value == 'legend' %}bg-amber-100 text-amber-700
-                        {% elif item.owner.badge_tier.value == 'pillar' %}bg-purple-100 text-purple-700
-                        {% elif item.owner.badge_tier.value == 'trusted' %}bg-emerald-100 text-emerald-700
-                        {% elif item.owner.badge_tier.value == 'active' %}bg-blue-100 text-blue-700
-                        {% else %}bg-gray-100 text-gray-700{% endif %}">
+                    <a href="/members?badge_tier={{ item.owner.badge_tier.value }}"
+                       title="See all {{ t('badges.' + item.owner.badge_tier.value) }} members on La Piazza"
+                       class="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-semibold cursor-pointer hover:-translate-y-0.5 hover:shadow-md transition-all
+                        {% if item.owner.badge_tier.value == 'legend' %}bg-amber-100 text-amber-800 hover:bg-amber-200
+                        {% elif item.owner.badge_tier.value == 'pillar' %}bg-purple-100 text-purple-800 hover:bg-purple-200
+                        {% elif item.owner.badge_tier.value == 'trusted' %}bg-emerald-100 text-emerald-800 hover:bg-emerald-200
+                        {% elif item.owner.badge_tier.value == 'active' %}bg-blue-100 text-blue-800 hover:bg-blue-200
+                        {% else %}bg-gray-100 text-gray-800 hover:bg-gray-200{% endif %}">
                         {{ t('badges.' + item.owner.badge_tier.value) }}
-                    </span>
+                    </a>
                 </div>
 
-                <!-- Languages (CEFR badges) -->
+                <!-- Languages (CEFR badges) -- each clickable to browse same-language speakers -->
                 {% if item.owner.languages %}
                 <div class="mt-4">
                     <p class="text-xs font-medium text-gray-500 mb-2">{{ t('item.languages') }}</p>
                     <div class="flex flex-wrap gap-1.5">
                         {% for ulang in item.owner.languages %}
-                        <span class="text-xs px-2 py-1 bg-indigo-50 text-indigo-600 rounded font-medium">
+                        <a href="/members?language={{ ulang.language_code }}"
+                           title="Find members who speak {{ ulang.language_code | upper }} ({{ ulang.proficiency.value }})"
+                           class="inline-flex items-center gap-1 text-xs px-2 py-1 bg-indigo-100 text-indigo-800 rounded font-semibold cursor-pointer hover:bg-indigo-200 hover:-translate-y-0.5 hover:shadow-sm transition-all">
                             {{ lang_flags.get(ulang.language_code, '\U0001f310') }} {{ ulang.language_code | upper }} {{ ulang.proficiency.value }}
-                        </span>
+                        </a>
                         {% endfor %}
                     </div>
                 </div>
                 {% endif %}
 
-                <!-- Location -->
+                <!-- Location -- clickable to browse members in same city -->
                 {% if item.owner.city %}
                 <div class="mt-4">
                     <p class="text-xs font-medium text-gray-500 mb-1">{{ t('item.location') }}</p>
-                    <p class="text-sm text-gray-700">{{ item.owner.city }}{% if item.owner.country_code %}, {{ item.owner.country_code }}{% endif %}</p>
+                    <a href="/members?city={{ item.owner.city | urlencode }}"
+                       title="Find members in {{ item.owner.city }}"
+                       class="inline-flex items-center gap-1.5 text-sm text-gray-800 font-medium hover:text-indigo-700 hover:underline transition-colors">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25s-7.5-4.108-7.5-11.25a7.5 7.5 0 1115 0z"/></svg>
+                        {{ item.owner.city }}{% if item.owner.country_code %}, {{ item.owner.country_code }}{% endif %}
+                    </a>
                 </div>
                 {% endif %}
 

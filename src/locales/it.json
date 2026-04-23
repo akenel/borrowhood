@@ -38,7 +38,16 @@
     "helpboard_title": "Chiedi al quartiere",
     "helpboard_body": "C'e sempre qualcuno che conosce qualcuno. Chiedi aiuto, offri una mano.",
     "list_title": "Condividi cio che hai, sai o fai",
-    "list_body": "Un oggetto da noleggiare, un'abilita da insegnare, uno spazio da ospitare. Niente commissioni."
+    "list_body": "Un oggetto da noleggiare, un'abilita da insegnare, uno spazio da ospitare. Niente commissioni.",
+    "dashboard_hint": "Panoramica del tuo laboratorio -- annunci, guadagni, statistiche",
+    "profile_hint": "Come ti vede la comunita -- bio, lingue, reputazione",
+    "orders_hint": "Oggetti che hai noleggiato e oggetti noleggiati da te",
+    "leaderboard_hint": "I membri piu attivi della comunita per punti e streak",
+    "members_hint": "Sfoglia le persone del quartiere",
+    "chat_hint": "AI Concierge -- chiedi qualsiasi cosa, trova qualsiasi cosa",
+    "settings_hint": "Preferenze account, notifiche, pagamenti",
+    "logout_hint": "Esci da questo dispositivo",
+    "text_size_hint": "Rendi il testo piu grande o piu piccolo ovunque nell'app"
   },
   "settings": {
     "font_size": "Dimensione Testo",
