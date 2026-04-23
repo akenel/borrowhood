@@ -265,7 +265,7 @@ class BHItem(BHBase, Base):
 
     # Relationships
     owner: Mapped["BHUser"] = relationship(back_populates="items")
-    media: Mapped[List["BHItemMedia"]] = relationship(back_populates="item", cascade="all, delete-orphan")
+    media: Mapped[List["BHItemMedia"]] = relationship(back_populates="item", cascade="all, delete-orphan", order_by="BHItemMedia.sort_order")
     listings: Mapped[List["BHListing"]] = relationship(back_populates="item")
 
 

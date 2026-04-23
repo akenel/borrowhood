@@ -1120,6 +1120,7 @@
     "return_policy_hint": "Let buyers know your return terms. No policy = no returns assumed.",
     "drag_to_reorder": "Drag photos to reorder. First photo is the cover image.",
     "order_saved": "Photo order saved!",
+    "set_as_cover": "Set as cover",
     "email_notifications": "Email Notifications",
     "email_notif_desc": "Receive email alerts for new messages, bookings, and offers.",
     "enabled": "Enabled",

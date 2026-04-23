@@ -828,46 +828,72 @@
                     {{ t('i18n.item_photo') }}
                 </label>
 
-                <!-- Existing photos (edit mode) -- drag to reorder -->
-                <div x-show="existingMedia.length > 0" class="mb-3">
+                <!-- Existing photos (edit mode) -- drag to reorder, tap to cover -->
+                <div x-show="existingMedia.length > 0" class="mb-3"
+                     x-data="{
+                        dragIdx: null,
+                        dragOverIdx: null,
+                        isVideo: function(m) {
+                            var u = (m && m.url) || '';
+                            return u.endsWith('.mp4') || u.endsWith('.webm') || u.endsWith('.mov') || u.includes('/video');
+                        },
+                        persistOrder: function() {
+                            fetch('/api/v1/items/' + editItemId + '/media/reorder', {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ media_ids: this.existingMedia.map(function(x){ return x.id; }) })
+                            }).then(function(r) {
+                                if (r.ok) window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{{ t('i18n.order_saved') }}' } }));
+                                else window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Save failed' } }));
+                            });
+                        },
+                        setCover: function(midx) {
+                            if (midx === 0) return;
+                            if (this.isVideo(this.existingMedia[midx])) {
+                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Cover image cannot be a video' } }));
+                                return;
+                            }
+                            var moved = this.existingMedia.splice(midx, 1)[0];
+                            this.existingMedia.unshift(moved);
+                            this.persistOrder();
+                        },
+                        moveTo: function(from, to) {
+                            if (from === to) return;
+                            var snapshot = this.existingMedia.slice();
+                            var moved = this.existingMedia.splice(from, 1)[0];
+                            this.existingMedia.splice(to, 0, moved);
+                            if (this.isVideo(this.existingMedia[0])) {
+                                this.existingMedia.splice(0, this.existingMedia.length, ...snapshot);
+                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Cover image cannot be a video' } }));
+                                return;
+                            }
+                            this.persistOrder();
+                        }
+                     }">
                     <p class="text-xs text-gray-500 mb-2" x-show="existingMedia.length > 1">{{ t('i18n.drag_to_reorder') }}</p>
-                    <div class="grid grid-cols-3 sm:grid-cols-5 gap-2"
-                         x-data="{ dragIdx: null, dragOverIdx: null }">
+                    <div class="grid grid-cols-3 sm:grid-cols-5 gap-2">
                         <template x-for="(m, midx) in existingMedia" :key="m.id">
                             <div class="relative group cursor-grab active:cursor-grabbing"
                                  draggable="true"
                                  @dragstart="dragIdx = midx; $event.dataTransfer.effectAllowed = 'move'"
                                  @dragover.prevent="dragOverIdx = midx; $event.dataTransfer.dropEffect = 'move'"
                                  @dragleave="if(dragOverIdx === midx) dragOverIdx = null"
-                                 @drop.prevent="
-                                    if(dragIdx !== null && dragIdx !== midx) {
-                                        var moved = existingMedia.splice(dragIdx, 1)[0];
-                                        existingMedia.splice(midx, 0, moved);
-                                        // Check video not in cover position
-                                        if(existingMedia[0].url && (existingMedia[0].url.endsWith('.mp4') || existingMedia[0].url.includes('video'))) {
-                                            // Swap back
-                                            existingMedia.splice(midx, 0, existingMedia.splice(dragIdx > midx ? dragIdx : dragIdx, 1)[0]);
-                                            window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Cover image cannot be a video' } }));
-                                        } else {
-                                            // Save new order to server
-                                            fetch('/api/v1/items/' + editItemId + '/media/reorder', {
-                                                method: 'PUT',
-                                                headers: { 'Content-Type': 'application/json' },
-                                                body: JSON.stringify({ media_ids: existingMedia.map(function(x){ return x.id; }) })
-                                            }).then(function(r) {
-                                                if(r.ok) window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: '{{ t('i18n.order_saved') }}' } }));
-                                            });
-                                        }
-                                    }
-                                    dragIdx = null; dragOverIdx = null;
-                                 "
+                                 @drop.prevent="if (dragIdx !== null) moveTo(dragIdx, midx); dragIdx = null; dragOverIdx = null;"
                                  @dragend="dragIdx = null; dragOverIdx = null"
                                  :class="dragOverIdx === midx ? 'ring-2 ring-amber-400 scale-105' : ''">
                                 <img :src="m.url" :alt="m.alt_text" class="w-full h-24 object-cover rounded-lg border border-gray-200 transition-transform"
                                      :class="midx === 0 && uploadPreviews.length === 0 ? 'ring-2 ring-indigo-500' : ''">
                                 <span x-show="midx === 0 && uploadPreviews.length === 0" class="absolute top-1 left-1 text-[10px] px-1.5 py-0.5 bg-indigo-600 text-white rounded-full font-semibold">Cover</span>
-                                <button type="button" @click="fetch('/api/v1/items/' + editItemId + '/media/' + m.id, {method:'DELETE'}).then(r=>{if(r.ok){existingMedia.splice(midx,1)}else{alert('Failed to delete')}})"
-                                        class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">&times;</button>
+                                <!-- Set as cover (tap-friendly, hidden on cover itself and on videos) -->
+                                <button type="button"
+                                        x-show="midx !== 0 && !isVideo(m)"
+                                        @click.stop="setCover(midx)"
+                                        class="absolute bottom-1 right-1 text-[10px] px-1.5 py-0.5 bg-indigo-600 text-white rounded-full font-semibold opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity min-h-[24px]"
+                                        title="Set as cover">
+                                    {{ t('i18n.set_as_cover') }}
+                                </button>
+                                <button type="button" @click.stop="fetch('/api/v1/items/' + editItemId + '/media/' + m.id, {method:'DELETE'}).then(r=>{if(r.ok){existingMedia.splice(midx,1)}else{alert('Failed to delete')}})"
+                                        class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center justify-center">&times;</button>
                                 <span class="absolute bottom-1 left-1 text-[9px] px-1 py-0.5 bg-black/50 text-white rounded" x-text="(midx+1) + '/' + existingMedia.length"></span>
                             </div>
                         </template>

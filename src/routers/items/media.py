@@ -69,12 +69,17 @@ async def add_item_media(
         raise HTTPException(status_code=403, detail="Not your item")
 
     from src.models.item import MediaType
+    max_order = await db.scalar(
+        select(func.coalesce(func.max(BHItemMedia.sort_order), -1))
+        .where(BHItemMedia.item_id == item.id)
+    )
+    next_order = (max_order if max_order is not None else -1) + 1
     media = BHItemMedia(
         item_id=item.id,
         url=data.url,
         alt_text=data.alt_text,
         media_type=MediaType(data.media_type) if data.media_type in [e.value for e in MediaType] else MediaType.PHOTO,
-        sort_order=0,
+        sort_order=next_order,
     )
     db.add(media)
     await db.commit()
