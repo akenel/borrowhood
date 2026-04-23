@@ -17,8 +17,10 @@ class BHSettings(BaseSettings):
     debug: bool = False
     log_level: str = "INFO"
     # Deployment environment: "dev" | "staging" | "prod".
-    # Drives the staging badge in the footer, default notifications, etc.
-    environment: str = "dev"
+    # Default is "prod" so an unset env var = safe silent prod-mode
+    # (no badge). Local dev sets BH_ENVIRONMENT=dev via .env; staging
+    # sets it via the compose file.
+    environment: str = "prod"
 
     # Community (local-global: change these per deployment)
     community_name: str = "Trapani, Sicily"  # e.g. "Portland, Oregon" or "Zurich"
