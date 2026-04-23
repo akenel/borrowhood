@@ -58,6 +58,7 @@ class HelpPostOut(BaseModel):
     updated_at: Optional[datetime] = None
     # Enriched fields (set by router)
     author_name: Optional[str] = None
+    author_slug: Optional[str] = None
     author_avatar: Optional[str] = None
     resolved_by_name: Optional[str] = None
     item_name: Optional[str] = None
@@ -94,6 +95,7 @@ class HelpReplyOut(BaseModel):
     updated_at: Optional[datetime] = None
     # Enriched
     author_name: Optional[str] = None
+    author_slug: Optional[str] = None
     author_avatar: Optional[str] = None
     media: list[HelpMediaOut] = []
     children: list["HelpReplyOut"] = []
