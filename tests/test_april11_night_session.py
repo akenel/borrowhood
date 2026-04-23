@@ -105,11 +105,12 @@ class TestRSVPLiveCount:
         content = Path("src/templates/pages/item_detail.html").read_text()
         assert "addEventListener('rsvp-changed'" in content or "rsvp-changed" in content
 
-    def test_rsvp_data_attributes_for_toast(self):
+    def test_rsvp_shows_registered_or_waitlisted_toast(self):
+        """RSVP must render the correct status toast. Rewritten for BL-143: data- attrs
+        were replaced with inline Jinja translations after adding the notes-panel."""
         content = Path("src/templates/pages/item_detail.html").read_text()
-        assert "data-msg-wait" in content
-        assert "data-msg-ok" in content
-        assert "$el.dataset.msgWait" in content
+        assert "t('events.waitlisted')" in content
+        assert "t('events.registered')" in content
 
 
 # ── 7. Online event link ──

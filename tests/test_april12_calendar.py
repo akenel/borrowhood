@@ -207,7 +207,9 @@ class TestMonthNavigation:
 class TestCalendarRSVP:
     def test_rsvp_button_in_template(self):
         content = CALENDAR_HTML.read_text()
-        assert "rsvp(ev.id)" in content
+        # BL-143: the direct rsvp(ev.id) call is now wrapped behind a notes
+        # panel; the function is still invoked, just with an optional 2nd arg.
+        assert "rsvp(ev.id" in content
 
     def test_cancel_rsvp_button(self):
         content = CALENDAR_HTML.read_text()

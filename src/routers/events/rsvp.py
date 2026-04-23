@@ -16,7 +16,7 @@ from src.models.event_rsvp import BHEventRSVP, RSVPStatus
 from src.models.item import BHItem
 from src.models.listing import BHListing, ListingStatus, ListingType
 from src.models.user import BHUser
-from src.schemas.event_rsvp import RSVPCreate, RSVPInfo, RSVPOut
+from src.schemas.event_rsvp import AttendeeOut, RSVPCreate, RSVPInfo, RSVPOut
 
 from ._shared import _check_achievements
 
@@ -158,6 +158,59 @@ async def get_rsvp_info(
         is_registered=user_rsvp is not None,
         user_status=user_rsvp.status if user_rsvp else None,
     )
+
+
+@router.get("/{listing_id}/attendees", response_model=list[AttendeeOut])
+async def list_attendees(
+    listing_id: UUID,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Event owner view: all attendees with their notes + status.
+
+    Only the event owner can see this. Non-owners get 403.
+    """
+    user = await get_user(db, token)
+
+    listing = await db.get(BHListing, listing_id)
+    if not listing or listing.deleted_at:
+        raise HTTPException(status_code=404, detail="Event not found")
+    if listing.listing_type != ListingType.EVENT:
+        raise HTTPException(status_code=400, detail="Not an event listing")
+
+    item = await db.get(BHItem, listing.item_id)
+    if not item or item.owner_id != user.id:
+        raise HTTPException(status_code=403, detail="Only the event owner can see attendees")
+
+    # Load RSVPs eager-joined with user
+    result = await db.execute(
+        select(BHEventRSVP)
+        .options(selectinload(BHEventRSVP.user))
+        .where(
+            BHEventRSVP.listing_id == listing_id,
+            BHEventRSVP.status.in_([
+                RSVPStatus.REGISTERED,
+                RSVPStatus.WAITLISTED,
+                RSVPStatus.ATTENDED,
+            ]),
+        )
+        .order_by(BHEventRSVP.registered_at.asc())
+    )
+    rsvps = result.scalars().unique().all()
+
+    return [
+        AttendeeOut(
+            rsvp_id=r.id,
+            user_id=r.user_id,
+            display_name=r.user.display_name if r.user else "Unknown",
+            user_slug=r.user.slug if r.user else "",
+            avatar_url=r.user.avatar_url if r.user else None,
+            status=r.status,
+            notes=r.notes,
+            registered_at=r.registered_at,
+        )
+        for r in rsvps
+    ]
 
 
 @router.patch("/{listing_id}/rsvp/{rsvp_id}/attend", response_model=RSVPOut)

@@ -1159,35 +1159,55 @@
 
                 {% if user and not is_owner %}
                 {% if listing_type_val.val == 'event' %}
-                <!-- RSVP Button -->
-                <div x-data="{ rsvpStatus: null, submitting: false, init() {
+                <!-- RSVP Button + notes panel -->
+                <div x-data="{ rsvpStatus: null, submitting: false, showNotes: false, notes: '', init() {
                     fetch('/api/v1/events/{{ active_listing_id.val }}/rsvp')
                     .then(r => r.ok ? r.json() : null)
                     .then(d => { if(d) this.rsvpStatus = d.user_status; });
                 }}">
-                    <template x-if="!rsvpStatus || rsvpStatus === 'cancelled'">
-                        <button @click="
-                            submitting = true;
-                            fetch('/api/v1/events/{{ active_listing_id.val }}/rsvp', {
-                                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({})
-                            }).then(async r => {
-                                if (!r.ok) { var e = await r.json(); throw new Error(e.detail || 'Failed'); }
-                                var d = await r.json();
-                                rsvpStatus = d.status;
-                                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: d.status === 'waitlisted' ? $el.dataset.msgWait : $el.dataset.msgOk } }));
-                                window.dispatchEvent(new CustomEvent('rsvp-changed'));
-                            }).catch(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } })); })
-                            .finally(() => { submitting = false; });
-                        " :disabled="submitting"
-                           data-msg-wait="{{ t('events.waitlisted') }}" data-msg-ok="{{ t('events.registered') }}"
+                    <template x-if="(!rsvpStatus || rsvpStatus === 'cancelled') && !showNotes">
+                        <button @click="showNotes = true" :disabled="submitting"
                            class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition-colors min-h-[44px]">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            <template x-if="submitting"><span>...</span></template>
-                            <template x-if="!submitting"><span>{{ t('events.rsvp') }}</span></template>
+                            <span>{{ t('events.rsvp') }}</span>
                         </button>
+                    </template>
+                    <template x-if="(!rsvpStatus || rsvpStatus === 'cancelled') && showNotes">
+                        <div class="space-y-2 p-3 bg-rose-50 border border-rose-200 rounded-lg">
+                            <label class="block text-sm font-semibold text-rose-800">{{ t('events.notes_label') }}</label>
+                            <textarea x-model="notes" rows="3" maxlength="300"
+                                      class="w-full text-sm px-3 py-2 border border-rose-200 rounded-md focus:ring-2 focus:ring-rose-500"
+                                      placeholder="{{ t('events.notes_placeholder') }}"></textarea>
+                            <p class="text-xs text-rose-700">{{ t('events.notes_hint') }}</p>
+                            <div class="flex gap-2">
+                                <button @click="
+                                    submitting = true;
+                                    var body = {};
+                                    if (notes && notes.trim()) body.notes = notes.trim();
+                                    fetch('/api/v1/events/{{ active_listing_id.val }}/rsvp', {
+                                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(body)
+                                    }).then(async r => {
+                                        if (!r.ok) { var e = await r.json(); throw new Error(e.detail || 'Failed'); }
+                                        var d = await r.json();
+                                        rsvpStatus = d.status;
+                                        showNotes = false;
+                                        window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: d.status === 'waitlisted' ? '{{ t('events.waitlisted') }}' : '{{ t('events.registered') }}' } }));
+                                        window.dispatchEvent(new CustomEvent('rsvp-changed'));
+                                    }).catch(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } })); })
+                                    .finally(() => { submitting = false; });
+                                " :disabled="submitting"
+                                   class="flex-1 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-md disabled:opacity-50">
+                                    {{ t('events.confirm_rsvp') }}
+                                </button>
+                                <button @click="showNotes = false; notes = ''"
+                                        class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                                    {{ t('common.cancel') }}
+                                </button>
+                            </div>
+                        </div>
                     </template>
                     <template x-if="rsvpStatus === 'registered'">
                         <div class="space-y-2">
@@ -1280,6 +1300,37 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     {{ t('i18n.edit_listing') }}
                 </a>
+                {% if listing_type_val.val == 'event' %}
+                <!-- Event owner: attendees panel with their RSVP notes -->
+                <div class="mt-4" x-data="{ attendees: [], loaded: false, open: false, async load() {
+                    try {
+                        var r = await fetch('/api/v1/events/{{ active_listing_id.val }}/attendees');
+                        if (r.ok) { this.attendees = await r.json(); }
+                    } catch(e) {}
+                    this.loaded = true;
+                }}" x-init="load(); window.addEventListener('rsvp-changed', () => load())">
+                    <button @click="open = !open"
+                            class="w-full flex items-center justify-between px-4 py-3 bg-indigo-50 hover:bg-indigo-100 rounded-lg text-sm font-semibold text-indigo-700 transition-colors">
+                        <span>{{ t('events.attendees_title') }} <span x-text="'(' + attendees.length + ')'"></span></span>
+                        <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div x-show="open" x-cloak class="mt-2 space-y-2">
+                        <p x-show="loaded && attendees.length === 0" class="text-xs text-gray-400 text-center py-4">{{ t('events.no_attendees_yet') }}</p>
+                        <template x-for="a in attendees" :key="a.rsvp_id">
+                            <a :href="'/workshop/' + a.user_slug" class="block p-3 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 transition-colors">
+                                <div class="flex items-start gap-2">
+                                    <img :src="a.avatar_url || '/static/images/avatar-placeholder.svg'" :alt="a.display_name" class="w-8 h-8 rounded-full flex-shrink-0 object-cover">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-semibold text-gray-900 truncate" x-text="a.display_name"></p>
+                                        <p class="text-[10px] uppercase tracking-wide" :class="a.status === 'registered' ? 'text-green-600' : a.status === 'waitlisted' ? 'text-amber-600' : 'text-gray-400'" x-text="a.status"></p>
+                                        <p x-show="a.notes" class="text-xs text-gray-700 mt-1 italic" x-text="'&ldquo;' + (a.notes || '') + '&rdquo;'"></p>
+                                    </div>
+                                </div>
+                            </a>
+                        </template>
+                    </div>
+                </div>
+                {% endif %}
                 {% else %}
                 <a href="/login"
                    class="w-full flex items-center justify-center px-6 py-3 {{ 'bg-green-600 hover:bg-green-700 focus:ring-green-500' if is_giveaway.val else 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500' }} text-white font-semibold rounded-lg focus:ring-2 focus:ring-offset-2 transition-colors min-h-[44px]">

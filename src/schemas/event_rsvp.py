@@ -31,3 +31,15 @@ class RSVPInfo(BaseModel):
     capacity: Optional[int] = None
     is_registered: bool = False
     user_status: Optional[RSVPStatus] = None
+
+
+class AttendeeOut(BaseModel):
+    """One attendee row as seen by the event organizer."""
+    rsvp_id: UUID
+    user_id: UUID
+    display_name: str
+    user_slug: str
+    avatar_url: Optional[str] = None
+    status: RSVPStatus
+    notes: Optional[str] = None
+    registered_at: datetime
