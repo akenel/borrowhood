@@ -204,153 +204,98 @@
         <!-- Member grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="members-grid">
             {% for member in members %}
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group relative">
-                <!-- Favorite heart (only when logged in) -->
+            {% set badge_color = 'amber' if member.badge_tier.value == 'legend' else 'purple' if member.badge_tier.value == 'pillar' else 'emerald' if member.badge_tier.value == 'trusted' else 'blue' if member.badge_tier.value == 'active' else 'gray' %}
+            <div class="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-indigo-300 transition-all duration-300 flex flex-col relative">
+                <a href="/workshop/{{ member.slug }}" class="block p-5 flex-1 flex flex-col">
+                    <!-- Header: avatar + name + workshop + tagline -->
+                    <div class="flex items-start gap-3">
+                        <div class="w-14 h-14 rounded-full flex-shrink-0 flex items-center justify-center bg-{{ badge_color }}-100 ring-2 ring-{{ badge_color }}-200 overflow-hidden">
+                            {% if member.avatar_url %}
+                            <img src="{{ member.avatar_url }}" alt="{{ member.display_name }}" class="w-14 h-14 rounded-full object-cover">
+                            {% else %}
+                            <span class="text-xl font-bold text-{{ badge_color }}-600">{{ member.display_name[0] | upper }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-base font-bold text-gray-900 group-hover:text-indigo-600 transition-colors truncate">{{ member.display_name }}</h3>
+                            {% if member.workshop_name %}
+                            <p class="text-sm text-gray-500 truncate">{{ member.workshop_name }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if member.tagline %}
+                    <p class="text-xs text-gray-400 mt-3 line-clamp-2">{{ member.tagline }}</p>
+                    {% endif %}
+
+                    <!-- Service offer badges (wraps cleanly) -->
+                    {% if member.offers_repair or member.offers_custom_orders or member.offers_training or member.offers_delivery or member.offers_pickup %}
+                    <div class="mt-3 flex flex-wrap gap-1">
+                        {% if member.offers_repair %}
+                        <span class="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full font-medium">{{ t('i18n.repair') }}</span>
+                        {% endif %}
+                        {% if member.offers_custom_orders %}
+                        <span class="text-xs px-2 py-0.5 bg-purple-50 text-purple-700 rounded-full font-medium">{{ t('i18n.custom') }}</span>
+                        {% endif %}
+                        {% if member.offers_training %}
+                        <span class="text-xs px-2 py-0.5 bg-cyan-50 text-cyan-700 rounded-full font-medium">{{ t('i18n.training') }}</span>
+                        {% endif %}
+                        {% if member.offers_delivery %}
+                        <span class="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full font-medium">{{ t('i18n.delivery') }}</span>
+                        {% endif %}
+                        {% if member.offers_pickup %}
+                        <span class="text-xs px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full font-medium">{{ t('i18n.pickup') }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="flex-1"></div>
+
+                    <!-- Badge + trust score row (wrapping-safe) -->
+                    <div class="mt-4 flex flex-wrap items-center gap-2">
+                        <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-{{ badge_color }}-100 text-{{ badge_color }}-700">{{ t('badges.' + member.badge_tier.value) }}</span>
+                        {% if member.trust_score is not none %}
+                        <span class="inline-flex items-center gap-1 text-xs font-medium {% if member.trust_score >= 70 %}text-emerald-600{% elif member.trust_score >= 40 %}text-blue-600{% else %}text-gray-500{% endif %}" title="{{ t('i18n.trust_score') }}">
+                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5C17.944 5.33 18 5.68 18 6.036 18 12.66 14.627 18.188 10 19.998 5.373 18.188 2 12.66 2 6.036c0-.357.056-.706.166-1.037z" clip-rule="evenodd"/></svg>
+                            <span>{{ [member.trust_score | int, 100] | min }}%</span>
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Footer: city + last-seen on one row, languages on next -->
+                    <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-2 text-xs text-gray-500 min-w-0">
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            {% if member.city %}
+                            <span class="truncate" x-data x-text="(() => {
+                                var city = '{{ member.city | e }}';
+                                var cc = '{{ (member.country_code or '') | upper | e }}';
+                                if (!cc) return city;
+                                var flag = String.fromCodePoint(...[...cc].map(c => 127397 + c.charCodeAt(0)));
+                                return flag + ' ' + city;
+                            })()">{{ member.city }}</span>
+                            {% endif %}
+                            {% set seen = member.last_active_at | last_seen(lang) %}
+                            {% if seen %}
+                            <span class="text-[10px] flex-shrink-0 {% if seen == 'online now' %}text-emerald-500 font-medium{% elif 'h ago' in seen or seen == 'seen yesterday' %}text-blue-400{% else %}text-gray-300{% endif %}">{{ seen }}</span>
+                            {% endif %}
+                        </div>
+                        {% if member.languages %}
+                        <span class="flex gap-0.5 flex-shrink-0" aria-label="Languages">
+                            {% for ulang in member.languages[:3] %}{{ lang_flags.get(ulang.language_code, '\U0001f310') }}{% endfor %}
+                        </span>
+                        {% endif %}
+                    </div>
+                </a>
+
+                <!-- Favorite heart in top-right corner (only when logged in) — stays outside anchor for click isolation -->
                 {% if user %}
                 <button @click.prevent="toggleFavorite('{{ member.id }}')"
                         class="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/80 hover:bg-white shadow-sm transition-colors"
                         :title="isFavorited('{{ member.id }}') ? '{{ t('favorites.remove') }}' : '{{ t('favorites.add') }}'">
-                    <svg class="w-5 h-5 transition-colors" :class="isFavorited('{{ member.id }}') ? 'text-red-500 fill-red-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    <svg class="w-5 h-5 transition-colors" :class="isFavorited('{{ member.id }}') ? 'text-red-500 fill-red-500' : 'text-gray-400 hover:text-red-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                     </svg>
                 </button>
                 {% endif %}
-
-                <a href="/workshop/{{ member.slug }}" class="block">
-                    <div class="p-6">
-                        <div class="flex items-start space-x-4">
-                            <!-- Avatar -->
-                            <div class="w-14 h-14 rounded-full flex-shrink-0 flex items-center justify-center
-                                {% if member.badge_tier.value == 'legend' %}bg-amber-100
-                                {% elif member.badge_tier.value == 'pillar' %}bg-purple-100
-                                {% elif member.badge_tier.value == 'trusted' %}bg-emerald-100
-                                {% elif member.badge_tier.value == 'active' %}bg-blue-100
-                                {% else %}bg-gray-100{% endif %}">
-                                {% if member.avatar_url %}
-                                <img src="{{ member.avatar_url }}" alt="{{ member.display_name }}" class="w-14 h-14 rounded-full object-cover">
-                                {% else %}
-                                <span class="text-xl font-bold
-                                    {% if member.badge_tier.value == 'legend' %}text-amber-600
-                                    {% elif member.badge_tier.value == 'pillar' %}text-purple-600
-                                    {% elif member.badge_tier.value == 'trusted' %}text-emerald-600
-                                    {% elif member.badge_tier.value == 'active' %}text-blue-600
-                                    {% else %}text-gray-500{% endif %}">{{ member.display_name[0] }}</span>
-                                {% endif %}
-                            </div>
-
-                            <!-- Info -->
-                            <div class="flex-1 min-w-0">
-                                <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors truncate">
-                                    {{ member.display_name }}
-                                </h3>
-                                {% if member.workshop_name %}
-                                <p class="text-sm text-gray-500 truncate">{{ member.workshop_name }}</p>
-                                {% endif %}
-                                {% if member.tagline %}
-                                <p class="text-xs text-gray-400 mt-1 line-clamp-2">{{ member.tagline }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Service offer badges -->
-                        {% if member.offers_repair or member.offers_custom_orders or member.offers_training or member.offers_delivery or member.offers_pickup %}
-                        <div class="mt-3 flex flex-wrap gap-1">
-                            {% if member.offers_repair %}
-                            <span class="text-xs px-1.5 py-0.5 bg-emerald-50 text-emerald-700 rounded font-medium inline-flex items-center gap-0.5">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                {{ t('i18n.repair') }}
-                            </span>
-                            {% endif %}
-                            {% if member.offers_custom_orders %}
-                            <span class="text-xs px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded font-medium inline-flex items-center gap-0.5">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
-                                {{ t('i18n.custom') }}
-                            </span>
-                            {% endif %}
-                            {% if member.offers_training %}
-                            <span class="text-xs px-1.5 py-0.5 bg-cyan-50 text-cyan-700 rounded font-medium inline-flex items-center gap-0.5">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                                {{ t('i18n.training') }}
-                            </span>
-                            {% endif %}
-                            {% if member.offers_delivery %}
-                            <span class="text-xs px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded font-medium inline-flex items-center gap-0.5">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10m10 0H3m10 0h2m4 0h2V9a3 3 0 00-3-3h-1l-2 4m0 0h-2m2 0v4m-7 0a2 2 0 11-4 0m14 0a2 2 0 11-4 0"/></svg>
-                                {{ t('i18n.delivery') }}
-                            </span>
-                            {% endif %}
-                            {% if member.offers_pickup %}
-                            <span class="text-xs px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded font-medium inline-flex items-center gap-0.5">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                {{ t('i18n.pickup') }}
-                            </span>
-                            {% endif %}
-                        </div>
-                        {% endif %}
-
-                        <!-- Meta row -->
-                        <div class="mt-4 flex items-center justify-between">
-                            <div class="flex items-center space-x-2">
-                                <!-- Badge -->
-                                <span class="text-xs px-2 py-0.5 rounded-full font-medium
-                                    {% if member.badge_tier.value == 'legend' %}bg-amber-100 text-amber-700
-                                    {% elif member.badge_tier.value == 'pillar' %}bg-purple-100 text-purple-700
-                                    {% elif member.badge_tier.value == 'trusted' %}bg-emerald-100 text-emerald-700
-                                    {% elif member.badge_tier.value == 'active' %}bg-blue-100 text-blue-700
-                                    {% else %}bg-gray-100 text-gray-600{% endif %}">
-                                    {{ t('badges.' + member.badge_tier.value) }}
-                                </span>
-                                <!-- Trust score -->
-                                {% if member.trust_score is not none %}
-                                <span class="inline-flex items-center gap-1 text-xs font-medium
-                                    {% if member.trust_score >= 70 %}text-emerald-600{% elif member.trust_score >= 40 %}text-blue-600{% else %}text-gray-500{% endif %}"
-                                    title="{{ t('i18n.trust_score') }}">
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5C17.944 5.33 18 5.68 18 6.036 18 12.66 14.627 18.188 10 19.998 5.373 18.188 2 12.66 2 6.036c0-.357.056-.706.166-1.037z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span>{{ t('i18n.trust_score') }}: {{ [member.trust_score | int, 100] | min }}%</span>
-                                </span>
-                                {% endif %}
-                                <!-- City -->
-                                {% if member.city %}
-                                <span class="text-xs text-gray-400" x-data x-text="(() => {
-                                    var city = '{{ member.city | e }}';
-                                    var cc = '{{ (member.country_code or '') | upper | e }}';
-                                    if (!cc) return city;
-                                    var flag = String.fromCodePoint(...[...cc].map(c => 127397 + c.charCodeAt(0)));
-                                    return flag + ' ' + city + ', ' + cc;
-                                })()">{{ member.city }}{% if member.country_code %}, {{ member.country_code }}{% endif %}</span>
-                                {% endif %}
-                                {% set seen = member.last_active_at | last_seen(lang) %}
-                                {% if seen %}
-                                <span class="text-xs {% if seen == 'online now' %}text-emerald-500 font-medium{% elif 'h ago' in seen or seen == 'seen yesterday' %}text-blue-400{% else %}text-gray-300{% endif %}">{{ seen }}</span>
-                                {% endif %}
-                                <!-- Comm channels -->
-                                <span class="inline-flex items-center space-x-1 ml-1">
-                                    {% if member.telegram_username %}
-                                    <svg class="w-3.5 h-3.5 text-sky-500" viewBox="0 0 24 24" fill="currentColor" title="Telegram: @{{ member.telegram_username }}">
-                                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161l-1.97 9.293c-.145.658-.537.818-1.084.508l-3-2.211-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.93z"/>
-                                    </svg>
-                                    {% endif %}
-                                    {% if member.notify_email %}
-                                    <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" title="Email notifications on">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                    </svg>
-                                    {% endif %}
-                                </span>
-                            </div>
-
-                            <!-- Languages (first 3) -->
-                            <div class="flex items-center space-x-1">
-                                {% for ulang in member.languages[:3] %}
-                                <span class="text-xs px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded font-medium">
-                                    {{ lang_flags.get(ulang.language_code, '\U0001f310') }} {{ ulang.language_code | upper }}
-                                </span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </a>
             </div>
             {% endfor %}
 

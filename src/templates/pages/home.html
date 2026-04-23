@@ -532,62 +532,91 @@
 
 <!-- Featured Items -->
 {% if featured_items %}
-<section class="bg-white py-16">
+<section class="bg-white py-16"
+         x-data="{
+             favs: JSON.parse(localStorage.getItem('favs') || '[]'),
+             isFav(id) { return this.favs.includes(id); },
+             toggleFav(id, ev) {
+                 ev.preventDefault(); ev.stopPropagation();
+                 fetch('/api/v1/items/' + id + '/favorite', { method: 'POST' }).then(r => {
+                     if (r.ok) {
+                         this.favs = this.isFav(id) ? this.favs.filter(x => x !== id) : [...this.favs, id];
+                         localStorage.setItem('favs', JSON.stringify(this.favs));
+                     } else if (r.status === 401) {
+                         window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: 'Log in to save favorites' } }));
+                     }
+                 });
+             },
+             doShare(name, slug, ev) { ev.preventDefault(); ev.stopPropagation(); bhShare(name, window.location.origin + '/items/' + slug); }
+         }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="text-3xl font-bold text-gray-900 mb-8">{{ t('home.featured_title') }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for item in featured_items %}
-            <a href="/items/{{ item.slug }}"
-               class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group flex flex-col">
-                <div class="relative overflow-hidden">
+            {% set active_listing = item.listings | selectattr('status.value', 'equalto', 'active') | first if item.listings else none %}
+            {% set type_colors = {
+                'rent': 'bg-blue-500/90', 'sell': 'bg-green-500/90', 'auction': 'bg-amber-500/90',
+                'commission': 'bg-purple-500/90', 'offer': 'bg-pink-500/90', 'service': 'bg-teal-500/90',
+                'training': 'bg-cyan-500/90', 'giveaway': 'bg-emerald-500/90', 'event': 'bg-rose-500/90'
+            } %}
+            <div class="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-indigo-300 transition-all duration-300 flex flex-col">
+                <a href="/items/{{ item.slug }}" class="block relative h-52 sm:h-56 overflow-hidden bg-gray-100">
                     {% if item.media %}
                     <img src="{{ item.media[0].url }}" alt="{{ item.media[0].alt_text }}"
-                         class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                         loading="lazy">
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
                     {% else %}
-                    <div class="w-full h-48 bg-gray-100 flex items-center justify-center">
-                        <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <svg class="w-20 h-20 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     </div>
                     {% endif %}
-                    {% if item.listings %}
-                    <div class="absolute top-2 left-2 flex flex-wrap gap-1">
-                        {% set type_colors = {
-                            'rent': 'bg-blue-600', 'sell': 'bg-green-600', 'auction': 'bg-amber-600',
-                            'commission': 'bg-purple-600', 'offer': 'bg-pink-600', 'service': 'bg-teal-600',
-                            'training': 'bg-cyan-600'
-                        } %}
-                        {% for listing in item.listings if listing.status.value == 'active' %}
-                        <span class="text-xs px-2 py-0.5 {{ type_colors.get(listing.listing_type.value, 'bg-gray-600') }} text-white rounded-full font-medium shadow-sm">
-                            {{ t('listing_types.' + listing.listing_type.value) }}
+                    {% if active_listing %}
+                    <div class="absolute top-3 left-3">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg backdrop-blur-sm {{ type_colors.get(active_listing.listing_type.value, 'bg-gray-500/90') }} text-white">
+                            <span class="w-2 h-2 rounded-full bg-white/80"></span>
+                            {{ t('listing_types.' + active_listing.listing_type.value) }}
                         </span>
-                        {% endfor %}
                     </div>
                     {% endif %}
-                </div>
-                <div class="p-4 flex-1 flex flex-col">
-                    <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ item.name }}</h3>
-                    <p class="text-sm text-gray-500 mt-1 line-clamp-2 flex-1">{{ item.description or '' }}</p>
-                    {% if item.listings %}
-                    {% set active_listing = item.listings | selectattr('status.value', 'equalto', 'active') | first %}
                     {% if active_listing and active_listing.price %}
-                    <div class="mt-2">
-                        <span class="text-lg font-bold text-gray-900">&euro;{{ "%.0f" | format(active_listing.price) }}</span>
+                    <div class="absolute bottom-3 right-3 sm:top-3 sm:bottom-auto bg-white/95 backdrop-blur-sm rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 shadow-lg">
+                        <span class="text-lg sm:text-xl font-extrabold text-gray-900">&euro;{{ "%.0f" | format(active_listing.price) }}</span>
                         {% if active_listing.price_unit %}
-                        <span class="text-sm text-gray-500">{{ t('common.' + active_listing.price_unit) }}</span>
+                        <span class="text-[10px] text-gray-500 block text-center leading-tight">{{ t('common.' + active_listing.price_unit) }}</span>
                         {% endif %}
                     </div>
-                    {% endif %}
-                    {% endif %}
-                    <div class="mt-3 flex items-center justify-between">
-                        <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">{{ t('categories.' + item.category) }}</span>
-                        {% if item.owner %}
-                        <span class="text-xs text-gray-400">{{ item.owner.display_name }}</span>
-                        {% endif %}
+                    {% elif active_listing and active_listing.listing_type.value in ('offer', 'giveaway') %}
+                    <div class="absolute bottom-3 right-3 sm:top-3 sm:bottom-auto bg-emerald-500/95 backdrop-blur-sm rounded-xl px-4 py-2 shadow-lg">
+                        <span class="text-lg font-extrabold text-white">{{ t('common.free') }}</span>
                     </div>
+                    {% endif %}
+                </a>
+                <div class="p-5 flex-1 flex flex-col">
+                    <a href="/items/{{ item.slug }}">
+                        <h3 class="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-2 leading-snug">{{ item.name }}</h3>
+                    </a>
+                    <p class="text-sm text-gray-500 mt-1.5 line-clamp-2 flex-1">{{ item.description or '' }}</p>
+                    {% if item.owner %}
+                    <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
+                        <a href="/{{ item.owner.slug }}" class="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity">
+                            {% if item.owner.avatar_url %}
+                            <img src="{{ item.owner.avatar_url }}" alt="{{ item.owner.display_name }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-indigo-100 flex-shrink-0">
+                            {% else %}
+                            <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold ring-2 ring-indigo-100 flex-shrink-0">{{ item.owner.display_name[:1] | upper }}</div>
+                            {% endif %}
+                            <p class="text-sm font-semibold text-gray-900 truncate">{{ item.owner.display_name }}</p>
+                        </a>
+                        <div class="flex items-center gap-0.5 flex-shrink-0">
+                            <button @click="toggleFav('{{ item.id }}', $event)" class="p-2 rounded-full hover:bg-red-50 transition-colors" title="{{ t('favorites.add') }}">
+                                <svg class="w-5 h-5 transition-colors" :class="isFav('{{ item.id }}') ? 'text-red-500 fill-red-500' : 'text-gray-300 hover:text-red-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+                            </button>
+                            <button @click="doShare($el.dataset.name, '{{ item.slug }}', $event)" data-name="{{ item.name | e }}" class="p-2 rounded-full hover:bg-indigo-50 transition-colors" title="Share">
+                                <svg class="w-5 h-5 text-gray-400 hover:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
-            </a>
+            </div>
             {% endfor %}
         </div>
     </div>
