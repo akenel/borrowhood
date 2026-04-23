@@ -592,19 +592,29 @@ async def update_item(
     for activity in activities:
         db.add(activity)
 
-    # Feedback reward hook: item just flipped to DONE
-    if update.status == BacklogStatus.DONE and item.status == BacklogStatus.DONE:
-        from src.services.backlog_rewards import reward_reporter_on_done
-        try:
-            await reward_reporter_on_done(db, item)
-        except Exception as exc:
-            logger.warning("reward_reporter_on_done failed for BL-%d: %s", item.item_number, exc)
-
+    # Commit the item update first so it can't be rolled back by a
+    # downstream reward failure (enum mismatch, notification error, etc).
+    fired_reward_for_done = (
+        update.status == BacklogStatus.DONE and item.status == BacklogStatus.DONE
+    )
     await db.commit()
     await db.refresh(item)
 
     if activities:
         logger.info(f"BL-{item.item_number:03d} updated by {actor}: {len(activities)} activity entries")
+
+    # Feedback reward hook: best-effort, isolated from the main update.
+    if fired_reward_for_done:
+        from src.services.backlog_rewards import reward_reporter_on_done
+        try:
+            await reward_reporter_on_done(db, item)
+            await db.commit()
+        except Exception as exc:
+            logger.warning("reward_reporter_on_done failed for BL-%d: %s", item.item_number, exc)
+            try:
+                await db.rollback()
+            except Exception:
+                pass
 
     return item
 
