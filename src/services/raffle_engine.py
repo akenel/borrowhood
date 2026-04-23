@@ -48,12 +48,20 @@ async def completed_raffle_count(db: AsyncSession, user_id) -> int:
 
 
 async def validate_raffle_value(db: AsyncSession, user_id, ticket_price: float, max_tickets: Optional[int]) -> tuple[bool, str]:
-    """Check if proposed raffle value is within the organizer's trust tier."""
-    if max_tickets is None:
-        return True, ""
-    total_value = ticket_price * max_tickets
+    """Check if proposed raffle value is within the organizer's trust tier.
+
+    A raffle with no max_tickets is an unbounded pot. That's a legal grey zone
+    and makes the trust cap impossible to enforce, so it's rejected outright.
+    Pick a max and the total-value cap kicks in.
+    """
     count = await completed_raffle_count(db, user_id)
     limit = max_raffle_value_for(count)
+    if max_tickets is None:
+        return False, (
+            f"Raffles must have a max ticket count. Your current total-value limit "
+            f"is EUR {limit:.2f} ({count} completed raffles)."
+        )
+    total_value = ticket_price * max_tickets
     if total_value > limit:
         return False, (
             f"Total raffle value EUR {total_value:.2f} exceeds your current limit "

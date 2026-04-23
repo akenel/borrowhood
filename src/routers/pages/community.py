@@ -61,11 +61,29 @@ async def raffles_page(request: Request,
 
 @router.get("/raffles/create", response_class=HTMLResponse)
 async def raffle_create_page(request: Request,
+                             db: AsyncSession = Depends(get_db),
                              token: Optional[dict] = Depends(get_current_user_token)):
     """Raffle creation form. Requires login."""
     if not token:
         return RedirectResponse(url="/login", status_code=302)
-    ctx = _ctx(request, token)
+    from src.services.raffle_engine import completed_raffle_count
+    from src.models.raffle import max_raffle_value_for, RAFFLE_TRUST_TIERS
+    user = await get_user(db, token)
+    raffle_count = await completed_raffle_count(db, user.id)
+    raffle_cap_eur = max_raffle_value_for(raffle_count)
+    # Age 14 min for organizers
+    from datetime import date as _date
+    age_years = None
+    if user.date_of_birth:
+        today = _date.today()
+        dob = user.date_of_birth if isinstance(user.date_of_birth, _date) else user.date_of_birth.date()
+        age_years = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+    ctx = _ctx(request, token,
+        raffle_completed_count=raffle_count,
+        raffle_cap_eur=raffle_cap_eur,
+        raffle_tier_table=RAFFLE_TRUST_TIERS,
+        user_age_years=age_years,
+    )
     return _render("pages/raffle_create.html", ctx)
 
 

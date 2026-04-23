@@ -179,7 +179,7 @@
     </div>
 
     <!-- Provably Fair -->
-    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+    <div id="verify" class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
         <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4">
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
@@ -197,6 +197,37 @@
             <div class="mt-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
                 <p class="font-semibold text-gray-900 mb-1">{% if lang == 'it' %}Perché conta:{% else %}Why it matters:{% endif %}</p>
                 <p class="text-gray-600">{% if lang == 'it' %}Dopo l'estrazione, il seed viene pubblicato. Chiunque può verificare che il vincitore è stato scelto in modo equo. Se l'organizzatore avesse provato a barare, la matematica non tornerebbe.{% else %}After the draw, the seed is published. Anyone can verify the winner was chosen fairly. If the organizer had tried to cheat, the math wouldn't match.{% endif %}</p>
+            </div>
+
+            <!-- Step-by-step "verify it yourself" -->
+            <div class="mt-4 bg-emerald-50 rounded-lg p-4 border border-emerald-200">
+                <p class="font-semibold text-emerald-900 mb-2 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                    {% if lang == 'it' %}Verifica tu stesso (3 minuti){% else %}Verify it yourself (3 minutes){% endif %}
+                </p>
+                <ol class="list-decimal list-inside space-y-2 text-sm text-emerald-900">
+                    <li>{% if lang == 'it' %}Apri la pagina del sorteggio. Copia il <b>Seed</b> e il <b>Proof</b> (si trovano sotto il vincitore).{% else %}Open the raffle page. Copy the <b>Seed</b> and the <b>Proof</b> (shown under the winner).{% endif %}</li>
+                    <li>{% if lang == 'it' %}Copia anche la lista dei biglietti confermati (il <b>pool</b>) mostrata sulla pagina.{% else %}Also copy the list of confirmed ticket IDs (the <b>pool</b>) shown on the page.{% endif %}</li>
+                    <li>{% if lang == 'it' %}Apri un terminale e incolla uno di questi comandi:{% else %}Open a terminal and paste one of these commands:{% endif %}</li>
+                </ol>
+                <div class="mt-3 space-y-2">
+                    <div>
+                        <p class="text-xs font-semibold text-emerald-800 mb-1">{% if lang == 'it' %}Mac / Linux (bash):{% else %}Mac / Linux (bash):{% endif %}</p>
+                        <pre class="bg-gray-900 text-emerald-300 text-xs p-3 rounded-md overflow-x-auto"><code>echo -n "&lt;SEED&gt;&lt;POOL&gt;" | sha256sum</code></pre>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-emerald-800 mb-1">{% if lang == 'it' %}Windows / Python (funziona ovunque):{% else %}Windows / Python (works anywhere):{% endif %}</p>
+                        <pre class="bg-gray-900 text-emerald-300 text-xs p-3 rounded-md overflow-x-auto"><code>python3 -c "import hashlib; print(hashlib.sha256(b'&lt;SEED&gt;&lt;POOL&gt;').hexdigest())"</code></pre>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-emerald-800 mb-1">{% if lang == 'it' %}Browser (nessuna installazione):{% else %}Browser (no install needed):{% endif %}</p>
+                        <p class="text-xs text-emerald-700">{% if lang == 'it' %}Apri <a href="https://emn178.github.io/online-tools/sha256.html" target="_blank" rel="noopener" class="underline">emn178.github.io/online-tools/sha256</a>, incolla <code>&lt;SEED&gt;&lt;POOL&gt;</code> e premi invio.{% else %}Open <a href="https://emn178.github.io/online-tools/sha256.html" target="_blank" rel="noopener" class="underline">emn178.github.io/online-tools/sha256</a>, paste <code>&lt;SEED&gt;&lt;POOL&gt;</code>, and hit enter.{% endif %}</p>
+                    </div>
+                </div>
+                <p class="mt-3 text-sm text-emerald-900">
+                    <b>{% if lang == 'it' %}Confronta il risultato con il Proof.{% else %}Compare the result to the Proof.{% endif %}</b>
+                    {% if lang == 'it' %}Se combacia carattere per carattere, l'estrazione è onesta. Se non combacia, qualcuno ha barato &mdash; segnalalo.{% else %}If it matches character-for-character, the draw was honest. If it doesn't, someone cheated &mdash; report it.{% endif %}
+                </p>
             </div>
         </div>
     </div>

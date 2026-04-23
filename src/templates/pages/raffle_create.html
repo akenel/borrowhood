@@ -68,6 +68,34 @@
                 <p class="text-xs text-gray-400 mt-1">{% if lang == 'it' %}Scegli dalla lista dei tuoi oggetti. Se non lo vedi, aggiungilo prima.{% else %}Pick from your items. If you don't see it, add it first.{% endif %}</p>
             </div>
 
+            <!-- Trust-tier banner: shows the user's current pot cap and how to unlock more -->
+            {% if user_age_years is not none and user_age_years < 14 %}
+            <div class="bg-red-50 border-2 border-red-300 rounded-lg px-4 py-3">
+                <p class="text-sm font-bold text-red-900">{% if lang == 'it' %}Gli organizzatori di sorteggi devono avere almeno 14 anni.{% else %}Raffle organizers must be 14 or older.{% endif %}</p>
+            </div>
+            {% elif user_age_years is none %}
+            <div class="bg-red-50 border-2 border-red-300 rounded-lg px-4 py-3">
+                <p class="text-sm font-bold text-red-900">{% if lang == 'it' %}Aggiungi la tua data di nascita nelle impostazioni prima di organizzare un sorteggio.{% else %}Add your date of birth in Settings before organizing a raffle.{% endif %}</p>
+                <a href="/settings" class="text-xs text-red-700 underline">{% if lang == 'it' %}Vai alle impostazioni{% else %}Go to Settings{% endif %} &rarr;</a>
+            </div>
+            {% else %}
+            <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+                <div class="flex items-start gap-2">
+                    <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <div class="flex-1">
+                        <p class="text-sm text-blue-900">
+                            <span class="font-semibold">{% if lang == 'it' %}Il tuo limite sorteggio:{% else %}Your raffle cap:{% endif %}</span>
+                            <span class="font-bold">&euro;{{ "%.0f" | format(raffle_cap_eur) }}</span>
+                            <span class="text-blue-700">({{ raffle_completed_count }} {% if lang == 'it' %}sorteggi completati{% else %}completed raffles{% endif %})</span>
+                        </p>
+                        <p class="text-xs text-blue-700 mt-1">
+                            {% if lang == 'it' %}Ogni sorteggio completato raddoppia il tuo limite fino a 320 EUR. Prezzo biglietto &times; max biglietti non puo superare il limite.{% else %}Each completed raffle doubles your cap up to EUR 320. Ticket price &times; max tickets must stay at or under the cap.{% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Ticket price + max tickets -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
@@ -76,14 +104,22 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Max biglietti{% else %}Max Tickets{% endif %} *</label>
-                    <input x-model.number="form.max_tickets" type="number" min="1" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-base min-h-[48px]" placeholder="50">
+                    <input x-model.number="form.max_tickets" type="number" min="1" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-base min-h-[48px]" placeholder="5">
+                    <p class="text-[10px] text-gray-400 mt-0.5">{% if lang == 'it' %}Obbligatorio. Non ci sono sorteggi illimitati.{% else %}Required. Unbounded raffles aren't allowed.{% endif %}</p>
                 </div>
             </div>
 
-            <!-- Total value indicator -->
-            <div x-show="form.ticket_price > 0 && form.max_tickets > 0" class="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 flex items-center justify-between">
-                <span class="text-sm text-amber-800">{% if lang == 'it' %}Valore totale:{% else %}Total value:{% endif %}</span>
-                <span class="font-bold text-amber-900">&euro;<span x-text="(form.ticket_price * form.max_tickets).toFixed(2)"></span></span>
+            <!-- Total value indicator: green when under cap, red when over -->
+            <div x-show="form.ticket_price > 0 && form.max_tickets > 0"
+                 class="border rounded-lg px-4 py-3 flex items-center justify-between"
+                 :class="(form.ticket_price * form.max_tickets) > {{ raffle_cap_eur }} ? 'bg-red-50 border-red-300' : 'bg-emerald-50 border-emerald-200'">
+                <span class="text-sm" :class="(form.ticket_price * form.max_tickets) > {{ raffle_cap_eur }} ? 'text-red-800 font-semibold' : 'text-emerald-800'">
+                    {% if lang == 'it' %}Valore totale:{% else %}Total value:{% endif %}
+                </span>
+                <div class="flex items-center gap-2">
+                    <span class="font-bold" :class="(form.ticket_price * form.max_tickets) > {{ raffle_cap_eur }} ? 'text-red-900' : 'text-emerald-900'">&euro;<span x-text="(form.ticket_price * form.max_tickets).toFixed(2)"></span></span>
+                    <span x-show="(form.ticket_price * form.max_tickets) > {{ raffle_cap_eur }}" class="text-xs font-semibold text-red-700">{% if lang == 'it' %}Oltre il limite di{% else %}Over your EUR{% endif %} {{ "%.0f" | format(raffle_cap_eur) }} {% if lang == 'it' %}EUR{% else %}cap{% endif %}</span>
+                </div>
             </div>
 
             <!-- Max per user -->

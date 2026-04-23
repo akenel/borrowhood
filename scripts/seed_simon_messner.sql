@@ -104,16 +104,16 @@ WITH simon AS (SELECT id FROM bh_user WHERE email = 'simon.divinti3@gmail.com'),
       'kid trying on boxing glove first time smile quiet sicilian gym',
       20),
 
-     -- 5. Raffle: private coaching package
+     -- 5. Raffle: 1 private coaching session (EUR 1 x 10 tickets = EUR 10 pot, newcomer-tier cap)
      ('white-hammer-coaching-raffle',
-      'Raffle: 4 Private Coaching Sessions',
+      'Raffle: 1 Private Coaching Session',
       'SERVICE', 'training_service',
-      'Four one-hour private sessions. EUR 5 ticket. Draw in 2 weeks. Proceeds go back into gear for the community youth program.',
+      'One hour private coaching. EUR 1 ticket, 10 tickets total, draw in 2 weeks. Proceeds go back into gear for the community youth program.',
       'Raffling what I do. Simple.',
       'raffle, coaching, boxing, community, enna',
-      'RAFFLE', 5.00, 'flat', NULL,
+      'RAFFLE', 1.00, 'flat', NULL,
       'boxing gloves hanging raffle tickets warm gym sicilian',
-      NULL)
+      10)
      ),
      inserted AS (
          INSERT INTO bh_item (id, owner_id, name, slug, description, story, content_language,

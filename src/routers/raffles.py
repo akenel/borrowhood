@@ -180,11 +180,22 @@ async def create_raffle(
     if not ok:
         raise HTTPException(status_code=429, detail=msg)
 
+    # Age 14 min for organizers (Italian community norm, same as raffle fundraising associations)
+    if user.date_of_birth:
+        from datetime import date as _date
+        today = _date.today()
+        dob = user.date_of_birth if isinstance(user.date_of_birth, _date) else user.date_of_birth.date()
+        age_years = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        if age_years < 14:
+            raise HTTPException(status_code=403, detail="Raffle organizers must be 14 or older.")
+    else:
+        raise HTTPException(status_code=403, detail="Set your date of birth in Settings before organizing a raffle.")
+
     # Validate draw trigger
     if data.draw_date is None and data.max_tickets is None:
         raise HTTPException(status_code=400, detail="Either draw_date or max_tickets is required")
 
-    # Validate trust tier
+    # Validate trust tier (also rejects unbounded max_tickets)
     ok, msg = await validate_raffle_value(db, user.id, data.ticket_price, data.max_tickets)
     if not ok:
         raise HTTPException(status_code=403, detail=msg)

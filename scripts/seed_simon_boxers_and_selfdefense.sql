@@ -85,7 +85,7 @@ WITH simon AS (SELECT id FROM bh_user WHERE email = 'simon.divinti3@gmail.com'),
          SELECT gen_random_uuid(), simon.id,
                 'Raffle: Free seat in the Women''s Self-Defense Course',
                 'white-hammer-womens-self-defense-raffle',
-                'One lucky winner gets the full 4-week Women''s Self-Defense Course, free. EUR 3 per ticket, draw in 10 days. Proceeds (every euro of them) go toward more free seats for young women in Enna who cannot afford it. No platform fees, no cuts.',
+                'One lucky winner gets the full 4-week Women''s Self-Defense Course, free. EUR 0.50 per ticket, 20 tickets total, draw in 10 days. Every euro goes toward more free seats for young women in Enna. No platform fees, no cuts.',
                 'The best thing you can do with a raffle is give away what was never really yours. Someone taught me to defend myself. I am passing it on.',
                 'en',
                 'SERVICE'::itemtype, 'training_service',
@@ -108,7 +108,7 @@ WITH simon AS (SELECT id FROM bh_user WHERE email = 'simon.divinti3@gmail.com'),
      INSERT INTO bh_listing (id, item_id, listing_type, status, price, price_unit, currency,
                              deposit, delivery_available, pickup_only, max_participants, version, created_at, updated_at)
      SELECT gen_random_uuid(), ins.id, 'RAFFLE'::listingtype, 'ACTIVE'::listingstatus,
-            3.00, 'flat', 'EUR', NULL, false, true, NULL, 1, NOW(), NOW()
+            0.50, 'flat', 'EUR', NULL, false, true, 20, 1, NOW(), NOW()
      FROM ins;
 
 COMMIT;
