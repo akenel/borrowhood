@@ -1,6 +1,21 @@
 # Staging Environment Setup
 
-**Goal:** A near-production mirror where we test every commit before it reaches real users.
+> ## 🟡 NOT YET LIVE (as of April 24, 2026)
+>
+> **Everything in this doc is DESIGN, not reality.** The `staging.lapiazza.app` domain does NOT resolve, the staging container is NOT running, and all deploys currently go straight to `lapiazza.app` (prod).
+>
+> To turn it on, in order:
+> 1. Cloudflare DNS: add A record `staging.lapiazza.app` → `46.62.138.218` (Angel does this in the Cloudflare dashboard)
+> 2. Append `hetzner/Caddyfile.staging-snippet` into the live Caddyfile and reload Caddy
+> 3. `cd /opt/helixnet/hetzner && docker compose -f docker-compose.uat.yml -f docker-compose.staging.yml up -d borrowhood_staging`
+> 4. Seed the staging DB and KC realm
+> 5. Verify `curl https://staging.lapiazza.app/api/v1/health` returns 200
+>
+> Until the above is done, **there is one environment only: production.** Don't let the existence of `deploy-staging.sh` fool you into testing a URL that doesn't resolve.
+
+---
+
+**Goal (when we turn it on):** A near-production mirror where we test every commit before it reaches real users.
 
 **Decision log (April 23, 2026):**
 - Same Hetzner box (CX32). Second container + second DB on same postgres instance. ~EUR 0 extra.
