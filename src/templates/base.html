@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ lang | default('en') }}" class="h-full">
+<html lang="{{ lang | default('en') }}" translate="no" class="h-full notranslate">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Suppress browser auto-translate popup (Firefox "Show Original", Chrome/Edge translate bar) -->
+    <meta name="google" content="notranslate">
     <title>{% block title %}{{ t('app.name') }}{% endblock %}</title>
     <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/static/images/icon-192.png" type="image/png" sizes="192x192">
