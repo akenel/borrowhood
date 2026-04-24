@@ -76,11 +76,27 @@ fi
 # ── GATE 4: tests green (skippable with --skip-tests for emergency hotfix)
 if [[ "${SKIP_TESTS:-false}" != "true" ]]; then
     echo -e "${Y}--- running pytest${N}"
-    if ! python -m pytest tests/ -q --no-header --tb=line 2>&1 | tail -5; then
+    # Find a python with pytest installed (prefer the project venv)
+    PYTHON_BIN=""
+    for candidate in .venv/bin/python python3 python; do
+        if command -v "$candidate" >/dev/null 2>&1 && "$candidate" -c 'import pytest' >/dev/null 2>&1; then
+            PYTHON_BIN="$candidate"
+            break
+        fi
+    done
+    if [[ -z "$PYTHON_BIN" ]]; then
+        echo -e "${R}!! no python with pytest found. Activate the venv or use --skip-tests.${N}"
+        exit 1
+    fi
+    # Run pytest with PIPESTATUS so tail doesn't swallow the real exit code
+    set -o pipefail
+    if ! "$PYTHON_BIN" -m pytest tests/ -q --no-header --tb=line 2>&1 | tail -5; then
+        set +o pipefail
         echo -e "${R}!! tests failed. Fix before deploying.${N}"
         exit 1
     fi
-    echo -e "${G}✓ tests green${N}"
+    set +o pipefail
+    echo -e "${G}✓ tests green (via $PYTHON_BIN)${N}"
 fi
 
 # ── Summary

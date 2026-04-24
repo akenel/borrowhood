@@ -87,18 +87,7 @@
                                 {% endif %}
                             </span>
                             {% endif %}
-                            <!-- Favorite heart -->
-                            {% if user %}
-                            <div x-data="workshopFavorite('{{ workshop.id }}')">
-                                <button @click="toggle()"
-                                        class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                                        :title="favorited ? '{{ t('favorites.remove') }}' : '{{ t('favorites.add') }}'">
-                                    <svg class="w-5 h-5 transition-colors" :class="favorited ? 'text-red-500 fill-red-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                    </svg>
-                                </button>
-                            </div>
-                            {% endif %}
+                            <!-- Favorite heart moved to Contact block below -- more room, clearer label -->
                             <!-- Share buttons -->
                             <div class="flex items-center gap-1">
                                 <button @click="bhShare($el.dataset.name, window.location.href)" data-name="{{ workshop.display_name | e }}"
@@ -590,6 +579,19 @@
                    class="w-full flex items-center justify-center px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px]">
                     {{ t('workshop.message_telegram') }}
                 </a>
+                {% endif %}
+                {% if user and user.id != workshop.id %}
+                <!-- Save to favorites -- full-width, breathing room, clear label -->
+                <div x-data="workshopFavorite('{{ workshop.id }}')">
+                    <button @click="toggle()"
+                            class="w-full flex items-center justify-center gap-2 px-6 py-3 font-medium rounded-lg border transition-colors min-h-[44px]"
+                            :class="favorited ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'">
+                        <svg class="w-5 h-5 transition-colors" :class="favorited ? 'text-red-500 fill-red-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                        <span x-text="favorited ? '{{ t('favorites.remove') }}' : '{{ t('favorites.add') }}'"></span>
+                    </button>
+                </div>
                 {% endif %}
                 <a href="/workshop/{{ workshop.slug }}/export"
                    class="w-full flex items-center justify-center px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px]">
