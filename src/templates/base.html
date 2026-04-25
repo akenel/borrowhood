@@ -769,18 +769,8 @@
         </div>
     </footer>
 
-    <!-- Auto-translate toggle (hidden until needed) -->
-    <!-- Raised on mobile to clear the bottom-nav + feedback FAB stack. -->
-    <div id="bh-translate-toggle" style="display: none;"
-         class="fixed right-4 bottom-[calc(10rem+env(safe-area-inset-bottom))] lg:bottom-4 z-40 flex items-center gap-2 px-4 py-2.5 bg-white rounded-full shadow-lg border border-gray-200 cursor-pointer hover:shadow-xl transition-shadow"
-         onclick="BHTranslate.toggleOriginals(); var lbl = this.querySelector('span'); lbl.textContent = BHTranslate.showingOriginals ? lbl.getAttribute('data-show-translated') : lbl.getAttribute('data-show-original');">
-        <svg class="w-4 h-4 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
-        </svg>
-        <span class="text-sm font-medium text-gray-700"
-              data-show-original="{{ t('common.show_original') }}"
-              data-show-translated="{{ t('common.translate') }}">{{ t('common.show_original') }}</span>
-    </div>
+    <!-- Auto-translate toggle removed -- users pick EN or IT at login, we serve content as-authored. -->
+    <!-- Per-item Translate button on item_detail.html still works for explicit, opt-in translation. -->
 
     <!-- Shared components -->
     <script>
@@ -874,66 +864,16 @@
             return result;
         },
 
-        async autoTranslatePage() {
-            var els = document.querySelectorAll('[data-translatable][data-content-lang]');
-            if (!els.length) return;
-
-            var toTranslate = [];
-            els.forEach(function(el) {
-                var contentLang = el.getAttribute('data-content-lang');
-                // Skip already-translated elements and same-language content
-                if (contentLang && contentLang !== BHTranslate.userLang && !el.hasAttribute('data-translated-text')) {
-                    toTranslate.push(el);
-                }
-            });
-            if (!toTranslate.length) return;
-
-            BHTranslate._elements = BHTranslate._elements.concat(toTranslate);
-
-            // Show the toggle pill
-            var toggle = document.getElementById('bh-translate-toggle');
-            if (toggle) toggle.style.display = 'flex';
-
-            // Translate in batches of 5 to avoid hammering the API
-            for (var i = 0; i < toTranslate.length; i += 5) {
-                var batch = toTranslate.slice(i, i + 5);
-                await Promise.all(batch.map(async function(el) {
-                    var original = el.textContent.trim();
-                    if (!original) return;
-                    el.setAttribute('data-original-text', original);
-                    try {
-                        var translated = await BHTranslate.translateString(
-                            original, el.getAttribute('data-content-lang')
-                        );
-                        if (!BHTranslate.showingOriginals) {
-                            el.textContent = translated;
-                        }
-                        el.setAttribute('data-translated-text', translated);
-                    } catch(e) {
-                        // Silent fail -- leave original text
-                    }
-                }));
-            }
-        },
-
-        toggleOriginals() {
-            this.showingOriginals = !this.showingOriginals;
-            this._elements.forEach(function(el) {
-                if (BHTranslate.showingOriginals) {
-                    var orig = el.getAttribute('data-original-text');
-                    if (orig) el.textContent = orig;
-                } else {
-                    var trans = el.getAttribute('data-translated-text');
-                    if (trans) el.textContent = trans;
-                }
-            });
-        }
+        // autoTranslatePage + toggleOriginals removed.
+        // The floating "Show Original" pill was firing on every page load when any
+        // item's content_language differed from the viewer's lang -- which was
+        // basically always (mixed-locale community). Users get to pick EN or IT
+        // at login; we serve content in whatever language it was authored in.
+        // Per-item Translate button on item_detail (when content_lang != viewer's
+        // lang) is the only explicit translation surface left.
     };
 
-    // Auto-run on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        BHTranslate.autoTranslatePage();
-    });
+    // No auto-run -- translation is opt-in only.
     </script>
 
     <!-- Cookie Consent Banner (EU ePrivacy / GDPR) -->

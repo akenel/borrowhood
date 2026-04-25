@@ -69,7 +69,7 @@ function helpBoard() {
         async init() {
             await Promise.all([this.loadPosts(), this.loadSummary()]);
             this.loading = false;
-            this.$nextTick(() => { if (window.BHTranslate) BHTranslate.autoTranslatePage(); });
+            // Auto-translate disabled: users pick lang at login, content stays as-authored.
         },
 
         // ── List methods ──
