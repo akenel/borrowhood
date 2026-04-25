@@ -1411,6 +1411,9 @@
     "no_quotes_yet": "Nessun preventivo ancora",
     "start_browsing_services": "Sfoglia i servizi e richiedi il tuo primo preventivo",
     "as_customer": "Come Cliente",
-    "as_provider": "Come Fornitore"
+    "as_provider": "Come Fornitore",
+    "view": "Vedi",
+    "add_listing": "Aggiungi annuncio",
+    "confirm_delete_item": "Eliminare definitivamente questo articolo? Non puoi annullare."
   }
 }

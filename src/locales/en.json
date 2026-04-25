@@ -1411,6 +1411,9 @@
     "no_quotes_yet": "No quotes yet",
     "start_browsing_services": "Browse services and request your first quote",
     "as_customer": "As Customer",
-    "as_provider": "As Provider"
+    "as_provider": "As Provider",
+    "view": "View",
+    "add_listing": "Add listing",
+    "confirm_delete_item": "Delete this item permanently? This cannot be undone."
   }
 }
