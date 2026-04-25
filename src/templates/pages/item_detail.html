@@ -289,7 +289,7 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div id="desc-text" class="mt-2 text-gray-700 leading-relaxed prose prose-sm max-w-none" data-translatable data-content-lang="{{ item.content_language or 'en' }}" data-raw="{{ item.description | e }}"></div>
+                    <div id="desc-text" class="mt-2 text-gray-700 leading-relaxed prose prose-sm max-w-none break-words" data-translatable data-content-lang="{{ item.content_language or 'en' }}" data-raw="{{ item.description | e }}"></div>
                     <script>
                         (function() {
                             var el = document.getElementById('desc-text');
