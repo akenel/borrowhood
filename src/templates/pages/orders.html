@@ -1054,18 +1054,49 @@ function lockboxCodeBoxes(rentalId, color, title, hint) {
             if (!this.filled || this.verifying) return;
             var self = this;
             this.verifying = true;
+
+            // 15s fetch timeout via AbortController -- prevents the spinner
+            // from hanging forever if the response is lost in flight (we hit
+            // this April 25: server returned 200 + DB recorded the action,
+            // but the client never got the response back; user stuck staring
+            // at "Verifying...").
+            var ctrl = new AbortController();
+            var fetchTimeout = setTimeout(function() { ctrl.abort(); }, 15000);
+
+            // 20s watchdog: even if everything else fails silently, force
+            // the spinner off so the user can retry or refresh.
+            var watchdog = setTimeout(function() {
+                if (self.verifying) {
+                    self.verifying = false;
+                    window.dispatchEvent(new CustomEvent('toast', { detail: {
+                        type: 'error',
+                        message: 'No response from server. Refresh and check the order status -- your code may have already been accepted.'
+                    } }));
+                }
+            }, 20000);
+
             fetch('/api/v1/lockbox/' + this.rentalId + '/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: this.code })
+                body: JSON.stringify({ code: this.code }),
+                signal: ctrl.signal
             }).then(function(r) {
+                clearTimeout(fetchTimeout);
                 return r.json().then(function(d) { return { ok: r.ok, data: d }; });
             }).then(function(res) {
+                clearTimeout(watchdog);
                 if (!res.ok) throw new Error(res.data.detail || 'Invalid code');
-                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: res.data.message } }));
-                setTimeout(function() { location.reload(); }, 1500);
+                // Success: hard-reload immediately. No 1.5s delay -- if the
+                // toast doesn't render in time, the new page state is the
+                // real source of truth (status badge changes to RETURNED etc).
+                location.reload();
             }).catch(function(e) {
-                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } }));
+                clearTimeout(fetchTimeout);
+                clearTimeout(watchdog);
+                var msg = e.name === 'AbortError'
+                    ? 'Request timed out. Refresh the page -- your code may have been accepted on the server.'
+                    : (e.message || 'Verify failed');
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: msg } }));
                 self.verifying = false;
             });
         }
