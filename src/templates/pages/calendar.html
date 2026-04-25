@@ -76,7 +76,8 @@
             var evts = this.events.filter(e => e.day === day);
             var rnts = this.rentals.filter(r => r.days && r.days.indexOf(day) >= 0);
             var rfls = this.raffles.filter(r => r.day === day);
-            return evts.concat(rnts.map(r => ({ ...r, is_rental: true }))).concat(rfls);
+            var all = evts.concat(rnts.map(r => ({ ...r, is_rental: true, user_rsvp: 'mine' }))).concat(rfls);
+            return this.applyFilters(all);
         },
 
         isToday(day) {
@@ -92,11 +93,21 @@
             this.loading = true;
             try {
                 var params = '?month=' + this.month + '&year=' + this.year;
-                var [evRes, rnRes, rfRes] = await Promise.all([
+                var [evRes, rnRes, rfRes, rfMineRes] = await Promise.all([
                     fetch('/api/v1/events/calendar' + params),
                     fetch('/api/v1/rentals/calendar' + params).catch(() => null),
-                    fetch('/api/v1/raffles?status=all&limit=100').catch(() => null)
+                    fetch('/api/v1/raffles?status=all&limit=100').catch(() => null),
+                    this.loggedIn ? fetch('/api/v1/raffles/mine').catch(() => null) : Promise.resolve(null)
                 ]);
+                // Build a Set of raffle IDs the current user owns or has tickets for
+                var mineRaffleIds = new Set();
+                if (rfMineRes && rfMineRes.ok) {
+                    try {
+                        var mineData = await rfMineRes.json();
+                        (mineData.organized || []).forEach(r => mineRaffleIds.add(r.id));
+                        (mineData.participating || []).forEach(r => mineRaffleIds.add(r.id));
+                    } catch(e) {}
+                }
                 if (evRes.ok) {
                     var data = await evRes.json();
                     this.events = data.events;
@@ -138,6 +149,7 @@
                                 image: r.image,
                                 rsvp_count: s.tickets_confirmed || 0,
                                 percent_sold: s.percent_sold || 0,
+                                user_rsvp: mineRaffleIds.has(r.id) ? 'mine' : null,
                             };
                         });
                 } else {
@@ -342,9 +354,15 @@
                     :class="scopeFilter === 'all' ? 'bg-rose-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
                 {{ t('calendar.filter_all') }}
             </button>
-            <button @click="scopeFilter = 'mine'" class="px-3 py-1 rounded-full text-xs font-semibold transition-colors"
+            <button @click="scopeFilter = 'mine'" class="px-3 py-1 rounded-full text-xs font-semibold transition-colors inline-flex items-center gap-1.5"
                     :class="scopeFilter === 'mine' ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
-                {{ t('calendar.filter_mine') }}
+                {% if user %}
+                    {% set me_name = user.get('name', user.get('preferred_username', '')) %}
+                    <span x-show="scopeFilter !== 'mine'">{{ t('calendar.filter_mine') }}</span>
+                    <span x-show="scopeFilter === 'mine'" x-cloak>{{ t('calendar.filter_mine') }}{% if me_name %} · {{ me_name }}{% endif %}</span>
+                {% else %}
+                    {{ t('calendar.filter_mine') }}
+                {% endif %}
             </button>
             <!-- Price -->
             <span class="w-px h-4 bg-gray-200 mx-1"></span>
