@@ -143,7 +143,8 @@
     "max_days": "Max days",
     "no_matches_filter": "No matches for your filter",
     "no_matches_filter_hint": "Try a different month or clear filters to see everything happening on La Piazza.",
-    "clear_filters": "Show all"
+    "clear_filters": "Show all",
+    "create_raffle": "Create a Raffle"
   },
   "feedback": {
     "title": "Send Feedback",
@@ -734,7 +735,16 @@
     "notes": "Additional Notes",
     "notes_placeholder": "Any special terms, availability windows, etc.",
     "submit": "Publish Item",
-    "success": "Item listed successfully!"
+    "success": "Item listed successfully!",
+    "title_rent": "Rent Out an Item",
+    "title_sell": "Sell an Item",
+    "title_event": "Host an Event",
+    "title_service": "Offer a Service",
+    "title_training": "Teach a Workshop",
+    "title_offer": "Make an Offer",
+    "title_giveaway": "Give Something Away",
+    "title_commission": "Take a Commission",
+    "title_auction": "Start an Auction"
   },
   "dashboard": {
     "title": "My Dashboard",

@@ -192,14 +192,24 @@ async def edit_item_page(slug: str, request: Request,
 
 
 
+_PRESET_TYPES = {"rent", "sell", "service", "training", "event", "offer", "giveaway", "commission", "auction"}
+
+
 @router.get("/list", response_class=HTMLResponse)
 async def list_item_page(request: Request,
                          token: Optional[dict] = Depends(get_current_user_token)):
-    """Form to list a new item. Requires authentication."""
+    """Form to list a new item. Requires authentication.
+
+    Optional ?type= query param pre-selects a listing type and adapts the
+    heading -- e.g. /list?type=event arrives as "Host an Event" instead of
+    the generic "List an Item".
+    """
     if not token:
         from starlette.responses import RedirectResponse
         return RedirectResponse(url="/login", status_code=302)
-    ctx = _ctx(request, token, category_groups=CATEGORY_GROUPS)
+    raw_type = (request.query_params.get("type") or "").lower().strip()
+    preset_type = raw_type if raw_type in _PRESET_TYPES else None
+    ctx = _ctx(request, token, category_groups=CATEGORY_GROUPS, preset_type=preset_type)
     return _render("pages/list_item.html", ctx)
 
 

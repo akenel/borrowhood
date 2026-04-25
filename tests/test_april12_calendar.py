@@ -337,8 +337,12 @@ class TestEmptyStates:
 class TestCreateEventCTA:
     def test_create_event_link(self):
         content = CALENDAR_HTML.read_text()
-        assert 'href="/list"' in content
+        # /list?type=event so list_item.html shows "Host an Event" heading + pre-selects the type
+        assert 'href="/list?type=event"' in content
         assert "calendar.create_event" in content
+        # Raffles tab gets its own CTA pointing at the dedicated raffle creator
+        assert 'href="/raffles/create"' in content
+        assert "calendar.create_raffle" in content
 
 
 # ── 15. API endpoint structure ──

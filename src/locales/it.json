@@ -143,7 +143,8 @@
     "max_days": "Giorni max",
     "no_matches_filter": "Nessun risultato per il tuo filtro",
     "no_matches_filter_hint": "Prova un altro mese o azzera i filtri per vedere tutto quello che succede su La Piazza.",
-    "clear_filters": "Mostra tutto"
+    "clear_filters": "Mostra tutto",
+    "create_raffle": "Crea un sorteggio"
   },
   "feedback": {
     "title": "Invia Feedback",
@@ -734,7 +735,16 @@
     "notes": "Note Aggiuntive",
     "notes_placeholder": "Condizioni speciali, finestre di disponibilità, ecc.",
     "submit": "Pubblica Oggetto",
-    "success": "Oggetto pubblicato con successo!"
+    "success": "Oggetto pubblicato con successo!",
+    "title_rent": "Affitta un oggetto",
+    "title_sell": "Vendi un oggetto",
+    "title_event": "Organizza un evento",
+    "title_service": "Offri un servizio",
+    "title_training": "Insegna un workshop",
+    "title_offer": "Fai una proposta",
+    "title_giveaway": "Regala qualcosa",
+    "title_commission": "Accetta una commissione",
+    "title_auction": "Avvia un'asta"
   },
   "dashboard": {
     "title": "La Mia Dashboard",

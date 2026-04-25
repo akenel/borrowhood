@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}{% if edit_mode %}Edit Item{% else %}{{ t('list_item.title') }}{% endif %} - {{ t('app.name') }}{% endblock %}
+{# preset_type comes from ?type= query param. Maps to a friendlier heading. #}
+{% set page_title = t('list_item.title_' ~ preset_type) if preset_type else t('list_item.title') %}
+
+{% block title %}{% if edit_mode %}Edit Item{% else %}{{ page_title }}{% endif %} - {{ t('app.name') }}{% endblock %}
 
 {% block content %}
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -9,10 +12,10 @@
     <nav class="text-sm text-gray-500 mb-6">
         <a href="/" class="hover:text-indigo-600">{{ t('nav.home') }}</a>
         <span class="mx-2">/</span>
-        {% if edit_mode %}<a href="/items/{{ edit_item.slug }}" class="hover:text-indigo-600">{{ edit_item.name }}</a><span class="mx-2">/</span><span class="text-gray-900">Edit</span>{% else %}<span class="text-gray-900">{{ t('list_item.title') }}</span>{% endif %}
+        {% if edit_mode %}<a href="/items/{{ edit_item.slug }}" class="hover:text-indigo-600">{{ edit_item.name }}</a><span class="mx-2">/</span><span class="text-gray-900">Edit</span>{% else %}<span class="text-gray-900">{{ page_title }}</span>{% endif %}
     </nav>
 
-    <h1 class="text-2xl font-bold text-gray-900 mb-8">{% if edit_mode %}Edit: {{ edit_item.name }}{% else %}{{ t('list_item.title') }}{% endif %}</h1>
+    <h1 class="text-2xl font-bold text-gray-900 mb-8">{% if edit_mode %}Edit: {{ edit_item.name }}{% else %}{{ page_title }}{% endif %}</h1>
 
     <script>
     {% if edit_mode %}
@@ -123,7 +126,7 @@
               },
         itemAttributes: window._editData && window._editData.attributes ? window._editData.attributes : {},
         attributeSchema: {},
-        selectedTypes: ['rent'],
+        selectedTypes: [{% if preset_type %}'{{ preset_type }}'{% else %}'rent'{% endif %}],
         init() {
             if (window._editData) {
                 var d = window._editData;
