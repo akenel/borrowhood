@@ -601,34 +601,40 @@
 
                 <!-- Verify Pickup Code (buyer only, approved + codes exist) -->
                 {% if order.status.value == 'approved' and viewer_user_id == order.renter_id %}
-                <div x-data="{ showVerify: false, code: '', verifying: false }">
-                    <button @click="showVerify = true" class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg min-h-[36px] transition-colors">
+                <div x-data="lockboxCodeBoxes('{{ order.id }}', 'blue', 'Confirm Pickup', 'Enter the pickup code from the lockbox to confirm you picked up the item.')">
+                    <button @click="open()" class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg min-h-[36px] transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Confirm Pickup
                     </button>
-                    <div x-show="showVerify" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="showVerify = false">
+                    <div x-show="show" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="close()">
                         <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6" @click.stop>
-                            <h3 class="text-lg font-bold text-gray-900 mb-3">Confirm Pickup</h3>
-                            <p class="text-sm text-gray-500 mb-4">Enter the pickup code from the lockbox to confirm you picked up the item.</p>
-                            <input x-model="code" type="text" maxlength="8" placeholder="Enter 8-digit code"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 font-mono text-center text-lg tracking-wider uppercase">
+                            <h3 class="text-lg font-bold text-gray-900 mb-2" x-text="title"></h3>
+                            <p class="text-sm text-gray-500 mb-4" x-text="hint"></p>
+                            <div class="flex justify-center items-center gap-1 sm:gap-1.5 mb-2" @paste="handlePaste($event)">
+                                <template x-for="(c, idx) in chars" :key="'box' + idx">
+                                    <input data-code-box
+                                           type="text"
+                                           inputmode="text"
+                                           autocomplete="off"
+                                           autocorrect="off"
+                                           autocapitalize="characters"
+                                           spellcheck="false"
+                                           maxlength="1"
+                                           :value="c"
+                                           @input="handleInput(idx, $event)"
+                                           @keydown="handleKey(idx, $event)"
+                                           @focus="$event.target.select()"
+                                           :class="[
+                                             idx === 4 ? 'ml-2' : '',
+                                             chars[idx] ? 'border-' + color + '-500 bg-' + color + '-50' : 'border-gray-300 bg-white'
+                                           ]"
+                                           class="w-8 h-12 sm:w-9 sm:h-14 text-center font-mono text-xl font-bold uppercase border-2 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-colors">
+                                </template>
+                            </div>
+                            <p class="text-xs text-gray-400 text-center mb-4">Type or paste your 8-character code</p>
                             <div class="flex gap-3">
-                                <button @click="showVerify = false" class="flex-1 px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">Cancel</button>
-                                <button @click="
-                                    if (code.length < 4) return;
-                                    verifying = true;
-                                    fetch('/api/v1/lockbox/{{ order.id }}/verify', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ code: code })
-                                    }).then(async r => {
-                                        var d = await r.json();
-                                        if (!r.ok) throw new Error(d.detail || 'Invalid code');
-                                        window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: d.message } }));
-                                        setTimeout(() => location.reload(), 1500);
-                                    }).catch(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } })); })
-                                    .finally(() => { verifying = false; });
-                                " :disabled="verifying || code.length < 4" class="flex-1 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 min-h-[44px]">
+                                <button @click="close()" class="flex-1 px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">Cancel</button>
+                                <button @click="submit()" :disabled="verifying || !filled" class="flex-1 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]">
                                     <span x-text="verifying ? 'Verifying...' : 'Verify Code'"></span>
                                 </button>
                             </div>
@@ -639,34 +645,40 @@
 
                 <!-- Verify Return Code (buyer only, picked_up status) -->
                 {% if order.status.value == 'picked_up' and viewer_user_id == order.renter_id %}
-                <div x-data="{ showReturn: false, code: '', verifying: false }">
-                    <button @click="showReturn = true" class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg min-h-[36px] transition-colors">
+                <div x-data="lockboxCodeBoxes('{{ order.id }}', 'emerald', 'Confirm Return', 'Enter the return code to confirm the item has been returned.')">
+                    <button @click="open()" class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg min-h-[36px] transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Confirm Return
                     </button>
-                    <div x-show="showReturn" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="showReturn = false">
+                    <div x-show="show" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="close()">
                         <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6" @click.stop>
-                            <h3 class="text-lg font-bold text-gray-900 mb-3">Confirm Return</h3>
-                            <p class="text-sm text-gray-500 mb-4">Enter the return code to confirm the item has been returned.</p>
-                            <input x-model="code" type="text" maxlength="8" placeholder="Enter 8-digit code"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 font-mono text-center text-lg tracking-wider uppercase">
+                            <h3 class="text-lg font-bold text-gray-900 mb-2" x-text="title"></h3>
+                            <p class="text-sm text-gray-500 mb-4" x-text="hint"></p>
+                            <div class="flex justify-center items-center gap-1 sm:gap-1.5 mb-2" @paste="handlePaste($event)">
+                                <template x-for="(c, idx) in chars" :key="'box' + idx">
+                                    <input data-code-box
+                                           type="text"
+                                           inputmode="text"
+                                           autocomplete="off"
+                                           autocorrect="off"
+                                           autocapitalize="characters"
+                                           spellcheck="false"
+                                           maxlength="1"
+                                           :value="c"
+                                           @input="handleInput(idx, $event)"
+                                           @keydown="handleKey(idx, $event)"
+                                           @focus="$event.target.select()"
+                                           :class="[
+                                             idx === 4 ? 'ml-2' : '',
+                                             chars[idx] ? 'border-' + color + '-500 bg-' + color + '-50' : 'border-gray-300 bg-white'
+                                           ]"
+                                           class="w-8 h-12 sm:w-9 sm:h-14 text-center font-mono text-xl font-bold uppercase border-2 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-colors">
+                                </template>
+                            </div>
+                            <p class="text-xs text-gray-400 text-center mb-4">Type or paste your 8-character code</p>
                             <div class="flex gap-3">
-                                <button @click="showReturn = false" class="flex-1 px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">Cancel</button>
-                                <button @click="
-                                    if (code.length < 4) return;
-                                    verifying = true;
-                                    fetch('/api/v1/lockbox/{{ order.id }}/verify', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ code: code })
-                                    }).then(async r => {
-                                        var d = await r.json();
-                                        if (!r.ok) throw new Error(d.detail || 'Invalid code');
-                                        window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: d.message } }));
-                                        setTimeout(() => location.reload(), 1500);
-                                    }).catch(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } })); })
-                                    .finally(() => { verifying = false; });
-                                " :disabled="verifying || code.length < 4" class="flex-1 px-4 py-2 text-sm font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50 min-h-[44px]">
+                                <button @click="close()" class="flex-1 px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">Cancel</button>
+                                <button @click="submit()" :disabled="verifying || !filled" class="flex-1 px-4 py-2 text-sm font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]">
                                     <span x-text="verifying ? 'Verifying...' : 'Verify Code'"></span>
                                 </button>
                             </div>
@@ -963,6 +975,101 @@ function closeDisputeModal() {
     var modal = document.getElementById('disputeModal');
     modal.classList.add('hidden');
     modal.classList.remove('flex');
+}
+
+// Lockbox 8-character segmented code input — used by Confirm Pickup + Confirm Return modals.
+// Pattern: OTP-style boxes with auto-advance, backspace-to-prev, paste-fill, gap after position 4.
+function lockboxCodeBoxes(rentalId, color, title, hint) {
+    return {
+        rentalId: rentalId,
+        color: color,
+        title: title,
+        hint: hint,
+        show: false,
+        verifying: false,
+        chars: ['', '', '', '', '', '', '', ''],
+        get code() { return this.chars.join(''); },
+        get filled() { return this.chars.every(function(c){ return c.length === 1; }); },
+        open() {
+            var self = this;
+            this.show = true;
+            this.chars = ['', '', '', '', '', '', '', ''];
+            this.$nextTick(function() {
+                var first = self.$root.querySelector('input[data-code-box]');
+                if (first) first.focus();
+            });
+        },
+        close() {
+            this.show = false;
+            this.chars = ['', '', '', '', '', '', '', ''];
+        },
+        _boxes(el) {
+            return el.parentElement.querySelectorAll('input[data-code-box]');
+        },
+        handleInput(idx, evt) {
+            var raw = (evt.target.value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+            var boxes = this._boxes(evt.target);
+            if (raw.length > 1) {
+                // multi-char paste-into-one-box: spread across remaining boxes
+                for (var i = 0; i < raw.length && (idx + i) < 8; i++) {
+                    this.chars[idx + i] = raw[i];
+                }
+                var nextIdx = Math.min(idx + raw.length, 7);
+                if (boxes[nextIdx]) boxes[nextIdx].focus();
+            } else {
+                this.chars[idx] = raw;
+                evt.target.value = raw; // keep DOM in sync after sanitization
+                if (raw && idx < 7 && boxes[idx + 1]) boxes[idx + 1].focus();
+            }
+        },
+        handleKey(idx, evt) {
+            var boxes = this._boxes(evt.target);
+            if (evt.key === 'Backspace' && !this.chars[idx] && idx > 0) {
+                evt.preventDefault();
+                this.chars[idx - 1] = '';
+                if (boxes[idx - 1]) boxes[idx - 1].focus();
+            } else if (evt.key === 'ArrowLeft' && idx > 0 && boxes[idx - 1]) {
+                evt.preventDefault();
+                boxes[idx - 1].focus();
+            } else if (evt.key === 'ArrowRight' && idx < 7 && boxes[idx + 1]) {
+                evt.preventDefault();
+                boxes[idx + 1].focus();
+            } else if (evt.key === 'Enter' && this.filled) {
+                this.submit();
+            }
+        },
+        handlePaste(evt) {
+            evt.preventDefault();
+            var text = (evt.clipboardData.getData('text') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+            for (var i = 0; i < 8; i++) {
+                this.chars[i] = text[i] || '';
+            }
+            var boxes = evt.target.tagName === 'INPUT'
+                ? this._boxes(evt.target)
+                : evt.target.querySelectorAll('input[data-code-box]');
+            var focusIdx = Math.min(text.length, 7);
+            if (boxes[focusIdx]) boxes[focusIdx].focus();
+        },
+        submit() {
+            if (!this.filled || this.verifying) return;
+            var self = this;
+            this.verifying = true;
+            fetch('/api/v1/lockbox/' + this.rentalId + '/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: this.code })
+            }).then(function(r) {
+                return r.json().then(function(d) { return { ok: r.ok, data: d }; });
+            }).then(function(res) {
+                if (!res.ok) throw new Error(res.data.detail || 'Invalid code');
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: res.data.message } }));
+                setTimeout(function() { location.reload(); }, 1500);
+            }).catch(function(e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } }));
+                self.verifying = false;
+            });
+        }
+    };
 }
 </script>
 {% endblock %}
