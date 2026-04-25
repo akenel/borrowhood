@@ -110,7 +110,7 @@ function helpBoard() {
         },
         resetAndLoad() {
             this.page.offset = 0;
-            this.loadPosts().then(() => this.$nextTick(() => { if (window.BHTranslate) BHTranslate.autoTranslatePage(); }));
+            this.loadPosts(); // auto-translate disabled (April 25)
         },
         async loadSummary() {
             var resp = await fetch('/api/v1/helpboard/summary');
