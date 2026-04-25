@@ -1062,18 +1062,44 @@
             event.target.value = '';
             for (var i = 0; i < files.length && this.queue.length < 3; i++) {
                 var f = files[i];
-                // Shrink large images client-side so modern phone cams (12-20 MB HEIC/JPEG) just work
+                // HEIC detection (iPhone default) -- canvas can't decode, tell user upfront
+                if (f.type === 'image/heic' || f.type === 'image/heif' ||
+                    /\.(heic|heif)$/i.test(f.name || '')) {
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: f.name + ': HEIC photos not supported. On iPhone: Settings -> Camera -> Formats -> Most Compatible. Or share the photo as JPEG.' } }));
+                    continue;
+                }
+                // Shrink large images client-side. Iterative: try aggressive
+                // compression if the first pass is still over our 8 MB target
+                // (well under server's 25 MB cap so transfer stays fast).
                 if (f.type && f.type.startsWith('image/') && f.size > 1_500_000) {
-                    try {
-                        var originalSize = f.size;
-                        f = await this.shrinkImage(f);
+                    var originalSize = f.size;
+                    var passes = [
+                        { maxPx: 1920, quality: 0.85 },
+                        { maxPx: 1600, quality: 0.78 },
+                        { maxPx: 1280, quality: 0.70 },
+                    ];
+                    var compressed = null;
+                    for (var p = 0; p < passes.length; p++) {
+                        try {
+                            compressed = await this.shrinkImage(f, passes[p].maxPx, passes[p].quality);
+                            if (compressed.size <= 8 * 1024 * 1024) break;
+                        } catch (e) {
+                            // Likely an unsupported codec the canvas can't decode.
+                            // Stop iterating and surface a clear error below.
+                            window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: f.name + ': could not process photo (unsupported format?). Try a JPEG.' } }));
+                            compressed = null;
+                            break;
+                        }
+                    }
+                    if (compressed) {
+                        f = compressed;
                         window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: 'Photo compressed: ' + (originalSize / 1024 / 1024).toFixed(1) + ' MB -> ' + (f.size / 1024 / 1024).toFixed(1) + ' MB' } }));
-                    } catch (e) {
-                        // Compression failed -- fall through to size check below
+                    } else {
+                        continue; // shrinkImage threw; we already toasted
                     }
                 }
                 if (f.size > 25 * 1024 * 1024) {
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: f.name + ': too large (max 25 MB)' } }));
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: f.name + ': too large (' + (f.size / 1024 / 1024).toFixed(1) + ' MB; max 25 MB).' } }));
                     continue;
                 }
                 this.queue.push({ kind: 'file', name: f.name, size: f.size, mime: f.type, blob: f });
@@ -1171,8 +1197,15 @@
             fd.append('file', item.blob, item.name);
             var url = '/api/v1/backlog/feedback/' + blNumber + '/media';
             if (item.kind === 'screen_capture') url += '?kind=screen_capture';
-            var r = await fetch(url, { method: 'POST', body: fd });
-            return r.ok;
+            try {
+                var r = await fetch(url, { method: 'POST', body: fd });
+                if (r.ok) return { ok: true };
+                var detail = '';
+                try { var body = await r.json(); detail = body.detail || ''; } catch (e) {}
+                return { ok: false, error: detail || ('Upload failed (HTTP ' + r.status + ')') };
+            } catch (e) {
+                return { ok: false, error: e.message || 'Network error during upload' };
+            }
         },
 
         async submitFeedback() {
@@ -1204,11 +1237,17 @@
                     fetch('/api/v1/backlog/feedback/' + this.blNumber + '/media', { method: 'POST', body: diagFd });
                 } catch (e) {}
 
-                // Upload queued files sequentially
+                // Upload queued files sequentially. Surface per-file errors so
+                // users see WHY a photo didn't make it (Sylvie's BL-148 lesson).
                 this.uploadedCount = 0;
                 for (var i = 0; i < this.queue.length; i++) {
-                    var ok = await this.uploadOne(this.queue[i], this.blNumber);
-                    if (ok) this.uploadedCount += 1;
+                    var item = this.queue[i];
+                    var res = await this.uploadOne(item, this.blNumber);
+                    if (res.ok) {
+                        this.uploadedCount += 1;
+                    } else {
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: item.name + ': ' + res.error } }));
+                    }
                 }
 
                 this.submitted = true;

@@ -423,6 +423,15 @@ async def upload_feedback_media(
     and capped at MAX_ATTACHMENTS_PER_ITEM files per item to prevent drive-by abuse.
     """
     if file.content_type not in ALLOWED_FEEDBACK_MIME_TYPES:
+        # iPhone photos default to HEIC and most browsers can't canvas-encode
+        # them. Give the user an actionable hint instead of a cryptic mime string.
+        if file.content_type in ("image/heic", "image/heif"):
+            raise HTTPException(
+                status_code=400,
+                detail="HEIC/HEIF photos aren't supported. Open the photo on your phone, "
+                       "tap Share -> Save as JPEG (or change Camera settings: Format -> "
+                       "Most Compatible) and try again."
+            )
         raise HTTPException(status_code=400, detail=f"Unsupported type: {file.content_type}")
 
     item = (await db.execute(
@@ -446,7 +455,13 @@ async def upload_feedback_media(
 
     contents = await file.read()
     if len(contents) > MAX_FEEDBACK_FILE_SIZE:
-        raise HTTPException(status_code=400, detail="File too large (max 10 MB)")
+        max_mb = MAX_FEEDBACK_FILE_SIZE // (1024 * 1024)
+        actual_mb = len(contents) / (1024 * 1024)
+        raise HTTPException(
+            status_code=400,
+            detail=f"File too large ({actual_mb:.1f} MB; max {max_mb} MB). "
+                   "Try a shorter clip or a smaller photo."
+        )
 
     if kind == "screen_capture":
         media_type = FeedbackMediaType.SCREEN_CAPTURE
