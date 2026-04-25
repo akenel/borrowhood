@@ -127,6 +127,7 @@ def _raffle_out(raffle: BHRaffle, stats: Optional[dict] = None) -> dict:
         "status": raffle.status.value,
         "title": item.name if item else "",
         "description": item.description if item else "",
+        "item_id": str(item.id) if item else None,
         "item_slug": item.slug if item else None,
         "image": image,
         "ticket_price": raffle.ticket_price,

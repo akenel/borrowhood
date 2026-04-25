@@ -9,6 +9,9 @@
         rentals: [],
         raffles: [],
         loading: true,
+        favIds: new Set(),
+        loggedIn: {{ 'true' if user else 'false' }},
+        openShareId: null,
         year: new Date().getFullYear(),
         month: new Date().getMonth() + 1,
         today: new Date(),
@@ -128,9 +131,11 @@
                                 day: dd.getDate(),
                                 is_raffle: true,
                                 raffle_id: r.id,
+                                item_id: r.item_id,
+                                item_slug: r.item_slug,
                                 status: r.status,
-                                owner_name: null,
-                                image: null,
+                                owner_name: r.organizer_name,
+                                image: r.image,
                                 rsvp_count: s.tickets_confirmed || 0,
                                 percent_sold: s.percent_sold || 0,
                             };
@@ -205,8 +210,50 @@
             }
         },
 
+        async loadFavorites() {
+            if (!this.loggedIn) return;
+            try {
+                var r = await fetch('/api/v1/items/me/favorite-ids');
+                if (r.ok) { var d = await r.json(); this.favIds = new Set(d.ids || []); }
+            } catch(e) {}
+        },
+
+        isFav(itemId) { return itemId ? this.favIds.has(String(itemId)) : false; },
+
+        async toggleFav(itemId) {
+            if (!itemId) return;
+            if (!this.loggedIn) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: 'Log in to save favorites' } }));
+                return;
+            }
+            var key = String(itemId);
+            var method = this.favIds.has(key) ? 'DELETE' : 'POST';
+            var r = await fetch('/api/v1/items/' + itemId + '/favorite', { method: method });
+            if (r.ok || r.status === 409) {
+                this.favIds.has(key) ? this.favIds.delete(key) : this.favIds.add(key);
+                this.favIds = new Set(this.favIds);
+            }
+        },
+
+        eventUrl(ev) {
+            var origin = window.location.origin;
+            return ev.is_raffle ? origin + '/raffles/' + ev.raffle_id : origin + '/items/' + ev.item_slug;
+        },
+
+        shareWhatsApp(ev) {
+            var url = this.eventUrl(ev);
+            var msg = encodeURIComponent(ev.title + ' — ' + url);
+            window.open('https://wa.me/?text=' + msg, '_blank', 'noopener');
+        },
+
+        shareTelegram(ev) {
+            var url = this.eventUrl(ev);
+            window.open('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(ev.title), '_blank', 'noopener');
+        },
+
         async init() {
             await this.loadMonth();
+            this.loadFavorites();
         }
      }">
 
@@ -552,14 +599,42 @@
                             </div>
 
                             <!-- Actions footer -->
-                            <div class="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-gray-100" @click.prevent.stop>
-                                <button :data-name="ev.title" :data-url="ev.is_raffle ? 'https://lapiazza.app/raffles/' + ev.raffle_id : 'https://lapiazza.app/items/' + ev.item_slug"
-                                        @click="bhShare($el.dataset.name, $el.dataset.url)"
-                                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-rose-600 hover:bg-rose-50 transition-colors min-h-[40px]"
-                                        title="Share">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-                                    <span>{{ t('i18n.share') }}</span>
-                                </button>
+                            <div class="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-gray-100" @click.prevent.stop>
+                                <!-- Left: heart -->
+                                <template x-if="ev.item_id">
+                                    <button @click="toggleFav(ev.item_id)"
+                                            class="inline-flex items-center justify-center w-10 h-10 rounded-full transition-colors"
+                                            :class="isFav(ev.item_id) ? 'text-rose-500 bg-rose-50 hover:bg-rose-100' : 'text-gray-400 hover:text-rose-500 hover:bg-rose-50'"
+                                            data-lbl-add="{{ t('favorites.add') }}"
+                                            data-lbl-remove="{{ t('favorites.remove') }}"
+                                            :title="isFav(ev.item_id) ? $el.dataset.lblRemove : $el.dataset.lblAdd"
+                                            :aria-label="isFav(ev.item_id) ? $el.dataset.lblRemove : $el.dataset.lblAdd">
+                                        <svg class="w-5 h-5" :fill="isFav(ev.item_id) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                                    </button>
+                                </template>
+                                <template x-if="!ev.item_id"><span></span></template>
+
+                                <!-- Right: share channels + RSVP -->
+                                <div class="flex items-center gap-1.5">
+                                    <button :data-name="ev.title"
+                                            @click="bhShare($el.dataset.name, eventUrl(ev))"
+                                            class="inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                                            title="{{ t('i18n.share') }}"
+                                            aria-label="{{ t('i18n.share') }}">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                                    </button>
+                                    <button @click="shareWhatsApp(ev)"
+                                            class="inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:text-[#25D366] hover:bg-green-50 transition-colors"
+                                            title="WhatsApp"
+                                            aria-label="Share on WhatsApp">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                    </button>
+                                    <button @click="shareTelegram(ev)"
+                                            class="inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:text-[#229ED9] hover:bg-blue-50 transition-colors"
+                                            title="Telegram"
+                                            aria-label="Share on Telegram">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                                    </button>
                                 <template x-if="!ev.user_rsvp && ev.status === 'active'">
                                     <div x-data="{ showNotes: false, notes: '' }" class="relative" @click.stop>
                                         <button @click="showNotes = true"
@@ -597,6 +672,7 @@
                                         {{ t('events.cancel_rsvp') }}
                                     </button>
                                 </template>
+                                </div>
                             </div>
                         </a>
                     </template>
