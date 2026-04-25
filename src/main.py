@@ -74,6 +74,23 @@ def create_app() -> FastAPI:
 
     app.add_middleware(TokenRefreshMiddleware)
 
+    # Content-Language header -- tells Chrome/Firefox the page language so
+    # browser auto-translate doesn't offer to translate to the same language.
+    # Combined with <html translate="no"> this is the strongest server-side
+    # signal we can give. User-side: people whose browser is set to a different
+    # language still control via "always translate this site" preference.
+    class ContentLanguageMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request, call_next):
+            response = await call_next(request)
+            ctype = response.headers.get("content-type", "")
+            if "text/html" in ctype.lower() and "content-language" not in {k.lower() for k in response.headers.keys()}:
+                lang_cookie = request.cookies.get("bh_lang")
+                lang = lang_cookie if lang_cookie in ("en", "it") else "en"
+                response.headers["Content-Language"] = lang
+            return response
+
+    app.add_middleware(ContentLanguageMiddleware)
+
     # Favicon at root (browsers request /favicon.ico directly)
     @app.get("/favicon.ico", include_in_schema=False)
     async def favicon():
