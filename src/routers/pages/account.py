@@ -133,6 +133,58 @@ async def dashboard(request: Request,
             elif ListingStatus.DRAFT in statuses:
                 draft_count += 1
 
+    # ── Per-item analytics: views (30d), favorites (lifetime), conversations ──
+    # Three batched aggregate queries, each grouped by item_id, merged into
+    # a dict keyed by item_id. Cheaper than per-card subqueries on a 25-item
+    # dashboard. Empty dict is fine -- template defaults to 0.
+    item_stats = {}
+    if token and db_user and items:
+        from datetime import datetime, timedelta, timezone
+        from src.models.analytics import BHItemView
+        from src.models.item import BHItemFavorite
+        from src.models.message import BHMessage
+
+        item_ids = [it.id for it in items]
+        thirty_days_ago = datetime.now(timezone.utc) - timedelta(days=30)
+
+        # Views (last 30d)
+        views_rows = await db.execute(
+            select(BHItemView.item_id, func.count(BHItemView.id))
+            .where(BHItemView.item_id.in_(item_ids))
+            .where(BHItemView.created_at >= thirty_days_ago)
+            .group_by(BHItemView.item_id)
+        )
+        views_map = {row[0]: row[1] for row in views_rows.all()}
+
+        # Favorites (lifetime)
+        favs_rows = await db.execute(
+            select(BHItemFavorite.item_id, func.count(BHItemFavorite.id))
+            .where(BHItemFavorite.item_id.in_(item_ids))
+            .where(BHItemFavorite.deleted_at.is_(None))
+            .group_by(BHItemFavorite.item_id)
+        )
+        favs_map = {row[0]: row[1] for row in favs_rows.all()}
+
+        # Conversations: distinct senders who messaged about any of this
+        # item's listings (excluding the owner's own messages). Joins
+        # BHMessage.listing_id -> BHListing.item_id.
+        convs_rows = await db.execute(
+            select(BHListing.item_id, func.count(func.distinct(BHMessage.sender_id)))
+            .join(BHMessage, BHMessage.listing_id == BHListing.id)
+            .where(BHListing.item_id.in_(item_ids))
+            .where(BHMessage.sender_id != db_user.id)
+            .where(BHMessage.deleted_at.is_(None))
+            .group_by(BHListing.item_id)
+        )
+        convs_map = {row[0]: row[1] for row in convs_rows.all()}
+
+        for it in items:
+            item_stats[str(it.id)] = {
+                "views": views_map.get(it.id, 0),
+                "favorites": favs_map.get(it.id, 0),
+                "conversations": convs_map.get(it.id, 0),
+            }
+
     ctx = _ctx(request, token,
         items=items,
         item_total=item_count,
@@ -145,6 +197,7 @@ async def dashboard(request: Request,
         pending_count=pending_count,
         paused_count=paused_count,
         draft_count=draft_count,
+        item_stats=item_stats,
     )
     return _render("pages/dashboard.html", ctx)
 
