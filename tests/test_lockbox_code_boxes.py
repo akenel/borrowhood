@@ -220,3 +220,60 @@ class TestConfirmButtonsGatedOnCodes:
             "Old duplicate fetch in Generate Codes block must be removed "
             "-- use lifted lbLoaded + lbCodes state instead"
         )
+
+
+class TestOrderCardSurfacesCounterparty:
+    """The order card must always show WHO the counterparty is.
+
+    April 25 incident: Leo viewed an order he sold (Technical Drawing
+    Workshop). Card said 'You sold' and showed lockbox codes -- but with
+    no buyer name anywhere. Leo had no idea who the codes were for or
+    who was supposed to use them.
+
+    Symmetry rule:
+    - When you BOUGHT: card shows 'From <seller name>'
+    - When you SOLD: card MUST show 'You sold to <buyer name>'
+
+    Plus the codes block needs an audience hint so each side knows
+    whether the codes are FOR them (renter) or FOR somebody else (seller).
+    """
+
+    def test_seller_view_shows_buyer_name_in_header(self):
+        # The seller-side header must include 'You sold' followed by the
+        # buyer name link to /workshop/<slug>. Used to be just 'You sold'.
+        assert 't(\'i18n.you_sold\') }}{% if order.renter %}' in ORDERS_HTML, (
+            "Seller-side header must follow 'You sold' with the buyer name "
+            "(e.g. 'You sold to Sally Thompson') so the seller knows who"
+        )
+        assert "href=\"/workshop/{{ order.renter.slug }}\"" in ORDERS_HTML, (
+            "Buyer name in seller-side header must link to their workshop"
+        )
+
+    def test_codes_block_has_audience_hint_for_seller(self):
+        # When the seller views, the codes block must include 'These codes
+        # are for <buyer>' so the seller knows whose pickup/return these are.
+        assert "These codes are for" in ORDERS_HTML, (
+            "Seller-view codes block must include 'These codes are for "
+            "<buyer name>' hint -- otherwise codes float without context"
+        )
+
+    def test_codes_block_has_audience_hint_for_buyer(self):
+        # When the buyer views, the codes block tells them codes were
+        # shared by the seller and they enter them below.
+        assert "Codes shared by" in ORDERS_HTML, (
+            "Buyer-view codes block must include 'Codes shared by <seller>' "
+            "hint so buyer knows what to do with them"
+        )
+
+    def test_renter_eagerly_loaded_in_orders_query(self):
+        # Without selectinload(BHRental.renter), order.renter would lazy-
+        # load (or be unavailable in async). Lock that in.
+        from pathlib import Path
+        account_py = (
+            Path(__file__).resolve().parent.parent
+            / "src" / "routers" / "pages" / "account.py"
+        ).read_text()
+        assert "selectinload(BHRental.renter)" in account_py, (
+            "Orders query must eagerly load BHRental.renter so the "
+            "template can render buyer name without an async lazy-load"
+        )

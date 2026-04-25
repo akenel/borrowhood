@@ -440,7 +440,13 @@
                         <span class="font-semibold text-gray-700">EUR {{ "%.2f"|format(order.listing.price) }}</span>
                         {% endif %}
                         {% if item and item.owner %}
-                        <span>{% if viewer_user_id and item.owner.id == viewer_user_id %}{{ t('i18n.you_sold') }}{% else %}{{ t('i18n.from') }} <a href="/workshop/{{ item.owner.slug }}" class="text-indigo-600 hover:underline">{{ item.owner.display_name }}</a>{% endif %}</span>
+                        <span>
+                            {% if viewer_user_id and item.owner.id == viewer_user_id %}
+                                {{ t('i18n.you_sold') }}{% if order.renter %} {% if lang == 'it' %}a{% else %}to{% endif %} <a href="/workshop/{{ order.renter.slug }}" class="text-indigo-600 hover:underline">{{ order.renter.display_name }}</a>{% endif %}
+                            {% else %}
+                                {{ t('i18n.from') }} <a href="/workshop/{{ item.owner.slug }}" class="text-indigo-600 hover:underline">{{ item.owner.display_name }}</a>
+                            {% endif %}
+                        </span>
                         {% endif %}
                     </div>
 
@@ -475,24 +481,38 @@
             {% if order.status.value in ('approved', 'picked_up', 'committed', 'buyer_paid', 'payment_confirmed') %}
             <div class="px-4 pb-3">
                 <template x-if="lbLoaded && lbCodes">
-                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 flex flex-wrap items-center gap-4">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                            <span class="text-xs font-medium text-amber-700">{% if lang == 'it' %}Codici Lockbox{% else %}Lockbox Codes{% endif %}</span>
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
+                        {# Audience hint: tells the viewer WHO the codes are for #}
+                        {% if item and item.owner and viewer_user_id == item.owner.id and order.renter %}
+                        <div class="flex items-center gap-2 pb-1 border-b border-amber-200">
+                            <svg class="w-3.5 h-3.5 text-amber-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span class="text-xs text-amber-700">{% if lang == 'it' %}Questi codici sono per{% else %}These codes are for{% endif %} <a href="/workshop/{{ order.renter.slug }}" class="font-semibold underline hover:text-amber-800">{{ order.renter.display_name }}</a> {% if lang == 'it' %}(l'acquirente){% else %}(the buyer){% endif %}.</span>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <div>
-                                <span class="text-xs text-gray-500">{% if lang == 'it' %}Ritiro{% else %}Pickup{% endif %}:</span>
-                                <span class="font-mono font-bold text-sm text-amber-800 ml-1" x-text="lbCodes.pickup_code"></span>
-                            </div>
-                            <div>
-                                <span class="text-xs text-gray-500">{% if lang == 'it' %}Reso{% else %}Return{% endif %}:</span>
-                                <span class="font-mono font-bold text-sm text-amber-800 ml-1" x-text="lbCodes.return_code"></span>
-                            </div>
+                        {% elif viewer_user_id == order.renter_id and item and item.owner %}
+                        <div class="flex items-center gap-2 pb-1 border-b border-amber-200">
+                            <svg class="w-3.5 h-3.5 text-amber-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span class="text-xs text-amber-700">{% if lang == 'it' %}Codici condivisi da{% else %}Codes shared by{% endif %} <a href="/workshop/{{ item.owner.slug }}" class="font-semibold underline hover:text-amber-800">{{ item.owner.display_name }}</a>. {% if lang == 'it' %}Inseriscili sotto per confermare ritiro/reso.{% else %}Enter them below to confirm pickup / return.{% endif %}</span>
                         </div>
-                        <template x-if="lbCodes.location_hint">
-                            <span class="text-xs text-amber-600" x-text="lbCodes.location_hint"></span>
-                        </template>
+                        {% endif %}
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                <span class="text-xs font-medium text-amber-700">{% if lang == 'it' %}Codici Lockbox{% else %}Lockbox Codes{% endif %}</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div>
+                                    <span class="text-xs text-gray-500">{% if lang == 'it' %}Ritiro{% else %}Pickup{% endif %}:</span>
+                                    <span class="font-mono font-bold text-sm text-amber-800 ml-1" x-text="lbCodes.pickup_code"></span>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-gray-500">{% if lang == 'it' %}Reso{% else %}Return{% endif %}:</span>
+                                    <span class="font-mono font-bold text-sm text-amber-800 ml-1" x-text="lbCodes.return_code"></span>
+                                </div>
+                            </div>
+                            <template x-if="lbCodes.location_hint">
+                                <span class="text-xs text-amber-600" x-text="lbCodes.location_hint"></span>
+                            </template>
+                        </div>
                     </div>
                 </template>
                 {% if viewer_user_id == order.renter_id %}

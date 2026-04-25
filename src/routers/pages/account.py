@@ -184,6 +184,7 @@ async def orders_page(
                 .options(
                     selectinload(BHRental.listing).selectinload(BHListing.item).selectinload(BHItem.media),
                     selectinload(BHRental.listing).selectinload(BHListing.item).selectinload(BHItem.owner),
+                    selectinload(BHRental.renter),
                 )
             )
 
