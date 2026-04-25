@@ -277,6 +277,9 @@
                 <div class="mt-6">
                     <div class="flex items-center justify-between">
                         <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">{{ t('item.description') }}</h2>
+                        {# Translate button only shown when content is in a different language than the viewer's. #}
+                        {# If you're an EN user reading EN content, no button -- it's noise. #}
+                        {% if (item.content_language or 'en') != lang %}
                         <div x-data="translateText('desc-text')">
                             <button @click="translate()" class="text-xs text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1"
                                     :disabled="loading">
@@ -284,6 +287,7 @@
                                 <span x-show="loading">...</span><span x-show="!loading && translated" x-cloak>{{ t('common.show_original') }}</span><span x-show="!loading && !translated" x-cloak>{{ t('common.translate') }}</span>
                             </button>
                         </div>
+                        {% endif %}
                     </div>
                     <div id="desc-text" class="mt-2 text-gray-700 leading-relaxed prose prose-sm max-w-none" data-translatable data-content-lang="{{ item.content_language or 'en' }}" data-raw="{{ item.description | e }}"></div>
                     <script>
@@ -320,6 +324,7 @@
                 <div class="mt-6">
                     <div class="flex items-center justify-between">
                         <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">{{ t('item.story') }}</h2>
+                        {% if (item.content_language or 'en') != lang %}
                         <div x-data="translateText('story-text')">
                             <button @click="translate()" class="text-xs text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1"
                                     :disabled="loading">
@@ -327,6 +332,7 @@
                                 <span x-show="loading">...</span><span x-show="!loading && translated" x-cloak>{{ t('common.show_original') }}</span><span x-show="!loading && !translated" x-cloak>{{ t('common.translate') }}</span>
                             </button>
                         </div>
+                        {% endif %}
                     </div>
                     <div id="story-text" class="mt-2 text-gray-700 leading-relaxed italic prose prose-sm max-w-none" data-translatable data-content-lang="{{ item.content_language or 'en' }}" data-raw="{{ item.story | e }}"></div>
                     <script>(function(){var el=document.getElementById('story-text');if(el&&typeof marked!=='undefined'){try{el.innerHTML=marked.parse(el.dataset.raw||'')}catch(e){el.textContent=el.dataset.raw||''}}else if(el){el.textContent=el.dataset.raw||''}})();</script>
