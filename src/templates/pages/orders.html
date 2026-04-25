@@ -376,7 +376,13 @@
     <div class="space-y-4">
         {% for order in orders %}
         {% set item = order.listing.item if order.listing else None %}
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:border-gray-300 transition-colors">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:border-gray-300 transition-colors"
+             x-data="{ lbCodes: null, lbLoaded: false }"
+             {% if order.status.value in ('approved', 'picked_up', 'committed', 'buyer_paid', 'payment_confirmed') %}
+             x-init="fetch('/api/v1/lockbox/{{ order.id }}').then(r => r.ok ? r.json() : null).then(d => { lbCodes = d; lbLoaded = true; }).catch(() => { lbLoaded = true; })"
+             {% else %}
+             x-init="lbLoaded = true"
+             {% endif %}>
 
             <!-- Card top: image + info row -->
             <div class="flex gap-4 p-4">
@@ -467,9 +473,8 @@
 
             <!-- Lockbox codes (if active order) -->
             {% if order.status.value in ('approved', 'picked_up', 'committed', 'buyer_paid', 'payment_confirmed') %}
-            <div class="px-4 pb-3" x-data="{ codes: null, loaded: false }"
-                 x-init="fetch('/api/v1/lockbox/{{ order.id }}').then(r => r.ok ? r.json() : null).then(d => { codes = d; loaded = true; }).catch(() => { loaded = true; })">
-                <template x-if="loaded && codes">
+            <div class="px-4 pb-3">
+                <template x-if="lbLoaded && lbCodes">
                     <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 flex flex-wrap items-center gap-4">
                         <div class="flex items-center gap-2">
                             <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
@@ -478,18 +483,26 @@
                         <div class="flex items-center gap-4">
                             <div>
                                 <span class="text-xs text-gray-500">{% if lang == 'it' %}Ritiro{% else %}Pickup{% endif %}:</span>
-                                <span class="font-mono font-bold text-sm text-amber-800 ml-1" x-text="codes.pickup_code"></span>
+                                <span class="font-mono font-bold text-sm text-amber-800 ml-1" x-text="lbCodes.pickup_code"></span>
                             </div>
                             <div>
                                 <span class="text-xs text-gray-500">{% if lang == 'it' %}Reso{% else %}Return{% endif %}:</span>
-                                <span class="font-mono font-bold text-sm text-amber-800 ml-1" x-text="codes.return_code"></span>
+                                <span class="font-mono font-bold text-sm text-amber-800 ml-1" x-text="lbCodes.return_code"></span>
                             </div>
                         </div>
-                        <template x-if="codes.location_hint">
-                            <span class="text-xs text-amber-600" x-text="codes.location_hint"></span>
+                        <template x-if="lbCodes.location_hint">
+                            <span class="text-xs text-amber-600" x-text="lbCodes.location_hint"></span>
                         </template>
                     </div>
                 </template>
+                {% if viewer_user_id == order.renter_id %}
+                <template x-if="lbLoaded && !lbCodes">
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span class="text-xs text-amber-700">{% if lang == 'it' %}In attesa che {{ item.owner.display_name if item and item.owner else 'il venditore' }} generi i codici lockbox.{% else %}Waiting for {{ item.owner.display_name if item and item.owner else 'the seller' }} to share the lockbox codes.{% endif %}</span>
+                    </div>
+                </template>
+                {% endif %}
             </div>
             {% endif %}
 
@@ -558,9 +571,8 @@
 
                 <!-- Generate Lockbox Codes (seller only, approved status, no codes yet) -->
                 {% if order.status.value == 'approved' and item and viewer_user_id == item.owner_id %}
-                <div x-data="{ showGen: false, hint: '', instructions: '', generating: false }"
-                     x-init="fetch('/api/v1/lockbox/{{ order.id }}').then(r => r.ok ? r.json() : null).then(d => { if (d) showGen = 'done'; })">
-                    <template x-if="showGen !== 'done'">
+                <div x-data="{ showGen: false, hint: '', instructions: '', generating: false }">
+                    <template x-if="lbLoaded && !lbCodes">
                         <button @click="showGen = true" class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 rounded-lg min-h-[36px] transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                             Generate Lockbox Codes
@@ -601,7 +613,7 @@
 
                 <!-- Verify Pickup Code (buyer only, approved + codes exist) -->
                 {% if order.status.value == 'approved' and viewer_user_id == order.renter_id %}
-                <div x-data="lockboxCodeBoxes('{{ order.id }}', 'blue', 'Confirm Pickup', 'Enter the pickup code from the lockbox to confirm you picked up the item.')">
+                <div x-show="lbCodes" x-cloak x-data="lockboxCodeBoxes('{{ order.id }}', 'blue', 'Confirm Pickup', 'Enter the pickup code from the lockbox to confirm you picked up the item.')">
                     <button @click="open()" class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg min-h-[36px] transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Confirm Pickup
@@ -645,7 +657,7 @@
 
                 <!-- Verify Return Code (buyer only, picked_up status) -->
                 {% if order.status.value == 'picked_up' and viewer_user_id == order.renter_id %}
-                <div x-data="lockboxCodeBoxes('{{ order.id }}', 'emerald', 'Confirm Return', 'Enter the return code to confirm the item has been returned.')">
+                <div x-show="lbCodes" x-cloak x-data="lockboxCodeBoxes('{{ order.id }}', 'emerald', 'Confirm Return', 'Enter the return code to confirm the item has been returned.')">
                     <button @click="open()" class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg min-h-[36px] transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Confirm Return

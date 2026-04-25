@@ -162,3 +162,61 @@ class TestLockboxSubmitBulletproofing:
             "On AbortError / timeout, message must tell user to refresh "
             "(action may have succeeded server-side -- don't claim it failed)"
         )
+
+
+class TestConfirmButtonsGatedOnCodes:
+    """Confirm Pickup / Confirm Return buttons must only render when the
+    seller has actually generated lockbox codes -- otherwise the buyer is
+    handed a modal asking for a code they don't have.
+
+    Real incident, April 25: Drone Repair (service, status=approved) showed
+    "Confirm Pickup" button to buyer Leo, but seller Pietro hadn't generated
+    codes yet. Modal asked Leo for a code he had no way to know.
+    """
+
+    def test_card_has_lifted_codes_state(self):
+        # Card-level x-data must hold lbCodes/lbLoaded so child blocks share state
+        assert "lbCodes: null, lbLoaded: false" in ORDERS_HTML, (
+            "Card-level x-data must include lbCodes + lbLoaded so codes "
+            "display and Confirm buttons reference one shared state"
+        )
+
+    def test_card_init_fetches_codes_for_active_orders(self):
+        # The card x-init fetches /api/v1/lockbox/{id} once per card,
+        # not per inner block (which would mean N fetches per card).
+        assert "fetch('/api/v1/lockbox/{{ order.id }}')" in ORDERS_HTML
+        assert "lbCodes = d; lbLoaded = true" in ORDERS_HTML, (
+            "Card x-init must populate lbCodes + lbLoaded from a single "
+            "fetch -- removes duplicate fetches the inner blocks used to do"
+        )
+
+    def test_confirm_pickup_gated_on_lbCodes(self):
+        # The Confirm Pickup wrapper must use x-show="lbCodes" so it
+        # stays hidden until the seller has generated codes.
+        assert 'x-show="lbCodes" x-cloak x-data="lockboxCodeBoxes(\'{{ order.id }}\', \'blue\'' in ORDERS_HTML, (
+            "Confirm Pickup wrapper must be x-show=\"lbCodes\" -- without "
+            "this, buyer sees a modal asking for a code they don't have"
+        )
+
+    def test_confirm_return_gated_on_lbCodes(self):
+        # Same gating for Confirm Return.
+        assert 'x-show="lbCodes" x-cloak x-data="lockboxCodeBoxes(\'{{ order.id }}\', \'emerald\'' in ORDERS_HTML, (
+            "Confirm Return wrapper must be x-show=\"lbCodes\" -- without "
+            "this, buyer sees a Return modal before seller has set codes"
+        )
+
+    def test_buyer_sees_waiting_for_seller_hint(self):
+        # When codes don't exist yet, buyer should see a clear "waiting"
+        # message instead of empty space + a confusing Confirm button.
+        assert "Waiting for" in ORDERS_HTML and "to share the lockbox codes" in ORDERS_HTML, (
+            "Buyer must see 'Waiting for X to share the lockbox codes' "
+            "hint when status is approved/picked-up but codes not generated"
+        )
+
+    def test_generate_button_uses_lifted_state(self):
+        # Old per-block fetch in the seller's Generate Codes block should
+        # be removed -- it now references the lifted lbLoaded/lbCodes state.
+        assert 'x-init="fetch(\'/api/v1/lockbox/{{ order.id }}\').then(r => r.ok ? r.json() : null).then(d => { if (d) showGen = \'done\'; })"' not in ORDERS_HTML, (
+            "Old duplicate fetch in Generate Codes block must be removed "
+            "-- use lifted lbLoaded + lbCodes state instead"
+        )
