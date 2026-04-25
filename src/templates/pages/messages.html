@@ -190,9 +190,9 @@
 
                     <!-- Compose -->
                     <div class="p-3 border-t border-gray-100">
-                        <form @submit.prevent="sendMessage()" class="flex gap-2">
+                        <form @submit.prevent="sendMessage()" class="flex gap-2 items-center">
                             <input type="text" x-model="newMessage" placeholder="{{ t('i18n.type_a_message') }}"
-                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-full text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]"
+                                   class="flex-1 min-w-0 px-4 py-2 border border-gray-300 rounded-full text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]"
                                    maxlength="5000">
                             <button type="submit" :disabled="!newMessage.trim() || sending"
                                     class="px-4 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:opacity-50 transition-colors min-h-[40px]">

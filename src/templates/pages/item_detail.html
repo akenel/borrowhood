@@ -1705,13 +1705,13 @@
                 <!-- Ask a question -->
                 {% if user %}
                 <form @submit.prevent="askQuestion()" class="mb-4">
-                    <div class="flex gap-2">
+                    <div class="flex flex-col sm:flex-row gap-2">
                         <input type="text" x-model="newQuestion"
                                placeholder="{% if lang == 'it' %}Es. È disponibile questo weekend?{% else %}E.g. Is this available this weekend?{% endif %}"
-                               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]"
+                               class="flex-1 min-w-0 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]"
                                maxlength="2000" minlength="5">
                         <button type="submit" :disabled="asking || newQuestion.length < 5"
-                                class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors min-h-[40px]">
+                                class="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors min-h-[40px]">
                             {{ t('i18n.ask') }}
                         </button>
                     </div>
@@ -1729,9 +1729,9 @@
                                 <div class="text-sm text-emerald-700 mt-1"><span class="font-medium" x-text="qa.answerer_name || 'Owner'"></span>: <span class="prose prose-sm inline max-w-none" x-html="typeof marked !== 'undefined' ? marked.parse(qa.answer || '') : (qa.answer || '')"></span></div>
                             </template>
                             <template x-if="!qa.answer && isOwner">
-                                <div class="mt-1 flex gap-2">
-                                    <input type="text" x-model="qa._draft" placeholder="{{ t('i18n.answer') }}" class="flex-1 px-2 py-1 border border-gray-200 rounded text-sm">
-                                    <button @click="answerQuestion(qa)" class="px-2 py-1 bg-emerald-600 text-white text-xs rounded hover:bg-emerald-700">{{ t('i18n.reply') }}</button>
+                                <div class="mt-1 flex flex-col sm:flex-row gap-2">
+                                    <input type="text" x-model="qa._draft" placeholder="{{ t('i18n.answer') }}" class="flex-1 min-w-0 w-full px-2 py-1 border border-gray-200 rounded text-sm">
+                                    <button @click="answerQuestion(qa)" class="w-full sm:w-auto px-3 py-1.5 bg-emerald-600 text-white text-xs rounded hover:bg-emerald-700 min-h-[36px]">{{ t('i18n.reply') }}</button>
                                 </div>
                             </template>
                             <p class="text-xs text-gray-300 mt-0.5" x-text="formatDate(qa.created_at)"></p>

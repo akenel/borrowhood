@@ -2958,11 +2958,11 @@
                         <p>{{ t('i18n.whatsapp_consent') | safe }}</p>
                     </div>
                     <p class="text-sm text-gray-600 mb-4">{{ t('i18n.add_your_whatsapp_number_so_buyers_can_contact_you') }}</p>
-                    <div class="flex gap-2">
+                    <div class="flex flex-col sm:flex-row gap-2">
                         <input type="tel" x-model="waNumber" placeholder="+39 328 123 4567"
-                               class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#25D366] focus:border-[#25D366] min-h-[44px]">
+                               class="flex-1 min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#25D366] focus:border-[#25D366] min-h-[44px]">
                         <button @click="save()" :disabled="saving"
-                                class="px-4 py-2 bg-[#25D366] text-white text-sm font-semibold rounded-lg hover:bg-[#1DA851] transition-colors min-h-[44px] disabled:opacity-50">
+                                class="w-full sm:w-auto px-4 py-2 bg-[#25D366] text-white text-sm font-semibold rounded-lg hover:bg-[#1DA851] transition-colors min-h-[44px] disabled:opacity-50 flex items-center justify-center">
                             <span x-show="!saving && !saved">{{ t('i18n.save') }}</span>
                             <span x-show="saving" x-cloak>...</span>
                             <svg x-show="saved" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>

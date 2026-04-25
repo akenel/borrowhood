@@ -672,12 +672,12 @@
                 <!-- AI Draft -->
                 <div class="mb-4 p-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-100">
                     <p class="text-xs text-indigo-700 font-medium mb-2">AI Assistant -- describe your situation in a few words</p>
-                    <div class="flex gap-2">
+                    <div class="flex flex-col sm:flex-row gap-2">
                         <input x-model="aiDraftInput" type="text" placeholder="e.g. my bike frame cracked again, aluminum Bianchi"
-                               class="flex-1 px-3 py-2 border border-indigo-200 rounded-lg text-sm min-h-[44px] bg-white"
+                               class="flex-1 min-w-0 w-full px-3 py-2 border border-indigo-200 rounded-lg text-sm min-h-[44px] bg-white"
                                @keydown.enter="generateDraft()">
                         <button @click="generateDraft()" :disabled="!aiDraftInput.trim() || aiDrafting"
-                                class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 min-h-[44px] whitespace-nowrap">
+                                class="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 min-h-[44px] whitespace-nowrap">
                             <span x-show="!aiDrafting">Draft with AI</span>
                             <span x-show="aiDrafting" x-cloak>Thinking...</span>
                         </button>
