@@ -58,6 +58,26 @@ class TestBodyOverflowClamp:
             "defense against page-level horizontal scroll on mobile"
         )
 
+    def test_body_does_not_have_height_lock(self):
+        """BL-164: body must not use `h-full` (height: 100%) -- combined with
+        `overflow-x-hidden`, that creates a fixed-height scroll container on
+        Android Chrome that clips long pages. Use `min-h-full` instead.
+
+        Triggered the day we shipped the new home-page sections (surface menu
+        + trust strip + upcoming events): Fair Phone Android couldn't scroll
+        to the bottom of the home page anymore.
+        """
+        base = _read("base.html")
+        body_open = base.find("<body")
+        body_tag = base[body_open:base.find(">", body_open) + 1]
+        classes = body_tag.split('class="')[1].split('"')[0] if 'class="' in body_tag else ""
+        tokens = classes.split()
+        assert "h-full" not in tokens, (
+            "body must not have h-full -- with overflow-x-hidden it creates "
+            "a fixed-height scroll container on Android Chrome that clips "
+            "long pages. Use min-h-full instead."
+        )
+
 
 # ── Form-style input + button rows wrap on mobile (BL-155) ──
 
