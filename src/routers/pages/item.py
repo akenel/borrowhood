@@ -197,19 +197,72 @@ _PRESET_TYPES = {"rent", "sell", "service", "training", "event", "offer", "givea
 
 @router.get("/list", response_class=HTMLResponse)
 async def list_item_page(request: Request,
+                         db: AsyncSession = Depends(get_db),
                          token: Optional[dict] = Depends(get_current_user_token)):
     """Form to list a new item. Requires authentication.
 
     Optional ?type= query param pre-selects a listing type and adapts the
     heading -- e.g. /list?type=event arrives as "Host an Event" instead of
     the generic "List an Item".
+
+    Optional ?duplicate_from={item_id} (BL-150) pre-fills the form with
+    another item's metadata for one-tap relisting after a sale. The new
+    item gets a fresh slug and starts with no media or active listings;
+    only the descriptive fields and listing-type/pricing copy over.
     """
     if not token:
         from starlette.responses import RedirectResponse
         return RedirectResponse(url="/login", status_code=302)
     raw_type = (request.query_params.get("type") or "").lower().strip()
     preset_type = raw_type if raw_type in _PRESET_TYPES else None
-    ctx = _ctx(request, token, category_groups=CATEGORY_GROUPS, preset_type=preset_type)
+
+    # BL-150: duplicate_from support
+    duplicate_item = None
+    duplicate_listing_types: list[str] = []
+    duplicate_listing_prices: dict = {}
+    dup_id = (request.query_params.get("duplicate_from") or "").strip()
+    if dup_id:
+        try:
+            from uuid import UUID
+            dup_uuid = UUID(dup_id)
+            result = await db.execute(
+                select(BHItem)
+                .options(
+                    selectinload(BHItem.listings),
+                )
+                .where(BHItem.id == dup_uuid)
+                .where(BHItem.deleted_at.is_(None))
+            )
+            source = result.scalars().first()
+            if source:
+                user = await get_user(db, token)
+                if source.owner_id == user.id:
+                    duplicate_item = source
+                    for l in (source.listings or []):
+                        if l.deleted_at:
+                            continue
+                        lt = l.listing_type.value
+                        if lt not in duplicate_listing_types:
+                            duplicate_listing_types.append(lt)
+                        duplicate_listing_prices[lt] = {
+                            "price": float(l.price) if l.price else "",
+                            "price_unit": l.price_unit or "flat",
+                            "deposit": float(l.deposit) if l.deposit else "",
+                            "minimum_charge": float(l.minimum_charge) if l.minimum_charge else "",
+                            "per_person_rate": float(l.per_person_rate) if l.per_person_rate else "",
+                            "max_participants": l.max_participants or "",
+                            "group_discount_pct": float(l.group_discount_pct) if l.group_discount_pct else "",
+                        }
+        except (ValueError, AttributeError):
+            pass  # invalid UUID -- silently fall through to blank form
+
+    ctx = _ctx(request, token,
+        category_groups=CATEGORY_GROUPS,
+        preset_type=preset_type,
+        duplicate_item=duplicate_item,
+        duplicate_listing_types_json=Markup(json.dumps(duplicate_listing_types)),
+        duplicate_listing_prices_json=Markup(json.dumps(duplicate_listing_prices)),
+    )
     return _render("pages/list_item.html", ctx)
 
 
