@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block title %}{% if lang == 'it' %}Perché La Piazza{% else %}Why La Piazza{% endif %} - {{ t('app.name') }}{% endblock %}
+
+{% block og_title %}{% if lang == 'it' %}Perché La Piazza è diversa{% else %}Why La Piazza is different{% endif %}{% endblock %}
+{% block og_description %}{% if lang == 'it' %}Zero commissioni. Sei superfici in un'app. Vicini veri. Costruito da un camper a Trapani.{% else %}Zero fees. Six surfaces in one app. Real neighbors. Built from a camper in Trapani.{% endif %}{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="bg-gradient-to-br from-slate-900 via-indigo-900 to-violet-900 text-white py-16 sm:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-bold uppercase tracking-wider mb-5">
+            {% if lang == 'it' %}La storia onesta{% else %}The honest story{% endif %}
+        </div>
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+            {% if lang == 'it' %}Perché La Piazza è diversa{% else %}Why La Piazza is different{% endif %}
+        </h1>
+        <p class="mt-5 text-lg sm:text-xl text-indigo-100 max-w-2xl mx-auto leading-relaxed">
+            {% if lang == 'it' %}Una pagina semplice con la matematica reale. Niente trucchi. Niente pubblicità. Niente raccolta dati.{% else %}One simple page with the real math. No tricks. No ads. No data harvesting.{% endif %}
+        </p>
+    </div>
+</section>
+
+<!-- The Deeper Why -- Angel's voice, the heart of the platform -->
+<section class="bg-gradient-to-br from-amber-50 via-orange-50 to-stone-100 py-14 sm:py-16 border-b-4 border-amber-300">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-amber-200 text-amber-900 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+                {% if lang == 'it' %}Il vero perché{% else %}The deeper why{% endif %}
+            </div>
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
+                {% if lang == 'it' %}Per i pro senza certificato{% else %}For the pros without papers{% endif %}
+            </h2>
+        </div>
+
+        <div class="prose prose-lg max-w-none text-gray-800 leading-relaxed space-y-5">
+            <p class="text-lg sm:text-xl font-medium text-gray-900">
+                {% if lang == 'it' %}La gente mi chiede perché ho costruito questo.{% else %}People ask me why I built this.{% endif %}
+            </p>
+            <p>
+                {% if lang == 'it' %}La verità: in ogni quartiere ci sono <em>veri professionisti</em> che semplicemente non hanno la carta. La nonna che ti aggiusta qualsiasi maglione in dieci minuti. Il ragazzo che costruisce droni con i pezzi di scarto. Il pescatore che legge il mare meglio di qualsiasi laurea. Il meccanico che ha imparato dal nonno, non da una scuola. La cuoca la cui pasta ti commuove, ma che non ha mai aperto un ristorante perché la burocrazia se l'è mangiata viva.{% else %}Here's the truth: in every neighborhood there are <em>real pros</em> who just don't have the papers. The nonna who can fix any sweater in ten minutes. The kid who builds drones from scrap. The fisherman who reads the sea better than any university degree. The mechanic who learned from his grandfather, not from a trade school. The cook whose pasta makes you cry, but who never opened a restaurant because the bureaucracy ate her alive.{% endif %}
+            </p>
+            <p>
+                {% if lang == 'it' %}Tutte le altre piattaforme chiedono loro di "dimostrarsi". Partita IVA. Iscrizione camera di commercio. Verifica del background. Processore di pagamenti certificato. Cosi restano invisibili. Non prendono il lavoro. Non ricevono il rispetto.{% else %}Every other platform asks them to prove themselves. Tax IDs. Business registrations. Background checks. Verified payment processors. So they stay invisible. They don't get the work. They don't get the respect.{% endif %}
+            </p>
+            <p class="text-lg font-semibold text-gray-900">
+                {% if lang == 'it' %}La Piazza non chiede niente di tutto questo. Ti iscrivi. Pubblichi cosa sai fare. I tuoi vicini ti recensiscono. Quella è la credenziale. È l'unica che conta.{% else %}La Piazza doesn't ask for any of that. You sign up. You list what you do. Your neighbors review you. That's the credential. That's the only one that matters.{% endif %}
+            </p>
+            <p>
+                {% if lang == 'it' %}Pago il server di tasca mia. L'architettura è piccola abbastanza che il costo è piccolo. Nessun altro costruirebbe questo perché non ci sono soldi -- ed è esattamente per questo che andava costruito.{% else %}I pay for the server out of my own pocket. The architecture is small enough that the cost is small. Nobody else would build this because there's no money in it -- and that's exactly why it had to be built.{% endif %}
+            </p>
+            <p class="text-right text-base font-semibold text-amber-700 mt-6">
+                &mdash; Angel
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- The Four Promises (expanded) -->
+<section class="bg-white py-14 sm:py-16">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-3">
+            {% if lang == 'it' %}Quattro promesse, niente asterischi{% else %}Four promises, no asterisks{% endif %}
+        </h2>
+        <p class="text-center text-gray-600 max-w-2xl mx-auto mb-10">
+            {% if lang == 'it' %}Se una di queste si rompe, la community lo saprà per prima.{% else %}If any of these break, the community will be the first to know.{% endif %}
+        </p>
+
+        <div class="space-y-6">
+            <!-- 0% fees -->
+            <div class="flex flex-col sm:flex-row gap-5 p-6 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-2xl border border-amber-200">
+                <div class="flex-shrink-0">
+                    <div class="text-5xl font-extrabold text-amber-600">0%</div>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold text-gray-900">{% if lang == 'it' %}Zero commissioni, mai{% else %}Zero fees, ever{% endif %}</h3>
+                    <p class="mt-2 text-gray-700 leading-relaxed">
+                        {% if lang == 'it' %}Vendi una bici a 50 EUR? Ricevi 50 EUR. Affitti il trapano per 5 EUR? Ricevi 5 EUR. Insegni il pane per 30 EUR? Ricevi 30 EUR. Niente "fee finale", niente "fee transazione", niente "fee elaborazione". Lo zero significa zero.{% else %}Sell a bike for €50? You get €50. Rent the drill for €5? You get €5. Teach a sourdough class for €30? You get €30. No "final value fee", no "transaction fee", no "processing fee". Zero means zero.{% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- 6 in 1 -->
+            <div class="flex flex-col sm:flex-row gap-5 p-6 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200">
+                <div class="flex-shrink-0">
+                    <div class="text-5xl font-extrabold text-emerald-600">6&rarr;1</div>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold text-gray-900">{% if lang == 'it' %}Sei app in una{% else %}Six apps in one{% endif %}</h3>
+                    <p class="mt-2 text-gray-700 leading-relaxed">
+                        {% if lang == 'it' %}Per fare quello che fai qui in altri posti servono sei app: una per oggetti, una per maker, una per eventi, una per sorteggi, una per chiedere aiuto, una per la tua vetrina pubblica. Sei abbonamenti. Sei profili. Sei password. Qui: una.{% else %}To do what you do here on other platforms you need six apps: one for items, one for makers, one for events, one for raffles, one to ask for help, one for your public shop. Six subscriptions. Six profiles. Six passwords. Here: one.{% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Real neighbors -->
+            <div class="flex flex-col sm:flex-row gap-5 p-6 bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl border border-rose-200">
+                <div class="flex-shrink-0 w-16 sm:w-20">
+                    <svg class="w-12 h-12 sm:w-16 sm:h-16 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold text-gray-900">{% if lang == 'it' %}Vicini veri, non avatar{% else %}Real neighbors, not avatars{% endif %}</h3>
+                    <p class="mt-2 text-gray-700 leading-relaxed">
+                        {% if lang == 'it' %}Ogni profilo ha un nome reale, una foto, una storia, un quartiere. Trust score, badge (Newcomer &rarr; Active &rarr; Trusted &rarr; Pillar &rarr; Legend), recensioni di vicini reali. Niente account usa-e-getta, niente bot, niente "PowerSeller_2847".{% else %}Every profile has a real name, a photo, a story, a neighborhood. Trust score, badges (Newcomer &rarr; Active &rarr; Trusted &rarr; Pillar &rarr; Legend), reviews from actual neighbors. No throwaway accounts, no bots, no "PowerSeller_2847".{% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Local-first -->
+            <div class="flex flex-col sm:flex-row gap-5 p-6 bg-gradient-to-br from-cyan-50 to-blue-50 rounded-2xl border border-cyan-200">
+                <div class="flex-shrink-0 w-16 sm:w-20">
+                    <svg class="w-12 h-12 sm:w-16 sm:h-16 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold text-gray-900">{% if lang == 'it' %}Locale, non globale{% else %}Local, not global{% endif %}</h3>
+                    <p class="mt-2 text-gray-700 leading-relaxed">
+                        {% if lang == 'it' %}Costruito a Trapani, da Trapani, per Trapani. Nessun investitore di Silicon Valley a chiedere "scaliamo a 100 milioni di utenti". Sviluppato da un camper, deployato dal cellulare, testato al bar con i vicini.{% else %}Built in Trapani, from Trapani, for Trapani. No Silicon Valley investors asking "let's scale to 100M users". Developed from a camper van, deployed from a phone, tested at the bar with neighbors.{% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- The Honest Fee Comparison -->
+<section class="bg-gradient-to-br from-gray-50 to-slate-100 py-14 sm:py-16">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">
+                {% if lang == 'it' %}La matematica, in chiaro{% else %}The math, in plain sight{% endif %}
+            </h2>
+            <p class="mt-3 text-gray-600 max-w-2xl mx-auto">
+                {% if lang == 'it' %}Tariffe pubbliche di altre piattaforme, confrontate con le nostre. Verificate ad aprile 2026 -- controlla sempre i loro siti per gli aggiornamenti.{% else %}Public fee schedules from other platforms, compared to ours. Verified April 2026 -- always check their sites for updates.{% endif %}
+            </p>
+        </div>
+
+        <div class="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-100 text-gray-700">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold">{% if lang == 'it' %}Cosa fai{% else %}What you do{% endif %}</th>
+                        <th class="px-4 py-3 text-left font-semibold">{% if lang == 'it' %}Piattaforma tipica{% else %}Typical platform{% endif %}</th>
+                        <th class="px-4 py-3 text-left font-semibold">{% if lang == 'it' %}Quanto prendono{% else %}What they take{% endif %}</th>
+                        <th class="px-4 py-3 text-left font-semibold bg-emerald-100 text-emerald-900">{% if lang == 'it' %}La Piazza{% else %}La Piazza{% endif %}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <tr>
+                        <td class="px-4 py-3 font-medium text-gray-900">{% if lang == 'it' %}Vendere oggetti usati{% else %}Sell used items{% endif %}</td>
+                        <td class="px-4 py-3 text-gray-700">eBay</td>
+                        <td class="px-4 py-3 text-gray-700">13.25% + €0.30 / ordine</td>
+                        <td class="px-4 py-3 font-bold text-emerald-700 bg-emerald-50">0%</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 font-medium text-gray-900">{% if lang == 'it' %}Vendere creazioni{% else %}Sell handmade goods{% endif %}</td>
+                        <td class="px-4 py-3 text-gray-700">Etsy</td>
+                        <td class="px-4 py-3 text-gray-700">6.5% + listing fee + payment fee</td>
+                        <td class="px-4 py-3 font-bold text-emerald-700 bg-emerald-50">0%</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 font-medium text-gray-900">{% if lang == 'it' %}Affittare una stanza{% else %}Rent a room{% endif %}</td>
+                        <td class="px-4 py-3 text-gray-700">Airbnb</td>
+                        <td class="px-4 py-3 text-gray-700">~14-16% (host + guest)</td>
+                        <td class="px-4 py-3 font-bold text-emerald-700 bg-emerald-50">0%</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 font-medium text-gray-900">{% if lang == 'it' %}Vendere biglietti eventi{% else %}Sell event tickets{% endif %}</td>
+                        <td class="px-4 py-3 text-gray-700">Eventbrite</td>
+                        <td class="px-4 py-3 text-gray-700">3.7% + €1.79 / biglietto</td>
+                        <td class="px-4 py-3 font-bold text-emerald-700 bg-emerald-50">0%</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 font-medium text-gray-900">{% if lang == 'it' %}Servizi (pulizie, montaggio){% else %}Services (cleaning, assembly){% endif %}</td>
+                        <td class="px-4 py-3 text-gray-700">TaskRabbit</td>
+                        <td class="px-4 py-3 text-gray-700">15% + 7.5% trust fee</td>
+                        <td class="px-4 py-3 font-bold text-emerald-700 bg-emerald-50">0%</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 font-medium text-gray-900">{% if lang == 'it' %}Organizzare un meetup{% else %}Organize a meetup{% endif %}</td>
+                        <td class="px-4 py-3 text-gray-700">Meetup</td>
+                        <td class="px-4 py-3 text-gray-700">~$24/mese per organizzatore</td>
+                        <td class="px-4 py-3 font-bold text-emerald-700 bg-emerald-50">0%</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 font-medium text-gray-900">{% if lang == 'it' %}Annunci classificati{% else %}Classified ads{% endif %}</td>
+                        <td class="px-4 py-3 text-gray-700">Craigslist / Subito</td>
+                        <td class="px-4 py-3 text-gray-700">{% if lang == 'it' %}Gratis ma: niente profili, niente protezioni, niente pagamenti{% else %}Free but: no profiles, no protection, no payments{% endif %}</td>
+                        <td class="px-4 py-3 font-bold text-emerald-700 bg-emerald-50">{% if lang == 'it' %}Profili + badge + chat + pagamenti integrati{% else %}Profiles + badges + chat + payments built in{% endif %}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="mt-4 text-xs text-gray-500 text-center max-w-2xl mx-auto">
+            {% if lang == 'it' %}Tariffe estrapolate dalle pagine pubbliche di pricing di ciascuna piattaforma, aprile 2026. Controllare sempre i loro siti per le tariffe attuali.{% else %}Fees taken from each platform's public pricing pages as of April 2026. Always check their sites for current rates.{% endif %}
+        </p>
+
+        <!-- Concrete example -->
+        <div class="mt-10 p-6 sm:p-8 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border-2 border-amber-300">
+            <h3 class="text-lg sm:text-xl font-bold text-gray-900">{% if lang == 'it' %}Esempio concreto{% else %}A concrete example{% endif %}</h3>
+            <p class="mt-3 text-gray-700 leading-relaxed">
+                {% if lang == 'it' %}<strong>Affitti il tuo trapano per 10 EUR/giorno, 4 volte al mese.</strong><br>
+                Su una piattaforma con commissioni del 13%, tu ricevi <span class="line-through text-gray-400">€40</span> &rarr; <strong>€34.80</strong>. <br>
+                Su La Piazza ricevi <strong class="text-emerald-700 text-xl">€40</strong>. Per intero. Sempre.{% else %}<strong>You rent your drill for €10/day, 4 times a month.</strong><br>
+                On a platform that takes 13%, you get <span class="line-through text-gray-400">€40</span> &rarr; <strong>€34.80</strong>.<br>
+                On La Piazza you get <strong class="text-emerald-700 text-xl">€40</strong>. The full amount. Every time.{% endif %}
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- How We Stay Free -->
+<section class="bg-white py-14 sm:py-16">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-4">
+            {% if lang == 'it' %}Allora come restate gratis?{% else %}So how do you stay free?{% endif %}
+        </h2>
+        <p class="text-center text-gray-600 max-w-2xl mx-auto mb-10">
+            {% if lang == 'it' %}Domanda giusta. Risposta onesta.{% else %}Fair question. Honest answer.{% endif %}
+        </p>
+
+        <div class="space-y-5">
+            <div class="flex gap-4 p-5 bg-stone-50 rounded-xl border border-stone-200">
+                <div class="flex-shrink-0 w-10 h-10 bg-stone-200 rounded-full flex items-center justify-center text-stone-700 font-bold">1</div>
+                <div>
+                    <h3 class="font-bold text-gray-900">{% if lang == 'it' %}Niente investitori, niente VC{% else %}No investors, no VC{% endif %}</h3>
+                    <p class="text-sm text-gray-600 mt-1.5 leading-relaxed">
+                        {% if lang == 'it' %}Niente capitale di rischio significa niente pressione di crescita a tutti i costi. La Piazza è sostenibile a 100 utenti come a 100.000.{% else %}No venture capital means no growth-at-all-costs pressure. La Piazza is sustainable at 100 users or 100,000.{% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-4 p-5 bg-stone-50 rounded-xl border border-stone-200">
+                <div class="flex-shrink-0 w-10 h-10 bg-stone-200 rounded-full flex items-center justify-center text-stone-700 font-bold">2</div>
+                <div>
+                    <h3 class="font-bold text-gray-900">{% if lang == 'it' %}Costi minimi, perché self-hosted{% else %}Minimal costs, because self-hosted{% endif %}</h3>
+                    <p class="text-sm text-gray-600 mt-1.5 leading-relaxed">
+                        {% if lang == 'it' %}Server proprio (~30 EUR/mese), database proprio, codice open. Niente AWS Lambda a chiamata, niente abbonamenti SaaS infiniti. Sviluppato in proprio.{% else %}Own server (~€30/month), own database, open code. No per-call AWS Lambda, no endless SaaS subscriptions. Built in-house.{% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-4 p-5 bg-stone-50 rounded-xl border border-stone-200">
+                <div class="flex-shrink-0 w-10 h-10 bg-stone-200 rounded-full flex items-center justify-center text-stone-700 font-bold">3</div>
+                <div>
+                    <h3 class="font-bold text-gray-900">{% if lang == 'it' %}Le bottega Pro (in arrivo){% else %}Pro Bottegas (coming soon){% endif %}</h3>
+                    <p class="text-sm text-gray-600 mt-1.5 leading-relaxed">
+                        {% if lang == 'it' %}Per chi gestisce un'attività commerciale, una versione Pro opzionale (~5 EUR/mese) con analytics avanzate, prenotazioni programmate, branding personalizzato. Le bottega normali restano gratis per sempre.{% else %}For people running an actual business, an optional Pro tier (~€5/month) with advanced analytics, scheduled bookings, custom branding. Regular bottegas stay free forever.{% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-4 p-5 bg-stone-50 rounded-xl border border-stone-200">
+                <div class="flex-shrink-0 w-10 h-10 bg-stone-200 rounded-full flex items-center justify-center text-stone-700 font-bold">4</div>
+                <div>
+                    <h3 class="font-bold text-gray-900">{% if lang == 'it' %}Sponsorship locali, mai pubblicità{% else %}Local sponsorships, never ads{% endif %}</h3>
+                    <p class="text-sm text-gray-600 mt-1.5 leading-relaxed">
+                        {% if lang == 'it' %}Eventi sponsorizzati da bar, panifici, vivai locali -- contributi trasparenti, mai banner. Niente Google Ads. Niente Facebook tracking. Niente vendita di dati.{% else %}Events sponsored by local bars, bakeries, garden centers -- transparent contributions, never banner ads. No Google Ads. No Facebook tracking. No data sales.{% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-10 p-6 bg-gradient-to-br from-indigo-50 to-violet-50 rounded-2xl border border-indigo-200 text-center">
+            <p class="text-gray-700 italic leading-relaxed">
+                {% if lang == 'it' %}"Mio padre piantava giardini con la pala a mano per 60 anni. Non gli serviva un'app per farlo. La Piazza è costruita con la stessa filosofia: solido, sostenibile, fatto bene la prima volta."{% else %}"My father planted gardens with a hand shovel for 60 years. He didn't need an app to do it. La Piazza is built with the same philosophy: solid, sustainable, done right the first time."{% endif %}
+            </p>
+            <p class="mt-3 text-sm font-semibold text-indigo-700">
+                {% if lang == 'it' %}-- Angel, fondatore{% else %}-- Angel, founder{% endif %}
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- CTAs -->
+<section class="bg-gradient-to-br from-slate-900 via-indigo-900 to-violet-900 text-white py-14 sm:py-16">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
+            {% if lang == 'it' %}Convinto?{% else %}Convinced?{% endif %}
+        </h2>
+        <p class="text-lg text-indigo-100 mb-8 max-w-xl mx-auto">
+            {% if lang == 'it' %}Inizia da quello che ti suona meglio. Niente carta di credito, niente trucchi.{% else %}Start with whatever sounds best. No credit card, no tricks.{% endif %}
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="/browse" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-indigo-900 font-bold rounded-lg hover:bg-indigo-50 transition-colors min-h-[48px]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M10 18a8 8 0 110-16 8 8 0 010 16z"/></svg>
+                {% if lang == 'it' %}Esplora oggetti{% else %}Browse items{% endif %}
+            </a>
+            <a href="{% if user %}/profile{% else %}/login{% endif %}" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600 transition-colors min-h-[48px]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21"/></svg>
+                {% if lang == 'it' %}Apri una bottega{% else %}Open a bottega{% endif %}
+            </a>
+        </div>
+        <p class="mt-6 text-sm text-indigo-300">
+            {% if lang == 'it' %}Domande? Scrivi in <a href="/helpboard" class="underline hover:text-white">bacheca aiuto</a>.{% else %}Questions? Post on the <a href="/helpboard" class="underline hover:text-white">help board</a>.{% endif %}
+        </p>
+    </div>
+</section>
+{% endblock %}

@@ -78,6 +78,41 @@ async def home(request: Request,
     from src.services.activity_feed import get_activity_feed
     activity = await get_activity_feed(db, limit=8)
 
+    # Upcoming events (next 3) for the home page strip
+    from datetime import datetime, timezone
+    from src.models.event_rsvp import BHEventRSVP, RSVPStatus
+    now_utc = datetime.now(timezone.utc)
+    upcoming_result = await db.execute(
+        select(BHListing)
+        .options(
+            selectinload(BHListing.item).selectinload(BHItem.media),
+            selectinload(BHListing.item).selectinload(BHItem.owner),
+        )
+        .where(
+            BHListing.listing_type == ListingType.EVENT,
+            BHListing.status == ListingStatus.ACTIVE,
+            BHListing.event_start.isnot(None),
+            BHListing.event_start >= now_utc,
+        )
+        .order_by(BHListing.event_start.asc())
+        .limit(3)
+    )
+    upcoming_events = list(upcoming_result.scalars().unique().all())
+
+    # RSVP counts for the upcoming events
+    upcoming_rsvp_counts: dict = {}
+    if upcoming_events:
+        upcoming_ids = [l.id for l in upcoming_events]
+        rsvp_result = await db.execute(
+            select(BHEventRSVP.listing_id, func.count(BHEventRSVP.id))
+            .where(
+                BHEventRSVP.listing_id.in_(upcoming_ids),
+                BHEventRSVP.status == RSVPStatus.REGISTERED,
+            )
+            .group_by(BHEventRSVP.listing_id)
+        )
+        upcoming_rsvp_counts = dict(rsvp_result.all())
+
     ctx = _ctx(request, token,
         listing_count=listing_count or 0,
         user_count=user_count or 0,
@@ -88,6 +123,8 @@ async def home(request: Request,
         user_item_count=user_item_count,
         user_skill_count=user_skill_count,
         activity=activity,
+        upcoming_events=upcoming_events,
+        upcoming_rsvp_counts=upcoming_rsvp_counts,
     )
     return _render("pages/home.html", ctx)
 

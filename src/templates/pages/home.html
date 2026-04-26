@@ -47,6 +47,156 @@
     </div>
 </section>
 
+<!-- What you can do on La Piazza -- newbie surface menu -->
+<section class="bg-white py-12 sm:py-16 border-b border-gray-100">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-8 sm:mb-10">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
+                {% if lang == 'it' %}Cosa puoi fare in piazza{% else %}What you can do on La Piazza{% endif %}
+            </h2>
+            <p class="mt-3 text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+                {% if lang == 'it' %}Sei superfici, una sola community. Esplora ognuna -- non costa nulla.{% else %}Six surfaces, one community. Explore each -- it's all free to look.{% endif %}
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+            <!-- 1. Borrow & Lend -->
+            <a href="/browse" class="group bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-5 hover:shadow-md hover:border-blue-400 transition-all">
+                <div class="flex items-start gap-3">
+                    <div class="w-11 h-11 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+                        <svg class="w-6 h-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-lg font-bold text-gray-900 group-hover:text-blue-700 transition-colors">{% if lang == 'it' %}Prendi & Presta{% else %}Borrow & Lend{% endif %}</h3>
+                        <p class="text-sm text-gray-600 mt-1 leading-snug">{% if lang == 'it' %}Trapani, libri, attrezzi, abbigliamento -- dai vicini più vicini.{% else %}Drills, books, tools, clothes -- from the neighbors closest to you.{% endif %}</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 2. Hire a Maker -->
+            <a href="/members" class="group bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border border-emerald-200 p-5 hover:shadow-md hover:border-emerald-400 transition-all">
+                <div class="flex items-start gap-3">
+                    <div class="w-11 h-11 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-200 transition-colors">
+                        <svg class="w-6 h-6 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-lg font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">{% if lang == 'it' %}Trova un Maker{% else %}Hire a Maker{% endif %}</h3>
+                        <p class="text-sm text-gray-600 mt-1 leading-snug">{% if lang == 'it' %}Riparazioni, lezioni, ordini su misura, consegne -- artigiani vicini.{% else %}Repairs, lessons, custom orders, delivery -- artisans next door.{% endif %}</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 3. Events & Workshops -->
+            <a href="/calendar" class="group bg-gradient-to-br from-rose-50 to-pink-50 rounded-xl border border-rose-200 p-5 hover:shadow-md hover:border-rose-400 transition-all">
+                <div class="flex items-start gap-3">
+                    <div class="w-11 h-11 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-rose-200 transition-colors">
+                        <svg class="w-6 h-6 text-rose-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-lg font-bold text-gray-900 group-hover:text-rose-700 transition-colors">{% if lang == 'it' %}Eventi & Workshop{% else %}Events & Workshops{% endif %}</h3>
+                        <p class="text-sm text-gray-600 mt-1 leading-snug">{% if lang == 'it' %}Pulizia spiagge sabato, corso di pasta madre, scambio lingue.{% else %}Beach cleanup Saturday, sourdough class, language exchange.{% endif %}</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 4. Live Raffles -->
+            <a href="/raffles" class="group bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-200 p-5 hover:shadow-md hover:border-amber-400 transition-all">
+                <div class="flex items-start gap-3">
+                    <div class="w-11 h-11 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-amber-200 transition-colors">
+                        <svg class="w-6 h-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-lg font-bold text-gray-900 group-hover:text-amber-700 transition-colors">{% if lang == 'it' %}Sorteggi Live{% else %}Live Raffles{% endif %}</h3>
+                        <p class="text-sm text-gray-600 mt-1 leading-snug">{% if lang == 'it' %}Vinci qualcosa per pochi euro. Tutto resta nella community.{% else %}Win something for a few euros. Every cent stays in the community.{% endif %}</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 5. Help Board -->
+            <a href="/helpboard" class="group bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl border border-purple-200 p-5 hover:shadow-md hover:border-purple-400 transition-all">
+                <div class="flex items-start gap-3">
+                    <div class="w-11 h-11 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-purple-200 transition-colors">
+                        <svg class="w-6 h-6 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-lg font-bold text-gray-900 group-hover:text-purple-700 transition-colors">{% if lang == 'it' %}Bacheca Aiuto{% else %}Help Board{% endif %}</h3>
+                        <p class="text-sm text-gray-600 mt-1 leading-snug">{% if lang == 'it' %}Chiedi al quartiere -- risposte di solito entro un'ora.{% else %}Ask the neighborhood -- answers usually within the hour.{% endif %}</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 6. Open a Bottega -->
+            <a href="{% if user %}/profile{% else %}/login{% endif %}" class="group bg-gradient-to-br from-stone-50 to-amber-50 rounded-xl border border-stone-300 p-5 hover:shadow-md hover:border-stone-500 transition-all">
+                <div class="flex items-start gap-3">
+                    <div class="w-11 h-11 bg-stone-200 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-stone-300 transition-colors">
+                        <svg class="w-6 h-6 text-stone-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-lg font-bold text-gray-900 group-hover:text-stone-800 transition-colors">{% if lang == 'it' %}Apri una Bottega{% else %}Open a Bottega{% endif %}</h3>
+                        <p class="text-sm text-gray-600 mt-1 leading-snug">{% if lang == 'it' %}Pagina pubblica per il tuo lavoro -- mestiere, servizi, storia.{% else %}Public page for your craft -- trade, services, story.{% endif %}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Why La Piazza -- 4 trust pillars + link to detailed comparison -->
+<section class="bg-gradient-to-br from-slate-900 via-indigo-900 to-violet-900 text-white py-12 sm:py-14">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z"/></svg>
+                {% if lang == 'it' %}Perché La Piazza{% else %}Why La Piazza{% endif %}
+            </div>
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
+                {% if lang == 'it' %}Quattro promesse. Zero asterischi.{% else %}Four promises. Zero asterisks.{% endif %}
+            </h2>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            <!-- 0% fees -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-4 sm:p-5 hover:bg-white/15 transition-colors">
+                <div class="text-3xl sm:text-4xl font-extrabold text-amber-300 mb-1">0%</div>
+                <h3 class="text-sm sm:text-base font-bold text-white">{% if lang == 'it' %}Zero commissioni{% else %}Zero fees{% endif %}</h3>
+                <p class="text-xs sm:text-sm text-indigo-100 mt-1.5 leading-snug">{% if lang == 'it' %}Non prendiamo niente. Ogni euro resta con il vicino.{% else %}We don't take a cut. Every euro stays with the neighbor.{% endif %}</p>
+            </div>
+
+            <!-- 6 in 1 -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-4 sm:p-5 hover:bg-white/15 transition-colors">
+                <div class="text-3xl sm:text-4xl font-extrabold text-emerald-300 mb-1">6&rarr;1</div>
+                <h3 class="text-sm sm:text-base font-bold text-white">{% if lang == 'it' %}Sei app in una{% else %}Six apps in one{% endif %}</h3>
+                <p class="text-xs sm:text-sm text-indigo-100 mt-1.5 leading-snug">{% if lang == 'it' %}Oggetti, maker, eventi, sorteggi, aiuto, bottega -- tutto qui.{% else %}Items, makers, events, raffles, help, bottega -- one app.{% endif %}</p>
+            </div>
+
+            <!-- Real neighbors -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-4 sm:p-5 hover:bg-white/15 transition-colors">
+                <div class="text-3xl sm:text-4xl font-extrabold text-rose-300 mb-1">
+                    <svg class="w-9 h-9 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+                </div>
+                <h3 class="text-sm sm:text-base font-bold text-white">{% if lang == 'it' %}Vicini veri{% else %}Real neighbors{% endif %}</h3>
+                <p class="text-xs sm:text-sm text-indigo-100 mt-1.5 leading-snug">{% if lang == 'it' %}Profili verificati, badge, recensioni. Niente account anonimi.{% else %}Verified profiles, badges, reviews. No anonymous accounts.{% endif %}</p>
+            </div>
+
+            <!-- Local-first -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-4 sm:p-5 hover:bg-white/15 transition-colors">
+                <div class="text-3xl sm:text-4xl font-extrabold text-cyan-300 mb-1">
+                    <svg class="w-9 h-9 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                </div>
+                <h3 class="text-sm sm:text-base font-bold text-white">{% if lang == 'it' %}Nato in Sicilia{% else %}Local-first{% endif %}</h3>
+                <p class="text-xs sm:text-sm text-indigo-100 mt-1.5 leading-snug">{% if lang == 'it' %}Costruito per Trapani da chi ci vive. Da un camper.{% else %}Built for Trapani by people who live here. From a camper van.{% endif %}</p>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <a href="/why-lapiazza" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-indigo-900 font-semibold rounded-lg hover:bg-indigo-50 transition-colors text-sm">
+                {% if lang == 'it' %}Come restiamo gratis{% else %}How we stay free{% endif %}
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </a>
+        </div>
+    </div>
+</section>
+
 <!-- AI Concierge -- LOUD, not whispered -->
 <section class="relative overflow-hidden bg-gradient-to-br from-violet-600 via-fuchsia-600 to-amber-500 text-white py-14 sm:py-16">
     <!-- decorative glow -->
@@ -458,6 +608,101 @@
         </div>
     </div>
 </section>
+
+<!-- Upcoming Events -- next 3, server-rendered for SEO + speed -->
+{% if upcoming_events %}
+<section class="bg-gradient-to-br from-rose-50 via-pink-50 to-fuchsia-50 py-14 border-b border-rose-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-rose-200 text-rose-900 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                    {% if lang == 'it' %}Prossimi eventi{% else %}Upcoming Events{% endif %}
+                </div>
+                <h2 class="text-3xl font-extrabold text-gray-900">
+                    {% if lang == 'it' %}Cosa succede questa settimana{% else %}What's happening this week{% endif %}
+                </h2>
+                <p class="text-gray-600 mt-2 max-w-lg">
+                    {% if lang == 'it' %}Dai workshop alle pulizie di spiaggia. Iscriviti gratis, conosci nuove persone.{% else %}From workshops to beach cleanups. RSVP free, meet new neighbors.{% endif %}
+                </p>
+            </div>
+            <a href="/calendar" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-rose-500 text-white font-semibold rounded-lg hover:bg-rose-600 transition-colors text-sm">
+                {% if lang == 'it' %}Calendario completo{% else %}Full Calendar{% endif %}
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {% for ev in upcoming_events %}
+            {% set item = ev.item %}
+            {% set rsvp_n = upcoming_rsvp_counts.get(ev.id, 0) %}
+            <a href="/items/{{ item.slug }}" class="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-rose-300 transition-all group flex flex-col">
+                <!-- Image / date overlay -->
+                <div class="relative h-40 overflow-hidden {% if not item.media %}bg-gradient-to-br from-rose-300 to-pink-400{% else %}bg-gray-100{% endif %}">
+                    {% if item.media %}
+                    <img src="{{ item.media[0].url }}" alt="{{ item.media[0].alt_text or item.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                    {% else %}
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <svg class="w-16 h-16 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25"/></svg>
+                    </div>
+                    {% endif %}
+                    <!-- Date badge -->
+                    <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1.5 shadow-lg text-center">
+                        <div class="text-[10px] font-bold uppercase text-rose-600 leading-none">{{ ev.event_start.strftime('%b') }}</div>
+                        <div class="text-xl font-extrabold text-gray-900 leading-none mt-0.5">{{ ev.event_start.strftime('%d') }}</div>
+                    </div>
+                    <!-- Price badge -->
+                    <div class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-lg px-2.5 py-1 shadow-sm">
+                        {% if ev.price and ev.price > 0 %}
+                        <span class="text-base font-extrabold text-gray-900">&euro;{{ "%.0f" | format(ev.price) }}</span>
+                        {% else %}
+                        <span class="text-sm font-bold text-emerald-600">{% if lang == 'it' %}GRATIS{% else %}FREE{% endif %}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <!-- Content -->
+                <div class="p-4 flex-1 flex flex-col">
+                    <h3 class="font-bold text-gray-900 group-hover:text-rose-600 transition-colors line-clamp-2 leading-snug">{{ item.name }}</h3>
+                    <div class="mt-2 flex items-center gap-2 text-xs text-gray-500">
+                        <svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>{{ ev.event_start.strftime('%a %H:%M') }}</span>
+                        {% if ev.event_address %}
+                        <span class="text-gray-300">&middot;</span>
+                        <span class="truncate">{{ ev.event_address }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                        {% if item.owner %}
+                        <div class="flex items-center gap-2 min-w-0">
+                            {% if item.owner.avatar_url %}
+                            <img src="{{ item.owner.avatar_url }}" alt="{{ item.owner.display_name }}" class="w-6 h-6 rounded-full object-cover flex-shrink-0">
+                            {% else %}
+                            <div class="w-6 h-6 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center text-xs font-bold flex-shrink-0">{{ item.owner.display_name[:1] | upper }}</div>
+                            {% endif %}
+                            <span class="text-xs text-gray-600 truncate">{{ item.owner.display_name }}</span>
+                        </div>
+                        {% endif %}
+                        {% if rsvp_n > 0 %}
+                        <span class="text-xs font-semibold text-rose-700 inline-flex items-center gap-1 flex-shrink-0">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+                            {{ rsvp_n }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <div class="mt-6 text-center sm:hidden">
+            <a href="/calendar" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-rose-500 text-white font-semibold rounded-lg hover:bg-rose-600 transition-colors">
+                {% if lang == 'it' %}Calendario completo{% else %}Full Calendar{% endif %}
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
 
 <!-- Live Raffles — community fundraising -->
 <section class="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 py-14 border-b border-amber-200" x-data="{ raffles: [], loaded: false }" x-init="

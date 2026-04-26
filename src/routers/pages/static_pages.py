@@ -91,6 +91,15 @@ async def legal_notice(request: Request,
 
 
 
+@router.get("/why-lapiazza", response_class=HTMLResponse)
+async def why_lapiazza(request: Request,
+                       token: Optional[dict] = Depends(get_current_user_token)):
+    """Why La Piazza: the honest case for a fee-free neighborhood marketplace."""
+    ctx = _ctx(request, token)
+    return _render("pages/why_lapiazza.html", ctx)
+
+
+
 @router.get("/googled3f2ccce2b1f34d3.html", response_class=Response)
 async def google_verification():
     """Google Search Console verification file."""
@@ -125,6 +134,7 @@ async def sitemap_xml(db: AsyncSession = Depends(get_db)):
     urls.append(("https://lapiazza.app/browse", "daily", "0.9"))
     urls.append(("https://lapiazza.app/members", "daily", "0.8"))
     urls.append(("https://lapiazza.app/helpboard", "daily", "0.7"))
+    urls.append(("https://lapiazza.app/why-lapiazza", "monthly", "0.7"))
     urls.append(("https://lapiazza.app/terms", "monthly", "0.3"))
 
     # Items
