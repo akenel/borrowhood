@@ -708,6 +708,23 @@
                     .catch(() => { attributeSchema = {}; });
             "></template>
 
+            <!-- BL-128: Align listing type to item_type when user changes the dropdown directly -->
+            <!-- Only kicks in when selectedTypes still holds a default ('rent' or 'sell') and item_type implies something else -->
+            <template x-effect="
+                if (editMode) return;
+                const implied = {
+                    service: 'service',
+                    space: 'rent',
+                    digital: 'sell',
+                    made_to_order: 'commission',
+                }[form.item_type];
+                if (implied && selectedTypes.length === 1 && (selectedTypes[0] === 'rent' || selectedTypes[0] === 'sell')) {
+                    if (selectedTypes[0] !== implied) {
+                        selectedTypes = [implied];
+                    }
+                }
+            "></template>
+
             <!-- AI Generate Button -->
             <div>
                 <button @click="aiSuggest()" :disabled="!form.name.trim() || aiGenerating"
@@ -1146,7 +1163,17 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-3">{{ t('i18n.what_do_you_want_to_do') }} *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('i18n.what_do_you_want_to_do') }} *</label>
+                <!-- BL-128: explain the two-level model so newbies see why pricing was hidden -->
+                <p class="text-xs text-gray-500 mb-3">
+                    {% if lang == 'it' %}Scegli almeno un'opzione -- i campi di prezzo appaiono qui sotto.{% else %}Pick at least one option -- pricing fields appear below for each pick.{% endif %}
+                    <span x-show="form.item_type === 'service'" class="inline-block ml-1 text-indigo-600 font-medium">
+                        {% if lang == 'it' %}(Per i servizi: scegli "Servizio" o "Insegna".){% else %}(For services: pick "Service" or "Teach".){% endif %}
+                    </span>
+                    <span x-show="form.item_type === 'space'" class="inline-block ml-1 text-indigo-600 font-medium">
+                        {% if lang == 'it' %}(Per gli spazi: di solito "Affitta".){% else %}(For spaces: usually "Rent".){% endif %}
+                    </span>
+                </p>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <!-- Sell -->
                     <button type="button" @click="selectedTypes = ['sell']"
