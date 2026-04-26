@@ -704,6 +704,84 @@
 </section>
 {% endif %}
 
+<!-- Seasonal Pulse (BL-115) -- categories that match the month -->
+{% if seasonal_items and seasonal_hint %}
+{% set _accent_styles = {
+    'indigo':  {'badge_bg': 'bg-indigo-100',  'badge_text': 'text-indigo-900',  'border': 'border-indigo-200',  'hover_border': 'hover:border-indigo-300',  'section_bg': 'from-indigo-50 to-violet-50'},
+    'purple':  {'badge_bg': 'bg-purple-100',  'badge_text': 'text-purple-900',  'border': 'border-purple-200',  'hover_border': 'hover:border-purple-300',  'section_bg': 'from-purple-50 to-fuchsia-50'},
+    'emerald': {'badge_bg': 'bg-emerald-100', 'badge_text': 'text-emerald-900', 'border': 'border-emerald-200', 'hover_border': 'hover:border-emerald-300', 'section_bg': 'from-emerald-50 to-teal-50'},
+    'amber':   {'badge_bg': 'bg-amber-100',   'badge_text': 'text-amber-900',   'border': 'border-amber-200',   'hover_border': 'hover:border-amber-300',   'section_bg': 'from-amber-50 to-yellow-50'},
+    'cyan':    {'badge_bg': 'bg-cyan-100',    'badge_text': 'text-cyan-900',    'border': 'border-cyan-200',    'hover_border': 'hover:border-cyan-300',    'section_bg': 'from-cyan-50 to-sky-50'},
+    'blue':    {'badge_bg': 'bg-blue-100',    'badge_text': 'text-blue-900',    'border': 'border-blue-200',    'hover_border': 'hover:border-blue-300',    'section_bg': 'from-blue-50 to-indigo-50'},
+    'rose':    {'badge_bg': 'bg-rose-100',    'badge_text': 'text-rose-900',    'border': 'border-rose-200',    'hover_border': 'hover:border-rose-300',    'section_bg': 'from-rose-50 to-pink-50'},
+    'stone':   {'badge_bg': 'bg-stone-200',   'badge_text': 'text-stone-900',   'border': 'border-stone-300',   'hover_border': 'hover:border-stone-400',   'section_bg': 'from-stone-50 to-amber-50'},
+} %}
+{% set _s = _accent_styles.get(seasonal_hint.accent, _accent_styles['indigo']) %}
+<section class="bg-gradient-to-br {{ _s.section_bg }} py-14 border-b {{ _s.border }}">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 {{ _s.badge_bg }} {{ _s.badge_text }} rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-current opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-current"></span>
+                    </span>
+                    {% if lang == 'it' %}Di stagione{% else %}In season now{% endif %}
+                </div>
+                <h2 class="text-3xl font-extrabold text-gray-900">
+                    {% if lang == 'it' %}{{ seasonal_hint.theme_it }}{% else %}{{ seasonal_hint.theme_en }}{% endif %}
+                </h2>
+                <p class="text-gray-600 mt-2 max-w-2xl">
+                    {% if lang == 'it' %}{{ seasonal_hint.subtitle_it }}{% else %}{{ seasonal_hint.subtitle_en }}{% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+            {% for item in seasonal_items %}
+            {% set active_listing = item.listings | selectattr('status.value', 'equalto', 'active') | first if item.listings else none %}
+            <a href="/items/{{ item.slug }}" class="bg-white rounded-2xl border {{ _s.border }} overflow-hidden hover:shadow-lg {{ _s.hover_border }} transition-all group flex flex-col">
+                <!-- Image -->
+                <div class="relative h-32 sm:h-40 overflow-hidden bg-gray-100">
+                    {% if item.media %}
+                    <img src="{{ item.media[0].url }}" alt="{{ item.media[0].alt_text or item.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                    {% else %}
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5z"/></svg>
+                    </div>
+                    {% endif %}
+                    <!-- Price badge -->
+                    {% if active_listing and active_listing.price and active_listing.price > 0 %}
+                    <div class="absolute bottom-2 right-2 bg-white/95 backdrop-blur-sm rounded-lg px-2 py-0.5 shadow-sm">
+                        <span class="text-sm font-extrabold text-gray-900">&euro;{{ "%.0f" | format(active_listing.price) }}</span>
+                    </div>
+                    {% elif active_listing and active_listing.listing_type.value in ('giveaway', 'offer') %}
+                    <div class="absolute bottom-2 right-2 bg-emerald-500/95 backdrop-blur-sm rounded-lg px-2 py-0.5 shadow-sm">
+                        <span class="text-xs font-bold text-white">{% if lang == 'it' %}GRATIS{% else %}FREE{% endif %}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <!-- Content -->
+                <div class="p-3 flex-1 flex flex-col">
+                    <h3 class="text-sm font-bold text-gray-900 line-clamp-2 leading-snug">{{ item.name }}</h3>
+                    {% if item.owner %}
+                    <div class="mt-2 flex items-center gap-1.5 text-xs text-gray-500">
+                        {% if item.owner.avatar_url %}
+                        <img src="{{ item.owner.avatar_url }}" class="w-5 h-5 rounded-full object-cover flex-shrink-0">
+                        {% else %}
+                        <div class="w-5 h-5 rounded-full {{ _s.badge_bg }} {{ _s.badge_text }} flex items-center justify-center text-[10px] font-bold flex-shrink-0">{{ item.owner.display_name[:1] | upper }}</div>
+                        {% endif %}
+                        <span class="truncate">{{ item.owner.display_name }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
 <!-- Live Raffles — community fundraising -->
 <section class="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 py-14 border-b border-amber-200" x-data="{ raffles: [], loaded: false }" x-init="
     fetch('/api/v1/raffles?status=active&limit=3').then(r=>r.ok?r.json():[]).then(d=>{raffles=d;loaded=true}).catch(()=>{loaded=true})

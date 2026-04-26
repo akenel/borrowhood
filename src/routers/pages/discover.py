@@ -113,6 +113,25 @@ async def home(request: Request,
         )
         upcoming_rsvp_counts = dict(rsvp_result.all())
 
+    # BL-115: seasonal pulse -- surface listings whose category is in season
+    from src.services.seasonal import get_current_seasonal_hint
+    seasonal_hint = get_current_seasonal_hint(now_utc)
+    seasonal_result = await db.execute(
+        select(BHItem)
+        .options(
+            selectinload(BHItem.media),
+            selectinload(BHItem.owner),
+            selectinload(BHItem.listings),
+        )
+        .join(BHListing, BHItem.id == BHListing.item_id)
+        .where(BHListing.status == ListingStatus.ACTIVE)
+        .where(BHItem.deleted_at.is_(None))
+        .where(BHItem.category.in_(seasonal_hint["categories"]))
+        .order_by(func.random())
+        .limit(6)
+    )
+    seasonal_items = list(seasonal_result.scalars().unique().all())
+
     ctx = _ctx(request, token,
         listing_count=listing_count or 0,
         user_count=user_count or 0,
@@ -125,6 +144,8 @@ async def home(request: Request,
         activity=activity,
         upcoming_events=upcoming_events,
         upcoming_rsvp_counts=upcoming_rsvp_counts,
+        seasonal_items=seasonal_items,
+        seasonal_hint=seasonal_hint,
     )
     return _render("pages/home.html", ctx)
 
