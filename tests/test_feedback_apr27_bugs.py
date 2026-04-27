@@ -146,9 +146,11 @@ class TestRaffleOgTags:
     shares already do this; raffles were the regression."""
 
     def test_raffle_route_passes_og_title(self):
-        assert "og_title=f\"{raffle.title} - La Piazza Raffle\"" in COMMUNITY_PY, (
-            "Raffle detail route must pass og_title built from the raffle's "
-            "own title (was inheriting the generic site title)"
+        # raffle_title is derived from item.name (BHRaffle has no title col)
+        assert "og_title=f\"{raffle_title} - La Piazza Raffle\"" in COMMUNITY_PY, (
+            "Raffle detail route must pass og_title built from raffle_title "
+            "(which the route derives from item.name, since BHRaffle has no "
+            "title field of its own)"
         )
 
     def test_raffle_route_passes_og_description(self):

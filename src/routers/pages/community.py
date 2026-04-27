@@ -143,24 +143,31 @@ async def raffle_detail_page(raffle_id: str, request: Request,
         )
         user_had_ticket = (count or 0) > 0
 
-    # BL-165: rich OG tags so raffle shares get an image + price preview
+    # BL-165: rich OG tags so raffle shares get an image + price preview.
+    # BHRaffle has no own `title` -- the title is the underlying item.name.
     raffle_image = None
-    if raffle.listing and raffle.listing.item and raffle.listing.item.media:
-        raffle_image = _abs_url(raffle.listing.item.media[0].url)
+    raffle_title = "Raffle"
+    raffle_description = None
+    if raffle.listing and raffle.listing.item:
+        item = raffle.listing.item
+        raffle_title = item.name or raffle_title
+        raffle_description = item.description
+        if item.media:
+            raffle_image = _abs_url(item.media[0].url)
     organizer_name = raffle.organizer.display_name if raffle.organizer else "the community"
     ticket_price = float(raffle.ticket_price) if raffle.ticket_price else 0
     og_desc_parts = []
     if ticket_price > 0:
         og_desc_parts.append(f"EUR {ticket_price:.2f} per ticket")
     og_desc_parts.append(f"by {organizer_name}")
-    if raffle.listing and raffle.listing.item and raffle.listing.item.description:
-        og_desc_parts.append(raffle.listing.item.description[:140].strip())
+    if raffle_description:
+        og_desc_parts.append(raffle_description[:140].strip())
 
     ctx = _ctx(request, token,
         raffle=raffle,
         user_had_ticket=user_had_ticket,
         og_type="product",
-        og_title=f"{raffle.title} - La Piazza Raffle",
+        og_title=f"{raffle_title} - La Piazza Raffle",
         og_description=" - ".join(og_desc_parts),
         og_image=raffle_image,  # falls back to og-default.png in base.html when None
     )
