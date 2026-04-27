@@ -43,6 +43,21 @@
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
+    {% if is_owner and not active_listing %}
+    <!-- BL-170: owner-only draft banner (this page is 404 for non-owners) -->
+    <div class="mb-6 p-4 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg flex items-start gap-3">
+        <svg class="w-6 h-6 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        <div class="flex-1">
+            <p class="font-bold text-amber-900">{% if lang == 'it' %}Bozza -- non ancora pubblicato{% else %}Draft -- not yet published{% endif %}</p>
+            <p class="text-sm text-amber-800 mt-1">{% if lang == 'it' %}Solo tu vedi questa pagina. Aggiungi prezzo e dettagli per pubblicare e renderla visibile a tutti.{% else %}Only you can see this page. Add a price and publish to make it visible to everyone.{% endif %}</p>
+            <a href="/items/{{ item.slug }}/edit" class="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-amber-700 hover:text-amber-900">
+                {% if lang == 'it' %}Modifica e pubblica{% else %}Edit and publish{% endif %}
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Breadcrumb (Rule 36) -- contextual: Home / Category / Owner / Item -->
     <nav class="text-sm text-gray-500 mb-6 flex flex-wrap items-center gap-y-1">
         <a href="/" class="hover:text-indigo-600">{{ t('nav.home') }}</a>

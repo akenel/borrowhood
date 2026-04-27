@@ -252,6 +252,26 @@ class TestBhShareCarriesDescriptionText:
             "stripped the description)"
         )
 
+    def test_item_route_hides_draft_from_non_owners(self):
+        """BL-170: Giulia saved a listing as draft; the public /items/{slug}
+        URL was still accessible and rendered with no price block, looking
+        broken. Owners must still see + edit their drafts (with a banner);
+        everyone else must get 404."""
+        item_py = (REPO_ROOT / "src" / "routers" / "pages" / "item.py").read_text()
+        # The route must check has_active_listing AND not is_owner before 404
+        assert "has_active_listing" in item_py and "not is_owner" in item_py, (
+            "item_detail route must 404 when no active listing AND viewer is "
+            "not the owner -- otherwise DRAFT items leak to the public with "
+            "a broken-looking page"
+        )
+
+    def test_item_detail_shows_draft_banner_for_owner(self):
+        item_html = (REPO_ROOT / "src" / "templates" / "pages" / "item_detail.html").read_text()
+        assert "BL-170" in item_html and "is_owner and not active_listing" in item_html, (
+            "item_detail must show a 'Draft -- not yet published' banner for "
+            "owners viewing their own non-published items"
+        )
+
     def test_first_photo_url_skips_videos(self):
         """BL-168 lesson: Giulia's counselling listing's first media was an
         mp4. The OG image was a video URL, which platforms can't preview.

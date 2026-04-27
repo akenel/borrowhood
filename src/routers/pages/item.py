@@ -73,6 +73,18 @@ async def item_detail(slug: str, request: Request,
     # Compute ownership server-side so keycloak_id never reaches the template
     is_owner = bool(token and item.owner and item.owner.keycloak_id == token.get("sub", ""))
 
+    # BL-170: DRAFT listings (and items with no active listings) must NOT be
+    # publicly viewable -- Giulia hit this on her counselling listing: page
+    # rendered with no price/booking and looked broken. Owners still see
+    # their drafts so they can edit + publish.
+    has_active_listing = any(
+        l.status == ListingStatus.ACTIVE and not l.deleted_at
+        for l in (item.listings or [])
+    )
+    if not has_active_listing and not is_owner:
+        ctx = _ctx(request, token)
+        return _render("errors/404.html", ctx, status_code=404)
+
     # Similar items: same category, different item, limit 4
     # Load listings + owner so the card can render type badge, price, owner avatar
     similar_result = await db.execute(
