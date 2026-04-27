@@ -487,9 +487,13 @@
                             nUnread: 0,
                             notifOpen: false,
                             notifItems: [],
+                            pollTimer: null,
+                            authLost: false,
                             async loadSummary() {
+                                if (this.authLost) return;
                                 try {
                                     const r = await fetch('/api/v1/notifications/summary');
+                                    if (r.status === 401) { this.authLost = true; if (this.pollTimer) clearInterval(this.pollTimer); return; }
                                     if (r.ok) { const d = await r.json(); this.nUnread = d.unread; }
                                 } catch(e) {}
                                 try {
@@ -499,10 +503,17 @@
                             },
                             async openNotifs() {
                                 this.notifOpen = true;
+                                // BL-171: refresh count when opening so any backgrounded reads catch up
+                                this.loadSummary();
                                 try {
                                     const r = await fetch('/api/v1/notifications?limit=10');
                                     if (r.ok) this.notifItems = await r.json();
                                 } catch(e) {}
+                            },
+                            async closeNotifs() {
+                                this.notifOpen = false;
+                                // BL-171: re-fetch on close so the badge matches whatever was read in-drawer
+                                this.loadSummary();
                             },
                             async markRead(n) {
                                 if (n.read) return;
@@ -512,9 +523,15 @@
                                 try { fetch('/api/v1/notifications/' + n.id + '/read', { method: 'PATCH', keepalive: true }); } catch(e) {}
                                 n.read = true;
                                 this.nUnread = Math.max(0, this.nUnread - 1);
+                            },
+                            async markAllRead() {
+                                // BL-171: matches desktop behavior. Optimistic local update + server PATCH.
+                                this.notifItems.forEach(n => n.read = true);
+                                this.nUnread = 0;
+                                try { await fetch('/api/v1/notifications/read-all', { method: 'POST' }); } catch(e) {}
                             }
                          }"
-                         x-init="loadSummary()">
+                         x-init="loadSummary(); pollTimer = setInterval(() => loadSummary(), 30000)">
                         <a href="/messages" class="relative min-h-[52px] min-w-[48px] flex items-center justify-center text-gray-500">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
@@ -534,18 +551,22 @@
                         <!-- Mobile notifications drawer -->
                         <div x-show="notifOpen" x-cloak
                              x-transition.opacity
-                             @click.self="notifOpen = false"
+                             @click.self="closeNotifs()"
                              class="fixed inset-0 z-50 bg-black/40 flex items-start justify-center pt-16 px-4">
                             <div class="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden"
                                  @click.stop>
-                                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-rose-500 to-amber-500 text-white">
+                                <div class="flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-rose-500 to-amber-500 text-white">
                                     <span class="font-semibold">{{ t('nav.notifications') }}</span>
-                                    <button @click="notifOpen = false" class="text-white/90 hover:text-white text-xl leading-none" aria-label="Close">&times;</button>
+                                    <div class="flex items-center gap-3">
+                                        <!-- BL-171: parity with desktop drawer's Mark all as read -->
+                                        <button @click="markAllRead()" x-show="nUnread > 0" class="text-xs font-semibold text-white/95 hover:text-white underline underline-offset-2">{{ t('nav.mark_all_read') }}</button>
+                                        <button @click="closeNotifs()" class="text-white/90 hover:text-white text-xl leading-none" aria-label="Close">&times;</button>
+                                    </div>
                                 </div>
                                 <div class="max-h-[65vh] overflow-y-auto">
                                     <template x-for="n in notifItems" :key="n.id">
                                         <a :href="n.link || '#'"
-                                           @click="markRead(n); notifOpen = false"
+                                           @click="markRead(n); closeNotifs()"
                                            class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-50"
                                            :class="!n.read ? 'bg-indigo-50/50' : ''">
                                             <p class="text-sm text-gray-900" :class="!n.read ? 'font-semibold' : ''" x-text="n.title"></p>

@@ -76,6 +76,62 @@ class TestNotifPatchKeepalive:
         )
 
 
+# ---- BL-171: mobile notification drawer needs Mark-all + poll + close-refresh ----
+
+class TestMobileNotificationDrawerParity:
+    """The mobile drawer was missing three things the desktop drawer had:
+    a Mark-all-as-read button, a periodic poll, and a re-fetch-on-close.
+    Without them, badge counts felt stale even after the user 'read' a
+    notification (Angel's report April 27 morning shift).
+    """
+
+    def test_mobile_has_mark_all_read_function(self):
+        # The Alpine x-data must declare a markAllRead() method
+        idx = BASE_HTML.find("Mobile: notification + messages")
+        assert idx > 0
+        block = BASE_HTML[idx:idx + 3500]
+        assert "async markAllRead()" in block, (
+            "Mobile drawer must define markAllRead() so users can clear "
+            "the badge without tapping each notification individually"
+        )
+
+    def test_mobile_has_mark_all_button_in_drawer_header(self):
+        idx = BASE_HTML.find("Mobile notifications drawer")
+        block = BASE_HTML[idx:idx + 2500]
+        # Button must call markAllRead() and only show when there are unread
+        assert '@click="markAllRead()"' in block, (
+            "Mobile drawer header must include a Mark-all-as-read button"
+        )
+        assert 'x-show="nUnread > 0"' in block, (
+            "Mark-all button must be hidden when nothing is unread"
+        )
+
+    def test_mobile_polls_for_summary_updates(self):
+        idx = BASE_HTML.find("Mobile: notification + messages")
+        block = BASE_HTML[idx:idx + 3500]
+        # Must set up a 30-second poll like the desktop drawer
+        assert "setInterval(() => loadSummary(), 30000)" in block, (
+            "Mobile drawer must poll /summary every 30s so badge counts "
+            "stay fresh without requiring a page refresh"
+        )
+
+    def test_mobile_closeNotifs_refetches_summary(self):
+        idx = BASE_HTML.find("Mobile: notification + messages")
+        block = BASE_HTML[idx:idx + 3500]
+        assert "async closeNotifs()" in block, (
+            "Mobile drawer must define closeNotifs() that re-fetches the "
+            "summary -- otherwise the badge keeps a stale count after the "
+            "user reads notifications and closes the drawer"
+        )
+        # And the close paths must use closeNotifs(), not bare notifOpen=false
+        drawer_idx = BASE_HTML.find("Mobile notifications drawer")
+        drawer_block = BASE_HTML[drawer_idx:drawer_idx + 2500]
+        assert "closeNotifs()" in drawer_block, (
+            "All close actions in the mobile drawer (X button, backdrop tap, "
+            "notification tap) must call closeNotifs() to trigger the refresh"
+        )
+
+
 # ---- BL-166: leaderboard Streaks + Coaches must not cut off long names ----
 
 class TestLeaderboardOverflowDefenses:
