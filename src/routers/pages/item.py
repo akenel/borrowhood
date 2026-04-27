@@ -117,11 +117,23 @@ async def item_detail(slug: str, request: Request,
     except Exception:
         pass
 
+    # First active listing -- used by the template for price/booking blocks
+    # and the schema.org offer JSON. Was implicitly Undefined before, which
+    # quietly broke the schema.org offers and made the BL-170 owner-banner
+    # always-show.
+    active_listing = next(
+        (l for l in (item.listings or [])
+         if l.status == ListingStatus.ACTIVE and not l.deleted_at),
+        None,
+    )
+
     ctx = _ctx(request, token,
         item=item,
         is_owner=is_owner,
         viewer_tier=viewer_tier,
         similar_items=similar_items,
+        active_listing=active_listing,
+        has_active_listing=has_active_listing,
         og_type="product",
         og_title=f"{item.name} - La Piazza",
         og_description=_og_item_desc(item, item.listings[0] if item.listings else None),

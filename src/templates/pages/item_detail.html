@@ -43,7 +43,7 @@
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    {% if is_owner and not active_listing %}
+    {% if is_owner and not has_active_listing %}
     <!-- BL-170: owner-only draft banner (this page is 404 for non-owners) -->
     <div class="mb-6 p-4 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg flex items-start gap-3">
         <svg class="w-6 h-6 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
@@ -426,13 +426,21 @@
                 <h2 class="text-lg font-semibold text-gray-900">{{ t('item.available_as') }}</h2>
                 <div class="mt-4 space-y-4">
                     {% for listing in item.listings %}
-                    {% if listing.status.value == 'active' %}
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100">
+                    {# BL-170 follow-up: show DRAFT/PAUSED/PENDING/EXPIRED to owner so they can preview their price.
+                       Public viewers still only see ACTIVE listings (route 404s items with no active anyway). #}
+                    {% if listing.status.value == 'active' or (is_owner and listing.status.value in ('draft', 'pending', 'paused', 'expired')) %}
+                    {% set _show_status_pill = (is_owner and listing.status.value != 'active') %}
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg border {% if _show_status_pill %}bg-amber-50/40 border-amber-200{% else %}bg-gray-50 border-gray-100{% endif %}">
                         <div class="flex-1">
-                            <div class="flex items-center space-x-2">
+                            <div class="flex items-center flex-wrap gap-2">
                                 <span class="text-sm font-semibold text-gray-900">
                                     {{ t('listing_types.' + listing.listing_type.value) }}
                                 </span>
+                                {% if _show_status_pill %}
+                                <span class="text-[10px] px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full font-bold uppercase tracking-wider" title="{% if lang == 'it' %}Solo tu vedi questo{% else %}Only you can see this{% endif %}">
+                                    {{ listing.status.value }}
+                                </span>
+                                {% endif %}
                                 {% if listing.delivery_available and listing.listing_type.value != 'auction' %}
                                 <span class="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full">{{ t('item.delivery_available') }}</span>
                                 {% endif %}

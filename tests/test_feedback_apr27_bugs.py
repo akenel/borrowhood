@@ -323,9 +323,41 @@ class TestBhShareCarriesDescriptionText:
 
     def test_item_detail_shows_draft_banner_for_owner(self):
         item_html = (REPO_ROOT / "src" / "templates" / "pages" / "item_detail.html").read_text()
-        assert "BL-170" in item_html and "is_owner and not active_listing" in item_html, (
-            "item_detail must show a 'Draft -- not yet published' banner for "
-            "owners viewing their own non-published items"
+        # Banner condition must use has_active_listing (set by route), not
+        # active_listing (which was previously Undefined and made the banner
+        # always-true for any logged-in owner).
+        assert "BL-170" in item_html and "is_owner and not has_active_listing" in item_html, (
+            "item_detail draft banner must check has_active_listing (passed "
+            "from the route), not active_listing (which is silently undefined "
+            "and would make the banner always-show)"
+        )
+
+    def test_route_passes_active_listing_and_has_active_listing(self):
+        item_py = (REPO_ROOT / "src" / "routers" / "pages" / "item.py").read_text()
+        assert "active_listing=active_listing" in item_py, (
+            "item route must pass active_listing to ctx so the schema.org "
+            "offers JSON and price/booking blocks render"
+        )
+        assert "has_active_listing=has_active_listing" in item_py, (
+            "item route must pass has_active_listing to ctx for the BL-170 "
+            "draft banner condition"
+        )
+
+    def test_owner_sees_their_own_draft_listings_with_status_pill(self):
+        """Angel: 'pricing always blank in draft mode' -- the owner couldn't
+        see their own draft's price because the listings card filtered for
+        status=='active' only. Owner should see DRAFT/PENDING/PAUSED/EXPIRED
+        with a status pill so they can preview what they entered."""
+        item_html = (REPO_ROOT / "src" / "templates" / "pages" / "item_detail.html").read_text()
+        # The conditional must include is_owner clause for non-active listings
+        assert "is_owner and listing.status.value in ('draft', 'pending', 'paused', 'expired')" in item_html, (
+            "Listing card must show non-active listings to the owner so they "
+            "can preview their own draft pricing"
+        )
+        # And the status pill block must be conditional on _show_status_pill
+        assert "_show_status_pill" in item_html, (
+            "Non-active listings shown to the owner must carry a status pill "
+            "(draft / paused / expired) so they know it isn't public yet"
         )
 
     def test_first_photo_url_skips_videos(self):
