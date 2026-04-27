@@ -241,6 +241,16 @@ async def list_item_page(request: Request,
     raw_type = (request.query_params.get("type") or "").lower().strip()
     preset_type = raw_type if raw_type in _PRESET_TYPES else None
 
+    # BL-175: type-first splash. When no ?type= is set and we're not in a
+    # special flow (duplicate_from), show a 6-card "What are you posting?"
+    # picker. Picking a card sends the user to /list?type=X with the rest
+    # of the form pre-tuned. Skip the splash when duplicating since the
+    # type comes from the source.
+    has_dup = bool((request.query_params.get("duplicate_from") or "").strip())
+    if not preset_type and not has_dup:
+        ctx = _ctx(request, token)
+        return _render("pages/list_picker.html", ctx)
+
     # BL-150: duplicate_from support
     duplicate_item = None
     duplicate_listing_types: list[str] = []

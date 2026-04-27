@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}{% if lang == 'it' %}Cosa vuoi pubblicare?{% else %}What are you posting?{% endif %} - {{ t('app.name') }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    <!-- BL-175: Type-first splash. Asking 'what are you posting?' before
+         any other field cuts the rest of the form's noise -- events get
+         date/venue, services hide deposit, raffles redirect to their
+         dedicated flow. Bruce Lee: clarify intent, then act. -->
+
+    <div class="text-center mb-10">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900">
+            {% if lang == 'it' %}Cosa vuoi pubblicare?{% else %}What are you posting?{% endif %}
+        </h1>
+        <p class="mt-3 text-base sm:text-lg text-gray-600 max-w-xl mx-auto">
+            {% if lang == 'it' %}Scegli il tipo -- il modulo si adatta a quello che pubblichi.{% else %}Pick the type -- the form adapts to what you're posting.{% endif %}
+        </p>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+
+        <!-- 1. Lend or Sell -->
+        <a href="/list?type=rent"
+           class="group flex flex-col items-center justify-center text-center p-6 bg-white rounded-2xl border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 hover:shadow-lg transition-all min-h-[160px]">
+            <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-blue-200 transition-colors">
+                <svg class="w-8 h-8 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+            </div>
+            <span class="text-base sm:text-lg font-bold text-gray-900 group-hover:text-blue-700">{% if lang == 'it' %}Presta o Vendi{% else %}Lend or Sell{% endif %}</span>
+            <span class="text-xs text-gray-500 mt-1">{% if lang == 'it' %}Trapani, libri, attrezzi{% else %}Drills, books, tools{% endif %}</span>
+        </a>
+
+        <!-- 2. Offer a Service -->
+        <a href="/list?type=service"
+           class="group flex flex-col items-center justify-center text-center p-6 bg-white rounded-2xl border-2 border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 hover:shadow-lg transition-all min-h-[160px]">
+            <div class="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-emerald-200 transition-colors">
+                <svg class="w-8 h-8 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"/></svg>
+            </div>
+            <span class="text-base sm:text-lg font-bold text-gray-900 group-hover:text-emerald-700">{% if lang == 'it' %}Offri un Servizio{% else %}Offer a Service{% endif %}</span>
+            <span class="text-xs text-gray-500 mt-1">{% if lang == 'it' %}Riparazioni, pulizie{% else %}Repairs, cleaning, deliveries{% endif %}</span>
+        </a>
+
+        <!-- 3. Teach a Skill -->
+        <a href="/list?type=training"
+           class="group flex flex-col items-center justify-center text-center p-6 bg-white rounded-2xl border-2 border-gray-200 hover:border-amber-500 hover:bg-amber-50 hover:shadow-lg transition-all min-h-[160px]">
+            <div class="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-amber-200 transition-colors">
+                <svg class="w-8 h-8 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            </div>
+            <span class="text-base sm:text-lg font-bold text-gray-900 group-hover:text-amber-700">{% if lang == 'it' %}Insegna{% else %}Teach{% endif %}</span>
+            <span class="text-xs text-gray-500 mt-1">{% if lang == 'it' %}Lezioni, corsi, workshop{% else %}Lessons, courses, workshops{% endif %}</span>
+        </a>
+
+        <!-- 4. Host an Event -->
+        <a href="/list?type=event"
+           class="group flex flex-col items-center justify-center text-center p-6 bg-white rounded-2xl border-2 border-gray-200 hover:border-rose-500 hover:bg-rose-50 hover:shadow-lg transition-all min-h-[160px]">
+            <div class="w-14 h-14 bg-rose-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-rose-200 transition-colors">
+                <svg class="w-8 h-8 text-rose-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+            </div>
+            <span class="text-base sm:text-lg font-bold text-gray-900 group-hover:text-rose-700">{% if lang == 'it' %}Organizza un Evento{% else %}Host an Event{% endif %}</span>
+            <span class="text-xs text-gray-500 mt-1">{% if lang == 'it' %}Concerti, mercati, ritrovi{% else %}Concerts, markets, meetups{% endif %}</span>
+        </a>
+
+        <!-- 5. Run a Raffle (redirects to /raffles/create) -->
+        <a href="/raffles/create"
+           class="group flex flex-col items-center justify-center text-center p-6 bg-white rounded-2xl border-2 border-gray-200 hover:border-orange-500 hover:bg-orange-50 hover:shadow-lg transition-all min-h-[160px]">
+            <div class="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-orange-200 transition-colors">
+                <svg class="w-8 h-8 text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
+            </div>
+            <span class="text-base sm:text-lg font-bold text-gray-900 group-hover:text-orange-700">{% if lang == 'it' %}Sorteggio{% else %}Raffle{% endif %}</span>
+            <span class="text-xs text-gray-500 mt-1">{% if lang == 'it' %}Raccolta fondi community{% else %}Community fundraiser{% endif %}</span>
+        </a>
+
+        <!-- 6. Give it Away -->
+        <a href="/list?type=giveaway"
+           class="group flex flex-col items-center justify-center text-center p-6 bg-white rounded-2xl border-2 border-gray-200 hover:border-green-500 hover:bg-green-50 hover:shadow-lg transition-all min-h-[160px]">
+            <div class="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-green-200 transition-colors">
+                <svg class="w-8 h-8 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+            </div>
+            <span class="text-base sm:text-lg font-bold text-gray-900 group-hover:text-green-700">{% if lang == 'it' %}Regala{% else %}Give it Away{% endif %}</span>
+            <span class="text-xs text-gray-500 mt-1">{% if lang == 'it' %}Gratis, qualcuno ne ha bisogno{% else %}Free, someone needs it{% endif %}</span>
+        </a>
+
+    </div>
+
+    <!-- Help link for unsure users -->
+    <p class="mt-8 text-center text-sm text-gray-500">
+        {% if lang == 'it' %}Non sei sicuro?{% else %}Not sure?{% endif %}
+        <a href="/list?type=rent" class="text-indigo-600 hover:text-indigo-800 font-medium">
+            {% if lang == 'it' %}Inizia con "Presta o Vendi" -- puoi cambiare dopo.{% else %}Start with "Lend or Sell" -- you can change later.{% endif %}
+        </a>
+    </p>
+</div>
+{% endblock %}
