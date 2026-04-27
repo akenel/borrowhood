@@ -249,3 +249,74 @@ class TestBhShareCarriesDescriptionText:
             "dataset.text payload (was using a bare navigator.share that "
             "stripped the description)"
         )
+
+
+# ---- April 27 incident lesson: /api/v1/* must always return JSON on 500 ----
+
+class TestApiJsonErrorHandler:
+    """When an unhandled exception escapes an API route, the response MUST
+    be JSON -- not an HTML error page. Otherwise the frontend's
+    `await r.json()` chokes with 'Unexpected token <' and users see a
+    cryptic toast instead of a friendly 'try again' message.
+
+    Triggered April 27 when Postgres went into recovery mode mid-request
+    and the AI endpoint returned an HTML 500.
+    """
+
+    def test_handler_registered(self):
+        # Implemented as a BaseHTTPMiddleware (not @app.exception_handler) --
+        # the latter doesn't catch exceptions that escape downstream
+        # BaseHTTPMiddleware in starlette's task group.
+        from src.main import app as _app
+        middleware_names = [m.cls.__name__ for m in _app.user_middleware if hasattr(m, "cls")]
+        assert "JsonErrorMiddleware" in middleware_names, (
+            "JsonErrorMiddleware must be registered on the app so /api/v1/* "
+            "unhandled errors return JSON instead of HTML"
+        )
+
+    @pytest.mark.asyncio
+    async def test_handler_returns_json_for_api_paths(self, client):
+        # Reach into the global app and mount a test route that always raises.
+        # We can leave it mounted for the rest of the session -- it's namespaced.
+        from src.main import app as _app
+        if not any(getattr(r, "path", None) == "/api/v1/_test_boom" for r in _app.routes):
+            @_app.get("/api/v1/_test_boom")
+            async def _b():
+                raise RuntimeError("kaboom")
+        r = await client.get("/api/v1/_test_boom")
+        assert r.status_code == 500
+        assert r.headers.get("content-type", "").startswith("application/json"), (
+            f"Expected JSON 500 for /api/v1/* unhandled errors, got "
+            f"content-type: {r.headers.get('content-type')}"
+        )
+        body = r.json()
+        assert "detail" in body, "JSON 500 response must have a 'detail' field"
+        assert isinstance(body["detail"], str) and body["detail"].strip(), (
+            "detail must be a human-readable string the frontend can show in a toast"
+        )
+
+    @pytest.mark.asyncio
+    async def test_handler_does_not_leak_stack_trace_in_response(self, client):
+        """Stack traces must stay in the server log, never in the response body."""
+        from src.main import app as _app
+        if not any(getattr(r, "path", None) == "/api/v1/_test_secret_boom" for r in _app.routes):
+            @_app.get("/api/v1/_test_secret_boom")
+            async def _bs():
+                raise RuntimeError("SECRET_INTERNAL_DETAIL_dont_leak_me")
+        r = await client.get("/api/v1/_test_secret_boom")
+        assert "SECRET_INTERNAL_DETAIL" not in r.text, (
+            "Exception message must not be echoed back to the client -- "
+            "could leak DB connection strings, query SQL, etc."
+        )
+
+    @pytest.mark.asyncio
+    async def test_http_exceptions_still_pass_through_unchanged(self, client):
+        """The Exception handler must NOT shadow HTTPException -- 404, 422,
+        401, 403 etc. should still get their normal handling."""
+        # /api/v1/items/<bad-uuid> typically returns 422 (pydantic) or 404 --
+        # assert we don't accidentally convert those to a generic 500
+        r = await client.get("/api/v1/items/not-a-uuid")
+        assert r.status_code != 500, (
+            f"HTTPException/422-based responses must not be converted to "
+            f"generic 500 by the new Exception handler. Got: {r.status_code} {r.text[:200]}"
+        )

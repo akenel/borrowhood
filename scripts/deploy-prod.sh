@@ -173,6 +173,12 @@ curl -sf -o /dev/null -w "Browse: HTTP %{http_code}\n" "https://$DOMAIN/browse"
 curl -sf -o /dev/null -w "Calen.: HTTP %{http_code}\n" "https://$DOMAIN/calendar"
 curl -sf -o /dev/null -w "Health: HTTP %{http_code}\n" "https://$DOMAIN/api/v1/health"
 
+# ── Disk hygiene (April 27 incident: containerd filled to 64GB and Postgres
+#     ran out of write space). Keep latest + prod-previous + 5 newest prod-*
+#     tags, prune everything else and the build cache. Quiet on success.
+echo -e "${Y}--- cleanup: prune old images + build cache${N}"
+ssh $SERVER "docker images borrowhood --format '{{.Tag}} {{.CreatedAt}}' | grep '^prod-2' | sort -k2 -r | tail -n +6 | awk '{print \"borrowhood:\" \$1}' | xargs -r docker rmi >/dev/null 2>&1; docker builder prune -af >/dev/null 2>&1; df -h / | awk 'NR==2 {print \"  disk: \" \$3 \" used / \" \$2 \" total (\" \$5 \" full)\"}'"
+
 echo
 echo -e "${G}=== deployed $TAG to production ===${N}"
 echo "Rollback if needed: bash scripts/rollback-prod.sh"

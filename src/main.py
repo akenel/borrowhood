@@ -91,6 +91,37 @@ def create_app() -> FastAPI:
 
     app.add_middleware(ContentLanguageMiddleware)
 
+    # JSON-only error middleware for /api/v1/* (April 27 incident lesson):
+    # When the DB went into recovery mode, AI endpoints returned an HTML
+    # 500 page; the frontend tried to JSON.parse() it and surfaced a
+    # cryptic "Unexpected token 'I'... is not valid JSON" toast. Now any
+    # unhandled exception under /api/v1/* gets a JSON response the client
+    # can show as a normal toast. Implemented as middleware (not an
+    # @app.exception_handler) because BaseHTTPMiddleware swallows
+    # downstream exceptions before FastAPI's handler chain runs.
+    from fastapi.responses import JSONResponse, HTMLResponse
+
+    class JsonErrorMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request, call_next):
+            try:
+                return await call_next(request)
+            except Exception as exc:
+                logger.exception(
+                    "Unhandled %s on %s: %s",
+                    type(exc).__name__, request.url.path, exc,
+                )
+                if request.url.path.startswith("/api/v1/"):
+                    return JSONResponse(
+                        status_code=500,
+                        content={"detail": "Server is temporarily unavailable. Please try again."},
+                    )
+                return HTMLResponse(
+                    status_code=500,
+                    content="<h1>Something went wrong</h1><p>We're looking into it. <a href='/'>Back to La Piazza</a></p>",
+                )
+
+    app.add_middleware(JsonErrorMiddleware)
+
     # Favicon at root (browsers request /favicon.ico directly)
     @app.get("/favicon.ico", include_in_schema=False)
     async def favicon():
