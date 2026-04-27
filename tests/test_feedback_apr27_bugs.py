@@ -252,6 +252,46 @@ class TestBhShareCarriesDescriptionText:
             "stripped the description)"
         )
 
+    def test_first_photo_url_skips_videos(self):
+        """BL-168 lesson: Giulia's counselling listing's first media was an
+        mp4. The OG image was a video URL, which platforms can't preview.
+        _first_photo_url must skip videos and return the first photo (or
+        None to fall back to og-default.png in the template)."""
+        from src.routers.pages._helpers import _first_photo_url
+
+        class _FakeMedia:
+            def __init__(self, url, mt):
+                self.url = url
+                self.media_type = mt
+        class _MT:
+            def __init__(self, v): self.value = v
+        # Video first, photo second -> must return the photo
+        media = [
+            _FakeMedia("/uploads/clip.mp4", _MT("video")),
+            _FakeMedia("/uploads/photo.jpg", _MT("photo")),
+        ]
+        assert _first_photo_url(media) == "/uploads/photo.jpg"
+        # Only video -> None (template falls back to og-default.png)
+        assert _first_photo_url([_FakeMedia("/x.mp4", _MT("video"))]) is None
+        # Empty / None
+        assert _first_photo_url([]) is None
+        assert _first_photo_url(None) is None
+        # Plain string media_type also accepted (defensive)
+        media2 = [_FakeMedia("/u/p.jpg", "photo")]
+        assert _first_photo_url(media2) == "/u/p.jpg"
+
+    def test_item_route_uses_first_photo_url(self):
+        item_py = (REPO_ROOT / "src" / "routers" / "pages" / "item.py").read_text()
+        assert "_first_photo_url(item.media)" in item_py, (
+            "item route must use _first_photo_url helper for og_image so "
+            "items whose first media is a video still get a photo OG"
+        )
+
+    def test_raffle_route_uses_first_photo_url(self):
+        assert "_first_photo_url(item.media)" in COMMUNITY_PY, (
+            "raffle route must use _first_photo_url helper for og_image"
+        )
+
     def test_no_inline_navigator_share_in_user_facing_pages(self):
         """Every share call goes through bhShare so the description text
         and clipboard fallback stay consistent. Inline navigator.share

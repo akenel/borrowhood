@@ -21,7 +21,7 @@ from src.models.user import BadgeTier, BHUser, WorkshopType
 
 from ._helpers import (
     templates, _ctx, _render, _abs_url, _og_workshop_desc,
-    _og_item_desc, _last_seen,
+    _og_item_desc, _last_seen, _first_photo_url,
 )
 
 router = APIRouter(tags=["pages"])
@@ -152,8 +152,7 @@ async def raffle_detail_page(raffle_id: str, request: Request,
         item = raffle.listing.item
         raffle_title = item.name or raffle_title
         raffle_description = item.description
-        if item.media:
-            raffle_image = _abs_url(item.media[0].url)
+        raffle_image = _abs_url(_first_photo_url(item.media))  # BL-168: skip videos
     organizer_name = raffle.organizer.display_name if raffle.organizer else "the community"
     ticket_price = float(raffle.ticket_price) if raffle.ticket_price else 0
     og_desc_parts = []

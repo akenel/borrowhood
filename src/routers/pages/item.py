@@ -23,7 +23,7 @@ from src.models.user import BadgeTier, BHUser, WorkshopType
 
 from ._helpers import (
     templates, _ctx, _render, _abs_url, _og_workshop_desc,
-    _og_item_desc, _last_seen,
+    _og_item_desc, _last_seen, _first_photo_url,
 )
 
 router = APIRouter(tags=["pages"])
@@ -113,7 +113,7 @@ async def item_detail(slug: str, request: Request,
         og_type="product",
         og_title=f"{item.name} - La Piazza",
         og_description=_og_item_desc(item, item.listings[0] if item.listings else None),
-        og_image=_abs_url(item.media[0].url) if item.media else None,
+        og_image=_abs_url(_first_photo_url(item.media)),  # BL-168: skip videos
     )
     return _render("pages/item_detail.html", ctx)
 

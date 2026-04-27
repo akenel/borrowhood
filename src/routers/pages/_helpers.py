@@ -100,6 +100,22 @@ def _abs_url(path: Optional[str]) -> Optional[str]:
     return f"{settings.app_url}{path}"
 
 
+def _first_photo_url(media_list) -> Optional[str]:
+    """Return the URL of the first PHOTO media, skipping videos (BL-168 lesson:
+    Giulia's counselling listing had an mp4 first; OG image was a video URL
+    that platforms can't preview). Returns None if no photo exists -- the
+    template falls back to og-default.png in that case."""
+    if not media_list:
+        return None
+    for m in media_list:
+        mt = getattr(m, "media_type", None)
+        # Accept both Enum and string forms
+        mt_val = mt.value if hasattr(mt, "value") else mt
+        if mt_val == "photo":
+            return getattr(m, "url", None)
+    return None
+
+
 def _og_workshop_desc(user) -> str:
     """Build a rich OG description for workshop pages."""
     parts = []
