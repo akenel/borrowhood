@@ -252,6 +252,27 @@ class TestBhShareCarriesDescriptionText:
             "stripped the description)"
         )
 
+    def test_no_inline_navigator_share_in_user_facing_pages(self):
+        """Every share call goes through bhShare so the description text
+        and clipboard fallback stay consistent. Inline navigator.share
+        bypasses both. Also caught a missed straggler in raffles list +
+        a 2nd share button on item_detail and raffle_detail."""
+        import re
+        pages_dir = REPO_ROOT / "src" / "templates" / "pages"
+        offenders = []
+        # bhShare itself naturally calls navigator.share -- exempt base.html
+        for path in pages_dir.glob("*.html"):
+            text = path.read_text()
+            # Match inline button onclicks/atclicks that call navigator.share directly
+            for m in re.finditer(r"(?:onclick|@click)\s*=\s*\"[^\"]*navigator\.share", text):
+                offenders.append(f"{path.name}: {m.group(0)[:120]}")
+        assert not offenders, (
+            "Found inline navigator.share calls in user-facing pages. "
+            "Use bhShare(title, url, text) instead so all shares carry "
+            "the description payload and use the same clipboard fallback. "
+            "Offenders:\n" + "\n".join(offenders)
+        )
+
 
 # ---- April 27 incident lesson: /api/v1/* must always return JSON on 500 ----
 
