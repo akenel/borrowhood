@@ -44,7 +44,7 @@ async def calendar_page(
     ctx = _ctx(request, token,
         og_title="Community Calendar -- La Piazza",
         og_description="Workshops, meetups, and events happening in your neighborhood. RSVP and join the community.",
-        og_image="https://lapiazza.app/static/images/icon-192.png",
+        og_image="https://lapiazza.app/static/images/og-default.png",
     )
     return _render("pages/calendar.html", ctx)
 
