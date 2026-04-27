@@ -65,6 +65,7 @@ class BHListing(BHBase, Base):
     available_to: Mapped[Optional[str]] = mapped_column(String(10))    # "2026-09-30" (seasonal)
     delivery_available: Mapped[bool] = mapped_column(default=False)
     pickup_only: Mapped[bool] = mapped_column(default=True)
+    delivery_fee: Mapped[Optional[float]] = mapped_column(Float)  # EUR, leave NULL for free delivery
     notes: Mapped[Optional[str]] = mapped_column(Text)
     return_policy: Mapped[Optional[str]] = mapped_column(String(500))  # Seller-defined return terms
     # MVP availability note (free text). Signals preferred hours / days off / vacation.

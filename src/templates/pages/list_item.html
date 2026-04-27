@@ -227,6 +227,7 @@
                     this.form.return_policy = first.return_policy || '';
                     this.form.availability_note = first.availability_note || '';
                     this.form.delivery_available = first.delivery_available || false;
+                    this.form.delivery_fee = first.delivery_fee != null ? first.delivery_fee : '';
                 }
             }
         },
@@ -525,10 +526,15 @@
                         const isGiveaway = lt === 'giveaway';
                         const isSvcType = (lt === 'service' || lt === 'training');
                         const payload = {
+                            // BL-173: edit-mode publish fix -- without status the listing
+                            // stayed DRAFT no matter how many times you clicked Publish
+                            status: this.saveAsDraft ? 'draft' : 'active',
                             price: isGiveaway ? null : (terms.price ? parseFloat(terms.price) : null),
                             price_unit: isGiveaway ? 'flat' : terms.price_unit,
                             deposit: (isGiveaway || isSvcType) ? null : (terms.deposit ? parseFloat(terms.deposit) : null),
                             delivery_available: isGiveaway ? false : this.form.delivery_available,
+                            // BL-173: delivery_fee was silently dropped on every edit
+                            delivery_fee: (isGiveaway || !this.form.delivery_available) ? null : (this.form.delivery_fee !== '' ? parseFloat(this.form.delivery_fee) : null),
                             pickup_only: isGiveaway ? true : !this.form.delivery_available,
                         };
                         if (notesChanged) payload.notes = curNotes === '' ? null : curNotes;
@@ -576,6 +582,7 @@
                         currency: this.form.currency,
                         deposit: (isGiveaway || isSvcType) ? null : (terms.deposit ? parseFloat(terms.deposit) : null),
                         delivery_available: isGiveaway ? false : this.form.delivery_available,
+                        delivery_fee: (isGiveaway || !this.form.delivery_available) ? null : (this.form.delivery_fee !== '' ? parseFloat(this.form.delivery_fee) : null),
                         pickup_only: isGiveaway ? true : !this.form.delivery_available,
                         notes: this.form.notes || null,
                         return_policy: this.form.return_policy || null,

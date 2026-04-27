@@ -22,6 +22,7 @@ class ListingOut(BaseModel):
     max_rental_days: Optional[int] = None
     delivery_available: bool
     pickup_only: bool
+    delivery_fee: Optional[float] = None
     notes: Optional[str] = None
     return_policy: Optional[str] = None
     auction_end: Optional[datetime] = None
@@ -54,6 +55,7 @@ class ListingCreate(BaseModel):
     max_rental_days: Optional[int] = Field(None, ge=1)
     delivery_available: bool = False
     pickup_only: bool = True
+    delivery_fee: Optional[float] = Field(None, ge=0)
     notes: Optional[str] = None
     return_policy: Optional[str] = Field(None, max_length=500)
     auction_end: Optional[str] = None  # ISO datetime for auction listings
@@ -79,6 +81,7 @@ class ListingUpdate(BaseModel):
     deposit: Optional[float] = Field(None, ge=0)
     delivery_available: Optional[bool] = None
     pickup_only: Optional[bool] = None
+    delivery_fee: Optional[float] = Field(None, ge=0)
     notes: Optional[str] = None
     return_policy: Optional[str] = Field(None, max_length=500)
     auction_end: Optional[str] = None

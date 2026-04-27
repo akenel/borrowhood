@@ -77,6 +77,8 @@ async def run_migrations():
         "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS father_name VARCHAR(200)",
         # 2026-03-03: ToS acceptance tracking
         "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS tos_accepted_at TIMESTAMPTZ",
+        # 2026-04-27: BL-173 -- delivery fee was form-only, never persisted
+        "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS delivery_fee FLOAT",
         # 2026-03-03: minimum charge + team pricing for service/training listings
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS minimum_charge FLOAT",
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS per_person_rate FLOAT",

@@ -422,6 +422,75 @@ class TestBhShareCarriesDescriptionText:
         )
 
 
+# ---- BL-173: edit-mode publish + delivery_fee persistence ----
+
+class TestEditModePublishAndDeliveryFee:
+    """Two long-standing edit-form bugs Angel hit on the wood chipper:
+
+    1. Clicking 'Publish' on a draft kept it as draft -- the edit-mode
+       PATCH payload never included `status`, so the listing's status
+       was preserved no matter which button was clicked.
+    2. Delivery fee field rendered in the form, kept its value across
+       a single session, but disappeared after save -- the column didn't
+       exist on bh_listing, the schema didn't declare it, and the
+       payload didn't carry it.
+    """
+
+    def test_edit_payload_carries_status(self):
+        list_html = (REPO_ROOT / "src" / "templates" / "pages" / "list_item.html").read_text()
+        # The edit branch must include status: <draft|active> based on saveAsDraft
+        # Find the edit-mode payload block
+        assert "BL-173: edit-mode publish fix" in list_html, (
+            "Edit-mode PATCH payload must include the status field so the "
+            "Publish button can flip a draft to active"
+        )
+        assert "status: this.saveAsDraft ? 'draft' : 'active'" in list_html
+
+    def test_edit_payload_carries_delivery_fee(self):
+        list_html = (REPO_ROOT / "src" / "templates" / "pages" / "list_item.html").read_text()
+        assert "BL-173: delivery_fee was silently dropped" in list_html
+        # Both edit and create branches must send delivery_fee
+        assert list_html.count("delivery_fee:") >= 2, (
+            "Both edit-mode PATCH and create-mode POST payloads must "
+            "include delivery_fee; otherwise the form value is discarded"
+        )
+
+    def test_listing_model_has_delivery_fee_column(self):
+        listing_py = (REPO_ROOT / "src" / "models" / "listing.py").read_text()
+        assert "delivery_fee:" in listing_py, (
+            "BHListing must declare delivery_fee column so deliveries can "
+            "carry a real cost"
+        )
+
+    def test_listing_schemas_have_delivery_fee(self):
+        schema_py = (REPO_ROOT / "src" / "schemas" / "listing.py").read_text()
+        # Must appear in ListingOut (for prefill), ListingCreate (for new), and ListingUpdate (for edit)
+        assert schema_py.count("delivery_fee:") >= 3, (
+            "delivery_fee must be in ListingOut + ListingCreate + ListingUpdate"
+        )
+
+    def test_edit_route_serializes_delivery_fee_for_prefill(self):
+        item_py = (REPO_ROOT / "src" / "routers" / "pages" / "item.py").read_text()
+        assert '"delivery_fee":' in item_py, (
+            "Edit route must include delivery_fee in existing_listings JSON "
+            "so the form pre-fills the previously-saved value"
+        )
+
+    def test_form_init_prefills_delivery_fee(self):
+        list_html = (REPO_ROOT / "src" / "templates" / "pages" / "list_item.html").read_text()
+        assert "this.form.delivery_fee = first.delivery_fee" in list_html, (
+            "Alpine init() must pull delivery_fee from the first listing "
+            "so editing a published listing shows the existing fee"
+        )
+
+    def test_migrations_includes_delivery_fee(self):
+        db_py = (REPO_ROOT / "src" / "database.py").read_text()
+        assert "ADD COLUMN IF NOT EXISTS delivery_fee FLOAT" in db_py, (
+            "Migration list must include delivery_fee so fresh deploys "
+            "(staging, future hosts) get the column without manual ALTER"
+        )
+
+
 # ---- April 27 incident lesson: /api/v1/* must always return JSON on 500 ----
 
 class TestApiJsonErrorHandler:
