@@ -143,7 +143,27 @@ async def raffle_detail_page(raffle_id: str, request: Request,
         )
         user_had_ticket = (count or 0) > 0
 
-    ctx = _ctx(request, token, raffle=raffle, user_had_ticket=user_had_ticket)
+    # BL-165: rich OG tags so raffle shares get an image + price preview
+    raffle_image = None
+    if raffle.listing and raffle.listing.item and raffle.listing.item.media:
+        raffle_image = _abs_url(raffle.listing.item.media[0].url)
+    organizer_name = raffle.organizer.display_name if raffle.organizer else "the community"
+    ticket_price = float(raffle.ticket_price) if raffle.ticket_price else 0
+    og_desc_parts = []
+    if ticket_price > 0:
+        og_desc_parts.append(f"EUR {ticket_price:.2f} per ticket")
+    og_desc_parts.append(f"by {organizer_name}")
+    if raffle.listing and raffle.listing.item and raffle.listing.item.description:
+        og_desc_parts.append(raffle.listing.item.description[:140].strip())
+
+    ctx = _ctx(request, token,
+        raffle=raffle,
+        user_had_ticket=user_had_ticket,
+        og_type="product",
+        og_title=f"{raffle.title} - La Piazza Raffle",
+        og_description=" - ".join(og_desc_parts),
+        og_image=raffle_image,  # falls back to og-default.png in base.html when None
+    )
     return _render("pages/raffle_detail.html", ctx)
 
 

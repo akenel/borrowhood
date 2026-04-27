@@ -17,12 +17,16 @@
     <meta property="og:type" content="{{ og_type | default('website') }}">
     <meta property="og:title" content="{{ og_title | default(t('app.name')) }}">
     <meta property="og:description" content="{{ og_description | default(t('home.hero_subtitle')) }}">
-    <meta property="og:image" content="{{ og_image | default('https://lapiazza.app/static/images/icon-192.png') }}">
+    <meta property="og:image" content="{{ og_image | default('https://lapiazza.app/static/images/og-default.png') }}">
+    <meta property="og:image:width" content="{{ og_image_width | default('1200') }}">
+    <meta property="og:image:height" content="{{ og_image_height | default('630') }}">
+    <meta property="og:image:alt" content="{{ og_title | default(t('app.name')) }}">
     <meta property="og:url" content="{{ request.url | replace('http://', 'https://') }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ og_title | default(t('app.name')) }}">
     <meta name="twitter:description" content="{{ og_description | default(t('home.hero_subtitle')) }}">
-    <meta name="twitter:image" content="{{ og_image | default('https://lapiazza.app/static/images/icon-192.png') }}">
+    <meta name="twitter:image" content="{{ og_image | default('https://lapiazza.app/static/images/og-default.png') }}">
+    <meta name="twitter:image:alt" content="{{ og_title | default(t('app.name')) }}">
 
     <!-- PWA -->
     <link rel="manifest" href="/static/manifest.json">
@@ -306,7 +310,7 @@
                             </div>
                             <div class="max-h-64 overflow-y-auto">
                                 <template x-for="n in notifications" :key="n.id">
-                                    <a :href="n.link || '#'" @click="if(!n.read) { fetch('/api/v1/notifications/' + n.id + '/read', { method: 'PATCH' }); n.read = true; unread = Math.max(0, unread - 1); }" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-50" :class="!n.read ? 'bg-indigo-50/50' : ''">
+                                    <a :href="n.link || '#'" @click="if(!n.read) { fetch('/api/v1/notifications/' + n.id + '/read', { method: 'PATCH', keepalive: true }); n.read = true; unread = Math.max(0, unread - 1); }" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-50" :class="!n.read ? 'bg-indigo-50/50' : ''">
                                         <p class="text-sm text-gray-900" :class="!n.read ? 'font-semibold' : ''" x-text="n.title"></p>
                                         <p class="text-xs text-gray-400 mt-0.5" x-text="new Date(n.created_at).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' at ' + new Date(n.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })"></p>
                                     </a>
@@ -502,7 +506,10 @@
                             },
                             async markRead(n) {
                                 if (n.read) return;
-                                try { await fetch('/api/v1/notifications/' + n.id + '/read', { method: 'PATCH' }); } catch(e) {}
+                                // BL-167: keepalive so the PATCH completes even when the browser navigates
+                                // away to n.link in the same tap (otherwise the request gets cancelled
+                                // and the badge stays at its old count after the user comes back).
+                                try { fetch('/api/v1/notifications/' + n.id + '/read', { method: 'PATCH', keepalive: true }); } catch(e) {}
                                 n.read = true;
                                 this.nUnread = Math.max(0, this.nUnread - 1);
                             }
@@ -796,11 +803,21 @@
     }
 
     // ── Share button (Web Share API + clipboard fallback) ──
-    async function bhShare(title, url) {
+    // BL-168: optional `text` becomes the body of the share message --
+    // platforms like WhatsApp/Telegram/LinkedIn show this BEFORE the URL,
+    // so include the price + 1-line description so the recipient sees
+    // value even if the link preview fails to load.
+    async function bhShare(title, url, text) {
+        var payload = { title: title, url: url };
+        if (text) payload.text = text;
         if (navigator.share) {
-            try { await navigator.share({ title: title, url: url }); } catch(e) {}
+            try { await navigator.share(payload); } catch(e) {}
         } else {
-            await navigator.clipboard.writeText(url);
+            // Fallback: copy a richer block (title + text + url) to clipboard
+            var clip = title;
+            if (text) clip += '\n' + text;
+            clip += '\n' + url;
+            try { await navigator.clipboard.writeText(clip); } catch(e) { await navigator.clipboard.writeText(url); }
             window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Link copied to clipboard!' } }));
         }
     }
