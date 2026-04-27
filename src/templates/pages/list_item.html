@@ -635,23 +635,31 @@
             }
         }
     }">
-        <!-- Step indicators -->
-        <div class="flex items-center mb-8">
-            <div class="flex items-center">
-                <div :class="step >= 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600'"
-                     class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">1</div>
-                <span class="ml-2 text-sm font-medium" :class="step >= 1 ? 'text-indigo-600' : 'text-gray-500'">{{ t('list_item.step_1') }}</span>
-            </div>
-            <div class="w-12 h-0.5 mx-3" :class="step >= 2 ? 'bg-indigo-600' : 'bg-gray-200'"></div>
-            <div class="flex items-center">
-                <div :class="step >= 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600'"
-                     class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">2</div>
-                <span class="ml-2 text-sm font-medium" :class="step >= 2 ? 'text-indigo-600' : 'text-gray-500'">{{ t('list_item.step_2') }}</span>
-            </div>
+        <!-- BL-174: clean 3-step Bruce Lee flow.
+             Step 1 = WHAT (item details), Step 2 = HOW (policies), Step 3 = HOW MUCH (pricing).
+             Each step is exclusively visible; user never sees two at once. -->
+
+        <!-- Step indicator: always visible -->
+        <div class="flex items-center justify-center mb-6">
+            <template x-for="n in [1, 2, 3]" :key="n">
+                <div class="flex items-center">
+                    <div :class="step >= n ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'"
+                         class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors"
+                         x-text="n"></div>
+                    <div x-show="n < 3" class="w-12 h-0.5 mx-2" :class="step > n ? 'bg-indigo-600' : 'bg-gray-200'"></div>
+                </div>
+            </template>
         </div>
 
-        <!-- Step 1: Item Details -->
+        <!-- Step 1: About this item -->
         <div x-show="step === 1" class="bg-white rounded-lg border border-gray-200 p-6 space-y-5">
+            <div class="flex items-center gap-3 pb-3 border-b border-gray-100">
+                <span class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900">{% if lang == 'it' %}Cos'è?{% else %}What is it?{% endif %}</h2>
+                    <p class="text-xs text-gray-500 mt-0.5">{% if lang == 'it' %}Nome, foto, categoria{% else %}Name, photos, category{% endif %}</p>
+                </div>
+            </div>
 
             <!-- AI Assist Banner -->
             <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-4">
@@ -1240,40 +1248,23 @@
                 </div>
             </div>
 
-            <div class="flex justify-end pt-4">
+            <!-- Step 1 footer: Next -> Step 2 -->
+            <div class="flex justify-end pt-4 border-t border-gray-100">
                 <button @click="if(form.name.trim()) step = 2" :disabled="!form.name.trim()"
                         class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[44px]">
-                    Next &rarr;
+                    {% if lang == 'it' %}Avanti: Politiche{% else %}Next: Policies{% endif %} &rarr;
                 </button>
             </div>
         </div>
 
-        <!-- Step 2: Listing Terms -->
-        <div x-show="step === 2" x-cloak class="bg-white rounded-lg border border-gray-200 p-6 space-y-5">
-
-            <!-- Step 1 Summary Card -->
-            <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                <!-- Thumbnail -->
-                <div class="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-200">
-                    <img x-show="uploadPreviews.length" :src="uploadPreviews[0]" class="w-full h-full object-cover">
-                    <img x-show="!uploadPreviews.length && aiImageUrl" :src="aiImageUrl" class="w-full h-full object-cover">
-                    <div x-show="!uploadPreviews.length && !aiImageUrl" class="w-full h-full flex items-center justify-center text-gray-400">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    </div>
+        <!-- Step 3 (DOM-second, shown when step===3): Listing types + pricing -->
+        <div x-show="step === 3" x-cloak class="bg-white rounded-lg border border-gray-200 p-6 space-y-5 mt-5">
+            <div class="flex items-center gap-3 pb-3 border-b border-gray-100">
+                <span class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">3</span>
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900">{% if lang == 'it' %}Quanto?{% else %}How much?{% endif %}</h2>
+                    <p class="text-xs text-gray-500 mt-0.5">{% if lang == 'it' %}Tipo di annuncio + prezzo{% else %}Listing type + price{% endif %}</p>
                 </div>
-                <!-- Details -->
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-semibold text-gray-900 truncate" x-text="form.name || 'Untitled'"></p>
-                    <div class="flex flex-wrap gap-2 mt-1">
-                        <span class="text-xs px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full" x-text="form.category.replace(/_/g, ' ')"></span>
-                        <span class="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full" x-text="form.item_type.replace(/_/g, ' ')"></span>
-                        <span x-show="form.condition && form.item_type !== 'service' && form.item_type !== 'space'" class="text-xs px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full" x-text="form.condition?.replace(/_/g, ' ')"></span>
-                    </div>
-                </div>
-                <!-- Edit button -->
-                <button @click="step = 1" class="flex-shrink-0 text-xs text-indigo-600 hover:text-indigo-800 font-medium">
-                    {{ t('i18n.edit') }}
-                </button>
             </div>
 
             <div>
@@ -1579,6 +1570,37 @@
                 </div>
             </div>
 
+            <!-- Step 3 footer: Back + Save Draft + Publish -->
+            <div class="flex flex-col sm:flex-row gap-2 sm:justify-between pt-4 border-t border-gray-100">
+                <button @click="step = 2"
+                        class="w-full sm:w-auto px-6 py-3 text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px]">
+                    &larr; {% if lang == 'it' %}Indietro{% else %}Back{% endif %}
+                </button>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <button @click="saveAsDraft = true; submitItem()" :disabled="submitting"
+                            class="w-full sm:w-auto px-6 py-3 text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 transition-colors min-h-[44px]">
+                        <span x-show="!submitting || !saveAsDraft">{{ t('i18n.save_draft') }}</span>
+                        <span x-show="submitting && saveAsDraft" x-cloak>{{ t('common.loading') }}</span>
+                    </button>
+                    <button @click="saveAsDraft = false; submitItem()" :disabled="submitting"
+                            class="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors min-h-[44px]">
+                        <span x-show="!submitting || saveAsDraft">{{ t('list_item.submit') }}</span>
+                        <span x-show="submitting && !saveAsDraft" x-cloak>{{ t('common.loading') }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2 (DOM-third, shown when step===2): Delivery + notes + return policy + availability -->
+        <div x-show="step === 2" x-cloak class="bg-white rounded-lg border border-gray-200 p-6 space-y-5 mt-5">
+            <div class="flex items-center gap-3 pb-3 border-b border-gray-100">
+                <span class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900">{% if lang == 'it' %}Come funziona?{% else %}How does it work?{% endif %}</h2>
+                    <p class="text-xs text-gray-500 mt-0.5">{% if lang == 'it' %}Consegna, note, politica di reso, disponibilità -- tutto opzionale.{% else %}Delivery, notes, return policy, availability -- all optional.{% endif %}</p>
+                </div>
+            </div>
+
             <div class="space-y-2" x-show="!selectedTypes.includes('event')" x-cloak>
                 <div class="flex items-center space-x-3">
                     <input id="delivery" type="checkbox" x-model="form.delivery_available"
@@ -1626,23 +1648,16 @@
                 <p class="text-xs text-gray-400 mt-1">{{ t('availability.note_hint') }}</p>
             </div>
 
-            <div class="flex justify-between pt-4">
+            <!-- Step 2 footer: Back to Step 1, Next to Step 3 (pricing) -->
+            <div class="flex flex-col sm:flex-row gap-2 sm:justify-between pt-4 border-t border-gray-100">
                 <button @click="step = 1"
-                        class="px-6 py-3 text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px]">
-                    &larr; {{ t('common.back') }}
+                        class="w-full sm:w-auto px-6 py-3 text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px]">
+                    &larr; {% if lang == 'it' %}Indietro{% else %}Back{% endif %}
                 </button>
-                <div class="flex gap-2">
-                    <button @click="saveAsDraft = true; submitItem()" :disabled="submitting"
-                            class="px-6 py-3 text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 transition-colors min-h-[44px]">
-                        <span x-show="!submitting || !saveAsDraft">{{ t('i18n.save_draft') }}</span>
-                        <span x-show="submitting && saveAsDraft" x-cloak>{{ t('common.loading') }}</span>
-                    </button>
-                    <button @click="saveAsDraft = false; submitItem()" :disabled="submitting"
-                            class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors min-h-[44px]">
-                        <span x-show="!submitting || saveAsDraft">{{ t('list_item.submit') }}</span>
-                        <span x-show="submitting && !saveAsDraft" x-cloak>{{ t('common.loading') }}</span>
-                    </button>
-                </div>
+                <button @click="step = 3"
+                        class="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors min-h-[44px]">
+                    {% if lang == 'it' %}Avanti: Prezzo{% else %}Next: Pricing{% endif %} &rarr;
+                </button>
             </div>
         </div>
 
