@@ -24,7 +24,7 @@ from pathlib import Path
 sys.path.insert(0, "/app")
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-import aiohttp
+import httpx
 
 
 SEED_DIR = Path("/app/src/static/uploads/seed-images")
@@ -35,32 +35,31 @@ CONCURRENCY = 5
 PER_REQUEST_TIMEOUT = 60  # seconds; first-time generation can be slow
 
 
-async def fetch_one(session: aiohttp.ClientSession, sem: asyncio.Semaphore,
+async def fetch_one(client: httpx.AsyncClient, sem: asyncio.Semaphore,
                      media_id, original_url: str):
-    """Download one Pollinations URL. Returns (media_id, local_path or None)."""
+    """Download one Pollinations URL. Returns (media_id, local_url or None)."""
     async with sem:
         try:
-            timeout = aiohttp.ClientTimeout(total=PER_REQUEST_TIMEOUT)
-            async with session.get(original_url, timeout=timeout) as resp:
-                if resp.status != 200:
-                    print(f"  [{resp.status}] {media_id}: {original_url[:80]}")
-                    return media_id, None
-                data = await resp.read()
-                if len(data) < 1000:
-                    print(f"  [tiny:{len(data)}b] {media_id}: skipping")
-                    return media_id, None
-                ext = "jpg"
-                ctype = resp.headers.get("Content-Type", "")
-                if "png" in ctype:
-                    ext = "png"
-                elif "webp" in ctype:
-                    ext = "webp"
-                fname = f"{media_id}.{ext}"
-                fpath = SEED_DIR / fname
-                fpath.write_bytes(data)
-                local_url = f"{LOCAL_PREFIX}/{fname}"
-                return media_id, local_url
-        except asyncio.TimeoutError:
+            resp = await client.get(original_url, follow_redirects=True)
+            if resp.status_code != 200:
+                print(f"  [{resp.status_code}] {media_id}: {original_url[:80]}")
+                return media_id, None
+            data = resp.content
+            if len(data) < 1000:
+                print(f"  [tiny:{len(data)}b] {media_id}: skipping")
+                return media_id, None
+            ext = "jpg"
+            ctype = resp.headers.get("Content-Type", "")
+            if "png" in ctype:
+                ext = "png"
+            elif "webp" in ctype:
+                ext = "webp"
+            fname = f"{media_id}.{ext}"
+            fpath = SEED_DIR / fname
+            fpath.write_bytes(data)
+            local_url = f"{LOCAL_PREFIX}/{fname}"
+            return media_id, local_url
+        except httpx.TimeoutException:
             print(f"  [timeout] {media_id}")
             return media_id, None
         except Exception as e:
@@ -98,9 +97,10 @@ async def main():
 
     # Concurrent fetch
     sem = asyncio.Semaphore(CONCURRENCY)
-    connector = aiohttp.TCPConnector(limit=CONCURRENCY * 2)
-    async with aiohttp.ClientSession(connector=connector) as session:
-        tasks = [fetch_one(session, sem, mid, url) for mid, url in rows]
+    timeout = httpx.Timeout(PER_REQUEST_TIMEOUT, connect=10)
+    limits = httpx.Limits(max_connections=CONCURRENCY * 2)
+    async with httpx.AsyncClient(timeout=timeout, limits=limits) as client:
+        tasks = [fetch_one(client, sem, mid, url) for mid, url in rows]
         results = await asyncio.gather(*tasks)
 
     # Build update map
