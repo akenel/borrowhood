@@ -243,6 +243,9 @@ HELP_POSTS = [
 async def main():
     from sqlalchemy import select
     from src.database import async_session
+    # Import the full models package so SQLAlchemy can resolve every FK
+    # (BHUser references bh_community, etc.)
+    import src.models  # noqa: F401
     from src.models.user import (
         AccountStatus, BadgeTier, BHUser, BHUserLanguage, BHUserPoints,
         BHUserSkill, CEFRLevel, WorkshopType,
