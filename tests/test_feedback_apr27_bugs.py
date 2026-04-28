@@ -250,11 +250,40 @@ class TestOgDefaultImageFallback:
             "is too small for Facebook/LinkedIn/Twitter preview cards"
         )
 
-    def test_og_image_dimensions_declared(self):
-        assert 'property="og:image:width"' in BASE_HTML
-        assert 'property="og:image:height"' in BASE_HTML, (
-            "OG image must declare width + height so platforms cache and "
-            "render the preview without a fetch round-trip"
+    def test_og_image_dimensions_only_declared_when_known(self):
+        """BL-177: don't LIE about dimensions. Hardcoded 1200x630 was wrong
+        for user uploads (typically 1000x750 after resize_and_store). When
+        declared dims don't match the file, WhatsApp/Facebook reject the
+        preview and serve URL-only.
+
+        Contract:
+        - When og_image_width and og_image_height are explicitly set in
+          context, declare them.
+        - When og_image is NOT set (using og-default.png fallback), declare
+          1200x630 (we know the fallback's dimensions).
+        - Otherwise (user upload without computed dims), OMIT the meta tags
+          so platforms discover dims by fetching the image.
+        """
+        assert "BL-177" in BASE_HTML, (
+            "base.html must reference BL-177 in the og:image:width/height "
+            "comment block so the conditional logic stays documented"
+        )
+        # The conditional must check og_image_width AND og_image_height
+        assert "{% if og_image_width and og_image_height %}" in BASE_HTML, (
+            "Width/height meta tags must be inside an explicit-set conditional, "
+            "not a `default(...)` filter that lies about user uploads"
+        )
+        # Fallback branch declares 1200x630 only when og_image is unset
+        assert "{% elif not og_image %}" in BASE_HTML
+
+    def test_no_duplicate_og_image_dimensions_in_item_detail(self):
+        """item_detail.html previously hardcoded a SECOND set of og:image
+        dimension meta tags on top of base.html's set. Duplicates confuse
+        WhatsApp's parser. Removed in BL-177."""
+        item_detail = (REPO_ROOT / "src" / "templates" / "pages" / "item_detail.html").read_text()
+        assert 'property="og:image:width"' not in item_detail, (
+            "item_detail.html must NOT declare og:image:width -- base.html "
+            "handles it. Duplicate meta tags break some platform parsers."
         )
 
     def test_og_default_png_exists_at_expected_path(self):

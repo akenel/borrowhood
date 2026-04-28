@@ -7,8 +7,10 @@
 <meta property="product:price:amount" content="{{ listing.price }}">
 <meta property="product:price:currency" content="{{ listing.currency or 'EUR' }}">
 {% endif %}{% endfor %}
-{% if og_image %}<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">{% endif %}
+{# BL-177: don't declare og:image dimensions here -- they're set in base.html
+   only when actually known. Hardcoding 1200x630 was a LIE: user uploads are
+   typically 1000x750 (resize_and_store max 1200px proportional). WhatsApp
+   and Facebook reject the preview when declared dims don't match the file. #}
 <!-- JSON-LD Structured Data (Google rich results: price, rating, availability) -->
 <script type="application/ld+json">
 {

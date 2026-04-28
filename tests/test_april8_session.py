@@ -144,10 +144,15 @@ class TestItemDetailOGTags:
         assert "product:price:amount" in content
         assert "product:price:currency" in content
 
-    def test_has_og_image_size_hints(self):
+    def test_no_hardcoded_og_image_size_hints(self):
+        """BL-177: item_detail.html no longer hardcodes 1200x630 on top of
+        base.html's. Hardcoded dims were wrong for user uploads (typically
+        1000x750) and broke WhatsApp/Facebook previews."""
         content = self._read()
-        assert "og:image:width" in content
-        assert "og:image:height" in content
+        assert "og:image:width" not in content, (
+            "item_detail.html must not declare og:image:width -- base.html "
+            "handles dimensions only when actually known (no lying)"
+        )
 
 
 # ── Profile enum conversion ──
