@@ -348,7 +348,17 @@
                 if (data.condition) this.form.condition = data.condition;
                 if (data.item_type) this.form.item_type = data.item_type;
                 if (data.story_suggestion) this.form.story = data.story_suggestion;
+                // BL-178/179: auto-apply ALL AI tags to form.tags so user doesn't
+                // have to click each chip manually -- chips were a 'nice to have'
+                // refinement UI but Angel and other testers expected one-shot
+                // 'AI fills everything' behavior. Tags still appear as chips for
+                // visibility; clicking a chip de-dupes-add (no-op if already there).
                 this.aiTags = data.tags || [];
+                if (this.aiTags.length > 0) {
+                    const existing = (this.form.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+                    const merged = [...new Set([...existing, ...this.aiTags])];
+                    this.form.tags = merged.join(', ');
+                }
                 this.aiSuggestion = data;
                 this.aiProvider = data.ai_provider || 'gemini';
                 this.aiUsed = true;

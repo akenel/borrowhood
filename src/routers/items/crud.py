@@ -144,6 +144,15 @@ async def create_item(
         name=data.name,
         slug=slug,
         description=data.description,
+        # BL-178/179: story, tags, safety_notes, age_restricted were silently
+        # dropped on first-save. Schema accepted them but the route never
+        # copied them to the BHItem instance. PATCH (update) handled them
+        # via setattr loop, which is why edit-save worked but create-save
+        # quietly lost the AI-generated story + user-set tags.
+        story=data.story,
+        tags=data.tags,
+        age_restricted=data.age_restricted,
+        safety_notes=data.safety_notes,
         content_language=data.content_language,
         item_type=data.item_type,
         category=data.category,
