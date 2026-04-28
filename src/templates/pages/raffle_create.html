@@ -74,9 +74,19 @@
                 <p class="text-sm font-bold text-red-900">{% if lang == 'it' %}Gli organizzatori di sorteggi devono avere almeno 14 anni.{% else %}Raffle organizers must be 14 or older.{% endif %}</p>
             </div>
             {% elif user_age_years is none %}
-            <div class="bg-red-50 border-2 border-red-300 rounded-lg px-4 py-3">
-                <p class="text-sm font-bold text-red-900">{% if lang == 'it' %}Aggiungi la tua data di nascita nelle impostazioni prima di organizzare un sorteggio.{% else %}Add your date of birth in Settings before organizing a raffle.{% endif %}</p>
-                <a href="/settings" class="text-xs text-red-700 underline">{% if lang == 'it' %}Vai alle impostazioni{% else %}Go to Settings{% endif %} &rarr;</a>
+            <div class="bg-red-50 border-2 border-red-300 rounded-lg px-4 py-3" x-data="{ dob: '', saving: false, err: '' }">
+                <p class="text-sm font-bold text-red-900">{% if lang == 'it' %}Aggiungi la tua data di nascita prima di organizzare un sorteggio (riservato ai 14+).{% else %}Add your date of birth before organizing a raffle (14+ only).{% endif %}</p>
+                <div class="flex flex-wrap items-center gap-2 mt-2">
+                    <input type="date" x-model="dob" :max="new Date().toISOString().slice(0,10)" class="px-2 py-1.5 border border-red-300 rounded-md text-sm bg-white">
+                    <button type="button"
+                            :disabled="!dob || saving"
+                            @click="err=''; saving=true; fetch('/api/v1/users/me', {method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({date_of_birth: dob})}).then(async r => { if (!r.ok) { const j = await r.json().catch(()=>({})); throw new Error(j.detail || 'Save failed'); } window.location.reload(); }).catch(e => { err = e.message; saving = false; })"
+                            class="px-3 py-1.5 bg-red-600 text-white text-sm font-semibold rounded-md hover:bg-red-700 disabled:opacity-50">
+                        <span x-show="!saving">{% if lang == 'it' %}Salva{% else %}Save{% endif %}</span>
+                        <span x-show="saving" x-cloak>...</span>
+                    </button>
+                </div>
+                <p x-show="err" x-cloak x-text="err" class="text-xs text-red-700 mt-1"></p>
             </div>
             {% else %}
             <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">

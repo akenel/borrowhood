@@ -103,7 +103,20 @@ async def update_me(
         "offers_custom_orders", "offers_repair",
         "notify_telegram", "notify_email",
         "featured_video_url",
+        "date_of_birth",
     }
+
+    # date_of_birth: accept ISO YYYY-MM-DD (HTML5 <input type="date"> format) or null
+    if "date_of_birth" in data:
+        raw = data.get("date_of_birth")
+        if raw in (None, ""):
+            data["date_of_birth"] = None
+        else:
+            try:
+                from datetime import date as _date
+                data["date_of_birth"] = _date.fromisoformat(raw)
+            except (TypeError, ValueError):
+                raise HTTPException(status_code=400, detail="date_of_birth must be YYYY-MM-DD")
 
     # Fields backed by Postgres enums -- must convert string to enum or None
     from src.models.user import WorkshopType
