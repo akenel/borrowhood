@@ -30,19 +30,29 @@ import httpx
 SEED_DIR = Path("/app/src/static/uploads/seed-images")
 LOCAL_PREFIX = "/static/uploads/seed-images"
 
-# Be polite to Pollinations and don't hammer the box's network either
-CONCURRENCY = 5
-PER_REQUEST_TIMEOUT = 60  # seconds; first-time generation can be slow
+# Pollinations is aggressively rate-limited and slow on cold cache.
+# Run sequentially with a polite gap between requests; retry 429s.
+PER_REQUEST_TIMEOUT = 90    # cold-cache generation can take 30-60s
+INTER_REQUEST_DELAY = 4     # seconds between requests
+RETRY_429_BACKOFF = [10, 25, 60]  # seconds; ramp up on rate-limit
 
 
-async def fetch_one(client: httpx.AsyncClient, sem: asyncio.Semaphore,
-                     media_id, original_url: str):
-    """Download one Pollinations URL. Returns (media_id, local_url or None)."""
-    async with sem:
+async def fetch_one(client: httpx.AsyncClient, media_id, original_url: str):
+    """Download one Pollinations URL. Returns (media_id, local_url or None).
+    Retries 429 responses with exponential backoff."""
+    for attempt, backoff in enumerate([0] + RETRY_429_BACKOFF):
+        if backoff:
+            await asyncio.sleep(backoff)
         try:
             resp = await client.get(original_url, follow_redirects=True)
+            if resp.status_code == 429:
+                if attempt < len(RETRY_429_BACKOFF):
+                    print(f"  [429 retry {attempt+1}] {media_id} (sleeping {RETRY_429_BACKOFF[attempt]}s)")
+                    continue
+                print(f"  [429 gave-up] {media_id}")
+                return media_id, None
             if resp.status_code != 200:
-                print(f"  [{resp.status_code}] {media_id}: {original_url[:80]}")
+                print(f"  [{resp.status_code}] {media_id}: {original_url[:70]}")
                 return media_id, None
             data = resp.content
             if len(data) < 1000:
@@ -65,6 +75,7 @@ async def fetch_one(client: httpx.AsyncClient, sem: asyncio.Semaphore,
         except Exception as e:
             print(f"  [err] {media_id}: {type(e).__name__}: {e}")
             return media_id, None
+    return media_id, None
 
 
 async def main():
@@ -95,13 +106,19 @@ async def main():
     print(f"Saving to: {SEED_DIR}")
     print()
 
-    # Concurrent fetch
-    sem = asyncio.Semaphore(CONCURRENCY)
+    # Sequential fetch with polite delay -- Pollinations rate-limits aggressively
     timeout = httpx.Timeout(PER_REQUEST_TIMEOUT, connect=10)
-    limits = httpx.Limits(max_connections=CONCURRENCY * 2)
-    async with httpx.AsyncClient(timeout=timeout, limits=limits) as client:
-        tasks = [fetch_one(client, sem, mid, url) for mid, url in rows]
-        results = await asyncio.gather(*tasks)
+    results = []
+    async with httpx.AsyncClient(timeout=timeout) as client:
+        for i, (mid, url) in enumerate(rows):
+            if i > 0:
+                await asyncio.sleep(INTER_REQUEST_DELAY)
+            result = await fetch_one(client, mid, url)
+            results.append(result)
+            # Periodic progress + commit so we don't lose work on interrupt
+            if (i + 1) % 10 == 0:
+                done = sum(1 for _, lu in results if lu)
+                print(f"  ...progress {i+1}/{len(rows)} (got {done})")
 
     # Build update map
     updates = [(mid, local_url) for mid, local_url in results if local_url]
