@@ -76,6 +76,41 @@ class TestCreateItemPersistsAllSchemaFields:
             assert must_have in block, f"Lost a previously-working field: {must_have}"
 
 
+class TestCreateListingPersistsAllSchemaFields:
+    """Same root-cause as BL-178/179 but on the listing create endpoint:
+    availability_note, return_policy, delivery_fee all defined on the
+    schema but never copied to the new BHListing on first save."""
+
+    def _create_block(self):
+        listings_py = (REPO_ROOT / "src" / "routers" / "listings.py").read_text()
+        start = listings_py.find("@router.post(\"\"")
+        assert start > 0, "POST /api/v1/listings handler not found"
+        end = listings_py.find("db.add(listing)", start)
+        return listings_py[start:end]
+
+    def test_availability_note_set_on_create(self):
+        block = self._create_block()
+        assert "availability_note=data.availability_note" in block, (
+            "BL-180: create_listing must copy availability_note from the "
+            "payload. Was silently dropped (same pattern as BL-178/179)."
+        )
+
+    def test_return_policy_set_on_create(self):
+        block = self._create_block()
+        assert "return_policy=data.return_policy" in block, (
+            "create_listing must copy return_policy. Was missing alongside "
+            "availability_note -- found while fixing BL-180."
+        )
+
+    def test_delivery_fee_set_on_create(self):
+        block = self._create_block()
+        assert "delivery_fee=data.delivery_fee" in block, (
+            "BL-173 added the delivery_fee column + schema but the create "
+            "route was never updated. Edit-save preserved it (setattr loop) "
+            "but first save dropped it."
+        )
+
+
 class TestAITagsAutoApply:
     """The aiSuggest() handler must auto-apply the AI-suggested tags to
     form.tags so the user doesn't have to click each chip manually

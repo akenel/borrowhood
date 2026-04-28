@@ -161,8 +161,14 @@ async def create_listing(
         min_rental_days=data.min_rental_days,
         max_rental_days=data.max_rental_days,
         delivery_available=data.delivery_available,
+        delivery_fee=data.delivery_fee,
         pickup_only=data.pickup_only,
         notes=data.notes,
+        # BL-180: availability_note + return_policy were silently dropped on
+        # first create -- schema accepted them but route never copied them
+        # to the BHListing instance. Same pattern as BL-178/179 on items.
+        return_policy=data.return_policy,
+        availability_note=data.availability_note,
         auction_end=auction_end_dt,
         starting_bid=data.starting_bid,
         reserve_price=data.reserve_price,
