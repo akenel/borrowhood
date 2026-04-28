@@ -241,11 +241,16 @@ HELP_POSTS = [
 # ── Main ──────────────────────────────────────────────────────────────
 
 async def main():
+    import importlib
+    import pkgutil
     from sqlalchemy import select
     from src.database import async_session
-    # Import the full models package so SQLAlchemy can resolve every FK
-    # (BHUser references bh_community, etc.)
-    import src.models  # noqa: F401
+    # Register every model module so SQLAlchemy can resolve FKs at flush
+    # time (BHUser FKs to bh_community, etc., and not every model file is
+    # exposed through src/models/__init__.py).
+    import src.models as _models_pkg
+    for _, _modname, _ in pkgutil.iter_modules(_models_pkg.__path__):
+        importlib.import_module(f"src.models.{_modname}")
     from src.models.user import (
         AccountStatus, BadgeTier, BHUser, BHUserLanguage, BHUserPoints,
         BHUserSkill, CEFRLevel, WorkshopType,
