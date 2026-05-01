@@ -190,7 +190,7 @@ async def create_raffle(
         if age_years < 14:
             raise HTTPException(status_code=403, detail="Raffle organizers must be 14 or older.")
     else:
-        raise HTTPException(status_code=403, detail="Set your date of birth in Settings before organizing a raffle.")
+        raise HTTPException(status_code=403, detail="Add your date of birth before organizing a raffle (14+ only).")
 
     # Validate draw trigger
     if data.draw_date is None and data.max_tickets is None:
