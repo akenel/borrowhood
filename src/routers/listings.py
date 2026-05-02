@@ -137,18 +137,23 @@ async def create_listing(
         event_end_dt = _dt.fromisoformat(data.event_end.replace("Z", "+00:00"))
 
     # Determine listing status on create:
-    # - Draft stays draft (user wants to save without publishing)
-    # - Moderators/admins go straight to active
-    # - Everyone else goes to pending (awaiting review)
-    user_roles = set(token.get("realm_access", {}).get("roles", []))
-    is_moderator = bool(user_roles & _MODERATOR_ROLES)
-
+    # - DRAFT stays DRAFT (user wants to save without publishing)
+    # - Everything else goes straight to ACTIVE
+    #
+    # BL-187: previously this routed non-moderators to PENDING "awaiting
+    # review" -- but no moderation UI was ever built, so PENDING listings
+    # were dead on arrival. Mike Kenel hit this on Angel's Pentax P30T link
+    # (BL-186); audit found 22 other listings stuck PENDING the same way,
+    # invisible to everyone but their owners (and moderators who never
+    # checked the queue). Switching to ACTIVE-by-default matches the way
+    # 99% of marketplaces operate (Craigslist, FB Marketplace, eBay first-
+    # listing, etc.); bad listings get caught reactively via the existing
+    # /reports endpoint, not pre-emptively by a non-existent reviewer team.
+    # Moderators retain ability to manually flip listings to PAUSED/REMOVED.
     if data.status == ListingStatus.DRAFT:
         create_status = ListingStatus.DRAFT
-    elif is_moderator:
-        create_status = ListingStatus.ACTIVE
     else:
-        create_status = ListingStatus.PENDING
+        create_status = ListingStatus.ACTIVE
 
     listing = BHListing(
         item_id=data.item_id,

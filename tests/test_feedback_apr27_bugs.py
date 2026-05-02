@@ -489,6 +489,32 @@ class TestBhShareCarriesDescriptionText:
             "opens with item context pre-filled"
         )
 
+    def test_listing_create_defaults_active_not_pending(self):
+        """BL-187: regular users (non-moderators) must get ACTIVE on create,
+        not PENDING. The PENDING-as-soft-moderation route was scaffolded
+        but the moderation UI was never built -- 22 listings ended up
+        stuck PENDING and invisible (Mike hit one on Angel's Pentax link
+        in BL-186). Now: DRAFT stays DRAFT, everything else goes ACTIVE.
+        Bad listings get caught reactively via /reports."""
+        listings_py = (REPO_ROOT / "src" / "routers" / "listings.py").read_text()
+        # The create_listing function must NOT route non-moderators to PENDING
+        create_block = listings_py.split("@router.post(\"\"")[1].split("@router.patch")[0]
+        # Forbidden: routing a non-moderator path to PENDING in the create branch
+        assert "create_status = ListingStatus.PENDING" not in create_block, (
+            "create_listing route must NOT default new listings to PENDING "
+            "(BL-187): no moderation UI exists to drain that queue, so "
+            "PENDING listings stay invisible to everyone but the owner. "
+            "DRAFT stays DRAFT, everything else goes ACTIVE."
+        )
+        # Required: DRAFT and ACTIVE branches still exist
+        assert "create_status = ListingStatus.DRAFT" in create_block, (
+            "DRAFT-stays-DRAFT branch must still exist so users can save "
+            "without publishing"
+        )
+        assert "create_status = ListingStatus.ACTIVE" in create_block, (
+            "Default branch must set status = ACTIVE for new listings"
+        )
+
     def test_owner_sees_their_own_draft_listings_with_status_pill(self):
         """Angel: 'pricing always blank in draft mode' -- the owner couldn't
         see their own draft's price because the listings card filtered for
