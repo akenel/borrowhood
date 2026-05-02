@@ -263,6 +263,60 @@ async def test_item_detail_404_nonexistent(client):
 
 @needs_db
 @pytest.mark.asyncio
+async def test_item_detail_404_for_nonexistent_renders_bare_404_not_friendly(client):
+    """BL-186 regression guard: when the item slug doesn't exist *at all*,
+    the route must still render the bare 404 template -- NOT the friendly
+    listing-not-published page (which would try to render an owner card
+    with no item and crash, or render an empty card)."""
+    resp = await client.get("/items/this-item-does-not-exist-12345")
+    assert resp.status_code == 404
+    # The friendly page would have a noindex meta tag and the
+    # listing-not-published copy. The bare 404 has neither.
+    assert 'name="robots" content="noindex,nofollow"' not in resp.text, (
+        "missing-item case must render bare 404 template, not the "
+        "friendly listing-not-published page"
+    )
+    assert "isn't published yet" not in resp.text
+
+
+@needs_db
+@pytest.mark.asyncio
+async def test_item_detail_unpublished_renders_friendly_page_for_anon(client):
+    """BL-186: anonymous (non-owner) visitor hitting an item with no
+    ACTIVE listing must see the friendly page with owner card + Message-
+    Owner CTA + noindex meta -- not the bare 404. This requires a seeded
+    item whose only listing is PENDING/DRAFT.
+
+    Test relies on at least one such item existing in seed data; if the
+    seed has none, this test will be skipped via xfail."""
+    # Pentax slug from the BL-186 reproduction case
+    resp = await client.get(
+        "/items/pentax-p30t-film-camera-great-for-beginners",
+        follow_redirects=False,
+    )
+    if resp.status_code == 200:
+        # Listing got published since seed creation -- skip rather than
+        # silently misbehave.
+        pytest.skip(
+            "Test fixture listing has been published; can't verify "
+            "the friendly-page path. Re-seed or pick another fixture."
+        )
+    assert resp.status_code == 404, (
+        "unpublished item must return 404 (search-engine safe)"
+    )
+    assert 'name="robots" content="noindex,nofollow"' in resp.text, (
+        "friendly page must include noindex meta"
+    )
+    assert "isn't published yet" in resp.text, (
+        "friendly page must show the human-friendly heading"
+    )
+    assert "/messages?to=" in resp.text, (
+        "friendly page must include the Message-Owner CTA"
+    )
+
+
+@needs_db
+@pytest.mark.asyncio
 async def test_item_detail_has_similar_items_section(client):
     """Item detail should have a Similar Items section."""
     browse = await client.get("/browse")

@@ -410,6 +410,85 @@ class TestBhShareCarriesDescriptionText:
             "template must use the i18n key, not a hard-coded English string"
         )
 
+    def test_not_published_i18n_keys_exist_in_all_locales(self):
+        """BL-186: every locale must carry the new errors.not_published_*
+        keys; missing keys would render the raw key string in the UI."""
+        import json
+        from pathlib import Path
+        locales_dir = REPO_ROOT / "src" / "locales"
+        required_keys = ("not_published_title", "not_published_text")
+        for locale_file in locales_dir.glob("*.json"):
+            data = json.loads(locale_file.read_text())
+            errors = data.get("errors", {})
+            for key in required_keys:
+                assert key in errors, (
+                    f"{locale_file.name} is missing the i18n key "
+                    f"errors.{key} -- without it the friendly "
+                    f"listing-not-published page renders the raw "
+                    f"key string instead of human text"
+                )
+                # Cheap sanity check: not just an empty string
+                assert errors[key].strip(), (
+                    f"{locale_file.name}: errors.{key} is empty"
+                )
+
+    def test_not_published_template_extends_base_for_chrome(self):
+        """The friendly page must use the site chrome (header, nav, footer)
+        -- otherwise it looks broken/orphaned. Verifies it extends base.html
+        and uses the {% block content %} pattern."""
+        tpl = (REPO_ROOT / "src" / "templates" / "errors"
+               / "listing_not_published.html").read_text()
+        assert '{% extends "base.html" %}' in tpl, (
+            "listing_not_published.html must extend base.html so the "
+            "page has the standard nav/header/footer chrome"
+        )
+        assert "{% block content %}" in tpl and "{% endblock %}" in tpl, (
+            "template must use the {% block content %} pattern"
+        )
+        assert "{% block head %}" in tpl, (
+            "template must use the {% block head %} hook to inject "
+            "the noindex meta tag into the page <head>"
+        )
+
+    def test_not_published_template_does_not_leak_owner_keycloak_id(self):
+        """Defense-in-depth: even on the unpublished page, we must not
+        render the owner's keycloak_id (BL-prior security fix removed
+        it from item_detail). Template should reference owner.id (uuid)
+        and owner.slug, never owner.keycloak_id."""
+        tpl = (REPO_ROOT / "src" / "templates" / "errors"
+               / "listing_not_published.html").read_text()
+        assert "keycloak_id" not in tpl, (
+            "listing_not_published.html must not reference "
+            "owner.keycloak_id -- that's a PII leak vector"
+        )
+
+    def test_not_published_friendly_page_does_not_replace_real_404_for_missing_items(self):
+        """When an item slug doesn't exist at all (not just unpublished),
+        the route must still return the bare 404 template -- otherwise
+        we'd render an empty owner card. The friendly page is only for
+        the case where the item EXISTS but has no active listing."""
+        item_py = (REPO_ROOT / "src" / "routers" / "pages" / "item.py").read_text()
+        # The "item not found" branch (line ~48) renders errors/404.html
+        # (not listing_not_published.html) because there's no item to render
+        # an owner card for.
+        assert 'errors/404.html' in item_py, (
+            "item route must still render errors/404.html for the "
+            "no-item-at-all case (otherwise the friendly page would try "
+            "to render an empty owner card and crash the template)"
+        )
+
+    def test_not_published_template_links_message_thread_with_item_context(self):
+        """The Message-Owner CTA must pre-fill the message thread with
+        the item name as context, so the owner immediately knows which
+        listing the visitor was trying to reach."""
+        tpl = (REPO_ROOT / "src" / "templates" / "errors"
+               / "listing_not_published.html").read_text()
+        assert "/messages?to={{ item.owner.id }}&about={{ item.name | urlencode }}" in tpl, (
+            "Message-Owner CTA must include both `to=` (owner id) and "
+            "`about=` (urlencoded item name) so the message thread "
+            "opens with item context pre-filled"
+        )
+
     def test_owner_sees_their_own_draft_listings_with_status_pill(self):
         """Angel: 'pricing always blank in draft mode' -- the owner couldn't
         see their own draft's price because the listings card filtered for
