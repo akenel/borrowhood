@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('errors.not_published_title') }} - {{ t('app.name') }}{% endblock %}
+
+{% block head %}
+{# BL-170 follow-up: do not let unpublished listings get indexed by search engines #}
+<meta name="robots" content="noindex,nofollow">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-16 text-center">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+    </div>
+
+    <h1 class="text-2xl font-bold text-gray-900">{{ t('errors.not_published_title') }}</h1>
+    <p class="mt-3 text-gray-600">{{ t('errors.not_published_text') }}</p>
+
+    {% if item and item.owner %}
+    <div class="mt-10 max-w-md mx-auto bg-white rounded-lg border border-gray-200 p-6 text-left">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">{{ t('item.listed_by') }}</p>
+        <a href="/workshop/{{ item.owner.slug }}" class="flex items-center space-x-3 group">
+            {% if item.owner.avatar_url %}
+            <img src="{{ item.owner.avatar_url }}" alt="{{ item.owner.display_name }}" class="w-12 h-12 rounded-full object-cover">
+            {% else %}
+            <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                <span class="text-lg font-bold text-indigo-600">{{ item.owner.display_name[0] }}</span>
+            </div>
+            {% endif %}
+            <div>
+                <p class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                    {{ item.owner.workshop_name or item.owner.display_name }}
+                </p>
+                {% if item.owner.tagline %}
+                <p class="text-xs text-gray-500">{{ item.owner.tagline }}</p>
+                {% endif %}
+            </div>
+        </a>
+
+        <a href="/messages?to={{ item.owner.id }}&about={{ item.name | urlencode }}"
+           class="mt-5 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors min-h-[44px]">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            {{ t('item.contact_owner') }}
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="/browse"
+           class="w-full sm:w-auto px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors min-h-[44px] text-center">
+            {{ t('browse.title') }}
+        </a>
+        <a href="/"
+           class="w-full sm:w-auto px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors min-h-[44px] text-center">
+            {{ t('errors.go_home') }}
+        </a>
+    </div>
+</div>
+{% endblock %}

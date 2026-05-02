@@ -372,6 +372,44 @@ class TestBhShareCarriesDescriptionText:
             "draft banner condition"
         )
 
+    def test_unpublished_listing_renders_friendly_page_not_bare_404(self):
+        """BL-186 (BL-170 follow-up): when a non-owner hits an item whose
+        only listing is PENDING/DRAFT, render `errors/listing_not_published`
+        with the owner card so they can message the owner -- not a generic
+        404 that looks like the URL is broken. Status stays 404 so search
+        engines don't index unpublished items; template carries
+        noindex meta tag."""
+        item_py = (REPO_ROOT / "src" / "routers" / "pages" / "item.py").read_text()
+        assert "errors/listing_not_published.html" in item_py, (
+            "item route must render the friendly listing-not-published "
+            "template (with owner card) for non-owners on unpublished items"
+        )
+        # Item must be passed into ctx so the template can render the owner card
+        assert "ctx = _ctx(request, token, item=item)" in item_py, (
+            "item must be passed to ctx for the listing_not_published "
+            "template to render the owner avatar / message-owner CTA"
+        )
+
+    def test_listing_not_published_template_exists_with_owner_card_and_noindex(self):
+        tpl_path = (REPO_ROOT / "src" / "templates" / "errors"
+                    / "listing_not_published.html")
+        assert tpl_path.exists(), (
+            "errors/listing_not_published.html must exist -- it's the "
+            "friendly page for non-owners hitting an unpublished item"
+        )
+        html = tpl_path.read_text()
+        assert 'name="robots" content="noindex,nofollow"' in html, (
+            "listing_not_published template must include the noindex meta "
+            "tag so search engines never index unpublished listings"
+        )
+        assert "item.owner" in html and "/messages?to=" in html, (
+            "template must render the owner avatar/name and a Message-Owner "
+            "CTA so visitors can ping the owner to publish the listing"
+        )
+        assert "errors.not_published_title" in html, (
+            "template must use the i18n key, not a hard-coded English string"
+        )
+
     def test_owner_sees_their_own_draft_listings_with_status_pill(self):
         """Angel: 'pricing always blank in draft mode' -- the owner couldn't
         see their own draft's price because the listings card filtered for

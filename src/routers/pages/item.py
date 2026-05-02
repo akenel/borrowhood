@@ -77,13 +77,20 @@ async def item_detail(slug: str, request: Request,
     # publicly viewable -- Giulia hit this on her counselling listing: page
     # rendered with no price/booking and looked broken. Owners still see
     # their drafts so they can edit + publish.
+    #
+    # BL-170 follow-up (BL-186): instead of a bare 404, show non-owners a
+    # friendly "this listing isn't published yet" page with the owner's card
+    # so they can message the owner directly. Mike Kenel hit this on the
+    # Pentax Pp30t link: page 404'd with no recourse. Status stays 404 so
+    # search engines don't index unpublished items, and the template carries
+    # a noindex meta tag for belt-and-suspenders.
     has_active_listing = any(
         l.status == ListingStatus.ACTIVE and not l.deleted_at
         for l in (item.listings or [])
     )
     if not has_active_listing and not is_owner:
-        ctx = _ctx(request, token)
-        return _render("errors/404.html", ctx, status_code=404)
+        ctx = _ctx(request, token, item=item)
+        return _render("errors/listing_not_published.html", ctx, status_code=404)
 
     # Similar items: same category, different item, limit 4
     # Load listings + owner so the card can render type badge, price, owner avatar

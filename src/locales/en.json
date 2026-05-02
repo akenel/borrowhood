@@ -707,6 +707,8 @@
   "errors": {
     "not_found_title": "Page not found",
     "not_found_text": "The page you're looking for doesn't exist or has been moved.",
+    "not_published_title": "This listing isn't published yet",
+    "not_published_text": "The owner is still preparing it. Drop them a message if you're interested -- they'll know to publish it.",
     "server_error_title": "Something went wrong",
     "server_error_text": "We're working on it. Please try again in a moment.",
     "go_home": "Go Home"

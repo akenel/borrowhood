@@ -707,6 +707,8 @@
   "errors": {
     "not_found_title": "Pagina non trovata",
     "not_found_text": "La pagina che stai cercando non esiste o è stata spostata.",
+    "not_published_title": "Questo annuncio non è ancora pubblicato",
+    "not_published_text": "Il proprietario lo sta ancora preparando. Se ti interessa, scrivigli un messaggio -- saprà che è ora di pubblicarlo.",
     "server_error_title": "Qualcosa è andato storto",
     "server_error_text": "Ci stiamo lavorando. Riprova tra un momento.",
     "go_home": "Vai alla Home"
