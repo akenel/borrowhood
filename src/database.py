@@ -124,6 +124,8 @@ async def run_migrations():
         # 2026-04-17: Raffle gamification columns (added after initial table creation)
         "ALTER TABLE bh_raffle ADD COLUMN IF NOT EXISTS verifications_positive INTEGER DEFAULT 0",
         "ALTER TABLE bh_raffle ADD COLUMN IF NOT EXISTS verifications_negative INTEGER DEFAULT 0",
+        # 2026-05-11: BL-001 calendar blackout dates (Alice's first feedback on staging)
+        "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS blackout_dates JSONB DEFAULT '{}'::jsonb",
     ]
     # ALTER TYPE ... ADD VALUE -- SQLAlchemy uses enum .name (UPPERCASE) for PG enums
     enum_migrations = [
