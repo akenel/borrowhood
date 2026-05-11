@@ -1,7 +1,7 @@
 """Pydantic schemas for listing endpoints."""
 
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -38,6 +38,7 @@ class ListingOut(BaseModel):
     event_address: Optional[str] = None
     event_link: Optional[str] = None
     availability_note: Optional[str] = None
+    blackout_dates: Optional[dict[str, Any]] = None
 
     class Config:
         from_attributes = True
@@ -72,6 +73,7 @@ class ListingCreate(BaseModel):
     event_address: Optional[str] = Field(None, max_length=500)
     event_link: Optional[str] = Field(None, max_length=1000)
     availability_note: Optional[str] = Field(None, max_length=500)
+    blackout_dates: Optional[dict[str, Any]] = None
 
 
 class ListingUpdate(BaseModel):
@@ -98,3 +100,4 @@ class ListingUpdate(BaseModel):
     event_address: Optional[str] = Field(None, max_length=500)
     event_link: Optional[str] = Field(None, max_length=1000)
     availability_note: Optional[str] = Field(None, max_length=500)
+    blackout_dates: Optional[dict[str, Any]] = None

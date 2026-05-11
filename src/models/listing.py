@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import DateTime, Enum, Float, ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base, BHBase
@@ -71,6 +71,34 @@ class BHListing(BHBase, Base):
     # MVP availability note (free text). Signals preferred hours / days off / vacation.
     # Full rule-based availability will replace this -- see docs/AVAILABILITY-DESIGN.md.
     availability_note: Mapped[Optional[str]] = mapped_column(String(500))
+
+    # BL-001: Structured blackout dates. JSONB shape:
+    #   {
+    #     "ranges": [{"from": "2026-06-01", "to": "2026-06-30", "reason": "Holidays"}, ...],
+    #     "recurring_weekdays": [5, 6]   # Python weekday: Mon=0 ... Sun=6
+    #   }
+    # Used by is_blocked() helper to gate booking creation.
+    blackout_dates: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+
+    def is_blocked(self, target_date) -> bool:
+        """Return True if target_date (date or ISO string 'YYYY-MM-DD') is blocked.
+
+        A date is blocked when:
+        - its weekday (Mon=0..Sun=6) is in blackout_dates.recurring_weekdays, OR
+        - it falls within any range in blackout_dates.ranges (inclusive).
+        """
+        from datetime import date as _date
+        bd = self.blackout_dates or {}
+        if isinstance(target_date, str):
+            target_date = _date.fromisoformat(target_date)
+        if target_date.weekday() in bd.get("recurring_weekdays", []):
+            return True
+        target_iso = target_date.isoformat()
+        for r in bd.get("ranges", []):
+            f, t = r.get("from"), r.get("to")
+            if f and t and f <= target_iso <= t:
+                return True
+        return False
 
     # Minimum charge + team pricing (service/training listings)
     minimum_charge: Mapped[Optional[float]] = mapped_column(Float)     # Floor price regardless of hours/days

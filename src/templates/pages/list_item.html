@@ -173,14 +173,16 @@
         form: window._editForm
             ? Object.assign({
                   content_language: '{{ lang }}', currency: 'EUR',
-                  delivery_available: false, delivery_fee: '', notes: '', return_policy: '', availability_note: ''
+                  delivery_available: false, delivery_fee: '', notes: '', return_policy: '', availability_note: '',
+                  blackout_dates: { ranges: [], recurring_weekdays: [] }
               }, window._editForm)
             : {
                   name: '', description: '', story: '', category: 'power_tools',
                   item_type: 'physical', condition: 'good', brand: '',
                   age_restricted: false, safety_notes: '', tags: '',
                   content_language: '{{ lang }}', currency: 'EUR',
-                  delivery_available: false, delivery_fee: '', notes: '', return_policy: '', availability_note: ''
+                  delivery_available: false, delivery_fee: '', notes: '', return_policy: '', availability_note: '',
+                  blackout_dates: { ranges: [], recurring_weekdays: [] }
               },
         itemAttributes: (window._editData && window._editData.attributes)
             ? window._editData.attributes
@@ -228,6 +230,12 @@
                     this.form.availability_note = first.availability_note || '';
                     this.form.delivery_available = first.delivery_available || false;
                     this.form.delivery_fee = first.delivery_fee != null ? first.delivery_fee : '';
+                    // BL-001: hydrate blackout_dates; tolerate null / partial shapes
+                    var bd = first.blackout_dates || {};
+                    this.form.blackout_dates = {
+                        ranges: Array.isArray(bd.ranges) ? bd.ranges : [],
+                        recurring_weekdays: Array.isArray(bd.recurring_weekdays) ? bd.recurring_weekdays : []
+                    };
                 }
             }
         },
@@ -523,12 +531,15 @@
                     const hydratedNotes = firstListing.notes || '';
                     const hydratedReturnPolicy = firstListing.return_policy || '';
                     const hydratedAvailability = firstListing.availability_note || '';
+                    const hydratedBlackoutJson = JSON.stringify(firstListing.blackout_dates || {});
                     const curNotes = this.form.notes || '';
                     const curReturnPolicy = this.form.return_policy || '';
                     const curAvailability = this.form.availability_note || '';
+                    const curBlackoutJson = JSON.stringify(this.form.blackout_dates || {});
                     const notesChanged = curNotes !== hydratedNotes;
                     const returnPolicyChanged = curReturnPolicy !== hydratedReturnPolicy;
                     const availabilityChanged = curAvailability !== hydratedAvailability;
+                    const blackoutChanged = curBlackoutJson !== hydratedBlackoutJson;
                     for (const existing of window._editData.listings) {
                         const lt = existing.listing_type;
                         const terms = this.listingPrices[lt];
@@ -550,6 +561,7 @@
                         if (notesChanged) payload.notes = curNotes === '' ? null : curNotes;
                         if (returnPolicyChanged) payload.return_policy = curReturnPolicy === '' ? null : curReturnPolicy;
                         if (availabilityChanged) payload.availability_note = curAvailability === '' ? null : curAvailability;
+                        if (blackoutChanged) payload.blackout_dates = this.form.blackout_dates;
                         if (isSvcType) {
                             if (terms.minimum_charge) payload.minimum_charge = parseFloat(terms.minimum_charge);
                             if (terms.per_person_rate) payload.per_person_rate = parseFloat(terms.per_person_rate);
@@ -596,7 +608,8 @@
                         pickup_only: isGiveaway ? true : !this.form.delivery_available,
                         notes: this.form.notes || null,
                         return_policy: this.form.return_policy || null,
-                        availability_note: this.form.availability_note || null
+                        availability_note: this.form.availability_note || null,
+                        blackout_dates: this.form.blackout_dates  // BL-001: { ranges, recurring_weekdays }
                     };
                     if (isSvcType) {
                         if (terms.minimum_charge) payload.minimum_charge = parseFloat(terms.minimum_charge);
@@ -1645,6 +1658,59 @@
                           placeholder="{{ t('availability.note_placeholder') }}"
                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
                 <p class="text-xs text-gray-400 mt-1">{{ t('availability.note_hint') }}</p>
+            </div>
+
+            <!-- BL-001: Calendar blackout dates -- block specific dates or recurring weekdays -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    {% if lang == 'it' %}Date bloccate{% else %}Blocked dates{% endif %}
+                </label>
+                <p class="text-xs text-gray-500 mb-3">
+                    {% if lang == 'it' %}
+                        Blocca i giorni in cui non puoi accettare prenotazioni (weekend, ferie, festivit&agrave;).
+                    {% else %}
+                        Block days you can't accept bookings (weekends, holidays, vacation).
+                    {% endif %}
+                </p>
+
+                <!-- Quick toggle: Block weekends (Sat=5, Sun=6 in Python weekday) -->
+                <label class="flex items-center gap-2 mb-3 cursor-pointer">
+                    <input type="checkbox"
+                           :checked="form.blackout_dates.recurring_weekdays.includes(5) && form.blackout_dates.recurring_weekdays.includes(6)"
+                           @change="form.blackout_dates.recurring_weekdays = $event.target.checked
+                              ? [...new Set([...form.blackout_dates.recurring_weekdays, 5, 6])]
+                              : form.blackout_dates.recurring_weekdays.filter(d => d !== 5 && d !== 6)"
+                           class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    <span class="text-sm text-gray-700">
+                        {% if lang == 'it' %}Blocca i fine settimana (sabato e domenica){% else %}Block weekends (Saturdays and Sundays){% endif %}
+                    </span>
+                </label>
+
+                <!-- Specific date ranges -->
+                <div class="space-y-2 mb-2" x-show="form.blackout_dates.ranges.length > 0">
+                    <template x-for="(range, idx) in form.blackout_dates.ranges" :key="idx">
+                        <div class="flex flex-wrap items-center gap-2 p-2 bg-gray-50 rounded border border-gray-200">
+                            <input type="date" x-model="range.from"
+                                   class="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-indigo-500">
+                            <span class="text-gray-500 text-sm">&rarr;</span>
+                            <input type="date" x-model="range.to"
+                                   class="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-indigo-500">
+                            <input type="text" x-model="range.reason" maxlength="80"
+                                   :placeholder="'{% if lang == 'it' %}motivo (opzionale){% else %}reason (optional){% endif %}'"
+                                   class="flex-1 min-w-[120px] px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-indigo-500">
+                            <button type="button"
+                                    @click="form.blackout_dates.ranges.splice(idx, 1)"
+                                    class="text-red-600 hover:text-red-800 px-2 py-1 text-lg font-bold"
+                                    title="{% if lang == 'it' %}Rimuovi{% else %}Remove{% endif %}">&times;</button>
+                        </div>
+                    </template>
+                </div>
+
+                <button type="button"
+                        @click="form.blackout_dates.ranges.push({ from: '', to: '', reason: '' })"
+                        class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+                    + {% if lang == 'it' %}Aggiungi un intervallo di date{% else %}Add date range{% endif %}
+                </button>
             </div>
             </div>
             <!-- BL-174: end Step 2 (HOW). Footer below adapts to whichever step is active. -->
