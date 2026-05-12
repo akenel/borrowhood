@@ -79,6 +79,24 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # The app uses pg_trgm's similarity() function for fuzzy search.
+      # It's an optional Postgres extension -- has to be CREATE EXTENSION'd
+      # in each fresh database. Prod has it (set up manually long ago).
+      # CI needs to add it explicitly or any test exercising fuzzy search
+      # will hit "function similarity(...) does not exist".
+      - name: Enable Postgres extensions needed by the app
+        env:
+          PGPASSWORD: borrowhood_pass
+        run: |
+          # Wait for postgres to be ready (service container can be slow on first run)
+          for i in {1..10}; do
+            pg_isready -h localhost -U borrowhood && break
+            echo "Waiting for postgres... ($i/10)"
+            sleep 2
+          done
+          psql -h localhost -U borrowhood -d borrowhood -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+          psql -h localhost -U borrowhood -d borrowhood -c "SELECT extname, extversion FROM pg_extension;"
+
       # The seed has a known KeyError('item_type') bug -- see backlog.
       # Allow CI to continue past it so the actual test suite gets a chance
       # to run. Remove `continue-on-error` once seed bug is fixed in source.
