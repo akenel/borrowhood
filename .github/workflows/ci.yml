@@ -82,11 +82,19 @@ jobs:
       # The seed has a known KeyError('item_type') bug -- see backlog.
       # Allow CI to continue past it so the actual test suite gets a chance
       # to run. Remove `continue-on-error` once seed bug is fixed in source.
+      #
+      # IMPORTANT: `from src.main import app` is load-bearing. It triggers
+      # the import of all routers, which import all models, which register
+      # with Base.metadata. Without it, create_tables() only builds tables
+      # for models Python happens to have loaded -- e.g., bh_badge would be
+      # missing, breaking test_user_badges_public. Don't delete the import
+      # just because nothing references `app` in this script.
       - name: Set up schema + seed (best-effort)
         continue-on-error: true
         run: |
           python -c "
           import asyncio
+          from src.main import app  # load-bearing: registers all models with Base
           from src.database import create_tables, async_session
           from src.services.seeding import seed_database
           async def setup():
