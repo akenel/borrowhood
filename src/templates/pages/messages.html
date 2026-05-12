@@ -7,6 +7,51 @@
 
     <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ t('i18n.messages') }}</h1>
 
+    <!-- BL-191: Surface incoming quote requests at the top of the inbox.
+         Quote requests live in /orders?tab=quotes, but users expect them in Messages.
+         This banner closes that discoverability gap. -->
+    <div x-data="{
+            pending: [],
+            loaded: false,
+            async load() {
+                try {
+                    const r = await fetch('/api/v1/service-quotes?status=REQUESTED&role=provider&limit=10');
+                    if (r.ok) this.pending = await r.json();
+                } catch (e) { /* silent -- banner just stays hidden */ }
+                this.loaded = true;
+            }
+         }"
+         x-init="load()"
+         x-show="loaded && pending.length > 0"
+         x-cloak
+         class="mb-4">
+        <a href="/orders?tab=quotes"
+           class="block p-4 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg transition-colors group">
+            <div class="flex items-center gap-3">
+                <div class="flex-shrink-0 w-10 h-10 bg-amber-100 border border-amber-300 rounded-full flex items-center justify-center group-hover:bg-amber-200 transition-colors">
+                    <svg class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-amber-900">
+                        <span x-text="pending.length"></span>
+                        {% if lang == 'it' %}
+                        <span x-show="pending.length === 1">richiesta di preventivo in attesa</span>
+                        <span x-show="pending.length !== 1">richieste di preventivo in attesa</span>
+                        {% else %}
+                        <span x-show="pending.length === 1">pending quote request</span>
+                        <span x-show="pending.length !== 1">pending quote requests</span>
+                        {% endif %}
+                    </p>
+                    <p class="text-xs text-amber-700 mt-0.5">
+                        {% if lang == 'it' %}Tocca per rispondere con un prezzo &rarr;{% else %}Tap to respond with pricing &rarr;{% endif %}
+                    </p>
+                </div>
+            </div>
+        </a>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Thread list (inbox) -->
         <div class="md:col-span-1 bg-white rounded-lg border border-gray-200 overflow-hidden">
