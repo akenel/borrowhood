@@ -40,3 +40,6 @@ google-genai>=1.65.0
 minio==7.2.12
 
 # Stripe payments (uses httpx for API calls -- no SDK needed)
+
+# Testing
+lxml>=5.0           # HTML/XML parser used by tests/test_list_form_structure.py (BL-174 regression)
