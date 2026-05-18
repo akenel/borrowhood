@@ -1,16 +1,20 @@
-# BorrowHood
+# La Piazza
 
 **"Rent it. Lend it. Share it. Teach it."**
 
 *Free as in freedom. Open source. No platform fees. Forever.*
 
-![BorrowHood Demo](docs/demo.gif)
+> Brand: **La Piazza**. Codename (codebase, repo, db prefix `bh_*`): BorrowHood. Same product, the brand is the public-facing name.
 
-**Live demo:** [https://46.62.138.218](https://46.62.138.218) (test user: `angel` / `helix_pass`)
+![La Piazza Demo](docs/demo.gif)
 
-> **First visit?** Your browser will show a certificate warning ("Your connection is not private") because the server uses a self-signed certificate. This is expected. Click **Advanced** then **Proceed to site**. It only happens once.
+**Live:** [lapiazza.app](https://lapiazza.app/) (production — real users) — Let's Encrypt cert, no warnings.
+**Staging:** [staging.lapiazza.app](https://staging.lapiazza.app/) (sandbox — for testing new features before they hit prod).
+**Test user:** `angel` / `helix_pass` (or click **Demo** in the nav for a one-click persona).
 
-**Video walkthroughs:** [YouTube Playlist -- BorrowHood Feature Demos](https://youtube.com/playlist?list=PLrRlgzUrqK1_HzIH6cRHKtfYOuawEeSS3)
+**Video walkthroughs:** [YouTube Playlist — Feature Demos](https://youtube.com/playlist?list=PLrRlgzUrqK1_HzIH6cRHKtfYOuawEeSS3)
+
+**Platform repo:** This app runs on top of the [HelixNet platform](https://github.com/akenel/helixnet) (FastAPI + Keycloak + Caddy kernel). If you want the underlying infrastructure, start there.
 
 ---
 
@@ -26,25 +30,25 @@
 
 ---
 
-## What Is BorrowHood?
+## What Is La Piazza?
 
-A community rental, services, and skills platform. People list their underused tools, kitchen gear, equipment, and skills -- and neighbors borrow, rent, or trade. No middlemen. No fees. No algorithm deciding who sees what.
+A community rental, services, and skills platform — the "town square" of your neighborhood. People list their underused tools, kitchen gear, equipment, and skills, and neighbors borrow, rent, or trade. No middlemen. No fees. No algorithm deciding who sees what.
 
 Every user is a workshop. Every garage becomes a rental shop. Every kitchen becomes a bakery.
 
 ## The Origin Story
 
-My father Albert was a hand-shovel landscaper in Switzerland from 1960 to 2020. His garage had 500 tools. When he passed, they sat there collecting dust. His neighbors still needed shovels, rakes, and chainsaws -- they just didn't know where to look.
+My father Albert Kenel was a hand-shovel landscaper in Switzerland from 1960 to 2020. His garage had 500 tools. When he passed, they sat there collecting dust. His neighbors still needed shovels, rakes, and chainsaws — they just didn't know where to look.
 
 Craigslist is a wasteland. Facebook Marketplace is a data farm. None of them care about your community.
 
-BorrowHood fixes that. Built from a camper van in Trapani, Sicily.
+La Piazza fixes that. Built from a camper van in Trapani, Sicily.
 
 ## DEV Weekend Challenge
 
-This project was built for the [DEV Weekend Challenge](https://dev.to/challenges/weekend-2026-02-28) -- Anthropic Claude Code edition.
+This project was built for the [DEV Weekend Challenge](https://dev.to/challenges/weekend-2026-02-28) — Anthropic Claude Code edition.
 
-**Built with:** Claude Code (Claude Opus 4.6) as co-pilot.
+**Built with:** Claude Code (Opus 4.6, later 4.7) as co-pilot. Pair-programmed from a camper van.
 
 ---
 
@@ -311,10 +315,11 @@ QA Module:
 
 ### Option A: Just look at it (live demo)
 
-1. Open [https://46.62.138.218](https://46.62.138.218)
-2. Your browser will warn you about the certificate. Click **Advanced** > **Proceed**. (Self-signed cert, expected.)
-3. Browse around. No login needed for the public pages.
-4. To log in: click **Demo** in the nav bar, or go to `/demo-login` and pick a user. All passwords are `helix_pass`.
+1. Open [https://lapiazza.app](https://lapiazza.app/) (production) or [https://staging.lapiazza.app](https://staging.lapiazza.app/) (sandbox, safe to break)
+2. Browse around. No login needed for the public pages.
+3. To log in: click **Demo** in the nav bar, or go to `/demo-login` and pick a user. All passwords are `helix_pass`.
+
+> Both URLs use Let's Encrypt certificates — no browser warnings, no "click Advanced" dance.
 
 ### Option B: Run it yourself
 
@@ -477,5 +482,6 @@ MIT
 
 ---
 
-*Built from a camper van in Trapani, Sicily. 2026.*
+*La Piazza — built from a camper van in Trapani, Sicily. 2026.*
 *"Every neighborhood has a garage like his."*
+*"Casa è dove parcheggi." — Home is where you park it.*
