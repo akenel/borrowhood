@@ -276,7 +276,10 @@ async def browse_raffles(
         .where(BHRaffle.deleted_at.is_(None))
     )
     if status == "all":
-        q = q.where(BHRaffle.status != RaffleStatus.DRAFT)
+        # BL-192: exclude both DRAFT (unpublished) and CANCELLED raffles from
+        # the public-facing /raffles list. Users specifically asked not to see
+        # cancelled raffles cluttering the browse view.
+        q = q.where(BHRaffle.status.notin_([RaffleStatus.DRAFT, RaffleStatus.CANCELLED]))
     else:
         try:
             q = q.where(BHRaffle.status == RaffleStatus(status))
