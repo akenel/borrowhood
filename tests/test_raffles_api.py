@@ -167,6 +167,24 @@ async def test_browse_filter_by_status(client):
 
 
 @pytest.mark.asyncio
+async def test_browse_status_all_excludes_cancelled(client):
+    """BL-192: cancelled raffles must NOT appear in the public /raffles list.
+
+    The 'all' filter view excludes both DRAFT (unpublished) and CANCELLED
+    raffles. Contract test: any cancelled raffle leaking into status=all
+    fails this regression check.
+    """
+    resp = await client.get("/api/v1/raffles?status=all")
+    assert resp.status_code == 200
+    raffles = resp.json()
+    cancelled = [r for r in raffles if r.get("status") == "cancelled"]
+    assert cancelled == [], (
+        f"BL-192 regression: cancelled raffles appeared in status=all view: "
+        f"{[r.get('id') for r in cancelled]}"
+    )
+
+
+@pytest.mark.asyncio
 async def test_guide_page_public(client):
     """Raffle guide page is accessible without auth."""
     resp = await client.get("/raffles/guide")
