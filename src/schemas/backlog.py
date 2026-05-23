@@ -35,6 +35,10 @@ class BacklogItemUpdate(BaseModel):
     estimated_hours: Optional[float] = Field(None, ge=0)
     blocked_reason: Optional[str] = None
     tags: Optional[str] = Field(None, max_length=500)
+    # Task #30: when a fix ships, record the commit + a human-readable note.
+    # Router writes a COMMENT activity entry when either is set.
+    resolution_sha: Optional[str] = Field(None, max_length=64)
+    resolution_note: Optional[str] = Field(None, max_length=2000)
     comment: Optional[str] = Field(None, min_length=1)
     actor: str = Field(default="Angel", min_length=1, max_length=100)
 
@@ -54,6 +58,8 @@ class BacklogItemRead(BaseModel):
     estimated_hours: Optional[float] = None
     blocked_reason: Optional[str] = None
     tags: Optional[str] = None
+    resolution_sha: Optional[str] = None
+    resolution_note: Optional[str] = None
     created_by: str
     created_at: datetime
     updated_at: datetime

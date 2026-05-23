@@ -607,6 +607,30 @@ async def update_item(
     if update.tags is not None:
         item.tags = update.tags if update.tags else None
 
+    # Task #30: resolution fields -- write COMMENT activity entry so the
+    # trail is searchable and shows WHO recorded the fix + the SHA + the note.
+    if update.resolution_sha is not None or update.resolution_note is not None:
+        old_sha = item.resolution_sha or ""
+        new_sha = update.resolution_sha if update.resolution_sha is not None else old_sha
+        if update.resolution_sha is not None:
+            item.resolution_sha = update.resolution_sha if update.resolution_sha else None
+        if update.resolution_note is not None:
+            item.resolution_note = update.resolution_note if update.resolution_note else None
+        # One COMMENT entry summarises the resolution change so it shows up
+        # in the activity tab next to status changes etc.
+        if new_sha != old_sha or update.resolution_note:
+            comment_parts = []
+            if new_sha:
+                comment_parts.append(f"Resolved at commit {new_sha}")
+            if update.resolution_note:
+                comment_parts.append(update.resolution_note)
+            activities.append(BHBacklogActivity(
+                item_id=item.id,
+                activity_type=BacklogActivityType.COMMENT,
+                actor=actor,
+                comment=" — ".join(comment_parts) if comment_parts else "Resolution updated",
+            ))
+
     for activity in activities:
         db.add(activity)
 
