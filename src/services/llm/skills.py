@@ -13,7 +13,7 @@ from src.config import settings
 
 from ._common import (
     _get_settings,
-    _get_gemini_client,
+    _gemini_call_text,
     _get_provider_order,
     _parse_json_from_text,
     _ollama_generate,
@@ -69,21 +69,14 @@ Reply ONLY with this JSON:
 
 
 async def _skills_gemini(prompt: str) -> Optional[dict]:
-    """Try Gemini for skill extraction."""
-    client = _get_gemini_client()
-    if not client:
+    """Try Gemini for skill extraction (timeout + thread offload via helper)."""
+    text = await _gemini_call_text(prompt)
+    if not text:
         return None
-    try:
-        response = client.models.generate_content(
-            model=_get_settings().gemini_model,
-            contents=prompt,
-        )
-        data = _parse_json_from_text(response.text)
-        if data and "skills" in data:
-            return data
-        logger.warning("Gemini suggest_skills: invalid JSON response")
-    except Exception as e:
-        logger.warning("Gemini suggest_skills failed: %s", e)
+    data = _parse_json_from_text(text)
+    if data and "skills" in data:
+        return data
+    logger.warning("Gemini suggest_skills: invalid JSON response")
     return None
 
 
