@@ -268,6 +268,31 @@
                     </div>
                 </div>
 
+                <!-- How it was fixed (M1 of #31: surface resolution info on done items) -->
+                <div x-show="selectedItem && (selectedItem.resolution_sha || selectedItem.resolution_note)"
+                     class="border-t border-gray-200 pt-4 mb-4">
+                    <h3 class="text-sm font-semibold text-emerald-700 mb-2 flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        How it was fixed
+                    </h3>
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 space-y-2">
+                        <template x-if="selectedItem.resolution_sha">
+                            <div class="text-xs">
+                                <span class="text-gray-600">Commit:</span>
+                                <a :href="'https://github.com/akenel/borrowhood/commit/' + selectedItem.resolution_sha"
+                                   target="_blank" rel="noopener"
+                                   class="font-mono text-emerald-700 hover:text-emerald-900 underline ml-1"
+                                   x-text="selectedItem.resolution_sha"></a>
+                            </div>
+                        </template>
+                        <template x-if="selectedItem.resolution_note">
+                            <p class="text-sm text-gray-800 whitespace-pre-wrap" x-text="selectedItem.resolution_note"></p>
+                        </template>
+                    </div>
+                </div>
+
                 <!-- Activity Trail -->
                 <div class="border-t border-gray-200 pt-4">
                     <h3 class="text-sm font-semibold text-gray-700 mb-3">Activity</h3>
