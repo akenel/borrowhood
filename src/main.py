@@ -122,6 +122,24 @@ def create_app() -> FastAPI:
 
     app.add_middleware(JsonErrorMiddleware)
 
+    # Task #32: force browsers to revalidate /static/* via etag instead of
+    # caching aggressively. Without this header, prod responses had no
+    # Cache-Control at all, so Firefox heuristically cached JS for hours --
+    # the M2 comment-thread deploy (2026-05-23) shipped, the HTML page
+    # reloaded fine, but the JS was still the pre-deploy version, and the
+    # button silently stayed disabled. "no-cache, must-revalidate" means
+    # browsers can use their cache but MUST send If-None-Match first; the
+    # server returns 304 if unchanged (cheap) or 200 with new bytes if
+    # deployed. Zero risk of stale code surviving a deploy.
+    class StaticCacheControlMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request, call_next):
+            response = await call_next(request)
+            if request.url.path.startswith("/static/"):
+                response.headers["Cache-Control"] = "no-cache, must-revalidate"
+            return response
+
+    app.add_middleware(StaticCacheControlMiddleware)
+
     # Favicon at root (browsers request /favicon.ico directly)
     @app.get("/favicon.ico", include_in_schema=False)
     async def favicon():
