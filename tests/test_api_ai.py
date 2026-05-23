@@ -1,6 +1,42 @@
 """Tests for AI generation endpoints."""
 
+import asyncio
+import time
+from unittest.mock import patch, MagicMock
+
 import pytest
+
+
+@pytest.mark.asyncio
+async def test_helpboard_gemini_call_respects_timeout():
+    """BL-2: Gemini SDK call must time out + return None when slow, NOT hang.
+
+    Patches the Gemini client to sleep longer than the configured timeout.
+    The async wrapper (asyncio.wait_for + asyncio.to_thread) must cancel
+    the await and return None within the timeout window so the cascade
+    can fall through to Ollama / Pollinations / template fallback.
+    """
+    from src.services.llm import helpboard as hb_mod
+
+    # Make the Gemini client's generate_content sleep longer than the timeout
+    def slow_generate(**kwargs):
+        time.sleep(2.0)  # blocking sleep -- runs in to_thread worker
+        return MagicMock(text='{"title":"x","body":"x"}')
+
+    mock_client = MagicMock()
+    mock_client.models.generate_content = slow_generate
+
+    with patch.object(hb_mod, "_get_gemini_client", return_value=mock_client), \
+         patch.object(hb_mod, "_GEMINI_TIMEOUT_S", 0.2):
+        start = time.monotonic()
+        result = await hb_mod._helpboard_draft_gemini("test prompt")
+        elapsed = time.monotonic() - start
+
+    assert result is None, "Slow Gemini call must return None, not block forever"
+    assert elapsed < 1.0, (
+        f"Gemini timeout did not fire — elapsed {elapsed:.2f}s "
+        f"(should be ~0.2s for 0.2s timeout)"
+    )
 
 
 @pytest.mark.asyncio
