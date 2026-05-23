@@ -17,6 +17,9 @@ function backlogBoard() {
         filterType: '',
         filterAssigned: '',
         newItem: { title: '', description: '', item_type: 'dev_task', priority: 'medium', assigned_to: '', tags: '', created_by: window.LP.username },
+        // M2 of #31: comment thread state
+        newComment: '',
+        commenting: false,
 
         get assignees() {
             const names = [...new Set(this.items.map(i => i.assigned_to).filter(Boolean))];
@@ -83,6 +86,26 @@ function backlogBoard() {
                 window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: `Status changed to ${newStatus.replace('_', ' ')}` } }));
             } catch (e) {
                 window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Failed to update status' } }));
+            }
+        },
+
+        async addComment() {
+            if (!this.selectedItem || !this.newComment.trim() || this.commenting) return;
+            this.commenting = true;
+            try {
+                const actor = window.LP.username;
+                await this.api(`/api/v1/backlog/items/${this.selectedItem.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ comment: this.newComment.trim(), actor }),
+                });
+                this.newComment = '';
+                // Refresh just the activities -- no need to re-fetch the whole item
+                this.activities = await this.api(`/api/v1/backlog/items/${this.selectedItem.id}/activities`);
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Comment posted' } }));
+            } catch (e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Failed to post comment' } }));
+            } finally {
+                this.commenting = false;
             }
         },
 
