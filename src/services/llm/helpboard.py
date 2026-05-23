@@ -4,6 +4,7 @@ Part of the AI service cascade: gemini -> ollama -> pollinations -> template fal
 Extracted from the original gemini.py on 2026-04-18.
 """
 
+import asyncio
 from typing import Optional, List, Any
 import json
 import logging
@@ -22,6 +23,11 @@ from ._common import (
 )
 
 logger = logging.getLogger(__name__)
+
+# BL-2: Gemini SDK call is sync + blocks the event loop with no timeout.
+# Cap at 15s and run in a worker thread so the cascade can fall through
+# to Ollama / Pollinations / template fallback cleanly when Gemini is slow.
+_GEMINI_TIMEOUT_S = 15.0
 
 # ── Help Board AI Draft ──────────────────────────────────────────────
 
@@ -66,19 +72,31 @@ Reply ONLY with this JSON:
 
 
 async def _helpboard_draft_gemini(prompt: str) -> Optional[dict]:
-    """Try Gemini for help post drafting."""
+    """Try Gemini for help post drafting.
+
+    BL-2 fix: Gemini's SDK call is synchronous and was blocking the event
+    loop with no timeout, causing UI 'AI draft timed out' errors. Now runs
+    in a worker thread with a hard timeout so the cascade falls through
+    cleanly to Ollama / Pollinations / template when Gemini is slow.
+    """
     client = _get_gemini_client()
     if not client:
         return None
     try:
-        response = client.models.generate_content(
-            model=_get_settings().gemini_model,
-            contents=prompt,
+        response = await asyncio.wait_for(
+            asyncio.to_thread(
+                client.models.generate_content,
+                model=_get_settings().gemini_model,
+                contents=prompt,
+            ),
+            timeout=_GEMINI_TIMEOUT_S,
         )
         data = _parse_json_from_text(response.text)
         if data and "title" in data and "body" in data:
             return data
         logger.warning("Gemini helpboard_draft: invalid JSON response")
+    except asyncio.TimeoutError:
+        logger.warning("Gemini helpboard_draft: timed out after %ss", _GEMINI_TIMEOUT_S)
     except Exception as e:
         logger.warning("Gemini helpboard_draft failed: %s", e)
     return None
