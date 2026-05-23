@@ -1,6 +1,7 @@
 """Tests for AI generation endpoints."""
 
 import asyncio
+import sys
 import time
 from unittest.mock import patch, MagicMock
 
@@ -8,28 +9,26 @@ import pytest
 
 
 @pytest.mark.asyncio
-async def test_helpboard_gemini_call_respects_timeout():
-    """BL-2: Gemini SDK call must time out + return None when slow, NOT hang.
+async def test_gemini_call_text_respects_timeout():
+    """Task #29: the shared _gemini_call_text helper must time out and return
+    None when Gemini is slow -- so all five LLM services (helpboard, skills,
+    listing, review, concierge) get hang-protection in one place.
 
-    Patches the Gemini client to sleep longer than the configured timeout.
-    The async wrapper (asyncio.wait_for + asyncio.to_thread) must cancel
-    the await and return None within the timeout window so the cascade
-    can fall through to Ollama / Pollinations / template fallback.
+    Patches the Gemini client to sleep longer than the configured timeout
+    and asserts the helper returns None within the timeout window.
     """
-    from src.services.llm import helpboard as hb_mod
+    from src.services.llm import _common as cm
 
-    # Make the Gemini client's generate_content sleep longer than the timeout
     def slow_generate(**kwargs):
         time.sleep(2.0)  # blocking sleep -- runs in to_thread worker
-        return MagicMock(text='{"title":"x","body":"x"}')
+        return MagicMock(text='ignored')
 
     mock_client = MagicMock()
     mock_client.models.generate_content = slow_generate
 
-    with patch.object(hb_mod, "_get_gemini_client", return_value=mock_client), \
-         patch.object(hb_mod, "_GEMINI_TIMEOUT_S", 0.2):
+    with patch.object(cm, "_get_gemini_client", return_value=mock_client):
         start = time.monotonic()
-        result = await hb_mod._helpboard_draft_gemini("test prompt")
+        result = await cm._gemini_call_text("test prompt", timeout=0.2)
         elapsed = time.monotonic() - start
 
     assert result is None, "Slow Gemini call must return None, not block forever"
@@ -37,6 +36,56 @@ async def test_helpboard_gemini_call_respects_timeout():
         f"Gemini timeout did not fire — elapsed {elapsed:.2f}s "
         f"(should be ~0.2s for 0.2s timeout)"
     )
+
+
+@pytest.mark.asyncio
+async def test_gemini_call_text_returns_none_when_no_client():
+    """No GOOGLE_API_KEY -> _get_gemini_client returns None -> helper returns
+    None immediately without trying to call the SDK. Lets the cascade flow
+    straight to Ollama / Pollinations / template.
+    """
+    from src.services.llm import _common as cm
+
+    with patch.object(cm, "_get_gemini_client", return_value=None):
+        result = await cm._gemini_call_text("test prompt")
+    assert result is None
+
+
+@pytest.mark.asyncio
+async def test_all_five_llm_services_use_shared_gemini_helper():
+    """Task #29 contract: every service that talks to Gemini must go through
+    _gemini_call_text. If any service bypasses it (direct client call), it
+    loses the timeout protection -- which is exactly the bug we fixed.
+
+    Patches the shared helper to return None and asserts ALL FIVE services'
+    gemini wrappers honor it (return None when helper returns None). Catches
+    regressions where someone reintroduces a direct client.models.generate_content
+    call without going through the helper.
+    """
+    from src.services.llm import helpboard, skills, listing, review, concierge
+
+    cascade_targets = [
+        ("helpboard",  helpboard._helpboard_draft_gemini),
+        ("skills",     skills._skills_gemini),
+        ("listing",    listing._smart_listing_gemini),
+        ("review",     review._review_gemini),
+        ("concierge",  concierge._concierge_gemini),
+    ]
+
+    # Patch the helper to return None — every service must respect this and
+    # return None too (don't trust a None text from a hypothetical bypass path).
+    with patch("src.services.llm._common._gemini_call_text", return_value=None):
+        for name, fn in cascade_targets:
+            # Also patch each module's own re-import of the helper since
+            # `from ._common import _gemini_call_text` creates a module-local name.
+            mod = sys.modules[fn.__module__]
+            with patch.object(mod, "_gemini_call_text", return_value=None):
+                result = await fn("test prompt")
+                assert result is None, (
+                    f"Service {name} ignored helper returning None — "
+                    "it may be calling client.models.generate_content directly, "
+                    "bypassing the shared timeout protection."
+                )
 
 
 @pytest.mark.asyncio

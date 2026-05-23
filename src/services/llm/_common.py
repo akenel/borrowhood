@@ -14,6 +14,7 @@ Pollinations: Free cloud API, no key needed -- always-on fallback
 """
 
 
+import asyncio
 import json
 import logging
 from typing import Optional
@@ -21,6 +22,14 @@ from typing import Optional
 import httpx
 
 logger = logging.getLogger(__name__)
+
+# Gemini SDK calls are SYNCHRONOUS. Without the helper below they block the
+# event loop AND have no timeout, which lets a slow Gemini hang the whole
+# FastAPI worker (BL-2 was exactly this failure mode on /helpboard).
+# Task #29 (2026-05-23) lifts the pattern out of helpboard.py so all five
+# Gemini-using services (helpboard, skills, listing, review, concierge)
+# share the same hang-protection.
+GEMINI_TIMEOUT_S = 15.0
 
 # Lazy imports -- google-genai may not be installed in all environments
 _genai = None
@@ -70,6 +79,47 @@ def _get_gemini_client():
             return None
 
     return _genai.Client(api_key=s.google_api_key)
+
+
+async def _gemini_call_text(prompt: str, *, timeout: Optional[float] = None) -> Optional[str]:
+    """Call Gemini generate_content() with timeout + thread offload.
+
+    Returns response.text on success, or None on:
+      - No client configured (no GOOGLE_API_KEY)
+      - Timeout (logged at WARNING)
+      - Any other SDK exception (logged at WARNING)
+
+    Callers parse the returned text and validate per their schema. The
+    cascade in their dispatch dict naturally falls through to the next
+    provider (Ollama, then Pollinations) when this returns None.
+
+    Default timeout resolves to GEMINI_TIMEOUT_S at CALL time (not at
+    function-definition time) so tests can monkeypatch the module
+    constant and have the new value take effect.
+
+    Task #29 helper -- replaces five copies of this pattern across
+    helpboard, skills, listing, review, concierge.
+    """
+    client = _get_gemini_client()
+    if not client:
+        return None
+    effective_timeout = timeout if timeout is not None else GEMINI_TIMEOUT_S
+    s = _get_settings()
+    try:
+        response = await asyncio.wait_for(
+            asyncio.to_thread(
+                client.models.generate_content,
+                model=s.gemini_model,
+                contents=prompt,
+            ),
+            timeout=effective_timeout,
+        )
+        return response.text
+    except asyncio.TimeoutError:
+        logger.warning("Gemini call timed out after %ss", effective_timeout)
+    except Exception as e:
+        logger.warning("Gemini call failed: %s", e)
+    return None
 
 
 def _get_provider_order() -> list:
