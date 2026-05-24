@@ -72,12 +72,22 @@ async def validate_raffle_value(db: AsyncSession, user_id, ticket_price: float, 
 
 
 async def check_one_active_raffle(db: AsyncSession, user_id, exclude_id=None) -> tuple[bool, str]:
-    """Ensure organizer has no other active raffle running."""
+    """Ensure organizer has no other active raffle running.
+
+    BL-196 (2026-05-24): DRAFT was wrongly included in the active list,
+    so users with an abandoned draft (e.g. closed the wizard mid-creation)
+    were blocked from starting a new raffle with no UI to find or delete
+    the orphan draft. DRAFT is the user's own workspace, never visible
+    to the community -- it must NOT block new creation.
+
+    Blocking statuses are: PUBLISHED (visible + may have ticket buyers),
+    ACTIVE (currently selling), DRAWN (winner picked, awaiting completion).
+    """
     q = (
         select(func.count(BHRaffle.id))
         .where(BHRaffle.organizer_id == user_id)
         .where(BHRaffle.status.in_([
-            RaffleStatus.DRAFT, RaffleStatus.PUBLISHED, RaffleStatus.ACTIVE, RaffleStatus.DRAWN,
+            RaffleStatus.PUBLISHED, RaffleStatus.ACTIVE, RaffleStatus.DRAWN,
         ]))
         .where(BHRaffle.deleted_at.is_(None))
     )
