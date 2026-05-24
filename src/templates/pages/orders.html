@@ -330,7 +330,7 @@
                    Deposit shown on ACCEPTED while deposit_required > 0 and unpaid.
                    Balance shown on IN_PROGRESS (or ACCEPTED if no deposit was set). #}
                 {% if not is_provider and quote.status.value == 'accepted' and (quote.deposit_required or 0) > 0 and not quote.deposit_paid_at %}
-                <button onclick="window.bhMarkPayment('{{ quote.id }}', 'deposit', '{{ quote.currency }}', {{ '%.2f'|format(quote.deposit_required) }});"
+                <button onclick="window.bhMarkPayment('{{ quote.id }}', 'deposit', '{{ quote.currency }}', {{ '%.2f'|format(quote.deposit_required) }}, this);"
                         class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-lg min-h-[40px] transition-colors shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                     {{ t('i18n.mark_deposit_paid') }} ({{ quote.currency }} {{ "{:,.2f}".format(quote.deposit_required) }})
@@ -338,7 +338,7 @@
                 {% endif %}
                 {% if not is_provider and quote.status.value == 'in_progress' and not quote.final_paid_at %}
                 {% set balance_due = quote.total_amount - (quote.deposit_required or 0) %}
-                <button onclick="window.bhMarkPayment('{{ quote.id }}', 'final', '{{ quote.currency }}', {{ '%.2f'|format(balance_due) }});"
+                <button onclick="window.bhMarkPayment('{{ quote.id }}', 'final', '{{ quote.currency }}', {{ '%.2f'|format(balance_due) }}, this);"
                         class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-lg min-h-[40px] transition-colors shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                     {{ t('i18n.mark_balance_paid') }} ({{ quote.currency }} {{ "{:,.2f}".format(balance_due) }})
@@ -1121,7 +1121,12 @@ window.bhErrMsg = function (body) {
 // Off-platform payment confirmation. v1 = window.prompt for method (cash, iban,
 // paypal, twint, other). Upgrade to a styled modal in v2 once we know the most
 // common method per market.
-window.bhMarkPayment = function (quoteId, phase, currency, amount) {
+//
+// Loading state: the calling button gets `disabled` + an overlay spinner so the
+// user has clear feedback that something is in flight (slow wifi). Network
+// failures (offline, DNS, timeout) now show a toast via .catch -- previously
+// they were silent.
+window.bhMarkPayment = function (quoteId, phase, currency, amount, btnEl) {
     var label = phase === 'deposit' ? 'deposit' : 'balance';
     var raw = window.prompt(
         'How did you pay the ' + label + ' of ' + currency + ' ' +
@@ -1136,6 +1141,13 @@ window.bhMarkPayment = function (quoteId, phase, currency, amount) {
         window.dispatchEvent(new CustomEvent('toast', {detail: {type: 'error', message: 'Unknown method. Use one of: ' + allowed.join(', ')}}));
         return;
     }
+    // Loading state: disable button + swap label so the user sees progress.
+    var originalLabel = btnEl ? btnEl.innerHTML : null;
+    if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.classList.add('opacity-60', 'cursor-wait');
+        btnEl.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg><span>Recording payment...</span>';
+    }
     fetch('/api/v1/service-quotes/' + quoteId + '/payment', {
         method: 'PATCH',
         headers: {'Content-Type': 'application/json'},
@@ -1147,8 +1159,13 @@ window.bhMarkPayment = function (quoteId, phase, currency, amount) {
         } else {
             r.json().then(function (e) {
                 window.dispatchEvent(new CustomEvent('toast', {detail: {type: 'error', message: window.bhErrMsg(e)}}));
+                if (btnEl) { btnEl.disabled = false; btnEl.classList.remove('opacity-60', 'cursor-wait'); btnEl.innerHTML = originalLabel; }
             });
         }
+    }).catch(function (err) {
+        // Network failure, DNS, timeout, offline, etc. -- never silent.
+        window.dispatchEvent(new CustomEvent('toast', {detail: {type: 'error', message: 'Network error: ' + (err && err.message ? err.message : err) + '. Check your connection and try again.'}}));
+        if (btnEl) { btnEl.disabled = false; btnEl.classList.remove('opacity-60', 'cursor-wait'); btnEl.innerHTML = originalLabel; }
     });
 };
 function openDisputeModal(rentalId, itemName) {

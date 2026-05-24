@@ -369,11 +369,15 @@
                         <button @click="open = !open"
                                 :aria-expanded="open"
                                 aria-label="{{ t('nav.profile') }}"
-                                class="flex items-center gap-1 p-1 rounded-lg hover:bg-gray-50 transition-colors min-h-[44px]">
+                                class="flex items-center gap-2 p-1 pr-2 rounded-lg hover:bg-gray-50 transition-colors min-h-[44px]">
                             <div class="w-9 h-9 rounded-full bg-indigo-100 ring-2 ring-indigo-200 hover:ring-indigo-400 transition-all relative overflow-hidden flex items-center justify-center flex-shrink-0">
                                 <span class="text-sm font-bold text-indigo-600" data-fallback="{{ user.get('preferred_username', '?')[0] | upper }}" x-text="u ? (u.display_name||'?')[0] : $el.dataset.fallback"></span>
                                 <img x-show="u && u.avatar_url" :src="u ? u.avatar_url : ''" @error="$el.style.display='none'" class="absolute inset-0 w-full h-full object-cover rounded-full">
                             </div>
+                            {# Logged-in display name -- visible on sm+ so users always know
+                               which account they are on without having to open the dropdown.
+                               Avatar-only on phones (gap-2 keeps the layout tight). #}
+                            <span class="hidden sm:inline text-sm font-medium text-gray-700 max-w-[140px] truncate" x-text="u ? (u.display_name || u.username || '{{ user.get('preferred_username', '') }}') : '{{ user.get('preferred_username', '') }}'"></span>
                             <svg class="w-3.5 h-3.5 text-gray-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
                         <div x-show="open" x-cloak @click.outside="open = false"
