@@ -233,6 +233,21 @@
             </div>
             {% endif %}
 
+            {# Declined quotes: surface the customer's reason to the provider
+               (and back to the customer for memory). Replaces the silent-decline
+               experience where the provider had to DM "why?" -- Angel hit this. #}
+            {% if quote.status.value == 'declined' and quote.decline_reason %}
+            <div class="px-4 pb-3">
+                <div class="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+                    <svg class="w-4 h-4 mt-0.5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"/></svg>
+                    <div class="text-sm">
+                        <p class="font-semibold text-red-900">{{ t('i18n.declined_reason_label') }}:</p>
+                        <p class="text-red-800 whitespace-pre-wrap">{{ quote.decline_reason }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Action bar -->
             <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex flex-wrap items-center gap-2">
                 <!-- Provider: Submit Quote (only for REQUESTED status) -->
@@ -361,19 +376,82 @@
                 </button>
                 {% endif %}
 
-                <!-- Customer: Decline Quote -->
+                {# Customer: Decline Quote with reason picker (BL-191 follow-up).
+                   Bare confirm("Decline this quote?") gave the provider zero
+                   feedback after they spent time on a quote. Now: modal with
+                   7 common reasons + Other (textarea), all i18n. Reason flows
+                   to backend decline_reason field and shows on provider card. #}
                 {% if not is_provider and quote.status.value == 'quoted' %}
-                <button onclick="
-                    if (!confirm('Decline this quote?')) return;
-                    fetch('/api/v1/service-quotes/{{ quote.id }}/status', {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ status: 'declined', decline_reason: 'Customer declined' })
-                    }).then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Quote declined.' } })); setTimeout(() => location.reload(), 1500); }
-                    else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: window.bhErrMsg(e) } })); }); });
-                " class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors min-h-[36px]">
-                    {{ t('i18n.decline_quote') }}
-                </button>
+                <div x-data="{
+                    showDeclineModal: false,
+                    chosenReason: '',
+                    extraDetail: '',
+                    submittingDecline: false,
+                    reasons: [
+                        '{{ t('i18n.decline_reason_price') }}',
+                        '{{ t('i18n.decline_reason_timing') }}',
+                        '{{ t('i18n.decline_reason_scope') }}',
+                        '{{ t('i18n.decline_reason_other_option') }}',
+                        '{{ t('i18n.decline_reason_more_info') }}',
+                        '{{ t('i18n.decline_reason_later') }}',
+                        '{{ t('i18n.decline_reason_exploring') }}',
+                        '{{ t('i18n.decline_reason_other') }}'
+                    ]
+                }">
+                    <button @click="showDeclineModal = true; chosenReason = ''; extraDetail = ''"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors min-h-[36px]">
+                        {{ t('i18n.decline_quote') }}
+                    </button>
+                    <div x-show="showDeclineModal" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto" @click.self="showDeclineModal = false">
+                        <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 my-8" @click.stop>
+                            <h3 class="text-lg font-bold text-gray-900 mb-1">{{ t('i18n.decline_quote') }}</h3>
+                            <p class="text-sm text-gray-500 mb-4">{{ t('i18n.decline_reason_prompt') }}</p>
+                            <div class="space-y-2 mb-4">
+                                <template x-for="(reason, idx) in reasons" :key="idx">
+                                    <label class="flex items-start gap-2 p-3 rounded-lg border-2 cursor-pointer transition-colors"
+                                           :class="chosenReason === reason ? 'border-red-400 bg-red-50' : 'border-gray-200 hover:border-gray-300'">
+                                        <input type="radio" name="decline_reason_{{ quote.id }}" :value="reason" x-model="chosenReason" class="mt-0.5 text-red-600 focus:ring-red-500">
+                                        <span class="text-sm text-gray-800" x-text="reason"></span>
+                                    </label>
+                                </template>
+                            </div>
+                            <div x-show="chosenReason === '{{ t('i18n.decline_reason_other') }}'" class="mb-4">
+                                <label class="block text-xs font-medium text-gray-600 mb-1">{{ t('i18n.decline_reason_optional_detail') }}</label>
+                                <textarea x-model="extraDetail" rows="3" maxlength="200" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="..."></textarea>
+                            </div>
+                            <div class="flex gap-3 mt-4">
+                                <button @click="showDeclineModal = false" class="flex-1 px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">{{ t('common.cancel') }}</button>
+                                <button @click="
+                                    if (!chosenReason) { return; }
+                                    submittingDecline = true;
+                                    var fullReason = chosenReason === '{{ t('i18n.decline_reason_other') }}' && extraDetail.trim()
+                                        ? '{{ t('i18n.decline_reason_other') }}: ' + extraDetail.trim()
+                                        : chosenReason;
+                                    fetch('/api/v1/service-quotes/{{ quote.id }}/status', {
+                                        method: 'PATCH',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ status: 'declined', decline_reason: fullReason })
+                                    }).then(r => {
+                                        if (r.ok) {
+                                            window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Quote declined. Provider has been notified with your reason.' } }));
+                                            setTimeout(() => location.reload(), 1500);
+                                        } else {
+                                            r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: window.bhErrMsg(e) } })); });
+                                            submittingDecline = false;
+                                        }
+                                    }).catch(err => {
+                                        window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Network error: ' + (err && err.message ? err.message : err) } }));
+                                        submittingDecline = false;
+                                    });
+                                " :disabled="!chosenReason || submittingDecline"
+                                       class="flex-1 px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]">
+                                    <span x-show="!submittingDecline">{{ t('i18n.send_decline') }}</span>
+                                    <span x-show="submittingDecline">{{ t('i18n.sending') }}...</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {% endif %}
 
                 <!-- Provider: Mark In Progress (accepted quotes) -->
