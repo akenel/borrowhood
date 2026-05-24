@@ -382,20 +382,25 @@
                    7 common reasons + Other (textarea), all i18n. Reason flows
                    to backend decline_reason field and shows on provider card. #}
                 {% if not is_provider and quote.status.value == 'quoted' %}
+                {# tojson produces a properly-escaped JSON string literal -- critical
+                   because some translations contain apostrophes ("doesn't", "un'altra")
+                   that would break a bare single-quoted JS string and silently crash
+                   the whole Alpine component. #}
                 <div x-data="{
                     showDeclineModal: false,
                     chosenReason: '',
                     extraDetail: '',
                     submittingDecline: false,
+                    otherLabel: {{ t('i18n.decline_reason_other') | tojson }},
                     reasons: [
-                        '{{ t('i18n.decline_reason_price') }}',
-                        '{{ t('i18n.decline_reason_timing') }}',
-                        '{{ t('i18n.decline_reason_scope') }}',
-                        '{{ t('i18n.decline_reason_other_option') }}',
-                        '{{ t('i18n.decline_reason_more_info') }}',
-                        '{{ t('i18n.decline_reason_later') }}',
-                        '{{ t('i18n.decline_reason_exploring') }}',
-                        '{{ t('i18n.decline_reason_other') }}'
+                        {{ t('i18n.decline_reason_price') | tojson }},
+                        {{ t('i18n.decline_reason_timing') | tojson }},
+                        {{ t('i18n.decline_reason_scope') | tojson }},
+                        {{ t('i18n.decline_reason_other_option') | tojson }},
+                        {{ t('i18n.decline_reason_more_info') | tojson }},
+                        {{ t('i18n.decline_reason_later') | tojson }},
+                        {{ t('i18n.decline_reason_exploring') | tojson }},
+                        {{ t('i18n.decline_reason_other') | tojson }}
                     ]
                 }">
                     <button @click="showDeclineModal = true; chosenReason = ''; extraDetail = ''"
@@ -415,7 +420,7 @@
                                     </label>
                                 </template>
                             </div>
-                            <div x-show="chosenReason === '{{ t('i18n.decline_reason_other') }}'" class="mb-4">
+                            <div x-show="chosenReason === otherLabel" class="mb-4">
                                 <label class="block text-xs font-medium text-gray-600 mb-1">{{ t('i18n.decline_reason_optional_detail') }}</label>
                                 <textarea x-model="extraDetail" rows="3" maxlength="200" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="..."></textarea>
                             </div>
@@ -424,8 +429,8 @@
                                 <button @click="
                                     if (!chosenReason) { return; }
                                     submittingDecline = true;
-                                    var fullReason = chosenReason === '{{ t('i18n.decline_reason_other') }}' && extraDetail.trim()
-                                        ? '{{ t('i18n.decline_reason_other') }}: ' + extraDetail.trim()
+                                    var fullReason = chosenReason === otherLabel && extraDetail.trim()
+                                        ? otherLabel + ': ' + extraDetail.trim()
                                         : chosenReason;
                                     fetch('/api/v1/service-quotes/{{ quote.id }}/status', {
                                         method: 'PATCH',
