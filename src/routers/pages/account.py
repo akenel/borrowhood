@@ -320,8 +320,11 @@ async def orders_page(
                 (BHServiceQuote.customer_id == db_user.id) | (BHServiceQuote.provider_id == db_user.id)
             )
         if status:
+            # QuoteStatus enum values are lowercase ('requested', 'quoted'...);
+            # URL filter comes in lowercase too. .upper() was wrong -- it would
+            # raise ValueError every time, so the filter silently dropped.
             try:
-                q = q.where(BHServiceQuote.status == QuoteStatus(status.upper()))
+                q = q.where(BHServiceQuote.status == QuoteStatus(status.lower()))
             except ValueError:
                 pass
         q = q.order_by(BHServiceQuote.created_at.desc()).limit(limit).offset(offset)
