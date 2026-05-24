@@ -382,14 +382,15 @@
                    7 common reasons + Other (textarea), all i18n. Reason flows
                    to backend decline_reason field and shows on provider card. #}
                 {% if not is_provider and quote.status.value == 'quoted' %}
-                {# tojson produces a properly-escaped JSON string literal -- critical
-                   because some translations contain apostrophes ("doesn't", "un'altra")
-                   that would break a bare single-quoted JS string and silently crash
-                   the whole Alpine component. #}
-                <div x-data="{
+                {# x-data uses SINGLE quotes for the attribute wrapper so the
+                   inner JSON strings (from |tojson, which emits "..." double-quoted
+                   literals) don't terminate the HTML attribute. tojson handles
+                   apostrophes inside the translations (Italian "un'altra opzione",
+                   English "doesn't") -- raw single-quoted JS literals would crash. #}
+                <div x-data='{
                     showDeclineModal: false,
-                    chosenReason: '',
-                    extraDetail: '',
+                    chosenReason: "",
+                    extraDetail: "",
                     submittingDecline: false,
                     otherLabel: {{ t('i18n.decline_reason_other') | tojson }},
                     reasons: [
@@ -402,7 +403,7 @@
                         {{ t('i18n.decline_reason_exploring') | tojson }},
                         {{ t('i18n.decline_reason_other') | tojson }}
                     ]
-                }">
+                }'>
                     <button @click="showDeclineModal = true; chosenReason = ''; extraDetail = ''"
                             class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors min-h-[36px]">
                         {{ t('i18n.decline_quote') }}
