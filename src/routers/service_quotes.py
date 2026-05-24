@@ -55,6 +55,10 @@ class QuoteOut(BaseModel):
     provider_message: Optional[str] = None
     decline_reason: Optional[str] = None
     cancel_reason: Optional[str] = None
+    deposit_paid_at: Optional[str] = None
+    deposit_method: Optional[str] = None
+    final_paid_at: Optional[str] = None
+    final_method: Optional[str] = None
     created_at: str
 
     class Config:
@@ -86,6 +90,14 @@ class StatusUpdate(BaseModel):
     message: Optional[str] = Field(None, max_length=1000)
     decline_reason: Optional[str] = Field(None, max_length=500)
     cancel_reason: Optional[str] = Field(None, max_length=500)
+
+
+# Off-platform payment confirmation. v1 = customer-initiated, no Stripe.
+ALLOWED_PAYMENT_METHODS = {"cash", "iban", "paypal", "twint", "other"}
+
+class PaymentMark(BaseModel):
+    phase: str = Field(..., pattern="^(deposit|final)$")
+    method: str = Field(..., min_length=2, max_length=30)
 
 
 # --- Endpoints ---
@@ -340,6 +352,19 @@ async def update_quote_status(
         raise HTTPException(status_code=403, detail="Only customer can decline")
     if req.status == QuoteStatus.IN_PROGRESS and not is_provider:
         raise HTTPException(status_code=403, detail="Only provider can start work")
+    # Payment gates. Deposit must be paid before work starts (unless no deposit
+    # was set on the quote). Balance must be paid before the job can be marked
+    # complete. Off-platform payment is recorded via PATCH /payment.
+    if req.status == QuoteStatus.IN_PROGRESS and (quote.deposit_required or 0) > 0 and quote.deposit_paid_at is None:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Deposit of {quote.currency} {quote.deposit_required:.2f} must be marked paid before work can start.",
+        )
+    if req.status == QuoteStatus.COMPLETED and (quote.total_amount or 0) > 0 and quote.final_paid_at is None:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Balance of {quote.currency} {(quote.total_amount - (quote.deposit_required or 0)):.2f} must be marked paid before the job can be closed.",
+        )
     # COMPLETED can be marked by EITHER party: provider says "delivered, please
     # pay" or customer confirms "received, releasing payment." Customer-only
     # close was a stuck-state risk -- if provider finished and forgot to click,
@@ -394,6 +419,83 @@ async def update_quote_status(
     return {"status": quote.status.value, "quote_id": str(quote.id)}
 
 
+@router.patch("/{quote_id}/payment")
+async def mark_payment(
+    quote_id: UUID,
+    req: PaymentMark,
+    token: dict = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Customer marks an off-platform payment as completed.
+
+    Phase 'deposit' must be paid before provider can Start Work.
+    Phase 'final' must be paid before either party can Mark Complete.
+    Method is one of cash | iban | paypal | twint | other.
+    """
+    from datetime import datetime, timezone
+    user = await get_user(db, token)
+
+    method = req.method.lower().strip()
+    if method not in ALLOWED_PAYMENT_METHODS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown payment method '{req.method}'. Allowed: {', '.join(sorted(ALLOWED_PAYMENT_METHODS))}.",
+        )
+
+    result = await db.execute(
+        select(BHServiceQuote)
+        .options(selectinload(BHServiceQuote.listing).selectinload(BHListing.item))
+        .where(BHServiceQuote.id == quote_id)
+    )
+    quote = result.scalars().first()
+    if not quote:
+        raise HTTPException(status_code=404, detail="Quote not found")
+    if quote.customer_id != user.id:
+        raise HTTPException(status_code=403, detail="Only the customer can confirm payment.")
+
+    now = datetime.now(timezone.utc)
+    if req.phase == "deposit":
+        if (quote.deposit_required or 0) <= 0:
+            raise HTTPException(status_code=400, detail="No deposit was set on this quote.")
+        if quote.status != QuoteStatus.ACCEPTED:
+            raise HTTPException(status_code=400, detail=f"Deposit can only be marked paid on an accepted quote. Current status: {quote.status.value}.")
+        if quote.deposit_paid_at is not None:
+            raise HTTPException(status_code=400, detail="Deposit was already marked paid.")
+        quote.deposit_paid_at = now
+        quote.deposit_method = method
+        notif_title = f"Deposit paid: {quote.listing.item.name if quote.listing and quote.listing.item else 'Service quote'}"
+        notif_body = f"{user.display_name or user.username} paid the {quote.currency} {quote.deposit_required:.2f} deposit via {method}. You can now Start Work."
+    else:  # final
+        if quote.status not in (QuoteStatus.ACCEPTED, QuoteStatus.IN_PROGRESS):
+            raise HTTPException(status_code=400, detail=f"Balance can only be marked paid on an accepted or in-progress quote. Current status: {quote.status.value}.")
+        if quote.final_paid_at is not None:
+            raise HTTPException(status_code=400, detail="Balance was already marked paid.")
+        quote.final_paid_at = now
+        quote.final_method = method
+        balance = (quote.total_amount or 0) - (quote.deposit_required or 0)
+        notif_title = f"Balance paid: {quote.listing.item.name if quote.listing and quote.listing.item else 'Service quote'}"
+        notif_body = f"{user.display_name or user.username} paid the {quote.currency} {balance:.2f} balance via {method}. The job can now be marked complete."
+
+    await create_notification(
+        db=db,
+        user_id=quote.provider_id,
+        notification_type=NotificationType.SYSTEM,
+        title=notif_title,
+        body=notif_body,
+        link="/orders?tab=quotes",
+        entity_type="quote",
+        entity_id=quote.id,
+    )
+
+    await db.commit()
+    return {
+        "phase": req.phase,
+        "method": method,
+        "paid_at": now.isoformat(),
+        "quote_id": str(quote.id),
+    }
+
+
 # --- Helpers ---
 
 def _to_out(q: BHServiceQuote) -> QuoteOut:
@@ -417,5 +519,9 @@ def _to_out(q: BHServiceQuote) -> QuoteOut:
         provider_message=q.provider_message,
         decline_reason=q.decline_reason,
         cancel_reason=q.cancel_reason,
+        deposit_paid_at=q.deposit_paid_at.isoformat() if q.deposit_paid_at else None,
+        deposit_method=q.deposit_method,
+        final_paid_at=q.final_paid_at.isoformat() if q.final_paid_at else None,
+        final_method=q.final_method,
         created_at=q.created_at.isoformat(),
     )

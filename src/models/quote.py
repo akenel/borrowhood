@@ -11,9 +11,10 @@ with pricing, the customer accepts or declines.
 
 import enum
 import uuid
+from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Enum, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import DateTime, Enum, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -84,6 +85,14 @@ class BHServiceQuote(BHBase, Base):
     provider_message: Mapped[Optional[str]] = mapped_column(Text)
     decline_reason: Mapped[Optional[str]] = mapped_column(Text)
     cancel_reason: Mapped[Optional[str]] = mapped_column(Text)
+
+    # Off-platform payment confirmation (no Stripe in v1). Deposit gates the
+    # IN_PROGRESS transition; final payment gates COMPLETED. Method = one of
+    # cash | iban | paypal | twint | other (matches rental payment_method_used).
+    deposit_paid_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    deposit_method: Mapped[Optional[str]] = mapped_column(String(30))
+    final_paid_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    final_method: Mapped[Optional[str]] = mapped_column(String(30))
 
     # Idempotency
     idempotency_key: Mapped[Optional[str]] = mapped_column(String(100), unique=True)

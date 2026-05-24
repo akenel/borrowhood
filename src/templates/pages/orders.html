@@ -144,27 +144,90 @@
                     {% else %}
                     <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ quote.request_description }}</p>
                     {% endif %}
-                    {% if quote.total_amount %}
-                    <div class="flex items-center gap-3 mt-2">
-                        <span class="text-lg font-bold text-gray-900">EUR {{ "%.2f"|format(quote.total_amount) }}</span>
-                        {% if quote.estimated_days %}
-                        <span class="text-xs text-gray-400">~{{ quote.estimated_days }} days</span>
-                        {% endif %}
-                        {% if quote.deposit_required %}
-                        <span class="text-xs px-2 py-0.5 bg-amber-50 text-amber-700 rounded">Deposit: EUR {{ "%.2f"|format(quote.deposit_required) }}</span>
-                        {% endif %}
-                    </div>
-                    {% endif %}
                 </div>
             </div>
+
+            {# Status timeline strip -- shows progress through the quote lifecycle.
+               Cancelled/Declined quotes hide the strip (no forward path). #}
+            {% if quote.status.value not in ('cancelled', 'declined') %}
+            {% set steps = [
+                ('requested', 'Requested'),
+                ('quoted', 'Quoted'),
+                ('accepted', 'Accepted'),
+                ('in_progress', 'In Progress'),
+                ('completed', 'Completed'),
+            ] %}
+            {% set status_index = {'requested':0,'quoted':1,'accepted':2,'in_progress':3,'completed':4}.get(quote.status.value, 0) %}
+            <div class="px-4 pt-3">
+                <div class="flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider">
+                    {% for step_value, step_label in steps %}
+                    {% set step_index = loop.index0 %}
+                    <div class="flex items-center gap-1 {{ 'text-emerald-600' if step_index < status_index else ('text-indigo-600' if step_index == status_index else 'text-gray-300') }}">
+                        <span class="inline-block w-2 h-2 rounded-full {{ 'bg-emerald-500' if step_index < status_index else ('bg-indigo-500 ring-2 ring-indigo-200' if step_index == status_index else 'bg-gray-300') }}"></span>
+                        <span class="hidden sm:inline">{{ step_label }}</span>
+                    </div>
+                    {% if not loop.last %}
+                    <span class="flex-1 h-px {{ 'bg-emerald-300' if step_index < status_index else 'bg-gray-200' }}"></span>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# Money summary box -- visible once provider has quoted (QUOTED onward).
+               Replaces the old single-line price strip. Currency uses thousands
+               separator for readability (formatted via Python {:,.2f}). #}
+            {% if quote.total_amount and quote.status.value not in ('requested',) %}
+            {% set balance = quote.total_amount - (quote.deposit_required or 0) %}
+            <div class="px-4 pt-3">
+                <div class="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg p-3">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-gray-500">{{ t('i18n.total') }}</p>
+                            <p class="text-base font-bold text-gray-900">{{ quote.currency }} {{ "{:,.2f}".format(quote.total_amount) }}</p>
+                        </div>
+                        {% if quote.deposit_required and quote.deposit_required > 0 %}
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-gray-500">{{ t('i18n.deposit') }}</p>
+                            <p class="text-base font-bold {{ 'text-emerald-700' if quote.deposit_paid_at else 'text-amber-700' }}">{{ quote.currency }} {{ "{:,.2f}".format(quote.deposit_required) }}</p>
+                            <p class="text-[10px] {{ 'text-emerald-600' if quote.deposit_paid_at else 'text-gray-400' }}">
+                                {% if quote.deposit_paid_at %}{{ t('i18n.paid') }} &middot; {{ quote.deposit_method }} &middot; {{ quote.deposit_paid_at.strftime('%b %d') }}{% else %}{{ t('i18n.unpaid') }}{% endif %}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-gray-500">{{ t('i18n.balance') }}</p>
+                            <p class="text-base font-bold {{ 'text-emerald-700' if quote.final_paid_at else 'text-gray-700' }}">{{ quote.currency }} {{ "{:,.2f}".format(balance) }}</p>
+                            <p class="text-[10px] {{ 'text-emerald-600' if quote.final_paid_at else 'text-gray-400' }}">
+                                {% if quote.final_paid_at %}{{ t('i18n.paid') }} &middot; {{ quote.final_method }} &middot; {{ quote.final_paid_at.strftime('%b %d') }}{% else %}{{ t('i18n.unpaid') }}{% endif %}
+                            </p>
+                        </div>
+                        {% else %}
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-gray-500">{{ t('i18n.balance') }}</p>
+                            <p class="text-base font-bold {{ 'text-emerald-700' if quote.final_paid_at else 'text-gray-700' }}">{{ quote.currency }} {{ "{:,.2f}".format(quote.total_amount) }}</p>
+                            <p class="text-[10px] {{ 'text-emerald-600' if quote.final_paid_at else 'text-gray-400' }}">
+                                {% if quote.final_paid_at %}{{ t('i18n.paid') }} &middot; {{ quote.final_method }} &middot; {{ quote.final_paid_at.strftime('%b %d') }}{% else %}{{ t('i18n.unpaid') }}{% endif %}
+                            </p>
+                        </div>
+                        {% endif %}
+                        {% if quote.estimated_days %}
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-gray-500">{{ t('i18n.duration') }}</p>
+                            <p class="text-base font-bold text-gray-700">~{{ quote.estimated_days }}d</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
             <!-- Quote breakdown (if provider has submitted pricing) -->
             {% if quote.total_amount and quote.status.value != 'requested' %}
             <div class="px-4 pb-3">
                 <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-3 flex flex-wrap gap-x-6 gap-y-1 text-xs text-gray-600">
                     {% if quote.labor_hours %}<span><strong>{{ t('i18n.labor_hours') }}:</strong> {{ quote.labor_hours }}h</span>{% endif %}
-                    {% if quote.labor_rate %}<span><strong>{{ t('i18n.labor_rate') }}:</strong> EUR {{ "%.2f"|format(quote.labor_rate) }}/h</span>{% endif %}
-                    {% if quote.materials_cost %}<span><strong>{{ t('i18n.materials_cost') }}:</strong> EUR {{ "%.2f"|format(quote.materials_cost) }}</span>{% endif %}
+                    {% if quote.labor_rate %}<span><strong>{{ t('i18n.labor_rate') }}:</strong> {{ quote.currency }} {{ "{:,.2f}".format(quote.labor_rate) }}/h</span>{% endif %}
+                    {% if quote.materials_cost %}<span><strong>{{ t('i18n.materials_cost') }}:</strong> {{ quote.currency }} {{ "{:,.2f}".format(quote.materials_cost) }}</span>{% endif %}
                     {% if quote.quote_description %}<p class="w-full mt-1 text-gray-500 italic">{{ quote.quote_description }}</p>{% endif %}
                 </div>
             </div>
@@ -261,6 +324,25 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
+
+                {# Customer payment buttons -- off-platform confirmation.
+                   Deposit shown on ACCEPTED while deposit_required > 0 and unpaid.
+                   Balance shown on IN_PROGRESS (or ACCEPTED if no deposit was set). #}
+                {% if not is_provider and quote.status.value == 'accepted' and (quote.deposit_required or 0) > 0 and not quote.deposit_paid_at %}
+                <button onclick="window.bhMarkPayment('{{ quote.id }}', 'deposit', '{{ quote.currency }}', {{ '%.2f'|format(quote.deposit_required) }});"
+                        class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-lg min-h-[40px] transition-colors shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                    {{ t('i18n.mark_deposit_paid') }} ({{ quote.currency }} {{ "{:,.2f}".format(quote.deposit_required) }})
+                </button>
+                {% endif %}
+                {% if not is_provider and quote.status.value == 'in_progress' and not quote.final_paid_at %}
+                {% set balance_due = quote.total_amount - (quote.deposit_required or 0) %}
+                <button onclick="window.bhMarkPayment('{{ quote.id }}', 'final', '{{ quote.currency }}', {{ '%.2f'|format(balance_due) }});"
+                        class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-lg min-h-[40px] transition-colors shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                    {{ t('i18n.mark_balance_paid') }} ({{ quote.currency }} {{ "{:,.2f}".format(balance_due) }})
+                </button>
                 {% endif %}
 
                 <!-- Customer: Accept Quote -->
@@ -1035,6 +1117,39 @@ window.bhErrMsg = function (body) {
     if (typeof d === 'string') return d;
     if (Array.isArray(d)) return d.map(function (x) { return x.msg || JSON.stringify(x); }).join('; ');
     return JSON.stringify(d);
+};
+// Off-platform payment confirmation. v1 = window.prompt for method (cash, iban,
+// paypal, twint, other). Upgrade to a styled modal in v2 once we know the most
+// common method per market.
+window.bhMarkPayment = function (quoteId, phase, currency, amount) {
+    var label = phase === 'deposit' ? 'deposit' : 'balance';
+    var raw = window.prompt(
+        'How did you pay the ' + label + ' of ' + currency + ' ' +
+        amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '?\n\n' +
+        'Type one: cash | iban | paypal | twint | other',
+        'cash'
+    );
+    if (!raw) return;
+    var method = raw.trim().toLowerCase();
+    var allowed = ['cash', 'iban', 'paypal', 'twint', 'other'];
+    if (allowed.indexOf(method) === -1) {
+        window.dispatchEvent(new CustomEvent('toast', {detail: {type: 'error', message: 'Unknown method. Use one of: ' + allowed.join(', ')}}));
+        return;
+    }
+    fetch('/api/v1/service-quotes/' + quoteId + '/payment', {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({phase: phase, method: method})
+    }).then(function (r) {
+        if (r.ok) {
+            window.dispatchEvent(new CustomEvent('toast', {detail: {type: 'success', message: label.charAt(0).toUpperCase() + label.slice(1) + ' marked paid via ' + method}}));
+            setTimeout(function () { location.reload(); }, 1200);
+        } else {
+            r.json().then(function (e) {
+                window.dispatchEvent(new CustomEvent('toast', {detail: {type: 'error', message: window.bhErrMsg(e)}}));
+            });
+        }
+    });
 };
 function openDisputeModal(rentalId, itemName) {
     var modal = document.getElementById('disputeModal');

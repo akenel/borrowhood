@@ -126,6 +126,13 @@ async def run_migrations():
         "ALTER TABLE bh_raffle ADD COLUMN IF NOT EXISTS verifications_negative INTEGER DEFAULT 0",
         # 2026-05-11: BL-001 calendar blackout dates (Alice's first feedback on staging)
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS blackout_dates JSONB DEFAULT '{}'::jsonb",
+        # 2026-05-24: BL-191 follow-up -- off-platform payment confirmation on service
+        # quotes (deposit before Start Work, balance before Mark Complete).
+        # No Stripe in v1 -- customer pays via cash/IBAN/PayPal/Twint and confirms here.
+        "ALTER TABLE bh_service_quote ADD COLUMN IF NOT EXISTS deposit_paid_at TIMESTAMPTZ",
+        "ALTER TABLE bh_service_quote ADD COLUMN IF NOT EXISTS deposit_method VARCHAR(30)",
+        "ALTER TABLE bh_service_quote ADD COLUMN IF NOT EXISTS final_paid_at TIMESTAMPTZ",
+        "ALTER TABLE bh_service_quote ADD COLUMN IF NOT EXISTS final_method VARCHAR(30)",
     ]
     # ALTER TYPE ... ADD VALUE -- SQLAlchemy uses enum .name (UPPERCASE) for PG enums
     enum_migrations = [
