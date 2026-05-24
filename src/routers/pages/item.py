@@ -49,15 +49,22 @@ async def item_detail(slug: str, request: Request,
         ctx = _ctx(request, token)
         return _render("errors/404.html", ctx, status_code=404)
 
-    # Raffle items redirect to the raffle detail page
+    # Raffle items redirect to the raffle detail page -- but ONLY for raffles
+    # that are actually public. A DRAFT raffle living on an item that also has
+    # a service/sell/rent listing was hijacking the item page (Angel hit this
+    # via the "View service" link on /orders: handyman item had a DRAFT raffle
+    # alongside the SERVICE listing, and the page redirected to the draft
+    # raffle showing "DRAFT - This raffle is organized by Angel, not by La
+    # Piazza"). Skip DRAFT and CANCELLED; show those only to the owner via
+    # the regular item page.
     if item.listings:
+        from src.models.raffle import BHRaffle, RaffleStatus
         for listing in item.listings:
             if listing.listing_type == ListingType.RAFFLE and not listing.deleted_at:
-                from src.models.raffle import BHRaffle
                 raffle = await db.scalar(
                     select(BHRaffle).where(BHRaffle.listing_id == listing.id)
                 )
-                if raffle:
+                if raffle and raffle.status not in (RaffleStatus.DRAFT, RaffleStatus.CANCELLED):
                     return RedirectResponse(url=f"/raffles/{raffle.id}", status_code=302)
 
     # Resolve viewer's badge tier for progressive disclosure
