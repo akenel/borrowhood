@@ -134,6 +134,26 @@ async def item_detail(slug: str, request: Request,
         None,
     )
 
+    # BL-190: owner of a service/training listing has no signal on the item
+    # page that quote requests are waiting -- has to know to navigate to
+    # /orders?tab=quotes. Mike requested a quote on Angel's handyman listing;
+    # Angel viewed his own listing expecting to see "1 pending quote request"
+    # and saw nothing. Count REQUESTED-status quotes on this item's listings
+    # so the template can render an owner-only banner.
+    pending_quote_count = 0
+    if is_owner and active_listing and active_listing.listing_type in (
+        ListingType.SERVICE, ListingType.TRAINING
+    ):
+        from src.models.quote import BHServiceQuote, QuoteStatus
+        listing_ids = [l.id for l in (item.listings or []) if not l.deleted_at]
+        if listing_ids:
+            pending_quote_count = await db.scalar(
+                select(func.count(BHServiceQuote.id))
+                .where(BHServiceQuote.listing_id.in_(listing_ids))
+                .where(BHServiceQuote.status == QuoteStatus.REQUESTED)
+                .where(BHServiceQuote.deleted_at.is_(None))
+            ) or 0
+
     ctx = _ctx(request, token,
         item=item,
         is_owner=is_owner,
@@ -141,6 +161,7 @@ async def item_detail(slug: str, request: Request,
         similar_items=similar_items,
         active_listing=active_listing,
         has_active_listing=has_active_listing,
+        pending_quote_count=pending_quote_count,
         og_type="product",
         og_title=f"{item.name} - La Piazza",
         og_description=_og_item_desc(item, item.listings[0] if item.listings else None),

@@ -1354,6 +1354,17 @@
                 </button>
                 {% endif %}
                 {% elif user and is_owner %}
+                {# BL-190: surface pending quote requests on the owner's item page. #}
+                {% if pending_quote_count and pending_quote_count > 0 %}
+                <a href="/orders?tab=quotes&role=provider&status=requested"
+                   class="w-full flex items-center justify-between gap-2 px-4 py-3 mb-3 bg-amber-50 border-2 border-amber-300 rounded-lg hover:bg-amber-100 transition-colors">
+                    <span class="flex items-center gap-2 text-sm font-semibold text-amber-900">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        {{ pending_quote_count }} {{ t('i18n.pending_quote_requests') }}
+                    </span>
+                    <span class="text-xs font-medium text-amber-700">{{ t('i18n.view_in_orders') }} &rarr;</span>
+                </a>
+                {% endif %}
                 <a href="/items/{{ item.slug }}/edit"
                    class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white text-indigo-600 font-semibold rounded-lg border-2 border-indigo-200 hover:bg-indigo-50 transition-colors min-h-[44px]">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
