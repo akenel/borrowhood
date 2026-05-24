@@ -249,7 +249,7 @@
                                             provider_message: qMsg || null
                                         })
                                     }).then(async r => {
-                                        if (!r.ok) { var e = await r.json(); throw new Error(e.detail || 'Failed'); }
+                                        if (!r.ok) { var e = await r.json(); throw new Error(window.bhErrMsg(e)); }
                                         window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Quote submitted! Customer notified.' } }));
                                         setTimeout(() => location.reload(), 1500);
                                     }).catch(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } })); })
@@ -270,9 +270,9 @@
                     fetch('/api/v1/service-quotes/{{ quote.id }}/status', {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ status: 'ACCEPTED', message: 'Quote accepted' })
+                        body: JSON.stringify({ status: 'accepted', message: 'Quote accepted' })
                     }).then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Quote accepted!' } })); setTimeout(() => location.reload(), 1500); }
-                    else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); });
+                    else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: window.bhErrMsg(e) } })); }); });
                 " class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg min-h-[36px] transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     {{ t('i18n.accept_quote') }}
@@ -286,9 +286,9 @@
                     fetch('/api/v1/service-quotes/{{ quote.id }}/status', {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ status: 'DECLINED', decline_reason: 'Customer declined' })
+                        body: JSON.stringify({ status: 'declined', decline_reason: 'Customer declined' })
                     }).then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Quote declined.' } })); setTimeout(() => location.reload(), 1500); }
-                    else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); });
+                    else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: window.bhErrMsg(e) } })); }); });
                 " class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors min-h-[36px]">
                     {{ t('i18n.decline_quote') }}
                 </button>
@@ -300,9 +300,9 @@
                     fetch('/api/v1/service-quotes/{{ quote.id }}/status', {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ status: 'IN_PROGRESS' })
+                        body: JSON.stringify({ status: 'in_progress' })
                     }).then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Marked as in progress!' } })); setTimeout(() => location.reload(), 1500); }
-                    else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); });
+                    else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: window.bhErrMsg(e) } })); }); });
                 " class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg min-h-[36px] transition-colors">
                     Start Work
                 </button>
@@ -314,9 +314,9 @@
                     fetch('/api/v1/service-quotes/{{ quote.id }}/status', {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ status: 'COMPLETED' })
+                        body: JSON.stringify({ status: 'completed' })
                     }).then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Service completed!' } })); setTimeout(() => location.reload(), 1500); }
-                    else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); });
+                    else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: window.bhErrMsg(e) } })); }); });
                 " class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg min-h-[36px] transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Mark Complete
@@ -648,7 +648,7 @@
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({ location_hint: hint || null, instructions: instructions || null })
                                     }).then(async r => {
-                                        if (!r.ok) { var e = await r.json(); throw new Error(e.detail || 'Failed'); }
+                                        if (!r.ok) { var e = await r.json(); throw new Error(window.bhErrMsg(e)); }
                                         window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Lockbox codes generated! Buyer notified.' } }));
                                         setTimeout(() => location.reload(), 1500);
                                     }).catch(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.message } })); })
@@ -765,7 +765,7 @@
                                 currency: '{{ order.listing.currency or 'EUR' }}'
                             })
                         }).then(async r => {
-                            if (!r.ok) { var e = await r.json(); throw new Error(e.detail || 'Failed'); }
+                            if (!r.ok) { var e = await r.json(); throw new Error(window.bhErrMsg(e)); }
                             var data = await r.json();
                             if (data.approval_url) {
                                 sessionStorage.setItem('pp_payment_id', data.payment_id);
@@ -829,7 +829,7 @@
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({ payment_method: payMethod, note: payNote })
                                     }).then(async r => {
-                                        if (!r.ok) { var e = await r.json(); throw new Error(e.detail || 'Failed'); }
+                                        if (!r.ok) { var e = await r.json(); throw new Error(window.bhErrMsg(e)); }
                                         if (proofFile) {
                                             var fd = new FormData();
                                             fd.append('file', proofFile);
@@ -854,7 +854,7 @@
                     if (!confirm('Confirm you received payment for {{ item.name }}?')) return;
                     fetch('/api/v1/rentals/{{ order.id }}/confirm-payment', { method: 'POST' })
                         .then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Payment confirmed!' } })); setTimeout(() => location.reload(), 1500); }
-                        else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); });
+                        else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: window.bhErrMsg(e) } })); }); });
                 " class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg min-h-[36px] transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     Confirm Payment
@@ -866,7 +866,7 @@
                 <button onclick="
                     fetch('/api/v1/rentals/{{ order.id }}/complete', { method: 'POST' })
                         .then(r => { if (r.ok) { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Order completed!' } })); setTimeout(() => location.reload(), 1500); }
-                        else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: e.detail || 'Failed' } })); }); });
+                        else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: window.bhErrMsg(e) } })); }); });
                 " class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg min-h-[36px] transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Mark Complete
@@ -1022,6 +1022,18 @@
 
 {% block scripts %}
 <script>
+// Normalize FastAPI error responses for toast display. FastAPI returns:
+//   string detail  -> {detail: "message"}
+//   raise HTTPException(detail={...})  -> {detail: {...}}  (rare)
+//   422 validation  -> {detail: [{loc:..., msg:..., type:...}, ...]}
+// All three were being displayed as "[object Object]" before.
+window.bhErrMsg = function (body) {
+    if (!body || body.detail == null) return 'Request failed';
+    var d = body.detail;
+    if (typeof d === 'string') return d;
+    if (Array.isArray(d)) return d.map(function (x) { return x.msg || JSON.stringify(x); }).join('; ');
+    return JSON.stringify(d);
+};
 function openDisputeModal(rentalId, itemName) {
     var modal = document.getElementById('disputeModal');
     modal.classList.remove('hidden');
