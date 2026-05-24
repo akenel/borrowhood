@@ -484,7 +484,7 @@
                                 </span>
                                 {% if listing.price %}
                                 <span class="text-xs font-semibold text-gray-700">
-                                    {% if listing.listing_type.value == 'auction' %}{% if lang == 'it' %}da{% else %}from{% endif %} {% endif %}EUR {{ "%.0f"|format(listing.price) }}{% if listing.price_unit and listing.price_unit != 'flat' %}/{{ listing.price_unit | replace('per_', '') }}{% endif %}
+                                    {% if listing.listing_type.value == 'auction' %}{% if lang == 'it' %}da{% else %}from{% endif %} {% endif %}EUR {{ "%.0f"|format(listing.price) }}{% if listing.price_unit and listing.price_unit != 'flat' and listing.listing_type.value not in ('sell', 'commission') %}/{{ listing.price_unit | replace('per_', '') }}{% endif %}
                                 </span>
                                 {% elif listing.listing_type.value == 'giveaway' %}
                                 <span class="text-xs font-semibold text-green-600">{{ t('i18n.free') }}</span>

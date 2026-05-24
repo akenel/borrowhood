@@ -211,7 +211,7 @@
                                     </span>
                                     {# Price #}
                                     {% if listing.price and listing.price > 0 %}
-                                    <span class="font-semibold text-gray-700">{{ listing.currency or 'EUR' }} {{ "%.2f"|format(listing.price) }}{% if listing.price_unit and listing.price_unit != 'flat' %}<span class="font-normal text-gray-500">/{{ listing.price_unit }}</span>{% endif %}</span>
+                                    <span class="font-semibold text-gray-700">{{ listing.currency or 'EUR' }} {{ "%.2f"|format(listing.price) }}{% if listing.price_unit and listing.price_unit != 'flat' and lt not in ('sell', 'commission') %}<span class="font-normal text-gray-500">/{{ listing.price_unit }}</span>{% endif %}</span>
                                     {% elif lt == 'giveaway' %}
                                     <span class="font-semibold text-green-600">{{ t('i18n.free') if t('i18n.free') != 'i18n.free' else 'Free' }}</span>
                                     {% endif %}

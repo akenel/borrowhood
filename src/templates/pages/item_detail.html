@@ -455,6 +455,11 @@
                                     &euro;{{ "%.0f"|format(listing.price) }}
                                     {% if listing.listing_type.value == 'auction' %}
                                     <span class="text-sm font-normal text-gray-500">{{ t('i18n.starting_bid') if t('i18n.starting_bid') != 'i18n.starting_bid' else 'starting bid' }}</span>
+                                    {% elif listing.listing_type.value in ('sell', 'commission') %}
+                                    {# BL-189: sell + commission are inherently flat-rate transactions.
+                                       Rendering "per day" / "per hour" / etc next to the price reads as
+                                       RENTAL pricing (Mike's bug, 2026-05-02: "shows the item as a rental
+                                       not sale"). Suppress the unit for these types regardless of DB value. #}
                                     {% elif listing.price_unit and listing.price_unit != 'flat' %}
                                     <span class="text-sm font-normal text-gray-500">{{ t('common.' + listing.price_unit) }}</span>
                                     {% endif %}
