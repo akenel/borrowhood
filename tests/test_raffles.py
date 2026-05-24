@@ -479,3 +479,34 @@ def test_update_schema_optional():
     u = RaffleUpdate()
     assert u.title is None
     assert u.ticket_price is None
+
+
+def test_check_one_active_raffle_excludes_draft_bl196():
+    """BL-196 regression: DRAFT must NOT block new raffle creation.
+
+    Filed by Angelo Kenel 2026-05-24 from lapiazza.app/raffles/create.
+    A May-16 abandoned DRAFT silently blocked him for 8 days. DRAFT is
+    the user's own workspace, never visible to the community (per the
+    BL-192 list-filter fix). Blocking statuses are only the ones with
+    real community impact: PUBLISHED, ACTIVE, DRAWN.
+
+    Source inspection is brittle to renames but cheap and catches the
+    exact regression. The docstring's narrative reference to 'DRAFT was
+    wrongly included' is stripped before the assertion.
+    """
+    import inspect
+    from src.services import raffle_engine
+    src = inspect.getsource(raffle_engine.check_one_active_raffle)
+    # Must include the three real-active statuses
+    assert "RaffleStatus.PUBLISHED" in src
+    assert "RaffleStatus.ACTIVE" in src
+    assert "RaffleStatus.DRAWN" in src
+    # Strip the docstring before checking for DRAFT -- the bug-narrative
+    # reference in the docstring shouldn't trip the regression check.
+    parts = src.split('"""')
+    code_only = parts[2] if len(parts) >= 3 else src
+    assert "RaffleStatus.DRAFT" not in code_only, (
+        "BL-196 regression: check_one_active_raffle blocks users with "
+        "abandoned drafts. DRAFT is workspace, not active. See git log "
+        "for the May-24 fix."
+    )
