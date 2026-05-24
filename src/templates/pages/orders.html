@@ -311,6 +311,8 @@
                 <!-- Either: Mark Complete (in_progress quotes) -->
                 {% if quote.status.value == 'in_progress' %}
                 <button onclick="
+                    var prompt = {% if is_provider %}'Mark this service as completed? The customer will be asked to confirm + pay.'{% else %}'Confirm this service is done? This closes the job and releases payment to the provider.'{% endif %};
+                    if (!confirm(prompt)) return;
                     fetch('/api/v1/service-quotes/{{ quote.id }}/status', {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
@@ -319,7 +321,7 @@
                     else r.json().then(e => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: window.bhErrMsg(e) } })); }); });
                 " class="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg min-h-[36px] transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    Mark Complete
+                    {% if is_provider %}Mark Delivered{% else %}Confirm Done{% endif %}
                 </button>
                 {% endif %}
 

@@ -311,7 +311,9 @@ async def update_quote_status(
     user = await get_user(db, token)
 
     result = await db.execute(
-        select(BHServiceQuote).where(BHServiceQuote.id == quote_id)
+        select(BHServiceQuote)
+        .options(selectinload(BHServiceQuote.listing).selectinload(BHListing.item))
+        .where(BHServiceQuote.id == quote_id)
     )
     quote = result.scalars().first()
     if not quote:
@@ -338,8 +340,12 @@ async def update_quote_status(
         raise HTTPException(status_code=403, detail="Only customer can decline")
     if req.status == QuoteStatus.IN_PROGRESS and not is_provider:
         raise HTTPException(status_code=403, detail="Only provider can start work")
-    if req.status == QuoteStatus.COMPLETED and not is_provider:
-        raise HTTPException(status_code=403, detail="Only provider can mark complete")
+    # COMPLETED can be marked by EITHER party: provider says "delivered, please
+    # pay" or customer confirms "received, releasing payment." Customer-only
+    # close was a stuck-state risk -- if provider finished and forgot to click,
+    # the customer had no way to close the loop. Either side mis-marking can
+    # be challenged via the DISPUTED transition (both customer + provider can
+    # reach DISPUTED from COMPLETED per VALID_QUOTE_TRANSITIONS).
 
     quote.status = req.status
 
@@ -348,24 +354,37 @@ async def update_quote_status(
     if req.cancel_reason:
         quote.cancel_reason = req.cancel_reason
 
-    # Notify other party
+    # Notify other party. Title carries the headline + item name so the
+    # notification reads as actionable in the dropdown without opening it.
+    # Body carries actor + amount + optional message from the requester so
+    # the recipient knows who acted and what's at stake.
     other_id = quote.provider_id if is_customer else quote.customer_id
     status_labels = {
         QuoteStatus.ACCEPTED: "Quote accepted",
         QuoteStatus.DECLINED: "Quote declined",
-        QuoteStatus.IN_PROGRESS: "Work has started",
+        QuoteStatus.IN_PROGRESS: "Work started",
         QuoteStatus.COMPLETED: "Work completed",
         QuoteStatus.CANCELLED: "Quote cancelled",
         QuoteStatus.DISPUTED: "Quote disputed",
     }
-    title = status_labels.get(req.status, f"Quote status: {req.status.value}")
+    headline = status_labels.get(req.status, f"Quote status: {req.status.value}")
+    item_name = quote.listing.item.name if (quote.listing and quote.listing.item) else "Service quote"
+    title = f"{headline}: {item_name}"
+
+    actor_name = user.display_name or user.username or "The other party"
+    body_parts = [f"{actor_name} {req.status.value.replace('_', ' ')} the quote."]
+    if quote.total_amount:
+        body_parts.append(f"{quote.currency} {quote.total_amount:.2f}.")
+    if req.message:
+        body_parts.append(f'"{req.message}"')
+    body = " ".join(body_parts)
 
     await create_notification(
         db=db,
         user_id=other_id,
         notification_type=NotificationType.SYSTEM,
         title=title,
-        body=req.message,
+        body=body,
         link="/orders?tab=quotes",
         entity_type="quote",
         entity_id=quote.id,
