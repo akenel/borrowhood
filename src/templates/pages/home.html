@@ -920,7 +920,7 @@
                     <p class="text-sm text-gray-500 mt-1.5 line-clamp-2 flex-1">{{ item.description or '' }}</p>
                     {% if item.owner %}
                     <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
-                        <a href="/{{ item.owner.slug }}" class="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity">
+                        <a href="/workshop/{{ item.owner.slug }}" class="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity">
                             {% if item.owner.avatar_url %}
                             <img src="{{ item.owner.avatar_url }}" alt="{{ item.owner.display_name }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-indigo-100 flex-shrink-0">
                             {% else %}
