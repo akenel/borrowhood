@@ -30317,7 +30317,7 @@
       "condition": "good",
       "listings": [
         {
-          "listing_type": "RENT",
+          "listing_type": "rent",
           "price": 5.0,
           "currency": "EUR",
           "status": "PAUSED",
@@ -30327,19 +30327,23 @@
       "media": [
         {
           "url": "https://image.pollinations.ai/prompt/white%20electric%20Vespa%20scooter%20with%20delivery%20basket%20attached%20parked%20in%20front%20of%20old%20Sicilian%20bakery%20door%20sunlight%20realistic%20photo?width=800&height=600&nologo=true",
-          "alt_text": "White Vespa scooter with delivery basket at Sicilian bakery"
+          "alt_text": "White Vespa scooter with delivery basket at Sicilian bakery",
+          "media_type": "photo"
         },
         {
           "url": "https://image.pollinations.ai/prompt/white%20electric%20scooter%20Vespa%20style%20parked%20near%20Italian%20cafe%20terrace%20Mediterranean%20coast%20sunny%20realistic%20photo?width=800&height=600&nologo=true",
-          "alt_text": "White Vespa scooter at Mediterranean cafe terrace"
+          "alt_text": "White Vespa scooter at Mediterranean cafe terrace",
+          "media_type": "photo"
         },
         {
           "url": "https://image.pollinations.ai/prompt/woman%20riding%20white%20Vespa%20scooter%20through%20narrow%20Mediterranean%20village%20street%20Sicily%20Italy%20realistic?width=800&height=600&nologo=true",
-          "alt_text": "Woman riding Vespa through narrow Sicilian street"
+          "alt_text": "Woman riding Vespa through narrow Sicilian street",
+          "media_type": "photo"
         },
         {
           "url": "https://image.pollinations.ai/prompt/close%20up%20vintage%20cream%20Vespa%20scooter%20handlebars%20and%20front%20parked%20on%20Italian%20piazza%20cobblestones%20Sicily%20warm%20light%20realistic?width=800&height=600&nologo=true",
-          "alt_text": "Close-up vintage Vespa on Sicilian cobblestones"
+          "alt_text": "Close-up vintage Vespa on Sicilian cobblestones",
+          "media_type": "photo"
         }
       ],
       "item_type": "physical"
