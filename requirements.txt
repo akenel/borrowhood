@@ -40,3 +40,4 @@ google-genai>=1.65.0
 minio==7.2.12
 
 # Stripe payments (uses httpx for API calls -- no SDK needed)
+lxml>=5.2.0
