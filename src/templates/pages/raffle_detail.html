@@ -190,6 +190,10 @@
                     </div>
                     <div class="flex justify-between mt-1.5 text-xs text-gray-500">
                         <span><span class="font-bold text-gray-900" x-text="stats.tickets_confirmed"></span> {% if lang == 'it' %}venduti{% else %}sold{% endif %}</span>
+                        {# Show reserved-but-not-yet-paid so the page doesn't look "stuck" when
+                           all tickets are reserved but no payments confirmed yet (a real state
+                           on MANUAL-draw raffles with off-platform payments). #}
+                        <span x-show="stats.tickets_reserved > 0"><span class="font-bold text-amber-700" x-text="stats.tickets_reserved"></span> {% if lang == 'it' %}prenotati{% else %}pending payment{% endif %}</span>
                         <span x-text="stats.tickets_available + ' {% if lang == 'it' %}disponibili{% else %}available{% endif %}'"></span>
                     </div>
                 </div>
@@ -286,6 +290,112 @@
                         </div>
                     </div>
                 </div>
+
+                {# Organizer management panel -- only visible to the raffle organizer.
+                   Lists every ticket, lets the organizer mark reserved tickets paid
+                   (off-platform: cash/iban/paypal/twint), and trigger the draw when
+                   ready. Calls the existing /tickets, /tickets/{id}/confirm, /draw
+                   endpoints which were always there but had no UI hook -- the raffle
+                   workflow was effectively un-runnable from the browser without this. #}
+                {% if is_organizer %}
+                <div class="mt-6 pt-4 border-t border-amber-200 bg-amber-50/40 -mx-4 px-4 py-4 rounded-b-lg"
+                     x-data='{
+                        tickets: [],
+                        loading: false,
+                        actingOn: null,
+                        drawing: false,
+                        async load() {
+                            this.loading = true;
+                            try {
+                                const r = await fetch("/api/v1/raffles/{{ raffle.id }}/tickets");
+                                if (r.ok) this.tickets = await r.json();
+                            } catch (e) { console.error(e); }
+                            this.loading = false;
+                        },
+                        async confirmTicket(id) {
+                            this.actingOn = id;
+                            try {
+                                const r = await fetch("/api/v1/raffles/{{ raffle.id }}/tickets/" + id + "/confirm", {method: "POST"});
+                                if (r.ok) {
+                                    window.dispatchEvent(new CustomEvent("toast", {detail: {type: "success", message: "Payment confirmed"}}));
+                                    await this.load();
+                                } else {
+                                    const e = await r.json();
+                                    window.dispatchEvent(new CustomEvent("toast", {detail: {type: "error", message: (typeof e.detail === "string" ? e.detail : JSON.stringify(e.detail))}}));
+                                }
+                            } catch (err) {
+                                window.dispatchEvent(new CustomEvent("toast", {detail: {type: "error", message: "Network error"}}));
+                            }
+                            this.actingOn = null;
+                        },
+                        async triggerDraw() {
+                            if (!confirm("Trigger the draw now? A winner will be picked from CONFIRMED tickets and notifications will fire. This cannot be undone.")) return;
+                            this.drawing = true;
+                            try {
+                                const r = await fetch("/api/v1/raffles/{{ raffle.id }}/draw", {method: "POST"});
+                                if (r.ok) {
+                                    window.dispatchEvent(new CustomEvent("toast", {detail: {type: "success", message: "Draw complete -- winner notified."}}));
+                                    setTimeout(() => location.reload(), 1500);
+                                } else {
+                                    const e = await r.json();
+                                    window.dispatchEvent(new CustomEvent("toast", {detail: {type: "error", message: (typeof e.detail === "string" ? e.detail : JSON.stringify(e.detail))}}));
+                                }
+                            } catch (err) {
+                                window.dispatchEvent(new CustomEvent("toast", {detail: {type: "error", message: "Network error"}}));
+                            }
+                            this.drawing = false;
+                        }
+                     }' x-init="load()">
+                    <h4 class="text-sm font-bold text-amber-900 mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a4 4 0 00-4 4v2H4a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2h-2V6a4 4 0 00-4-4zm0 2a2 2 0 012 2v2H8V6a2 2 0 012-2z"/></svg>
+                        Organizer panel
+                    </h4>
+                    <p class="text-xs text-gray-600 mb-3">You're seeing this because you organize this raffle. Confirm each payment as it lands off-platform, then trigger the draw.</p>
+
+                    <div x-show="loading" class="text-center py-4"><div class="inline-block w-5 h-5 border-2 border-amber-300 border-t-amber-600 rounded-full animate-spin"></div></div>
+
+                    <template x-if="!loading && tickets.length === 0">
+                        <p class="text-sm text-gray-500 italic">No tickets yet.</p>
+                    </template>
+
+                    <div class="space-y-2 mb-4" x-show="!loading && tickets.length > 0">
+                        <template x-for="t in tickets" :key="t.id">
+                            <div class="bg-white rounded-lg p-3 border border-gray-200 flex items-center justify-between gap-3">
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm font-semibold text-gray-900 truncate" x-text="t.user_name + ' · ' + t.quantity + (t.quantity === 1 ? ' ticket' : ' tickets')"></p>
+                                    <p class="text-xs text-gray-500">
+                                        <span :class="{
+                                            'text-amber-700 font-semibold': t.status === 'reserved',
+                                            'text-emerald-700 font-semibold': t.status === 'confirmed',
+                                            'text-red-700 font-semibold': t.status === 'cancelled' || t.status === 'expired',
+                                        }" x-text="t.status"></span>
+                                        <span x-show="t.payment_method"> &middot; <span x-text="t.payment_method"></span></span>
+                                        <span x-show="t.ticket_numbers && t.ticket_numbers.length > 0"> &middot; #<span x-text="(t.ticket_numbers || []).join(', #')"></span></span>
+                                    </p>
+                                </div>
+                                <button x-show="t.status === 'reserved'"
+                                        @click="confirmTicket(t.id)"
+                                        :disabled="actingOn === t.id"
+                                        class="px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-lg whitespace-nowrap">
+                                    <span x-show="actingOn !== t.id">Mark Paid</span>
+                                    <span x-show="actingOn === t.id">...</span>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+
+                    {% if raffle.status.value in ('active', 'published') %}
+                    <button @click="triggerDraw()"
+                            :disabled="drawing"
+                            class="w-full px-4 py-3 text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg flex items-center justify-center gap-2 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                        <span x-show="!drawing">Trigger Draw</span>
+                        <span x-show="drawing">Drawing...</span>
+                    </button>
+                    <p class="text-[10px] text-gray-500 text-center mt-1.5">Picks a random winner from CONFIRMED tickets only.</p>
+                    {% endif %}
+                </div>
+                {% endif %}
 
                 <!-- QR Code -->
                 <div class="mt-6 pt-4 border-t border-gray-100" x-data="{

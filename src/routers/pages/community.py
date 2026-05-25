@@ -162,9 +162,21 @@ async def raffle_detail_page(raffle_id: str, request: Request,
     if raffle_description:
         og_desc_parts.append(raffle_description[:140].strip())
 
+    # is_organizer drives the management panel (confirm tickets, trigger draw).
+    # Was previously not passed -- raffle had no organizer-side UI at all.
+    is_organizer = False
+    if token:
+        from src.dependencies import get_user as _get_user
+        try:
+            _u = await _get_user(db, token)
+            is_organizer = raffle.organizer_id == _u.id
+        except Exception:
+            pass
+
     ctx = _ctx(request, token,
         raffle=raffle,
         user_had_ticket=user_had_ticket,
+        is_organizer=is_organizer,
         og_type="product",
         og_title=f"{raffle_title} - La Piazza Raffle",
         og_description=" - ".join(og_desc_parts),
