@@ -15,6 +15,14 @@ import asyncio
 import logging
 import sys
 import traceback
+from pathlib import Path
+
+# Make `src.*` importable. When this script is invoked as
+# `python scripts/ci_seed.py`, sys.path[0] is the scripts/ dir, not
+# the repo root -- so `from src.database import ...` fails. Inserting
+# the parent dir fixes it without depending on PYTHONPATH being set
+# in CI yaml.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
 async def main() -> None:
