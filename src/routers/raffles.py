@@ -714,6 +714,56 @@ async def draw_raffle(
     # Gamification: organizer + winner earn points on draw
     await award_draw_points(db, raffle)
 
+    # Notifications: winner + losers. Was missing -- Mike won the test raffle
+    # and got nothing in the bell. Reload raffle with item so we can name the
+    # prize in the message body.
+    from src.models.notification import NotificationType
+    from src.services.notify import create_notification
+    raffle_full = await db.scalar(
+        select(BHRaffle)
+        .options(selectinload(BHRaffle.listing).selectinload(BHListing.item))
+        .where(BHRaffle.id == raffle.id)
+    )
+    prize_name = (
+        raffle_full.listing.item.name
+        if raffle_full and raffle_full.listing and raffle_full.listing.item
+        else "the raffle"
+    )
+    link = f"/raffles/{raffle.id}"
+
+    # Winner notification
+    if raffle.winner_user_id:
+        await create_notification(
+            db=db,
+            user_id=raffle.winner_user_id,
+            notification_type=NotificationType.SYSTEM,
+            title=f"You won! {prize_name}",
+            body=f"Your ticket was drawn. The organizer will be in touch about delivery. Draw is verifiable on the raffle page (seed + proof hash).",
+            link=link,
+            entity_type="raffle",
+            entity_id=raffle.id,
+        )
+
+    # Loser notifications -- only CONFIRMED ticket holders who didn't win
+    confirmed_holders = (await db.execute(
+        select(BHRaffleTicket.user_id)
+        .where(BHRaffleTicket.raffle_id == raffle.id)
+        .where(BHRaffleTicket.status == RaffleTicketStatus.CONFIRMED)
+        .where(BHRaffleTicket.user_id != raffle.winner_user_id)
+        .distinct()
+    )).scalars().all()
+    for uid in confirmed_holders:
+        await create_notification(
+            db=db,
+            user_id=uid,
+            notification_type=NotificationType.SYSTEM,
+            title=f"Raffle drawn: {prize_name}",
+            body="You didn't win this time, but thanks for participating. The draw seed and proof hash are public on the raffle page.",
+            link=link,
+            entity_type="raffle",
+            entity_id=raffle.id,
+        )
+
     await db.commit()
     return result
 
