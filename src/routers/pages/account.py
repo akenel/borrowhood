@@ -256,10 +256,14 @@ async def orders_page(
                     (BHRental.renter_id == db_user.id) | (BHItem.owner_id == db_user.id)
                 )
 
-            # Status filter
+            # Status filter. RentalStatus enum .value is lowercase ('pending',
+            # 'committed'...) -- URL params come in lowercase from the dropdown.
+            # .upper() was wrong (same trap as the QuoteStatus filter that was
+            # silently dropping). Caught when Mike's Order History dropdown
+            # filtered to "Pending" showed Pending+Returned+Completed mixed.
             if status:
                 try:
-                    status_enum = RentalStatus(status.upper())
+                    status_enum = RentalStatus(status.lower())
                     base = base.where(BHRental.status == status_enum)
                 except ValueError:
                     pass
