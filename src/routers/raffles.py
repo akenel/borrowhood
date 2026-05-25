@@ -788,6 +788,54 @@ async def complete_raffle(
     return {"status": "completed"}
 
 
+@router.get("/{raffle_id}/proof")
+async def get_proof(
+    raffle_id: UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Public: return the inputs anyone needs to reproduce the draw proof.
+
+    Returns {seed, pool, proof, formula, command} where:
+      pool   = comma-separated CONFIRMED ticket UUIDs in draw order
+               (each repeated by its quantity).
+      proof  = sha256(seed + ":" + pool), as stored on the raffle row.
+      command = a ready-to-run `echo -n "..." | sha256sum` string a
+                user can paste into any shell to recompute proof.
+
+    Anyone can call this -- no auth -- because the whole point is for
+    a third party to be able to audit the draw without trusting us.
+    """
+    raffle = await _get_raffle(db, raffle_id)
+    if raffle.status not in (RaffleStatus.DRAWN, RaffleStatus.COMPLETED):
+        raise HTTPException(status_code=400, detail=f"Raffle has not been drawn yet (status: {raffle.status.value})")
+
+    confirmed = (await db.execute(
+        select(BHRaffleTicket)
+        .where(BHRaffleTicket.raffle_id == raffle.id)
+        .where(BHRaffleTicket.status == RaffleTicketStatus.CONFIRMED)
+        .order_by(BHRaffleTicket.created_at)
+    )).scalars().all()
+
+    pool_ids = []
+    for t in confirmed:
+        pool_ids.extend([str(t.id)] * t.quantity)
+    pool = ",".join(pool_ids)
+
+    proof_input = f"{raffle.draw_seed}:{pool}"
+    command = f'echo -n "{proof_input}" | sha256sum'
+
+    return {
+        "raffle_id": str(raffle.id),
+        "seed": raffle.draw_seed,
+        "pool": pool,
+        "proof": raffle.draw_proof_hash,
+        "formula": "sha256(seed + \":\" + pool) == proof",
+        "command": command,
+        "winner_ticket_id": str(raffle.winner_ticket_id) if raffle.winner_ticket_id else None,
+        "total_entries": len(pool_ids),
+    }
+
+
 @router.post("/{raffle_id}/cancel")
 async def cancel_raffle(
     raffle_id: UUID,
