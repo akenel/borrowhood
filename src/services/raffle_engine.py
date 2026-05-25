@@ -299,33 +299,110 @@ async def raffle_stats(db: AsyncSession, raffle: BHRaffle) -> dict:
 
 # ── Background: ticket expiry + organizer inaction ────────────────────
 
-async def expire_stale_tickets():
-    """Expire reserved tickets past their hold window. Release back to pool."""
-    async with async_session() as db:
-        now = datetime.now(timezone.utc)
-        result = await db.execute(
-            select(BHRaffleTicket)
-            .options(selectinload(BHRaffleTicket.raffle))
-            .where(BHRaffleTicket.status == RaffleTicketStatus.RESERVED)
-            .where(BHRaffleTicket.expires_at < now)
+RAFFLE_NO_SHOW_WINDOW_DAYS = 30  # rolling window for counting expired tickets per user
+MAX_RAFFLE_NO_SHOWS = 3           # before reservation gets blocked
+RAFFLE_BAN_COOLDOWN_DAYS = 7      # how long the block lasts after the 3rd no-show
+
+
+async def _expire_tickets_query(db: AsyncSession, raffle_id=None):
+    """Pure impl: find + flip expired RESERVED tickets, decrement inventory,
+    notify each holder, return list of (ticket, raffle, prize_name) tuples.
+
+    Caller is responsible for `await db.commit()`. Accepts an optional
+    raffle_id to scope the sweep to a single raffle (lazy mode); without it,
+    every ACTIVE/PUBLISHED raffle is swept (background cron mode).
+    """
+    from src.models.listing import BHListing
+    from src.models.item import BHItem
+    from src.models.notification import NotificationType
+    from src.services.notify import create_notification
+
+    now = datetime.now(timezone.utc)
+    q = (
+        select(BHRaffleTicket)
+        .options(
+            selectinload(BHRaffleTicket.raffle)
+            .selectinload(BHRaffle.listing)
+            .selectinload(BHListing.item)
         )
-        expired = result.scalars().all()
-        if not expired:
-            return 0
+        .where(BHRaffleTicket.status == RaffleTicketStatus.RESERVED)
+        .where(BHRaffleTicket.expires_at < now)
+    )
+    if raffle_id is not None:
+        q = q.where(BHRaffleTicket.raffle_id == raffle_id)
+    expired = (await db.execute(q)).scalars().all()
+    if not expired:
+        return 0
 
-        count = 0
-        for ticket in expired:
-            ticket.status = RaffleTicketStatus.EXPIRED
-            if ticket.raffle:
-                ticket.raffle.tickets_reserved = max(0, (ticket.raffle.tickets_reserved or 0) - ticket.quantity)
-            count += 1
-            logger.info("Expired raffle ticket %s (raffle=%s, user=%s, qty=%d)",
-                        ticket.id, ticket.raffle_id, ticket.user_id, ticket.quantity)
+    count = 0
+    for ticket in expired:
+        ticket.status = RaffleTicketStatus.EXPIRED
+        raffle = ticket.raffle
+        if raffle:
+            raffle.tickets_reserved = max(0, (raffle.tickets_reserved or 0) - ticket.quantity)
+            prize_name = (
+                raffle.listing.item.name
+                if raffle.listing and raffle.listing.item
+                else "the raffle"
+            )
+            # Notify the buyer that their hold expired and the ticket is back
+            # in the pool. Without this they just see the bell silent and
+            # wonder why their reservation vanished.
+            try:
+                await create_notification(
+                    db=db,
+                    user_id=ticket.user_id,
+                    notification_type=NotificationType.SYSTEM,
+                    title=f"Reservation expired: {prize_name}",
+                    body=(
+                        f"Your {ticket.quantity}-ticket hold expired without payment. "
+                        f"The ticket is back in the pool -- re-reserve if you still want it."
+                    ),
+                    link=f"/raffles/{raffle.id}",
+                    entity_type="raffle",
+                    entity_id=raffle.id,
+                )
+            except Exception as e:
+                logger.warning("Could not notify expired-ticket buyer %s: %s", ticket.user_id, e)
+        count += 1
+        logger.info("Expired raffle ticket %s (raffle=%s, user=%s, qty=%d)",
+                    ticket.id, ticket.raffle_id, ticket.user_id, ticket.quantity)
 
-        await db.commit()
+    return count
+
+
+async def expire_stale_tickets():
+    """Background-task entry: open a session, sweep all raffles, commit."""
+    async with async_session() as db:
+        count = await _expire_tickets_query(db, raffle_id=None)
         if count:
+            await db.commit()
             logger.info("Expired %d stale raffle tickets", count)
         return count
+
+
+async def expire_stale_tickets_for_raffle(db: AsyncSession, raffle_id) -> int:
+    """Lazy-sweep helper: scope to one raffle, use caller's session, no commit.
+
+    Call this from page handlers / endpoints before reading inventory state so
+    the user never sees a "0 available" display caused by expired ghost holds
+    that the cron hasn't gotten to yet.
+    """
+    count = await _expire_tickets_query(db, raffle_id=raffle_id)
+    if count:
+        await db.commit()
+    return count
+
+
+async def count_recent_raffle_no_shows(db: AsyncSession, user_id) -> int:
+    """How many raffle tickets did this user let expire in the rolling window?"""
+    cutoff = datetime.now(timezone.utc) - timedelta(days=RAFFLE_NO_SHOW_WINDOW_DAYS)
+    return await db.scalar(
+        select(func.count(BHRaffleTicket.id))
+        .where(BHRaffleTicket.user_id == user_id)
+        .where(BHRaffleTicket.status == RaffleTicketStatus.EXPIRED)
+        .where(BHRaffleTicket.updated_at > cutoff)
+    ) or 0
 
 
 async def auto_cancel_abandoned_raffles():

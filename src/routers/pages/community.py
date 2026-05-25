@@ -127,6 +127,15 @@ async def raffle_detail_page(raffle_id: str, request: Request,
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Raffle not found")
 
+    # Lazy sweep: flip any expired RESERVED tickets to EXPIRED before computing
+    # the inventory shown to the viewer. Avoids "0 available" caused by stale
+    # ghost holds when the background cron hasn't run yet. Only meaningful for
+    # raffles still in a buying state.
+    from src.models.raffle import RaffleStatus
+    if raffle.status in (RaffleStatus.PUBLISHED, RaffleStatus.ACTIVE):
+        from src.services.raffle_engine import expire_stale_tickets_for_raffle
+        await expire_stale_tickets_for_raffle(db, raffle_id=raffle.id)
+
     # Only confirmed ticket holders can verify a drawn/completed raffle --
     # gate the Fair/Not-fair UI to them so anonymous viewers don't hit 400s.
     user_had_ticket = False

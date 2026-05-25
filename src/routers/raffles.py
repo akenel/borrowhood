@@ -476,6 +476,34 @@ async def reserve_tickets(
     if raffle.organizer_id == user.id:
         raise HTTPException(status_code=400, detail="Organizer cannot buy own raffle tickets")
 
+    # Lazy sweep: flip any RESERVED tickets past expires_at to EXPIRED before
+    # checking capacity. Stops the "0 available because ghosts still hold the
+    # slots" problem when nobody has visited the page in a while.
+    from src.services.raffle_engine import (
+        expire_stale_tickets_for_raffle,
+        count_recent_raffle_no_shows,
+        MAX_RAFFLE_NO_SHOWS,
+        RAFFLE_NO_SHOW_WINDOW_DAYS,
+    )
+    await expire_stale_tickets_for_raffle(db, raffle_id=raffle.id)
+    # Reload to pick up the freed inventory
+    raffle = await _get_raffle(db, raffle_id)
+
+    # 3-strike check: if this user let too many raffle tickets expire recently,
+    # block them from reserving more. Prevents deadbeats from camping
+    # inventory across multiple raffles. Window + threshold defined in engine.
+    no_shows = await count_recent_raffle_no_shows(db, user.id)
+    if no_shows >= MAX_RAFFLE_NO_SHOWS:
+        raise HTTPException(
+            status_code=429,
+            detail=(
+                f"You have {no_shows} expired raffle reservations in the last "
+                f"{RAFFLE_NO_SHOW_WINDOW_DAYS} days. Reservations are paused for "
+                f"you on all raffles to free inventory for other buyers. Pay an "
+                f"existing reservation or wait a few days before reserving again."
+            ),
+        )
+
     # Per-user limit
     if raffle.max_tickets_per_user:
         existing = await db.scalar(
@@ -822,7 +850,20 @@ async def get_proof(
     pool = ",".join(pool_ids)
 
     proof_input = f"{raffle.draw_seed}:{pool}"
-    command = f'echo -n "{proof_input}" | sha256sum'
+    # Self-checking command: hash + compare against expected proof + print a
+    # plain-language MATCH / MISMATCH line. Was just `echo ... | sha256sum`
+    # which printed a 64-char hex string the user had to eyeball against the
+    # Proof above -- Angel ran it himself and said it was still confusing.
+    expected = raffle.draw_proof_hash or ""
+    command = (
+        f'EXPECTED={expected}; '
+        f'ACTUAL=$(echo -n "{proof_input}" | sha256sum | awk \'{{print $1}}\'); '
+        f'[ "$ACTUAL" = "$EXPECTED" ] '
+        f'&& echo "VERIFIED -- the draw is provably fair" '
+        f'|| echo "MISMATCH -- expected $EXPECTED but got $ACTUAL"'
+    )
+    # Raw command for power users who want just the hash output.
+    command_raw = f'echo -n "{proof_input}" | sha256sum'
 
     return {
         "raffle_id": str(raffle.id),
@@ -831,6 +872,7 @@ async def get_proof(
         "proof": raffle.draw_proof_hash,
         "formula": "sha256(seed + \":\" + pool) == proof",
         "command": command,
+        "command_raw": command_raw,
         "winner_ticket_id": str(raffle.winner_ticket_id) if raffle.winner_ticket_id else None,
         "total_entries": len(pool_ids),
     }
@@ -876,6 +918,13 @@ async def get_stats(
     raffle = await _get_raffle(db, raffle_id)
     if raffle.status == RaffleStatus.DRAFT:
         raise HTTPException(status_code=404, detail="Raffle not found")
+    # Lazy sweep so the live stats poll never shows ghost-held inventory
+    # (RESERVED tickets past their expires_at). Only meaningful while the
+    # raffle is still selling.
+    if raffle.status in (RaffleStatus.PUBLISHED, RaffleStatus.ACTIVE):
+        from src.services.raffle_engine import expire_stale_tickets_for_raffle
+        await expire_stale_tickets_for_raffle(db, raffle_id=raffle.id)
+        raffle = await _get_raffle(db, raffle_id)
     return await raffle_stats(db, raffle)
 
 
