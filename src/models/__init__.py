@@ -31,6 +31,19 @@ from src.models.message import BHMessage
 from src.models.listing_qa import BHListingQA
 from src.models.event_rsvp import BHEventRSVP
 from src.models.achievement import BHAchievement
+# Newer models that weren't registered with Base.metadata via this __init__
+# -- without these imports, create_all() can't see the tables they own,
+# and FKs from older tables (e.g. bh_user.default_community_id -> bh_community)
+# fail with NoReferencedTableError. Caught when CI's seed step finally
+# surfaced the real traceback (was silently exit-1 for 9+ days).
+from src.models.analytics import BHItemView
+from src.models.community import BHCommunity, BHCommunityMembership
+from src.models.delivery import BHDeliveryTracking, BHDeliveryEvent
+from src.models.insurance import BHInsurancePolicy, BHInsuranceClaim
+from src.models.invoice import BHInvoice
+from src.models.quote import BHServiceQuote
+from src.models.raffle import BHRaffle, BHRaffleTicket, BHRaffleVerification, BHRaffleVouch
+from src.models.saved_search import BHSavedSearch
 
 __all__ = [
     "BHUser",
