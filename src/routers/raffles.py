@@ -161,10 +161,29 @@ async def create_raffle(
 
     # Verify item ownership
     item = await db.scalar(
-        select(BHItem).where(BHItem.id == data.item_id).where(BHItem.owner_id == user.id)
+        select(BHItem)
+        .options(selectinload(BHItem.media))
+        .where(BHItem.id == data.item_id).where(BHItem.owner_id == user.id)
     )
     if not item:
         raise HTTPException(status_code=404, detail="Item not found or not yours")
+
+    # Item must have at least one photo. Raffles without a prize image get
+    # ~60% lower share-conversion in standard data, AND the social-card
+    # preview falls back to the generic La Piazza branding (looks spammy in
+    # group chats). Block here with a helpful message so the organizer
+    # adds the photo on the item first, then comes back.
+    visible_media = [m for m in (item.media or []) if not m.deleted_at]
+    if not visible_media:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Your item '{item.name}' has no photo. Raffles need at least "
+                f"one photo of the prize so buyers can see what they're winning "
+                f"and the share preview on WhatsApp/Telegram looks real. Add a "
+                f"photo on /items/{item.slug}/edit, then come back here."
+            ),
+        )
 
     # Raffle ban check (2+ abandoned raffles with ticket holders)
     ok, msg = await check_raffle_ban(db, user.id)
