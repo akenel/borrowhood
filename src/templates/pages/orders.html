@@ -543,13 +543,24 @@
             <div>
                 <label class="block text-xs font-medium text-gray-500 mb-1">{{ t('i18n.status') }}</label>
                 <select name="status" class="w-full border border-gray-300 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 min-h-[40px]">
+                    {# Dropdown covers every RentalStatus value -- the old list
+                       was missing committed/buyer_paid/payment_confirmed/expired/
+                       returned/disputed, which meant orders in those states
+                       couldn't be filtered to (Mike had Returned + Expired rentals
+                       invisible to the filter). #}
                     <option value="">{{ t('i18n.all') }}</option>
+                    <option value="committed" {% if selected_status == 'committed' %}selected{% endif %}>Committed</option>
+                    <option value="buyer_paid" {% if selected_status == 'buyer_paid' %}selected{% endif %}>Buyer Paid</option>
+                    <option value="payment_confirmed" {% if selected_status == 'payment_confirmed' %}selected{% endif %}>Payment Confirmed</option>
                     <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending</option>
                     <option value="approved" {% if selected_status == 'approved' %}selected{% endif %}>Approved</option>
                     <option value="picked_up" {% if selected_status == 'picked_up' %}selected{% endif %}>Picked Up</option>
+                    <option value="returned" {% if selected_status == 'returned' %}selected{% endif %}>Returned</option>
                     <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Completed</option>
                     <option value="declined" {% if selected_status == 'declined' %}selected{% endif %}>Declined</option>
                     <option value="cancelled" {% if selected_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    <option value="expired" {% if selected_status == 'expired' %}selected{% endif %}>Expired</option>
+                    <option value="disputed" {% if selected_status == 'disputed' %}selected{% endif %}>Disputed</option>
                 </select>
             </div>
             <div>

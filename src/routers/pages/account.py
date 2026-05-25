@@ -256,15 +256,15 @@ async def orders_page(
                     (BHRental.renter_id == db_user.id) | (BHItem.owner_id == db_user.id)
                 )
 
-            # Status filter. RentalStatus enum .value is lowercase ('pending',
-            # 'committed'...) -- URL params come in lowercase from the dropdown.
-            # .upper() was wrong (same trap as the QuoteStatus filter that was
-            # silently dropping). Caught when Mike's Order History dropdown
-            # filtered to "Pending" showed Pending+Returned+Completed mixed.
+            # Status filter. Dropdown sends lowercase values that already
+            # match RentalStatus.value -- pass straight in, no coercion.
+            # The test in tests/test_enum_casing_traps.py prevents anyone
+            # from re-introducing .upper()/.lower() here (history: that
+            # pattern silently dropped filters for both RentalStatus and
+            # QuoteStatus until 2026-05-24/25).
             if status:
                 try:
-                    status_enum = RentalStatus(status.lower())
-                    base = base.where(BHRental.status == status_enum)
+                    base = base.where(BHRental.status == RentalStatus(status))
                 except ValueError:
                     pass
 
@@ -324,11 +324,10 @@ async def orders_page(
                 (BHServiceQuote.customer_id == db_user.id) | (BHServiceQuote.provider_id == db_user.id)
             )
         if status:
-            # QuoteStatus enum values are lowercase ('requested', 'quoted'...);
-            # URL filter comes in lowercase too. .upper() was wrong -- it would
-            # raise ValueError every time, so the filter silently dropped.
+            # Dropdown sends lowercase that matches QuoteStatus.value -- no
+            # coercion. See tests/test_enum_casing_traps.py for the guard.
             try:
-                q = q.where(BHServiceQuote.status == QuoteStatus(status.lower()))
+                q = q.where(BHServiceQuote.status == QuoteStatus(status))
             except ValueError:
                 pass
         q = q.order_by(BHServiceQuote.created_at.desc()).limit(limit).offset(offset)
