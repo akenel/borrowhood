@@ -98,7 +98,7 @@
                     <p class="text-gray-500"><span class="font-bold text-gray-700">Proof:</span> <span class="break-all">{{ raffle.draw_proof_hash or '' }}</span></p>
                     <p class="text-gray-400 mt-2 text-[10px] font-sans">
                         {% if lang == 'it' %}Chiunque puo verificare: SHA-256(seed + pool) = proof. {% else %}Anyone can verify: SHA-256(seed + pool) = proof. {% endif %}
-                        <a href="/raffle-guide#verify" class="text-emerald-700 underline font-semibold">{% if lang == 'it' %}Come si fa?{% else %}How do I check this?{% endif %}</a>
+                        <a href="/raffles/guide#verify" class="text-emerald-700 underline font-semibold">{% if lang == 'it' %}Come si fa?{% else %}How do I check this?{% endif %}</a>
                     </p>
                 </div>
             </div>
