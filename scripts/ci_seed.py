@@ -34,11 +34,17 @@ async def main() -> None:
     log = logging.getLogger("ci_seed")
 
     log.info("=== ci_seed: importing ===")
-    from src.database import create_tables, async_session
+    from src.database import create_tables, run_migrations, async_session
     from src.services.seeding import seed_database
 
     log.info("=== ci_seed: creating tables ===")
     await create_tables()
+
+    # Run the same lightweight migrations the app runs at startup -- notably
+    # CREATE EXTENSION pg_trgm, which fuzzy item search depends on. Without
+    # this the search endpoint 500s in CI's fresh postgres.
+    log.info("=== ci_seed: running migrations ===")
+    await run_migrations()
 
     log.info("=== ci_seed: opening session ===")
     async with async_session() as db:

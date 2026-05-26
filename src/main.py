@@ -145,6 +145,16 @@ def create_app() -> FastAPI:
     async def favicon():
         return FileResponse("src/static/favicon.ico", media_type="image/x-icon")
 
+    # PWA manifest at root, served with the correct content-type. StaticFiles
+    # serves /static/manifest.json as application/json, but Chrome's WebAPK
+    # minter wants application/manifest+json -- a wrong type contributes to a
+    # non-compliant WebAPK (Fred's "built for older Android" Play Protect
+    # warning). Serving from a dedicated route guarantees the right header.
+    @app.get("/manifest.webmanifest", include_in_schema=False)
+    @app.get("/manifest.json", include_in_schema=False)
+    async def manifest():
+        return FileResponse("src/static/manifest.json", media_type="application/manifest+json")
+
     # Static files
     app.mount("/static", StaticFiles(directory="src/static"), name="static")
 

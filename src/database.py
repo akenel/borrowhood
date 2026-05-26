@@ -71,6 +71,11 @@ async def run_migrations():
     Each statement is idempotent (ADD COLUMN IF NOT EXISTS).
     """
     migrations = [
+        # 2026-05-26: pg_trgm powers fuzzy item search (func.similarity in
+        # items/crud.py). Without it, every /api/v1/items?q=... search 500s.
+        # Prod had it installed manually; fresh DBs (CI, new deploys) did not,
+        # which is why 3 search tests failed in CI. Create it everywhere.
+        "CREATE EXTENSION IF NOT EXISTS pg_trgm",
         # 2026-03-03: identity fields for legends seed
         "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS date_of_birth DATE",
         "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS mother_name VARCHAR(200)",
