@@ -418,6 +418,23 @@
                             }
                             this.drawing = false;
                         },
+                        async publishRaffle() {
+                            if (!confirm("Publish this raffle? It becomes visible to the community and buyers can reserve tickets. You can't edit the terms after publishing.")) return;
+                            this.acting = true;
+                            try {
+                                const r = await fetch("/api/v1/raffles/{{ raffle.id }}/publish", {method: "POST"});
+                                if (r.ok) {
+                                    window.dispatchEvent(new CustomEvent("toast", {detail: {type: "success", message: "Raffle published -- it's live!"}}));
+                                    setTimeout(() => location.reload(), 1500);
+                                } else {
+                                    const e = await r.json();
+                                    window.dispatchEvent(new CustomEvent("toast", {detail: {type: "error", message: (typeof e.detail === "string" ? e.detail : JSON.stringify(e.detail))}}));
+                                }
+                            } catch (err) {
+                                window.dispatchEvent(new CustomEvent("toast", {detail: {type: "error", message: "Network error"}}));
+                            }
+                            this.acting = false;
+                        },
                         async markComplete() {
                             if (!confirm("Mark this raffle complete? Confirm you have delivered the prize to the winner. This closes the raffle for good.")) return;
                             this.acting = true;
@@ -492,6 +509,22 @@
                         </template>
                     </div>
 
+                    {# DRAFT -> Publish + Edit. A saved draft was a dead-end from
+                       the raffle page: the organizer panel had no Publish button,
+                       so you'd have to hunt for the listing-level publish on the
+                       dashboard. Angel hit this. Publish re-runs all the guards
+                       (cooldown, one-active, photo, value cap) server-side. #}
+                    {% if raffle.status.value == 'draft' %}
+                    <button @click="publishRaffle()"
+                            :disabled="acting"
+                            class="w-full px-4 py-3 text-sm font-bold text-white bg-amber-600 hover:bg-amber-700 disabled:opacity-50 rounded-lg flex items-center justify-center gap-2 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m0 0l-7 7m7-7l7 7"/></svg>
+                        <span x-show="!acting">Publish Raffle</span>
+                        <span x-show="acting">Publishing...</span>
+                    </button>
+                    <p class="text-[10px] text-gray-500 text-center mt-1.5">Only you can see this until you publish. To change the terms, delete it and create a new one (editing drafts is coming later).</p>
+                    {% endif %}
+
                     {% if raffle.status.value in ('active', 'published') %}
                     <button @click="triggerDraw()"
                             :disabled="drawing"
@@ -518,15 +551,16 @@
                     <p class="text-[10px] text-gray-500 text-center mt-1.5">Confirms you handed the prize to the winner. Frees you to run another raffle.</p>
                     {% endif %}
 
-                    {# Cancel available in any pre-completion state. Voids all
-                       tickets + notifies buyers. Destructive, hence the red
-                       styling + confirm prompt. #}
-                    {% if raffle.status.value in ('active', 'published', 'drawn') %}
+                    {# Cancel available in any pre-completion state (incl. draft).
+                       Voids all tickets + notifies buyers. Destructive, hence the
+                       red styling + confirm prompt. For a draft it's effectively
+                       a delete (no tickets, no buyers to notify). #}
+                    {% if raffle.status.value in ('draft', 'active', 'published', 'drawn') %}
                     <button @click="cancelRaffle()"
                             :disabled="acting"
                             class="w-full mt-2 px-4 py-2.5 text-xs font-semibold text-red-700 bg-white border-2 border-red-200 hover:bg-red-50 disabled:opacity-50 rounded-lg flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                        Cancel Raffle
+                        {% if raffle.status.value == 'draft' %}Delete Draft{% else %}Cancel Raffle{% endif %}
                     </button>
                     {% endif %}
                 </div>
