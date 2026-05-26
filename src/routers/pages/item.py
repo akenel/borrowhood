@@ -49,22 +49,34 @@ async def item_detail(slug: str, request: Request,
         ctx = _ctx(request, token)
         return _render("errors/404.html", ctx, status_code=404)
 
-    # Raffle items redirect to the raffle detail page -- but ONLY for raffles
-    # that are actually public. A DRAFT raffle living on an item that also has
-    # a service/sell/rent listing was hijacking the item page (Angel hit this
-    # via the "View service" link on /orders: handyman item had a DRAFT raffle
-    # alongside the SERVICE listing, and the page redirected to the draft
-    # raffle showing "DRAFT - This raffle is organized by Angel, not by La
-    # Piazza"). Skip DRAFT and CANCELLED; show those only to the owner via
-    # the regular item page.
+    # Raffle items redirect to the canonical raffle detail page, which renders
+    # the full raffle (facts box, payment, draw date, organizer panel). The
+    # generic item page can't show raffle-specific fields, so a raffle viewed
+    # here looks half-blind (Angel: "missing delivery + draw details").
+    #
+    # Rules:
+    #  - PUBLISHED/ACTIVE/DRAWN/COMPLETED raffle -> always redirect (public).
+    #  - DRAFT raffle -> redirect ONLY for the owner AND only when the raffle is
+    #    the item's sole active listing. This previews the draft in full for the
+    #    organizer without re-breaking the handyman case (item with a SERVICE
+    #    listing + a stray DRAFT raffle must NOT redirect, or the service is
+    #    hidden). CANCELLED never redirects.
     if item.listings:
         from src.models.raffle import BHRaffle, RaffleStatus
-        for listing in item.listings:
-            if listing.listing_type == ListingType.RAFFLE and not listing.deleted_at:
+        live_listings = [l for l in item.listings if not l.deleted_at]
+        viewer_is_owner = bool(token and item.owner and item.owner.keycloak_id == token.get("sub", ""))
+        for listing in live_listings:
+            if listing.listing_type == ListingType.RAFFLE:
                 raffle = await db.scalar(
                     select(BHRaffle).where(BHRaffle.listing_id == listing.id)
                 )
-                if raffle and raffle.status not in (RaffleStatus.DRAFT, RaffleStatus.CANCELLED):
+                if not raffle:
+                    continue
+                if raffle.status in (RaffleStatus.PUBLISHED, RaffleStatus.ACTIVE,
+                                     RaffleStatus.DRAWN, RaffleStatus.COMPLETED):
+                    return RedirectResponse(url=f"/raffles/{raffle.id}", status_code=302)
+                if (raffle.status == RaffleStatus.DRAFT and viewer_is_owner
+                        and len(live_listings) == 1):
                     return RedirectResponse(url=f"/raffles/{raffle.id}", status_code=302)
 
     # Resolve viewer's badge tier for progressive disclosure
