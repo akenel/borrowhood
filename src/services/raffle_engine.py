@@ -407,13 +407,16 @@ async def count_recent_raffle_no_shows(db: AsyncSession, user_id) -> int:
 
 async def auto_cancel_abandoned_raffles():
     """Cancel raffles where organizer took no action past the deadline."""
+    from src.models.listing import BHListing, ListingStatus
     async with async_session() as db:
         now = datetime.now(timezone.utc)
         cutoff = now - timedelta(days=ORGANIZER_INACTION_DAYS)
 
-        # Published/active raffles with draw_date in the past and no draw action
+        # Published/active raffles with draw_date in the past and no draw action.
+        # Eager-load listing so we can expire it without a lazy-load greenlet error.
         result = await db.execute(
             select(BHRaffle)
+            .options(selectinload(BHRaffle.listing))
             .where(BHRaffle.status.in_([RaffleStatus.PUBLISHED, RaffleStatus.ACTIVE]))
             .where(BHRaffle.draw_date.is_not(None))
             .where(BHRaffle.draw_date < cutoff)
@@ -425,6 +428,11 @@ async def auto_cancel_abandoned_raffles():
         count = 0
         for raffle in abandoned:
             raffle.status = RaffleStatus.CANCELLED
+            # Expire the underlying listing too, or it lingers as ACTIVE in
+            # browse + the owner's dashboard while the raffle is dead. (This
+            # was the English Lessons inconsistency Angel spotted.)
+            if raffle.listing:
+                raffle.listing.status = ListingStatus.EXPIRED
             # Cancel all remaining tickets
             tickets = (await db.execute(
                 select(BHRaffleTicket)

@@ -215,7 +215,35 @@
                                     {% elif lt == 'giveaway' %}
                                     <span class="font-semibold text-green-600">{{ t('i18n.free') if t('i18n.free') != 'i18n.free' else 'Free' }}</span>
                                     {% endif %}
-                                    {# Status badge #}
+                                    {# Status badge. For RAFFLE listings, show the real raffle
+                                       outcome (Completed/Cancelled/Drawn/Active) instead of the
+                                       generic listing status -- otherwise a completed raffle and a
+                                       cancelled one both collapse to "Expired", which is confusing.
+                                       raffle_statuses maps listing.id (str) -> raffle.status value. #}
+                                    {% set rstatus = raffle_statuses.get(listing.id | string) if listing.listing_type.value == 'raffle' else None %}
+                                    {% if rstatus %}
+                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full font-medium
+                                        {% if rstatus in ('active','published') %}bg-emerald-50 text-emerald-700
+                                        {% elif rstatus == 'drawn' %}bg-purple-50 text-purple-700
+                                        {% elif rstatus == 'completed' %}bg-blue-50 text-blue-700
+                                        {% elif rstatus == 'cancelled' %}bg-red-50 text-red-700
+                                        {% elif rstatus == 'draft' %}bg-gray-100 text-gray-600
+                                        {% else %}bg-amber-50 text-amber-700{% endif %}">
+                                        <span class="w-1.5 h-1.5 rounded-full
+                                            {% if rstatus in ('active','published') %}bg-emerald-500
+                                            {% elif rstatus == 'drawn' %}bg-purple-500
+                                            {% elif rstatus == 'completed' %}bg-blue-500
+                                            {% elif rstatus == 'cancelled' %}bg-red-500
+                                            {% elif rstatus == 'draft' %}bg-gray-400
+                                            {% else %}bg-amber-500{% endif %}"></span>
+                                        {% if rstatus == 'drawn' %}{% if lang == 'it' %}Estratto{% else %}Drawn{% endif %}
+                                        {% elif rstatus == 'completed' %}{% if lang == 'it' %}Completato{% else %}Completed{% endif %}
+                                        {% elif rstatus == 'cancelled' %}{% if lang == 'it' %}Annullato{% else %}Cancelled{% endif %}
+                                        {% elif rstatus in ('active','published') %}{{ t('i18n.active') }}
+                                        {% elif rstatus == 'draft' %}{{ t('i18n.draft') }}
+                                        {% else %}{{ rstatus | title }}{% endif %}
+                                    </span>
+                                    {% else %}
                                     <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full font-medium
                                         {% if listing.status.value == 'active' %}bg-emerald-50 text-emerald-700
                                         {% elif listing.status.value == 'pending' %}bg-blue-50 text-blue-700
@@ -231,6 +259,7 @@
                                         {% elif listing.status.value == 'draft' %}{{ t('i18n.draft') }}
                                         {% else %}{{ listing.status.value | title }}{% endif %}
                                     </span>
+                                    {% endif %}
                                     {# Per-listing toggle action #}
                                     {% if listing.status.value == 'active' %}
                                     <button onclick="fetch('/api/v1/listings/{{ listing.id }}/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'paused'})}).then(r=>{if(r.ok)location.reload();else r.json().then(e=>alert(e.detail))})"

@@ -40,6 +40,7 @@ async def dashboard(request: Request,
     owner_rentals = []
     earnings_total = 0.0
     completed_count = 0
+    raffle_statuses = {}
     db_user = None
 
     if token:
@@ -59,6 +60,24 @@ async def dashboard(request: Request,
             )
             items = list(items_result.scalars().unique().all())
             item_count = len(items)
+
+            # Map raffle-listing-id -> raffle.status so the dashboard can show
+            # the real raffle outcome (Completed/Cancelled/Drawn/Active) instead
+            # of the generic listing status, which collapses every terminal
+            # raffle to "Expired" -- a completed raffle is a win, not an expiry.
+            raffle_statuses = {}
+            raffle_listing_ids = [
+                l.id for it in items for l in (it.listings or [])
+                if l.listing_type == ListingType.RAFFLE and not l.deleted_at
+            ]
+            if raffle_listing_ids:
+                from src.models.raffle import BHRaffle
+                rows = await db.execute(
+                    select(BHRaffle.listing_id, BHRaffle.status)
+                    .where(BHRaffle.listing_id.in_(raffle_listing_ids))
+                    .where(BHRaffle.deleted_at.is_(None))
+                )
+                raffle_statuses = {str(lid): st.value for lid, st in rows.all()}
 
             # Sort: active listings first, then paused, pending, draft, no-listing last
             def _item_sort_key(it):
@@ -198,6 +217,7 @@ async def dashboard(request: Request,
         paused_count=paused_count,
         draft_count=draft_count,
         item_stats=item_stats,
+        raffle_statuses=raffle_statuses,
     )
     return _render("pages/dashboard.html", ctx)
 
