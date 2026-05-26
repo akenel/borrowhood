@@ -343,6 +343,7 @@
                         loading: false,
                         actingOn: null,
                         drawing: false,
+                        acting: false,
                         async load() {
                             this.loading = true;
                             try {
@@ -383,6 +384,41 @@
                                 window.dispatchEvent(new CustomEvent("toast", {detail: {type: "error", message: "Network error"}}));
                             }
                             this.drawing = false;
+                        },
+                        async markComplete() {
+                            if (!confirm("Mark this raffle complete? Confirm you have delivered the prize to the winner. This closes the raffle for good.")) return;
+                            this.acting = true;
+                            try {
+                                const r = await fetch("/api/v1/raffles/{{ raffle.id }}/complete", {method: "POST"});
+                                if (r.ok) {
+                                    window.dispatchEvent(new CustomEvent("toast", {detail: {type: "success", message: "Raffle completed -- prize delivered."}}));
+                                    setTimeout(() => location.reload(), 1500);
+                                } else {
+                                    const e = await r.json();
+                                    window.dispatchEvent(new CustomEvent("toast", {detail: {type: "error", message: (typeof e.detail === "string" ? e.detail : JSON.stringify(e.detail))}}));
+                                }
+                            } catch (err) {
+                                window.dispatchEvent(new CustomEvent("toast", {detail: {type: "error", message: "Network error"}}));
+                            }
+                            this.acting = false;
+                        },
+                        async cancelRaffle() {
+                            if (!confirm("Cancel this raffle? ALL tickets will be voided and buyers notified. This cannot be undone. Refund any payments you already received off-platform.")) return;
+                            this.acting = true;
+                            try {
+                                const r = await fetch("/api/v1/raffles/{{ raffle.id }}/cancel", {method: "POST"});
+                                if (r.ok) {
+                                    const d = await r.json();
+                                    window.dispatchEvent(new CustomEvent("toast", {detail: {type: "success", message: "Raffle cancelled -- " + (d.tickets_voided || 0) + " ticket(s) voided."}}));
+                                    setTimeout(() => location.reload(), 1500);
+                                } else {
+                                    const e = await r.json();
+                                    window.dispatchEvent(new CustomEvent("toast", {detail: {type: "error", message: (typeof e.detail === "string" ? e.detail : JSON.stringify(e.detail))}}));
+                                }
+                            } catch (err) {
+                                window.dispatchEvent(new CustomEvent("toast", {detail: {type: "error", message: "Network error"}}));
+                            }
+                            this.acting = false;
                         }
                      }' x-init="load()">
                     <h4 class="text-sm font-bold text-amber-900 mb-3 flex items-center gap-2">
@@ -432,6 +468,33 @@
                         <span x-show="drawing">Drawing...</span>
                     </button>
                     <p class="text-[10px] text-gray-500 text-center mt-1.5">Picks a random winner from CONFIRMED tickets only.</p>
+                    {% endif %}
+
+                    {# DRAWN -> Mark Complete (prize delivered). Without this the
+                       organizer is stuck forever: a DRAWN raffle blocks creating a
+                       new one (check_one_active_raffle), and there was no UI to
+                       advance it to COMPLETED. Angel hit exactly this. #}
+                    {% if raffle.status.value == 'drawn' %}
+                    <button @click="markComplete()"
+                            :disabled="acting"
+                            class="w-full px-4 py-3 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-lg flex items-center justify-center gap-2 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span x-show="!acting">Mark Complete (Prize Delivered)</span>
+                        <span x-show="acting">Working...</span>
+                    </button>
+                    <p class="text-[10px] text-gray-500 text-center mt-1.5">Confirms you handed the prize to the winner. Frees you to run another raffle.</p>
+                    {% endif %}
+
+                    {# Cancel available in any pre-completion state. Voids all
+                       tickets + notifies buyers. Destructive, hence the red
+                       styling + confirm prompt. #}
+                    {% if raffle.status.value in ('active', 'published', 'drawn') %}
+                    <button @click="cancelRaffle()"
+                            :disabled="acting"
+                            class="w-full mt-2 px-4 py-2.5 text-xs font-semibold text-red-700 bg-white border-2 border-red-200 hover:bg-red-50 disabled:opacity-50 rounded-lg flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        Cancel Raffle
+                    </button>
                     {% endif %}
                 </div>
                 {% endif %}
