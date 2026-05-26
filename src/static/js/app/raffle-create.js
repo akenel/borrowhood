@@ -19,6 +19,7 @@ function raffleForm() {
             payment_methods: [],
             payment_instructions: '',
             delivery_method: 'pickup',
+            shipping_notes: '',
         },
         tosAccepted: false,
         saving: false,

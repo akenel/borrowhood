@@ -176,6 +176,14 @@
                 </select>
             </div>
 
+            <!-- Delivery instructions (shipping_notes) -- free text. Backend + the
+                 raffle detail page already support this; the form just never
+                 collected it (Angel: "I had special delivery instructions"). -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{% if lang == 'it' %}Istruzioni di consegna{% else %}Delivery instructions{% endif %} <span class="text-gray-400 font-normal">({% if lang == 'it' %}facoltativo{% else %}optional{% endif %})</span></label>
+                <textarea x-model="form.shipping_notes" rows="2" maxlength="500" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-base" placeholder="{% if lang == 'it' %}Es: Ritiro al bar Maltese, Mar-Sab 9-18. Per la spedizione aggiungi EUR 5.{% else %}E.g. Pickup at Caffe Maltese, Tue-Sat 9-18. Shipping +EUR 5 within Sicily.{% endif %}"></textarea>
+            </div>
+
             <!-- TOS checkbox -->
             <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
                 <label class="flex items-start gap-3 cursor-pointer">
