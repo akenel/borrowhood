@@ -220,6 +220,39 @@
                     <div class="text-sm text-gray-500">{% if lang == 'it' %}per biglietto{% else %}per ticket{% endif %}</div>
                 </div>
 
+                {# Static raffle facts -- rendered server-side from the raffle row so
+                   they show even on DRAFT (the live stats/countdown below are
+                   stats-API driven and 404 for drafts). Buyers need these to judge
+                   odds + timing before deciding to buy. #}
+                <div class="mb-4 rounded-xl border border-gray-100 bg-gray-50 divide-y divide-gray-100 text-sm">
+                    {% if raffle.draw_date %}
+                    <div class="flex items-center justify-between px-3 py-2">
+                        <span class="text-gray-500">{% if lang == 'it' %}Estrazione{% else %}Draw{% endif %}</span>
+                        <span class="font-semibold text-gray-900">{{ raffle.draw_date.strftime('%b %d, %Y') }} {% if lang == 'it' %}ore{% else %}at{% endif %} {{ raffle.draw_date.strftime('%H:%M') }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="flex items-center justify-between px-3 py-2">
+                        <span class="text-gray-500">{% if lang == 'it' %}Tipo estrazione{% else %}Draw type{% endif %}</span>
+                        <span class="font-semibold text-gray-900">
+                            {% if raffle.draw_type.value == 'date' %}{% if lang == 'it' %}Alla data{% else %}On the date{% endif %}
+                            {% elif raffle.draw_type.value == 'soldout' %}{% if lang == 'it' %}Quando esauriti{% else %}When sold out{% endif %}
+                            {% else %}{% if lang == 'it' %}Manuale{% else %}Manual{% endif %}{% endif %}
+                        </span>
+                    </div>
+                    {% if raffle.max_tickets %}
+                    <div class="flex items-center justify-between px-3 py-2">
+                        <span class="text-gray-500">{% if lang == 'it' %}Biglietti totali{% else %}Total tickets{% endif %}</span>
+                        <span class="font-semibold text-gray-900">{{ raffle.max_tickets }}</span>
+                    </div>
+                    {% endif %}
+                    {% if raffle.max_tickets_per_user %}
+                    <div class="flex items-center justify-between px-3 py-2">
+                        <span class="text-gray-500">{% if lang == 'it' %}Max per persona{% else %}Max per person{% endif %}</span>
+                        <span class="font-semibold text-gray-900">{{ raffle.max_tickets_per_user }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
                 <!-- Progress -->
                 <div x-show="stats.total_tickets" class="mb-4">
                     <div class="relative h-4 bg-gray-100 rounded-full overflow-hidden">
