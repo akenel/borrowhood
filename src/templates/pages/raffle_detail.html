@@ -419,12 +419,12 @@
                             this.drawing = false;
                         },
                         async publishRaffle() {
-                            if (!confirm("Publish this raffle? It becomes visible to the community and buyers can reserve tickets. You can't edit the terms after publishing.")) return;
+                            if (!confirm("Publish this raffle? It becomes visible to the community and buyers can reserve tickets. You cannot edit the terms after publishing.")) return;
                             this.acting = true;
                             try {
                                 const r = await fetch("/api/v1/raffles/{{ raffle.id }}/publish", {method: "POST"});
                                 if (r.ok) {
-                                    window.dispatchEvent(new CustomEvent("toast", {detail: {type: "success", message: "Raffle published -- it's live!"}}));
+                                    window.dispatchEvent(new CustomEvent("toast", {detail: {type: "success", message: "Raffle published -- now live!"}}));
                                     setTimeout(() => location.reload(), 1500);
                                 } else {
                                     const e = await r.json();
