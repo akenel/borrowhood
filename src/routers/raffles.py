@@ -923,6 +923,39 @@ async def cancel_raffle(
     for t in active_tickets:
         t.status = RaffleTicketStatus.CANCELLED
 
+    # Notify every affected buyer. The cancel UI promises "buyers notified"
+    # and a buyer who already paid off-platform MUST be told to seek a refund
+    # -- a silent void is the worst-case raffle experience. Confirmed buyers
+    # get a stronger "request a refund" message than reserved-only holders.
+    from src.models.notification import NotificationType
+    from src.services.notify import create_notification
+    prize_name = (
+        raffle.listing.item.name
+        if raffle.listing and raffle.listing.item
+        else "the raffle"
+    )
+    notified = set()
+    for t in active_tickets:
+        if t.user_id in notified:
+            continue
+        notified.add(t.user_id)
+        body = (
+            "The organizer cancelled this raffle and all tickets were voided. "
+            + ("You had a confirmed (paid) ticket -- contact the organizer to arrange your refund."
+               if t.confirmed_at is not None
+               else "Your reserved ticket was released; no payment was due.")
+        )
+        await create_notification(
+            db=db,
+            user_id=t.user_id,
+            notification_type=NotificationType.SYSTEM,
+            title=f"Raffle cancelled: {prize_name}",
+            body=body,
+            link=f"/raffles/{raffle.id}",
+            entity_type="raffle",
+            entity_id=raffle.id,
+        )
+
     await db.commit()
     return {"status": "cancelled", "tickets_voided": len(active_tickets)}
 
