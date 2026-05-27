@@ -6,14 +6,14 @@
  * - HTML pages and API calls: network-first with offline fallback
  */
 
-const CACHE_NAME = 'lp-v18';
+const CACHE_NAME = 'lp-v19';
 const STATIC_ASSETS = [
   '/',
   '/browse',
   '/members',
   '/helpboard',
-  '/static/images/icon-192.svg',
-  '/static/images/icon-512.svg',
+  '/static/images/icon-192.png',
+  '/static/images/icon-512.png',
 ];
 
 // Install: pre-cache shell
