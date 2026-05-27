@@ -210,6 +210,10 @@ async def browse(request: Request,
         )
         .where(has_active_listing)
         .where(BHItem.deleted_at.is_(None))
+        # Never surface items whose owner is soft-deleted -- their /workshop/<slug>
+        # 404s, so the card would link to a dead page. (Account delete normally
+        # hard-deletes items; this guards the admin/manual soft-delete case.)
+        .where(BHItem.owner.has(BHUser.deleted_at.is_(None)))
     )
 
     if q:
@@ -243,6 +247,7 @@ async def browse(request: Request,
         select(func.count(BHItem.id))
         .where(has_active_listing)
         .where(BHItem.deleted_at.is_(None))
+        .where(BHItem.owner.has(BHUser.deleted_at.is_(None)))  # mirror main query
     )
     if q:
         # Must mirror the main query's fuzzy clause exactly, or the count and the

@@ -49,6 +49,8 @@ async def list_items(
         select(BHItem)
         .options(selectinload(BHItem.media))
         .where(BHItem.deleted_at.is_(None))
+        # Hide items whose owner is soft-deleted (their workshop page 404s).
+        .where(BHItem.owner.has(BHUser.deleted_at.is_(None)))
     )
 
     if q:
