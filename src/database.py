@@ -3,6 +3,7 @@
 Uses SQLAlchemy 2.0 async patterns with PostgreSQL.
 """
 
+import logging
 import uuid
 from datetime import datetime
 from typing import AsyncGenerator, Optional
@@ -13,6 +14,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from src.config import settings
+
+logger = logging.getLogger(__name__)
 
 engine = create_async_engine(
     settings.database_url,
@@ -184,9 +187,17 @@ async def run_migrations():
         "ALTER TYPE workshoptype RENAME VALUE 'study' TO 'STUDY'",
     ]
     import sqlalchemy as sa
-    async with engine.begin() as conn:
+    # Per-statement + autocommit so one failure (e.g. CREATE EXTENSION needing a
+    # privilege the app role lacks on a fresh env) is logged and skipped rather
+    # than aborting the whole batch. Every statement here is idempotent
+    # (IF NOT EXISTS), so re-running is safe.
+    async with engine.connect() as conn:
+        await conn.execution_options(isolation_level="AUTOCOMMIT")
         for sql in migrations:
-            await conn.execute(sa.text(sql))
+            try:
+                await conn.execute(sa.text(sql))
+            except Exception as exc:
+                logger.warning("migration skipped: %s -> %s", sql.split("\n")[0][:80], exc)
     # Enum type extensions need autocommit (PG restriction)
     async with engine.connect() as conn:
         await conn.execution_options(isolation_level="AUTOCOMMIT")

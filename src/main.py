@@ -228,13 +228,25 @@ def create_app() -> FastAPI:
     @app.on_event("startup")
     async def startup():
         logger.info("BorrowHood starting up...")
-        if settings.debug:
-            await create_tables()
-            logger.info("Database tables created/verified")
-            # Run lightweight migrations (ADD COLUMN IF NOT EXISTS)
-            from src.database import run_migrations
+
+        # Schema setup runs on EVERY env, not just debug. (2026-05-27: staging
+        # runs BH_DEBUG=false, so run_migrations() -- which CREATEs the pg_trgm
+        # extension fuzzy search needs -- never ran there, and /browse?q=... 500'd
+        # while prod (debug=true) was fine. Gating idempotent migrations behind
+        # debug let staging silently drift from the schema. Decoupled so every
+        # env self-heals. create_all + run_migrations are both idempotent;
+        # prod already ran them via debug=true, so prod behavior is unchanged.)
+        await create_tables()
+        logger.info("Database tables created/verified")
+        from src.database import run_migrations
+        try:
             await run_migrations()
             logger.info("Schema migrations applied")
+        except Exception:
+            logger.exception("run_migrations failed -- continuing startup")
+
+        # Seeding stays debug-only (don't reseed real envs on every boot).
+        if settings.debug:
             # Add any new users and items from seed.json that don't exist yet
             from sqlalchemy.ext.asyncio import AsyncSession
             async with async_session() as db:
