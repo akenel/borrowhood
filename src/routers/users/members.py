@@ -66,10 +66,16 @@ async def list_members(
 
     if q:
         search_term = f"%{q}%"
+        # Match the handle too: people see "@akenel" / /workshop/akenel everywhere,
+        # so searching the slug (or KC username) should find them -- not just the
+        # display name. Powers both the members page and the messages "new
+        # conversation" box (same endpoint).
         query = query.where(
             BHUser.display_name.ilike(search_term)
             | BHUser.workshop_name.ilike(search_term)
             | BHUser.tagline.ilike(search_term)
+            | BHUser.slug.ilike(search_term)
+            | BHUser.username.ilike(search_term)
         )
     if city:
         query = query.where(BHUser.city.ilike(f"%{city}%"))
