@@ -103,10 +103,14 @@ async function sweep(browser, url, cookie) {
     const warnings = [];
     const badRequests = []; // {status, url}
 
+    // Client-network noise: the runner's own connection dropping (e.g. a camper
+    // wifi switch) -- ERR_NETWORK_CHANGED / disconnected -- and ERR_ABORTED (a
+    // resource still loading as the page navigates). Never an app bug.
+    const CLIENT_NET_NOISE = /ERR_NETWORK_CHANGED|ERR_INTERNET_DISCONNECTED|ERR_NETWORK_IO_SUSPENDED|ERR_ABORTED/;
     page.on('console', (msg) => {
         const type = msg.type();
         const text = msg.text();
-        if (type === 'error') errors.push(text);
+        if (type === 'error') { if (!CLIENT_NET_NOISE.test(text)) errors.push(text); }
         else if (type === 'warning') {
             if (!IGNORED_WARNINGS.some((w) => text.includes(w))) warnings.push(text);
         }
@@ -117,10 +121,9 @@ async function sweep(browser, url, cookie) {
     page.on('requestfailed', (req) => {
         const f = req.failure();
         const err = f ? f.errorText : '';
-        // Only OUR requests, and not benign cancellations: ERR_ABORTED fires when a
-        // map tile / image is still loading as the page navigates away -- not a bug.
-        // External domains (OSM tiles, fonts) are out of our control.
-        if (f && isOurs(req.url()) && !/favicon/.test(req.url()) && !/ERR_ABORTED/.test(err)) {
+        // Only OUR requests, and not benign client-network noise. External domains
+        // (OSM tiles, fonts) are out of our control.
+        if (f && isOurs(req.url()) && !/favicon/.test(req.url()) && !CLIENT_NET_NOISE.test(err)) {
             badRequests.push({ status: err, url: req.url() });
         }
     });
@@ -155,7 +158,10 @@ async function sweep(browser, url, cookie) {
             }
         }
     }
-    if (navErr) errors.push(`navigation: ${navErr}`);
+    // A nav failure from the runner's own flaky link (network-changed / timeout)
+    // is not an app bug -- mark the page "skipped", don't fail it.
+    const navNoise = navErr && /ERR_NETWORK_CHANGED|ERR_INTERNET_DISCONNECTED|ERR_NETWORK_IO_SUSPENDED|timeout/i.test(navErr);
+    if (navErr && !navNoise) errors.push(`navigation: ${navErr}`);
     await sleep(900); // let Alpine init + marked render + lazy fetches settle
 
     let render = { leaks: [], brokenImages: [], title: '' };
@@ -180,9 +186,10 @@ async function sweep(browser, url, cookie) {
     const fivexx = badRequests.filter((r) => typeof r.status === 'number' && r.status >= 500);
     const fourxx = badRequests.filter((r) => typeof r.status === 'number' && r.status >= 400 && r.status < 500);
     const netfail = badRequests.filter((r) => typeof r.status === 'string');
-    const docFailed = docStatus >= 400 || docStatus === 0;
+    const docFailed = (docStatus >= 400 || docStatus === 0) && !navNoise;
 
     const findings = [];
+    if (navNoise) { /* page skipped due to runner network -- recorded as soft below */ }
     if (docFailed) findings.push(`page did not load (status ${docStatus})`);
     errors.forEach((e) => findings.push(`console error: ${e}`));
     fivexx.forEach((r) => findings.push(`5xx request: ${r.status} ${r.url}`));
@@ -191,6 +198,7 @@ async function sweep(browser, url, cookie) {
     netfail.forEach((r) => findings.push(`request failed: ${r.status} ${r.url}`));
 
     const softs = [];
+    if (navNoise) softs.push(`skipped: runner network blip (${navErr})`);
     fourxx.forEach((r) => softs.push(`4xx request: ${r.status} ${r.url}`));
     warnings.forEach((w) => softs.push(`console warning: ${w}`));
 

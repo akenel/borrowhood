@@ -861,6 +861,27 @@
         }
     }
 
+    // ── Strip Markdown to plain text (for truncated card previews) ──
+    // Item/raffle descriptions support Markdown; in a small truncated preview we
+    // want clean plain text, not raw ** / ## (BL-210), and not full HTML either.
+    function bhStripMarkdown(s) {
+        if (!s) return '';
+        return String(s)
+            .replace(/```[\s\S]*?```/g, ' ')         // fenced code blocks
+            .replace(/`([^`]+)`/g, '$1')             // inline code
+            .replace(/!\[[^\]]*\]\([^)]*\)/g, '')    // images
+            .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1') // links -> text
+            .replace(/^#{1,6}\s+/gm, '')             // headings
+            .replace(/(\*\*|__)(.*?)\1/g, '$2')      // bold
+            .replace(/(\*|_)(.*?)\1/g, '$2')         // italic
+            .replace(/^\s*[-*+]\s+/gm, '')           // list markers
+            .replace(/^\s*>\s?/gm, '')               // blockquotes
+            .replace(/\r?\n+/g, ' ')                 // newlines -> space
+            .replace(/\s+/g, ' ')                    // collapse whitespace
+            .trim();
+    }
+    window.bhStripMarkdown = bhStripMarkdown;
+
     // ── Per-element translate toggle (used in item_detail.html) ──
     function translateText(elId) {
         return {

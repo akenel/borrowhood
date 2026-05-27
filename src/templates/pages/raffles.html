@@ -162,7 +162,7 @@
                     </a>
 
                     <!-- Description preview -->
-                    <p class="text-sm text-gray-500 mt-1.5 line-clamp-2" x-text="r.description || ''"></p>
+                    <p class="text-sm text-gray-500 mt-1.5 line-clamp-2" x-text="bhStripMarkdown(r.description)"></p>
 
                     <!-- Progress bar -->
                     <template x-if="r.stats && r.stats.total_tickets">
