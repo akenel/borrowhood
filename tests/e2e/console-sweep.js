@@ -112,14 +112,21 @@ async function sweep(browser, url, cookie) {
         }
     });
     page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
+    const ownHost = new URL(BASE_URL).hostname;
+    const isOurs = (u) => { try { return new URL(u).hostname === ownHost; } catch { return false; } };
     page.on('requestfailed', (req) => {
         const f = req.failure();
-        // favicon / aborted analytics are noise; record real failures
-        if (f && !/favicon/.test(req.url())) badRequests.push({ status: f.errorText, url: req.url() });
+        const err = f ? f.errorText : '';
+        // Only OUR requests, and not benign cancellations: ERR_ABORTED fires when a
+        // map tile / image is still loading as the page navigates away -- not a bug.
+        // External domains (OSM tiles, fonts) are out of our control.
+        if (f && isOurs(req.url()) && !/favicon/.test(req.url()) && !/ERR_ABORTED/.test(err)) {
+            badRequests.push({ status: err, url: req.url() });
+        }
     });
     page.on('response', (resp) => {
         const s = resp.status();
-        if (s >= 400 && !/favicon/.test(resp.url())) badRequests.push({ status: s, url: resp.url() });
+        if (s >= 400 && isOurs(resp.url()) && !/favicon/.test(resp.url())) badRequests.push({ status: s, url: resp.url() });
     });
 
     if (cookie) {
