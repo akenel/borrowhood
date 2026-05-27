@@ -78,7 +78,18 @@
             <!-- Section 9 - Privacy -->
             <section id="privacy" class="scroll-mt-20">
                 <h2 class="text-lg font-semibold text-gray-900">{{ t('terms.section_9_title') }}</h2>
-                <p class="mt-2 text-gray-700 leading-relaxed whitespace-pre-line">{{ t('terms.section_9_text') }}</p>
+                {# section_9_text is authored in Markdown (**bold**, - bullets). Render it the
+                   same way item descriptions are rendered: client-side via the global marked.js,
+                   with a plain-text fallback if marked failed to load. #}
+                <div id="privacy-text" class="mt-2 text-gray-700 leading-relaxed prose prose-sm max-w-none break-words" data-raw="{{ t('terms.section_9_text') | e }}"></div>
+                <script>
+                    (function() {
+                        var el = document.getElementById('privacy-text');
+                        if (el && typeof marked !== 'undefined') {
+                            try { el.innerHTML = marked.parse(el.dataset.raw || ''); } catch(e) { el.textContent = el.dataset.raw || ''; }
+                        } else if (el) { el.textContent = el.dataset.raw || ''; }
+                    })();
+                </script>
             </section>
 
             <!-- Section 10 -->
