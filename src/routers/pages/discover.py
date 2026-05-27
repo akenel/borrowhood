@@ -214,11 +214,14 @@ async def browse(request: Request,
 
     if q:
         search_term = f"%{q}%"
+        # word_similarity matches the query against the best word in the field, so
+        # typos like "cooky" hit "...Cookie..." in a long name. Plain similarity()
+        # scored the whole string and missed (see crud.py for the full note).
         query = query.where(
             BHItem.name.ilike(search_term)
             | BHItem.description.ilike(search_term)
-            | (func.similarity(BHItem.name, q) > 0.2)
-            | (func.similarity(BHItem.description, q) > 0.15)
+            | (func.word_similarity(q, BHItem.name) > 0.4)
+            | (func.word_similarity(q, BHItem.description) > 0.4)
         )
     if category:
         query = query.where(BHItem.category == category)
@@ -242,11 +245,13 @@ async def browse(request: Request,
         .where(BHItem.deleted_at.is_(None))
     )
     if q:
+        # Must mirror the main query's fuzzy clause exactly, or the count and the
+        # rendered results disagree.
         count_q = count_q.where(
             BHItem.name.ilike(f"%{q}%")
             | BHItem.description.ilike(f"%{q}%")
-            | (func.similarity(BHItem.name, q) > 0.2)
-            | (func.similarity(BHItem.description, q) > 0.15)
+            | (func.word_similarity(q, BHItem.name) > 0.4)
+            | (func.word_similarity(q, BHItem.description) > 0.4)
         )
     if category:
         count_q = count_q.where(BHItem.category == category)

@@ -53,13 +53,18 @@ async def list_items(
 
     if q:
         search_term = f"%{q}%"
-        # Fuzzy search: trigram similarity OR substring match
-        from sqlalchemy import text as sa_text
+        # Fuzzy search: substring match OR trigram WORD similarity.
+        # word_similarity(query, text) scores the query against the best-matching
+        # *word* in the text -- so a typo like "cooky" matches "...Cookie..." even
+        # in a long product name. Plain similarity() scores the WHOLE string, so a
+        # short query scored ~0.1 against a long name and never cleared threshold
+        # (that's why "cooky" found nothing). Threshold 0.4 cleanly separates real
+        # typos (cooky->cookie 0.67, dril->drill 0.8) from nonsense (zzzxqq -> 0.0).
         query = query.where(
             BHItem.name.ilike(search_term)
             | BHItem.description.ilike(search_term)
-            | (func.similarity(BHItem.name, q) > 0.2)
-            | (func.similarity(BHItem.description, q) > 0.15)
+            | (func.word_similarity(q, BHItem.name) > 0.4)
+            | (func.word_similarity(q, BHItem.description) > 0.4)
         )
     if category:
         query = query.where(BHItem.category == category)
