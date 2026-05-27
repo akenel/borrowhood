@@ -222,7 +222,11 @@ function messagesApp() {
             }
             this.searchLoading = true;
             try {
-                var resp = await fetch('/api/v1/users?q=' + encodeURIComponent(this.searchQuery) + '&limit=6');
+                // Trailing slash is REQUIRED: /api/v1/users (no slash) 307-redirects to
+                // /api/v1/users/, and behind the proxy that redirect Location comes back as
+                // http:// -- which the browser blocks as mixed content on our https page, so
+                // the fetch silently fails and search shows nothing. Hit the slash URL direct.
+                var resp = await fetch('/api/v1/users/?q=' + encodeURIComponent(this.searchQuery) + '&limit=6');
                 if (resp.ok) {
                     var data = await resp.json();
                     // Filter out self
