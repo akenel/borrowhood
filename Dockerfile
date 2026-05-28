@@ -20,4 +20,11 @@ HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
 
 EXPOSE 8000
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# --proxy-headers makes uvicorn trust Caddy's X-Forwarded-Proto / -For / -Host,
+# so request.url.scheme is "https" (not "http"). Without this, FastAPI's 307
+# trailing-slash redirects emit Location: http://... which the browser blocks
+# as mixed content -- silently killing any fetch hitting a no-slash collection
+# route (see lesson-trailing-slash-mixed-content-redirect). Only the proxy can
+# reach this container on the internal Docker network, so '*' = "trust Caddy."
+# (The rate limiter already parses X-Forwarded-For itself; behavior unchanged.)
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*"]
