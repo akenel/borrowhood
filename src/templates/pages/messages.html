@@ -228,6 +228,17 @@
                                 <p class="font-semibold text-indigo-900">📍 {% if lang == 'it' %}Condividi il tuo indirizzo{% else %}Share your address{% endif %}</p>
                                 <button @click="showShareSheet = false" type="button" class="text-indigo-500 hover:text-indigo-700 text-lg leading-none">&times;</button>
                             </div>
+                            <!-- No-address prompt: send them to their profile to add one first -->
+                            <template x-if="u && !(u.address_line || u.city || u.postal_code)">
+                                <div>
+                                    <p class="text-sm text-indigo-900 mb-2">{% if lang == 'it' %}Non hai ancora aggiunto un indirizzo al tuo profilo.{% else %}You haven't set an address on your profile yet.{% endif %}</p>
+                                    <p class="text-xs text-indigo-700 mb-3">{% if lang == 'it' %}Aggiungilo una volta nel profilo e potrai condividerlo qui in un clic.{% else %}Add it once on your profile and you can share it here in one click.{% endif %}</p>
+                                    <a href="/profile" class="inline-block px-3 py-1.5 text-xs bg-indigo-600 text-white rounded hover:bg-indigo-700">{% if lang == 'it' %}Vai al profilo →{% else %}Add it on your profile →{% endif %}</a>
+                                </div>
+                            </template>
+                            <!-- Normal sheet: user has an address, show the share options -->
+                            <template x-if="u && (u.address_line || u.city || u.postal_code)">
+                            <div>
                             <p class="text-xs text-indigo-700 mb-3">{% if lang == 'it' %}Inviato dal tuo profilo. Solo il destinatario può vederlo.{% else %}Pulled from your profile. Only the recipient sees it.{% endif %}</p>
                             <div class="space-y-2">
                                 <label class="flex items-start gap-2 cursor-pointer">
@@ -259,6 +270,8 @@
                                 </button>
                                 <button @click="showShareSheet = false" type="button" class="px-3 py-1.5 text-xs text-gray-600 hover:text-gray-900">{% if lang == 'it' %}Annulla{% else %}Cancel{% endif %}</button>
                             </div>
+                            </div>
+                            </template>
                         </div>
                         <form @submit.prevent="sendMessage()" class="flex gap-2 items-center">
                             <!-- Share address button -->
