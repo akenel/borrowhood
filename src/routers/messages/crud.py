@@ -15,7 +15,7 @@ from src.models.listing import BHListing
 from src.models.message import BHMessage
 from src.models.rental import BHRental
 from src.models.user import BHUser
-from src.schemas.message import MessageCreate, MessageOut, MessageSummary, MessageUpdate, ThreadSummary
+from src.schemas.message import MessageCreate, MessageOut, MessageSummary, MessageUpdate, ShareAddressRequest, ThreadSummary
 
 router = APIRouter()
 
@@ -89,6 +89,114 @@ async def send_message(
         created_at=message.created_at,
         sender_name=user.display_name,
         sender_avatar=user.avatar_url,
+    )
+
+
+@router.post("/share-address", response_model=MessageOut, status_code=201)
+async def share_address(
+    data: ShareAddressRequest,
+    token: dict = Depends(require_auth),
+    _throttle: dict = Depends(user_throttle("send_message", 50, 3600)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Send the sender's profile address to a recipient as a structured card.
+
+    The address lives in `body_meta` (JSONB), NEVER in `body` -- so we can hide,
+    redact, or exclude it from exports without rewriting message history.
+    """
+    user = await get_user(db, token)
+
+    if data.recipient_id == user.id:
+        raise HTTPException(status_code=400, detail="Cannot message yourself")
+
+    recipient = await db.get(BHUser, data.recipient_id)
+    if not recipient:
+        raise HTTPException(status_code=404, detail="Recipient not found")
+
+    # Need an address on the sender's profile -- otherwise there's nothing to share.
+    if not (user.address_line or user.city or user.postal_code):
+        raise HTTPException(
+            status_code=400,
+            detail="Set your address in your profile before sharing it.",
+        )
+
+    if data.mode == "exact":
+        address = {
+            "address_line": user.address_line,
+            "city": user.city,
+            "state_region": user.state_region,
+            "postal_code": user.postal_code,
+            "country_code": user.country_code,
+            "lat": user.latitude,
+            "lng": user.longitude,
+        }
+        fallback_body = "📍 Shared address"
+    else:  # approx -- drop the street line and blur the coords (existing 500m policy)
+        from src.services.location_privacy import blur_coordinates
+        b_lat, b_lng = blur_coordinates(user.latitude, user.longitude, str(user.id))
+        address = {
+            "address_line": None,
+            "city": user.city,
+            "state_region": user.state_region,
+            "postal_code": user.postal_code,
+            "country_code": user.country_code,
+            "lat": b_lat,
+            "lng": b_lng,
+        }
+        fallback_body = "📍 Shared approximate location"
+
+    from datetime import timedelta
+    hide_at = None
+    if data.hide_after_days:
+        hide_at = (datetime.now(timezone.utc) + timedelta(days=data.hide_after_days)).isoformat()
+
+    body_meta = {
+        "type": "address_share",
+        "mode": data.mode,
+        "address": address,
+        "hide_at": hide_at,
+    }
+
+    message = BHMessage(
+        sender_id=user.id,
+        recipient_id=data.recipient_id,
+        body=fallback_body,
+        message_type="address_share",
+        body_meta=body_meta,
+    )
+    db.add(message)
+    await db.flush()
+
+    from src.models.notification import NotificationType
+    from src.services.notify import create_notification
+    await create_notification(
+        db=db,
+        user_id=data.recipient_id,
+        notification_type=NotificationType.MESSAGE_RECEIVED,
+        title=f"{user.display_name} shared their address",
+        body=fallback_body,
+        link="/messages",
+        entity_type="message",
+        entity_id=message.id,
+    )
+
+    await db.commit()
+    await db.refresh(message)
+
+    return MessageOut(
+        id=message.id,
+        sender_id=message.sender_id,
+        recipient_id=message.recipient_id,
+        body=message.body,
+        message_type=message.message_type,
+        listing_id=message.listing_id,
+        rental_id=message.rental_id,
+        read_at=message.read_at,
+        edited_at=message.edited_at,
+        created_at=message.created_at,
+        sender_name=user.display_name,
+        sender_avatar=user.avatar_url,
+        body_meta=message.body_meta,
     )
 
 

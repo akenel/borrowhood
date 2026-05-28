@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import DateTime, Enum, ForeignKey, Numeric, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base, BHBase
@@ -77,6 +77,11 @@ class BHMessage(BHBase, Base):
     edited_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True), default=None
     )
+
+    # Structured payload for non-text messages -- kept OUT of `body` so we can
+    # redact / hide / future-proof without rewriting message history. v1 use:
+    # {"type":"address_share","mode":"exact"|"approx","address":{...},"hide_at":"..."|null}
+    body_meta: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
 
     # Relationships
     sender: Mapped["BHUser"] = relationship(foreign_keys=[sender_id])

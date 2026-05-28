@@ -141,6 +141,9 @@ async def run_migrations():
         "ALTER TABLE bh_service_quote ADD COLUMN IF NOT EXISTS deposit_method VARCHAR(30)",
         "ALTER TABLE bh_service_quote ADD COLUMN IF NOT EXISTS final_paid_at TIMESTAMPTZ",
         "ALTER TABLE bh_service_quote ADD COLUMN IF NOT EXISTS final_method VARCHAR(30)",
+        # 2026-05-28: structured "Share address" message attachment. Lives in JSONB
+        # so we never put a plaintext address in message.body (redactable + safer).
+        "ALTER TABLE bh_message ADD COLUMN IF NOT EXISTS body_meta JSONB",
     ]
     # ALTER TYPE ... ADD VALUE -- SQLAlchemy uses enum .name (UPPERCASE) for PG enums
     enum_migrations = [

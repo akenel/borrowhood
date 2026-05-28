@@ -1,10 +1,22 @@
 """Pydantic schemas for messaging endpoints."""
 
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
+
+
+class ShareAddressRequest(BaseModel):
+    """Share the sender's profile address with the recipient in a 1:1 thread.
+
+    'exact' = full street address + precise coords.
+    'approx' = no street_line; coordinates blurred to 500m (see location_privacy).
+    hide_after_days = if set, the recipient sees "[address hidden]" past that mark.
+    """
+    recipient_id: UUID
+    mode: Literal["exact", "approx"] = "exact"
+    hide_after_days: Optional[int] = Field(None, ge=1, le=90)
 
 
 class MessageCreate(BaseModel):
@@ -35,6 +47,7 @@ class MessageOut(BaseModel):
     created_at: datetime
     sender_name: Optional[str] = None
     sender_avatar: Optional[str] = None
+    body_meta: Optional[dict] = None  # structured payload (e.g. address_share)
 
     class Config:
         from_attributes = True

@@ -68,6 +68,7 @@ async def get_thread(
                 sender_id=msg.sender_id,
                 recipient_id=msg.recipient_id,
                 body=msg.body,
+                message_type=msg.message_type or "text",
                 listing_id=msg.listing_id,
                 rental_id=msg.rental_id,
                 read_at=msg.read_at,
@@ -75,6 +76,7 @@ async def get_thread(
                 created_at=msg.created_at,
                 sender_name=sender.display_name if sender else None,
                 sender_avatar=sender.avatar_url if sender else None,
+                body_meta=msg.body_meta,
             )
         )
 
@@ -139,6 +141,7 @@ async def get_order_thread(
                 sender_id=msg.sender_id,
                 recipient_id=msg.recipient_id,
                 body=msg.body,
+                message_type=msg.message_type or "text",
                 listing_id=msg.listing_id,
                 rental_id=msg.rental_id,
                 read_at=msg.read_at,
@@ -146,6 +149,7 @@ async def get_order_thread(
                 created_at=msg.created_at,
                 sender_name=sender.display_name if sender else None,
                 sender_avatar=sender.avatar_url if sender else None,
+                body_meta=msg.body_meta,
             )
         )
 

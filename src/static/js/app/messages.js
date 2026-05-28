@@ -48,6 +48,12 @@ function messagesApp() {
         editingMsgId: null,
         editBody: '',
 
+        // Share address (📍 button in composer)
+        showShareSheet: false,
+        shareMode: 'exact',       // 'exact' | 'approx'
+        shareHideDays: 0,         // 0 = never auto-hide; >0 = days
+        sharing: false,
+
         async init() {
             // Get my user ID
             try {
@@ -177,6 +183,74 @@ function messagesApp() {
                     });
                 }
             } catch(e) {}
+        },
+
+        // ── Share my profile address as a structured card ──
+        async shareAddress() {
+            if (!this.activeThread || this.sharing) return;
+            this.sharing = true;
+            try {
+                var payload = {
+                    recipient_id: this.activeThread,
+                    mode: this.shareMode,
+                };
+                if (this.shareHideDays && this.shareHideDays > 0) {
+                    payload.hide_after_days = this.shareHideDays;
+                }
+                var resp = await fetch('/api/v1/messages/share-address', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                if (resp.ok) {
+                    var msg = await resp.json();
+                    this.messages.push(msg);
+                    this.showShareSheet = false;
+                    this.shareHideDays = 0;
+                    this.$nextTick(() => {
+                        var el = document.getElementById('msg-scroll');
+                        if (el) el.scrollTop = el.scrollHeight;
+                    });
+                } else {
+                    var err = await resp.json().catch(function() { return {}; });
+                    var detail = err.detail || 'Could not share address';
+                    if (typeof detail !== 'string') detail = 'Could not share address';
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: detail } }));
+                }
+            } catch(e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: 'Could not share address' } }));
+            }
+            this.sharing = false;
+        },
+
+        // Has the auto-hide window passed?
+        addressIsHidden(meta) {
+            if (!meta || !meta.hide_at) return false;
+            try { return new Date(meta.hide_at) < new Date(); } catch(e) { return false; }
+        },
+
+        // Build a Google Maps URL preferring coords, else free-text address.
+        addressMapsUrl(addr) {
+            if (!addr) return '#';
+            if (addr.lat != null && addr.lng != null) {
+                return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr.lat + ',' + addr.lng);
+            }
+            var text = [addr.address_line, addr.postal_code, addr.city, addr.state_region, addr.country_code]
+                .filter(Boolean).join(', ');
+            return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(text);
+        },
+
+        // Copy a human-readable address to clipboard.
+        async copyAddress(addr) {
+            if (!addr) return;
+            var text = [addr.address_line, [addr.postal_code, addr.city].filter(Boolean).join(' '), [addr.state_region, addr.country_code].filter(Boolean).join(', ')]
+                .filter(Boolean).join('\n');
+            try {
+                await navigator.clipboard.writeText(text);
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'success', message: 'Address copied' } }));
+            } catch(e) {
+                window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: text } }));
+            }
         },
 
         async sendMessage() {
