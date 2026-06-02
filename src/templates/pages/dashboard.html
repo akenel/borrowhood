@@ -2645,7 +2645,25 @@
                                             } catch(e) {}
                                             locating = false;
                                         },
-                                        (err) => { window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: err.message || 'Location access denied' } })); locating = false; },
+                                        (err) => {
+                                            // GeolocationPositionError.code: 1 = PERMISSION_DENIED, 2 = POSITION_UNAVAILABLE, 3 = TIMEOUT.
+                                            // Firefox on desktop Linux often returns code 2 with 'Unknown error acquiring position'
+                                            // when Mozilla's location service can't get a fix -- the actionable answer is the city
+                                            // search below, not the raw browser message. (Reported by Angel on 2026-06-02.)
+                                            let msg;
+                                            const code = err && err.code;
+                                            {% if lang == 'it' %}
+                                            if (code === 1) msg = 'Permesso di posizione bloccato. Consentilo nel browser o usa la ricerca citta qui sotto.';
+                                            else if (code === 3) msg = 'Tempo scaduto. Riprova o usa la ricerca citta.';
+                                            else msg = 'Il browser non ha trovato la tua posizione. Usa la ricerca citta qui sotto o inserisci i campi manualmente.';
+                                            {% else %}
+                                            if (code === 1) msg = 'Location permission blocked. Allow it in your browser, or use the city search below.';
+                                            else if (code === 3) msg = 'Location request timed out. Try again, or use the city search below.';
+                                            else msg = 'Your browser could not find your location. Use the city search below, or enter the fields manually.';
+                                            {% endif %}
+                                            window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'error', message: msg } }));
+                                            locating = false;
+                                        },
                                         { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
                                     );
                                 " :disabled="locating"
