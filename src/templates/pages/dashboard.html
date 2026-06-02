@@ -2667,12 +2667,13 @@
                                         { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
                                     );
                                 " :disabled="locating"
+                                   title="{% if lang == 'it' %}Rileva la posizione tramite il browser. Se non funziona, usa la ricerca Citta qui sotto.{% else %}Detect your location via the browser. If it does not work, use the City search below.{% endif %}"
                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors min-h-[36px]">
                                     <svg class="w-4 h-4" :class="locating && 'animate-pulse'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     <span x-text="locating ? '{% if lang == 'it' %}Localizzazione...{% else %}Locating...{% endif %}' : '{% if lang == 'it' %}Usa la mia posizione{% else %}Use my location{% endif %}'"></span>
                                 </button>
                             </div>
-                            <p class="text-xs text-gray-400">{% if lang == 'it' %}Un clic riempie tutto automaticamente. Puoi modificare dopo.{% else %}One click fills everything. You can edit after.{% endif %}</p>
+                            <p class="text-xs text-gray-400">{% if lang == 'it' %}Un clic riempie tutto automaticamente. Puoi modificare dopo. Se il browser non trova la posizione, usa la ricerca Citta qui sotto.{% else %}One click fills everything. You can edit after. If your browser cannot find you, the city search below works as a fallback.{% endif %}</p>
 
                             <!-- City search (manual fallback) -->
                             <div class="relative">
