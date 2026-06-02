@@ -53,12 +53,17 @@ function messagesApp() {
         shareMode: 'exact',       // 'exact' | 'approx'
         shareHideDays: 0,         // 0 = never auto-hide; >0 = days
         sharing: false,
+        u: null,                  // current-user profile (set in init from /me) -- the share sheet branches on u.address_line / u.city to decide whether to show options or the "add it on your profile" prompt. Latent bug 2026-05-29 -> 2026-06-02: this was never declared, so the sheet body silently rendered nothing.
 
         async init() {
             // Get my user ID
             try {
                 var resp = await fetch('/api/v1/users/me');
-                if (resp.ok) { var d = await resp.json(); this.myUserId = d.id; }
+                if (resp.ok) {
+                    var d = await resp.json();
+                    this.myUserId = d.id;
+                    this.u = d;          // <-- the share sheet needs the full profile, not just id
+                }
             } catch(e) {}
 
             await this.loadThreads();
