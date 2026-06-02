@@ -651,10 +651,21 @@ async def update_item(
         try:
             await reward_reporter_on_done(db, item)
             await db.commit()
+            # The second commit expires server-set columns (updated_at = now()).
+            # Without this refresh, FastAPI's response serialization triggers a
+            # sync lazy-load on item.updated_at -> MissingGreenlet -> 500.
+            # Closes task #33 (and unblocks the close-feedback-with-memory loop).
+            await db.refresh(item)
         except Exception as exc:
             logger.warning("reward_reporter_on_done failed for BL-%d: %s", item.item_number, exc)
             try:
                 await db.rollback()
+            except Exception:
+                pass
+            # Rollback can leave item attrs in a half-loaded state -- a final
+            # refresh keeps the response serializable even if reward failed.
+            try:
+                await db.refresh(item)
             except Exception:
                 pass
 
