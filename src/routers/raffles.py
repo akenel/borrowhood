@@ -492,6 +492,15 @@ async def reserve_tickets(
 
     if raffle.status not in (RaffleStatus.PUBLISHED, RaffleStatus.ACTIVE):
         raise HTTPException(status_code=400, detail="Raffle is not accepting tickets")
+    # Hard close on expiry: never trust a date that's only displayed (BL-213).
+    # If the draw date has passed, reject -- the organizer must extend the date
+    # to keep selling. A soft date gate breaks the "provably-fair scheduled draw"
+    # promise the trust-tier model depends on.
+    if raffle.draw_date and raffle.draw_date < datetime.now(timezone.utc):
+        raise HTTPException(
+            status_code=400,
+            detail="This raffle has closed -- the draw date has passed.",
+        )
     if raffle.organizer_id == user.id:
         raise HTTPException(status_code=400, detail="Organizer cannot buy own raffle tickets")
 
