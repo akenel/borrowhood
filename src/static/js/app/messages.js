@@ -234,15 +234,25 @@ function messagesApp() {
             try { return new Date(meta.hide_at) < new Date(); } catch(e) { return false; }
         },
 
-        // Build a Google Maps URL preferring coords, else free-text address.
+        // Build a Google Maps URL. PREFER the typed text address over stored coords:
+        // (1) profile coords are rounded to 3 decimals (~111m) so a coord-pin lands
+        //     near but not ON the house -- Angel reported 2026-06-02 his Mattenweg 5
+        //     pin opened ~100m off in Beckenried; Maps geocoding from full text
+        //     lands on the actual house instead.
+        // (2) for approximate mode (no address_line, only city/postal), the text
+        //     resolves to the town centre -- better than a blurred-of-rounded coord.
+        // Coords remain the fallback for users who somehow only stored coords.
         addressMapsUrl(addr) {
             if (!addr) return '#';
+            var text = [addr.address_line, addr.postal_code, addr.city, addr.state_region, addr.country_code]
+                .filter(Boolean).join(', ');
+            if (text) {
+                return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(text);
+            }
             if (addr.lat != null && addr.lng != null) {
                 return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr.lat + ',' + addr.lng);
             }
-            var text = [addr.address_line, addr.postal_code, addr.city, addr.state_region, addr.country_code]
-                .filter(Boolean).join(', ');
-            return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(text);
+            return '#';
         },
 
         // Copy a human-readable address to clipboard.
