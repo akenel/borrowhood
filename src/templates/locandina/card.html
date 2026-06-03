@@ -10,20 +10,28 @@
        c3 = (108, 5)       <- 5 + 97 + 6 = 108
        c4 = (108, 151.5)
 
-   We use ABSOLUTE POSITIONING here on purpose. The first cut at this template
-   used flexbox with `width: 140.5mm` on each card and it broke on long titles
-   ("Jiu-Jitsu per Principianti -- Workshop Gratuito") -- flex children grow
-   past their declared width to fit content, two cards overflowed the sheet
-   width, the row wrapped, and we got 4 cards stacked vertically across 2 pages
-   instead of 2x2 on one page. Absolute positioning is deterministic: each card
-   sits in a fixed 140.5x97mm box, overflow is hidden inside, content can be
-   any length and the layout cannot change.
+   Inside-card vertical regions (89mm usable after 4mm padding top+bottom):
+     header  = 42mm  (photo + title + byline-with-avatar + schedule)
+     desc    = 22mm  (description block, see DESC_LIMIT in router)
+     qr-row  = 25mm  (real QR + scan-me + URL)
+     total   = 89mm
+
+   Block 3 design rules (see memory files for the why):
+     - Avatar INLINE with byline (option B). Never overlaid on the photo.
+       Photos may have important content; overlay risks covering it.
+     - Background wash = cover image at 12% opacity, full-bleed under content.
+       Adds mood, fills the lower half of the card that was previously empty.
+     - Description: verbatim if <=250 chars, stub-truncated otherwise. Block 4
+       replaces the truncation with Ollama Turbo compression.
 
    WeasyPrint caveats we respect here:
      - @page sets paper size (NOT body/html dimensions).
      - margin: 0 on @page; we manage all whitespace in body padding.
      - CSS grid is partial in WeasyPrint -- avoided.
      - mm units throughout -- never px in print CSS.
+     - We use ABSOLUTE positioning for the card boxes (deterministic against
+       long content) and CSS tables for inside-card layout (WeasyPrint
+       renders tables rock-solid).
 #}<!DOCTYPE html>
 <html lang="{{ lang }}">
 <head>
@@ -43,7 +51,6 @@
       width: 140.5mm; height: 97mm;
       box-sizing: border-box;
       border: 0.3mm dashed #cccccc;   /* cutting guide */
-      padding: 4mm;
       overflow: hidden;                /* belt + braces: content can't push the box */
     }
     .card.c1 { top: 5mm;   left: 5mm;     }
@@ -51,76 +58,174 @@
     .card.c3 { top: 108mm; left: 5mm;     }
     .card.c4 { top: 108mm; left: 151.5mm; }
 
-    /* Inside-the-card grid: left photo block, right info column.
-       Using a 2-column table for inside-card layout -- WeasyPrint renders
-       tables rock-solid. Flex/absolute outside the card; table inside it. */
-    .card-grid { display: table; width: 100%; height: 100%; border-collapse: collapse; }
-    .card-row  { display: table-row; }
-    .photo {
+    /* Background wash: cover image full-bleed at 12% opacity behind content.
+       z-index: 0 keeps it under everything. Always rendered even if no image
+       (the .card-content sits on a white background regardless). */
+    .bg-wash {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.12;
+      z-index: 0;
+    }
+
+    /* Content layer -- everything readable sits above the wash. */
+    .card-content {
+      position: relative;
+      z-index: 1;
+      padding: 4mm;
+      width: 100%; height: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Header row: cover photo (left) + title/byline/schedule (right). */
+    .header { display: table; width: 100%; height: 42mm; }
+    .header-row { display: table-row; }
+    .photo-cell {
       display: table-cell;
-      width: 85mm;
+      width: 42mm;
       vertical-align: top;
+    }
+    .photo {
+      width: 42mm; height: 42mm;
       background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
       border: 0.2mm solid #d1d5db;
+      box-sizing: border-box;
       text-align: center; color: #9ca3af; font-size: 7pt;
+      overflow: hidden;
     }
-    .photo .photo-placeholder { display: block; margin-top: 40mm; }
     .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .info {
+    .photo .placeholder { display: block; margin-top: 18mm; }
+    .info-cell {
       display: table-cell;
       vertical-align: top;
       padding-left: 3mm;
     }
     .title {
-      font-size: 12pt;
+      font-size: 10pt;
       line-height: 1.15;
-      margin: 0 0 2mm 0;
+      margin: 0 0 1.5mm 0;
       font-weight: 700;
       overflow-wrap: break-word;
       hyphens: auto;
     }
-    .schedule { font-size: 9pt; color: #374151; margin: 0 0 1.5mm 0; }
-    .byline   { font-size: 8pt; color: #6b7280; margin: 0 0 2mm 0; }
+    .byline {
+      font-size: 8pt;
+      color: #374151;
+      margin: 0 0 1.2mm 0;
+      line-height: 1.2;
+    }
+    /* Inline avatar (option B) -- never overlaid on the photo. */
+    .avatar-inline {
+      width: 6mm; height: 6mm;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 1.2mm;
+      object-fit: cover;
+      border: 0.2mm solid #d1d5db;
+    }
+    .avatar-fallback {
+      display: inline-block;
+      width: 6mm; height: 6mm;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 1.2mm;
+      background: #c7d2fe;
+      color: #1e3a8a;
+      font-weight: 700;
+      font-size: 6pt;
+      text-align: center;
+      line-height: 6mm;
+      border: 0.2mm solid #a5b4fc;
+    }
+    .schedule { font-size: 8pt; color: #1a1a1a; margin: 0; font-weight: 600; }
 
-    /* QR row pinned to the bottom of the info column via a nested table. */
-    .qr-block { display: table; width: 100%; margin-top: 2mm; }
-    .qr-block .qr-cell { display: table-cell; vertical-align: bottom; width: 18mm; }
-    .qr-block .meta-cell { display: table-cell; vertical-align: bottom; padding-left: 2mm; }
-    .qr {
-      width: 18mm; height: 18mm;
-      background: repeating-linear-gradient(
-        45deg, #000 0 0.6mm, transparent 0.6mm 1.2mm
-      ), #ffffff;
-      border: 0.2mm solid #1a1a1a;
+    /* Description block -- 22mm slot, content clipped if it overflows. */
+    .description {
+      height: 22mm;
+      margin-top: 2mm;
+      font-size: 7.5pt;
+      line-height: 1.3;
+      color: #1a1a1a;
+      overflow: hidden;
+      text-align: justify;
+    }
+    .description.empty {
+      /* When no description, leave the slot blank rather than collapsing --
+         the QR row stays at the bottom either way. */
+    }
+
+    /* QR row at the bottom. */
+    .qr-row { display: table; width: 100%; height: 25mm; }
+    .qr-row .qr-cell {
+      display: table-cell;
+      vertical-align: bottom;
+      width: 22mm;
+    }
+    .qr-row .qr-cell img {
+      width: 22mm; height: 22mm; display: block;
+    }
+    .qr-row .meta-cell {
+      display: table-cell;
+      vertical-align: bottom;
+      padding-left: 2.5mm;
     }
     .scan-me { font-size: 7.5pt; font-weight: 600; color: #1a1a1a; display: block; }
-    .url     { font-size: 7pt; color: #6b7280; word-break: break-all; display: block; }
+    .url     { font-size: 7pt; color: #6b7280; word-break: break-all; display: block; margin-top: 0.5mm; }
   </style>
 </head>
 <body>
   <div class="sheet">
     {% for n in range(1, 5) %}
     <div class="card c{{ n }}">
-      <div class="card-grid">
-        <div class="card-row">
-          <div class="photo">
-            {# Block-3 will render <img src="..."> here. Block-2: gradient placeholder. #}
-            <span class="photo-placeholder">cover photo</span>
-          </div>
-          <div class="info">
-            <div class="title">{{ title }}</div>
-            <div class="schedule">{{ schedule_summary }}</div>
-            <div class="byline">{{ byline }}</div>
-            <div class="qr-block">
-              <div class="qr-cell">
-                {# Block-3: real QR PNG embedded as data: URI. Block-2: hatched placeholder. #}
-                <div class="qr"></div>
-              </div>
-              <div class="meta-cell">
-                <span class="scan-me">{{ scan_me }}</span>
-                <span class="url">{{ url_canonical }}</span>
+      {# Background wash -- only rendered when we have a cover image. #}
+      {% if cover_url %}
+      <img class="bg-wash" src="{{ cover_url }}" alt="">
+      {% endif %}
+      <div class="card-content">
+        {# Header: photo + title/byline/schedule #}
+        <div class="header">
+          <div class="header-row">
+            <div class="photo-cell">
+              <div class="photo">
+                {% if cover_url %}
+                <img src="{{ cover_url }}" alt="">
+                {% else %}
+                <span class="placeholder">cover photo</span>
+                {% endif %}
               </div>
             </div>
+            <div class="info-cell">
+              <div class="title">{{ title }}</div>
+              {% if byline %}
+              <div class="byline">
+                {% if avatar_url %}
+                <img class="avatar-inline" src="{{ avatar_url }}" alt="">
+                {% else %}
+                <span class="avatar-fallback">{{ (byline[0] | upper) if byline else "·" }}</span>
+                {% endif %}
+                {{ byline }}
+              </div>
+              {% endif %}
+              <div class="schedule">{{ schedule_summary }}</div>
+            </div>
+          </div>
+        </div>
+
+        {# Description block -- verbatim (<=250) or stub-truncated. #}
+        <div class="description {% if not description %}empty{% endif %}">
+          {{ description }}
+        </div>
+
+        {# QR + URL footer #}
+        <div class="qr-row">
+          <div class="qr-cell">
+            <img src="{{ qr_data_uri }}" alt="QR code">
+          </div>
+          <div class="meta-cell">
+            <span class="scan-me">{{ scan_me }}</span>
+            <span class="url">{{ url_display }}</span>
           </div>
         </div>
       </div>
