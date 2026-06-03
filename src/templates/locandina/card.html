@@ -1,4 +1,5 @@
-{# A6-ish UNIVERSAL share card -- 4-up on A4 landscape, 5mm sheet margin, 6mm gutters.
+{# A6-ish UNIVERSAL share card -- 4-up on A4 landscape, 5mm sheet margin,
+   10mm middle gutters (= 2 x sheet margin).
 
    Universal as of Block 5b: prints for ANY ListingType (event, raffle,
    giveaway, rental, sale, service, training, auction, commission, offer).
@@ -7,22 +8,37 @@
      - DATA RIBBON (between description and QR) -- type-aware fields
    See lp-locandina-universal-share-artifact memory for the why.
 
-   Geometry math (kept in source so a future reader doesn't have to re-derive):
+   GEOMETRY MATH (Block 5c: 5mm sheet edges + 10mm middle gutters)
+
+   The double-edge gutter rule: when N cards share a cut line, the gutter
+   between them must equal 2 x the per-card border. Otherwise, after cutting,
+   the cards get an asymmetric border (5mm on the outer edges, 3mm on the cut
+   edge) which screams "amateur." Cutting DEAD CENTER of the 10mm gutter
+   gives each card a clean SYMMETRIC 5mm frame on every side.
+
      A4 landscape   = 297 x 210 mm
-     usable area    = (297 - 2*5)   x (210 - 2*5)   = 287 x 200 mm
-     each card      = (287 - 6) / 2 x (200 - 6) / 2 = 140.5 x 97 mm
+     sheet edges    = 5mm on each side
+     middle gutters = 10mm horizontal AND 10mm vertical (= 2 x edge)
+     each card      = (297 - 2*5 - 10) / 2 x (210 - 2*5 - 10) / 2
+                    = (297 - 20) / 2 x (210 - 20) / 2
+                    = 138.5 x 95 mm
      card positions (top, left):
        c1 = (5,   5)
-       c2 = (5,   151.5)   <- 5 + 140.5 + 6 = 151.5
-       c3 = (108, 5)       <- 5 + 97 + 6 = 108
-       c4 = (108, 151.5)
+       c2 = (5,   153.5)   <- 5 + 138.5 + 10 = 153.5
+       c3 = (110, 5)       <- 5 + 95 + 10 = 110
+       c4 = (110, 153.5)
 
-   Inside-card vertical regions (89mm usable after 4mm padding top+bottom):
+   Cutting:
+     1 horizontal cut through y=105mm (dead center of the 10mm vertical gutter)
+     1 vertical cut through x=148.5mm (dead center of the 10mm horizontal gutter)
+     -> 4 cards, each with a clean 5mm white frame on all sides.
+
+   Inside-card vertical regions (87mm usable after 4mm padding top+bottom):
      header  = 42mm  (photo + title + byline-with-avatar + schedule)
-     desc    = 18mm  (description block, see DESC_LIMIT in router) -- was 22mm
-     ribbon  =  6mm  (type-aware data strip) -- NEW in Block 5b
+     desc    = 16mm  (description block, see DESC_LIMIT in router) -- was 18mm
+     ribbon  =  6mm  (type-aware data strip)
      qr-row  = 23mm  (real QR + scan-me + URL)
-     total   = 89mm
+     total   = 87mm
 
    The info-cell reserves padding-right: 22mm so a long title can't collide
    with the type badge that sits in the top-right corner.
@@ -38,6 +54,9 @@
      - CSS grid is partial in WeasyPrint -- avoided.
      - mm units throughout -- never px in print CSS.
      - Absolute positioning for outer card boxes, CSS tables for inside-card.
+
+   Future Block 6 idea: the 10mm gutter is real estate, not waste --
+   watermark, crop marks, "Made on La Piazza" microcopy, timestamps.
 #}<!DOCTYPE html>
 <html lang="{{ lang }}">
 <head>
@@ -54,15 +73,15 @@
     }
     .card {
       position: absolute;
-      width: 140.5mm; height: 97mm;
+      width: 138.5mm; height: 95mm;
       box-sizing: border-box;
-      border: 0.3mm dashed #cccccc;   /* cutting guide */
+      border: 0.3mm dashed #cccccc;   /* card edge marker (cut is 5mm OUTSIDE this, in the gutter middle) */
       overflow: hidden;
     }
     .card.c1 { top: 5mm;   left: 5mm;     }
-    .card.c2 { top: 5mm;   left: 151.5mm; }
-    .card.c3 { top: 108mm; left: 5mm;     }
-    .card.c4 { top: 108mm; left: 151.5mm; }
+    .card.c2 { top: 5mm;   left: 153.5mm; }
+    .card.c3 { top: 110mm; left: 5mm;     }
+    .card.c4 { top: 110mm; left: 153.5mm; }
 
     /* Background wash: cover image full-bleed at 12% opacity. */
     .bg-wash {
@@ -99,7 +118,8 @@
       box-sizing: border-box;
     }
 
-    /* Header row: cover photo (left) + title/byline/schedule (right). */
+    /* Header row: cover photo (left) + title/byline/schedule (right).
+       Card is 95mm tall - 8mm padding = 87mm usable: 42+16+6+23=87mm. */
     .header { display: table; width: 100%; height: 42mm; }
     .header-row { display: table-row; }
     .photo-cell {
@@ -162,9 +182,9 @@
     }
     .schedule { font-size: 8pt; color: #1a1a1a; margin: 0; font-weight: 600; }
 
-    /* Description block -- 18mm slot, content clipped if it overflows. */
+    /* Description block -- 16mm slot, content clipped if it overflows. */
     .description {
-      height: 18mm;
+      height: 16mm;
       margin-top: 2mm;
       font-size: 7.5pt;
       line-height: 1.3;
