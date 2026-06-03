@@ -119,6 +119,11 @@ class BHListing(BHBase, Base):
     event_address: Mapped[Optional[str]] = mapped_column(String(500)) # Full address
     event_link: Mapped[Optional[str]] = mapped_column(String(1000))   # Online event URL (Zoom/Meet/YouTube)
 
+    # Human-readable evergreen schedule line for the printed Locandina ("Ogni
+    # giovedi 20:00 fino al 1 dicembre"). A full RRULE recurrence engine is
+    # deliberately deferred; owner types this verbatim and the flyer prints it.
+    schedule_summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
     # Version for optimistic locking (Rule 28)
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 
