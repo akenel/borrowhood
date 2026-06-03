@@ -22,11 +22,12 @@ Later blocks wire:
 """
 
 import base64
+import os
 from io import BytesIO
 from uuid import UUID
 
 import qrcode
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -40,10 +41,40 @@ from src.routers.pages._helpers import templates
 
 router = APIRouter(prefix="/api/v1/listings", tags=["locandina"])
 
-# Public-facing canonical host. The QR scans to prod regardless of which
-# env rendered the PDF: a flyer in someone's hand should land them on the
-# real site, not a staging URL that may not exist tomorrow.
-PUBLIC_BASE = "https://lapiazza.app"
+# Hard fallback only -- DO NOT hardcode this for the URL itself. The card
+# must point at the env that rendered it so testers can verify their own
+# locandinas (staging cards -> staging.lapiazza.app, prod cards ->
+# lapiazza.app). See _public_base() below.
+PUBLIC_BASE_DEFAULT = "https://lapiazza.app"
+
+
+def _public_base(request: Request) -> str:
+    """Origin the locandina's QR + URL line point to.
+
+    Priority order:
+      1. BH_PUBLIC_BASE env var if explicitly set (e.g. "https://lapiazza.app"
+         on staging if you intentionally want staging cards to point at prod).
+      2. Derive from the request: scheme + host. Auto-correct per env.
+         Staging-rendered cards -> staging.lapiazza.app; prod -> lapiazza.app;
+         local dev -> https://helix.local. Each card is verifiable in the env
+         that rendered it without ever hardcoding a host in the codebase.
+      3. Hard fallback to PUBLIC_BASE_DEFAULT if request had no host header
+         (shouldn't happen behind Caddy, but a safety net).
+
+    Previously this was hardcoded to "https://lapiazza.app" which made every
+    staging-rendered card link to prod -- where the seeded test items don't
+    exist -- so anyone testing the printed URL got a 404. (Angel hit this
+    on 2026-06-03 testing the Jiu-Jitsu workshop card.)
+    """
+    explicit = os.environ.get("BH_PUBLIC_BASE", "").strip()
+    if explicit:
+        return explicit.rstrip("/")
+    # Trust forwarded headers from Caddy/Traefik (see Public Access memory).
+    scheme = request.url.scheme
+    netloc = request.url.netloc
+    if netloc:
+        return f"{scheme}://{netloc}"
+    return PUBLIC_BASE_DEFAULT
 
 # Description-block threshold. <= this many chars: print verbatim. Over:
 # stub-truncate in Block 3, real Ollama Turbo compression in Block 4.
@@ -303,6 +334,7 @@ def _schedule_text(listing: BHListing, lang: str) -> str | None:
 @router.get("/{listing_id}/locandina.pdf")
 async def generate_locandina(
     listing_id: UUID,
+    request: Request,
     lang: str = Query("en", pattern="^(en|it)$"),
     db: AsyncSession = Depends(get_db),
 ):
@@ -330,7 +362,12 @@ async def generate_locandina(
 
     owner: BHUser | None = item.owner
     cover_url = _cover_url(item)
-    qr_target = f"{PUBLIC_BASE}/items/{item.slug}"
+    public_base = _public_base(request)
+    qr_target = f"{public_base}/items/{item.slug}"
+
+    # The displayed URL line below the QR drops the scheme for visual
+    # cleanliness: "staging.lapiazza.app/items/<slug>" or "lapiazza.app/...".
+    display_host = public_base.removeprefix("https://").removeprefix("http://")
 
     ctx = {
         "title": item.name,
@@ -340,7 +377,7 @@ async def generate_locandina(
         "cover_url": cover_url,
         "description": _description_short(item),
         "qr_data_uri": _qr_data_uri(qr_target),
-        "url_display": f"lapiazza.app/items/{item.slug}",
+        "url_display": f"{display_host}/items/{item.slug}",
         "scan_me": (
             "Scansiona per i dettagli — apre su La Piazza"
             if lang == "it"
