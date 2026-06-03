@@ -1,6 +1,13 @@
-{# A6-ish event card -- 4-up on A4 landscape, 5mm sheet margin, 6mm gutters.
+{# A6-ish UNIVERSAL share card -- 4-up on A4 landscape, 5mm sheet margin, 6mm gutters.
 
-   Geometry math (kept in the source so a future reader doesn't have to re-derive):
+   Universal as of Block 5b: prints for ANY ListingType (event, raffle,
+   giveaway, rental, sale, service, training, auction, commission, offer).
+   The skeleton is constant; two regions vary by type:
+     - TYPE BADGE (top-right corner) -- color + label per type
+     - DATA RIBBON (between description and QR) -- type-aware fields
+   See lp-locandina-universal-share-artifact memory for the why.
+
+   Geometry math (kept in source so a future reader doesn't have to re-derive):
      A4 landscape   = 297 x 210 mm
      usable area    = (297 - 2*5)   x (210 - 2*5)   = 287 x 200 mm
      each card      = (287 - 6) / 2 x (200 - 6) / 2 = 140.5 x 97 mm
@@ -12,26 +19,25 @@
 
    Inside-card vertical regions (89mm usable after 4mm padding top+bottom):
      header  = 42mm  (photo + title + byline-with-avatar + schedule)
-     desc    = 22mm  (description block, see DESC_LIMIT in router)
-     qr-row  = 25mm  (real QR + scan-me + URL)
+     desc    = 18mm  (description block, see DESC_LIMIT in router) -- was 22mm
+     ribbon  =  6mm  (type-aware data strip) -- NEW in Block 5b
+     qr-row  = 23mm  (real QR + scan-me + URL)
      total   = 89mm
 
-   Block 3 design rules (see memory files for the why):
+   The info-cell reserves padding-right: 22mm so a long title can't collide
+   with the type badge that sits in the top-right corner.
+
+   Block 3 design rules (still in effect):
      - Avatar INLINE with byline (option B). Never overlaid on the photo.
-       Photos may have important content; overlay risks covering it.
-     - Background wash = cover image at 12% opacity, full-bleed under content.
-       Adds mood, fills the lower half of the card that was previously empty.
-     - Description: verbatim if <=250 chars, stub-truncated otherwise. Block 4
-       replaces the truncation with Ollama Turbo compression.
+     - Background wash = cover image at 12% opacity, full-bleed.
+     - Description: verbatim if <=250 chars, stub-truncated otherwise.
 
    WeasyPrint caveats we respect here:
      - @page sets paper size (NOT body/html dimensions).
      - margin: 0 on @page; we manage all whitespace in body padding.
      - CSS grid is partial in WeasyPrint -- avoided.
      - mm units throughout -- never px in print CSS.
-     - We use ABSOLUTE positioning for the card boxes (deterministic against
-       long content) and CSS tables for inside-card layout (WeasyPrint
-       renders tables rock-solid).
+     - Absolute positioning for outer card boxes, CSS tables for inside-card.
 #}<!DOCTYPE html>
 <html lang="{{ lang }}">
 <head>
@@ -51,16 +57,14 @@
       width: 140.5mm; height: 97mm;
       box-sizing: border-box;
       border: 0.3mm dashed #cccccc;   /* cutting guide */
-      overflow: hidden;                /* belt + braces: content can't push the box */
+      overflow: hidden;
     }
     .card.c1 { top: 5mm;   left: 5mm;     }
     .card.c2 { top: 5mm;   left: 151.5mm; }
     .card.c3 { top: 108mm; left: 5mm;     }
     .card.c4 { top: 108mm; left: 151.5mm; }
 
-    /* Background wash: cover image full-bleed at 12% opacity behind content.
-       z-index: 0 keeps it under everything. Always rendered even if no image
-       (the .card-content sits on a white background regardless). */
+    /* Background wash: cover image full-bleed at 12% opacity. */
     .bg-wash {
       position: absolute;
       top: 0; left: 0;
@@ -68,6 +72,22 @@
       object-fit: cover;
       opacity: 0.12;
       z-index: 0;
+    }
+
+    /* Type badge -- top-right corner, color per ListingType.
+       Sits above the bg-wash and the content layer. */
+    .type-badge {
+      position: absolute;
+      top: 3mm; right: 3mm;
+      z-index: 2;
+      padding: 1mm 2.2mm;
+      border-radius: 1mm;
+      color: #ffffff;
+      font-size: 6.5pt;
+      font-weight: 700;
+      letter-spacing: 0.3pt;
+      line-height: 1.1;
+      white-space: nowrap;
     }
 
     /* Content layer -- everything readable sits above the wash. */
@@ -101,6 +121,7 @@
       display: table-cell;
       vertical-align: top;
       padding-left: 3mm;
+      padding-right: 22mm;   /* reserve room for the type badge */
     }
     .title {
       font-size: 10pt;
@@ -141,9 +162,9 @@
     }
     .schedule { font-size: 8pt; color: #1a1a1a; margin: 0; font-weight: 600; }
 
-    /* Description block -- 22mm slot, content clipped if it overflows. */
+    /* Description block -- 18mm slot, content clipped if it overflows. */
     .description {
-      height: 22mm;
+      height: 18mm;
       margin-top: 2mm;
       font-size: 7.5pt;
       line-height: 1.3;
@@ -151,13 +172,31 @@
       overflow: hidden;
       text-align: justify;
     }
-    .description.empty {
-      /* When no description, leave the slot blank rather than collapsing --
-         the QR row stays at the bottom either way. */
+
+    /* Data ribbon -- type-aware 1-line strip between desc and QR.
+       Bordered top + bottom for visual separation, slightly shaded. */
+    .ribbon {
+      height: 6mm;
+      margin-top: 1mm;
+      padding: 0.6mm 1mm;
+      box-sizing: border-box;
+      border-top: 0.2mm solid #d1d5db;
+      border-bottom: 0.2mm solid #d1d5db;
+      background: rgba(255, 255, 255, 0.6);
+      font-size: 7.5pt;
+      font-weight: 600;
+      color: #1a1a1a;
+      line-height: 1.2;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .ribbon.empty {
+      visibility: hidden;     /* keep the height so QR row stays at bottom */
     }
 
     /* QR row at the bottom. */
-    .qr-row { display: table; width: 100%; height: 25mm; }
+    .qr-row { display: table; width: 100%; height: 23mm; }
     .qr-row .qr-cell {
       display: table-cell;
       vertical-align: bottom;
@@ -183,6 +222,14 @@
       {% if cover_url %}
       <img class="bg-wash" src="{{ cover_url }}" alt="">
       {% endif %}
+
+      {# Type badge -- top-right corner, color per ListingType. #}
+      {% if type_badge and type_badge.label %}
+      <div class="type-badge" style="background-color: {{ type_badge.color }};">
+        {{ type_badge.label }}
+      </div>
+      {% endif %}
+
       <div class="card-content">
         {# Header: photo + title/byline/schedule #}
         <div class="header">
@@ -208,14 +255,22 @@
                 {{ byline }}
               </div>
               {% endif %}
-              <div class="schedule">{{ schedule_summary }}</div>
+              {# Schedule line only renders for events (schedule_text=None for other types). #}
+              {% if schedule_text %}
+              <div class="schedule">{{ schedule_text }}</div>
+              {% endif %}
             </div>
           </div>
         </div>
 
         {# Description block -- verbatim (<=250) or stub-truncated. #}
-        <div class="description {% if not description %}empty{% endif %}">
+        <div class="description">
           {{ description }}
+        </div>
+
+        {# Data ribbon -- type-aware 1-line strip. Hidden but height-preserved when empty. #}
+        <div class="ribbon {% if not data_ribbon %}empty{% endif %}">
+          {{ data_ribbon }}
         </div>
 
         {# QR + URL footer #}
