@@ -144,6 +144,11 @@ async def run_migrations():
         # 2026-05-28: structured "Share address" message attachment. Lives in JSONB
         # so we never put a plaintext address in message.body (redactable + safer).
         "ALTER TABLE bh_message ADD COLUMN IF NOT EXISTS body_meta JSONB",
+        # 2026-06-02: Locandina (printed event flyer) needs a human-readable
+        # schedule line ("Ogni giovedi 20:00 fino al 1 dicembre"). A full RRULE
+        # recurrence engine is deliberately deferred; the owner types the summary
+        # and the card prints it verbatim. Truthful, evergreen, zero date math.
+        "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS schedule_summary TEXT",
     ]
     # ALTER TYPE ... ADD VALUE -- SQLAlchemy uses enum .name (UPPERCASE) for PG enums
     enum_migrations = [

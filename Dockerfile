@@ -3,8 +3,16 @@ FROM python:3.12-slim AS base
 WORKDIR /app
 
 # System dependencies
+# - curl: healthcheck
+# - libpango / libpangocairo / libgdk-pixbuf / libffi-dev: WeasyPrint runtime (renders the Locandina A6 cards to PDF)
+# - poppler-utils: ships pdftoppm, used to rasterise the WeasyPrint PDF to PNG for the mobile-friendly preview
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libgdk-pixbuf2.0-0 \
+    libffi-dev \
+    poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # Python dependencies
