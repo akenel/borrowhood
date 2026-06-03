@@ -93,6 +93,37 @@
       z-index: 0;
     }
 
+    /* Staging stamp -- big diagonal "STAGING . DO NOT DISTRIBUTE" across the
+       entire card. Only rendered when is_staging=True. The point: even if
+       a tester accidentally hands a staging-rendered card to a real user,
+       the stamp screams "test card" so nobody confuses it with prod. */
+    .staging-stamp {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 3;
+      pointer-events: none;
+      display: table;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .staging-stamp .staging-stamp-inner {
+      display: table-cell;
+      vertical-align: middle;
+      transform: rotate(-22deg);
+      font-family: "Courier New", monospace;
+      font-weight: 900;
+      letter-spacing: 1mm;
+      font-size: 18pt;
+      color: rgba(220, 38, 38, 0.55);    /* red, semi-transparent */
+      text-shadow:
+         0.3mm  0.3mm 0 rgba(255,255,255,0.75),
+        -0.3mm -0.3mm 0 rgba(255,255,255,0.75);
+      border: 0.6mm solid rgba(220, 38, 38, 0.55);
+      padding: 1mm 2mm;
+      box-sizing: border-box;
+    }
+
     /* Type badge -- top-right corner, color per ListingType.
        Sits above the bg-wash and the content layer. */
     .type-badge {
@@ -241,6 +272,14 @@
       {# Background wash -- only rendered when we have a cover image. #}
       {% if cover_url %}
       <img class="bg-wash" src="{{ cover_url }}" alt="">
+      {% endif %}
+
+      {# Staging stamp -- diagonal "STAGING DO NOT DISTRIBUTE" across the card,
+         z-index above content so it's unmissable. Only on staging-rendered cards. #}
+      {% if is_staging %}
+      <div class="staging-stamp">
+        <div class="staging-stamp-inner">STAGING&nbsp;&nbsp;TEST&nbsp;&nbsp;DO&nbsp;NOT&nbsp;DISTRIBUTE</div>
+      </div>
       {% endif %}
 
       {# Type badge -- top-right corner, color per ListingType. #}

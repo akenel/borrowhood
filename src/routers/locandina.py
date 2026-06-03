@@ -76,6 +76,21 @@ def _public_base(request: Request) -> str:
         return f"{scheme}://{netloc}"
     return PUBLIC_BASE_DEFAULT
 
+
+def _is_staging(request: Request) -> bool:
+    """True if this card is being rendered from the staging env.
+
+    Used to stamp a big diagonal "STAGING -- DO NOT DISTRIBUTE" watermark
+    across the card so a tester can never accidentally hand a staging-rendered
+    card to a real customer. Even if they did, the stamp screams "test."
+
+    Detection follows the same source-of-truth as _public_base:
+      1. If BH_PUBLIC_BASE explicitly contains 'staging', it's staging.
+      2. Otherwise check the request hostname for 'staging.'.
+    """
+    base = _public_base(request).lower()
+    return "staging" in base
+
 # Description-block threshold. <= this many chars: print verbatim. Over:
 # stub-truncate in Block 3, real Ollama Turbo compression in Block 4.
 DESC_LIMIT = 250
@@ -385,6 +400,7 @@ async def generate_locandina(
         ),
         "type_badge": _type_badge(listing, lang),
         "data_ribbon": _data_ribbon(listing, lang),
+        "is_staging": _is_staging(request),
         "lang": lang,
     }
 
