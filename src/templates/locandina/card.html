@@ -83,6 +83,41 @@
     .card.c3 { top: 110mm; left: 5mm;     }
     .card.c4 { top: 110mm; left: 153.5mm; }
 
+    /* Banksy watermark -- micro-type in the dead-center horizontal gutter
+       (y=102..108mm). Cryptic LP . date . hash code. Anti-fraud authentication
+       infrastructure (each genuine LP card has a verifiable fingerprint;
+       fakes can't reproduce the hash). Sized so it survives 150% browser
+       zoom but stays out of the way for normal viewing. */
+    .watermark-gutter {
+      position: absolute;
+      top: 103.5mm;
+      left: 0;
+      width: 297mm;
+      height: 3mm;
+      text-align: center;
+      font-family: "Courier New", monospace;
+      font-size: 5pt;
+      letter-spacing: 0.8pt;
+      color: #9ca3af;
+      line-height: 3mm;
+      pointer-events: none;
+    }
+    .watermark-vertical {
+      position: absolute;
+      top: 0;
+      left: 147mm;
+      width: 3mm;
+      height: 210mm;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      text-align: center;
+      font-family: "Courier New", monospace;
+      font-size: 5pt;
+      letter-spacing: 0.8pt;
+      color: #9ca3af;
+      pointer-events: none;
+    }
+
     /* Background wash: cover image full-bleed at 12% opacity. */
     .bg-wash {
       position: absolute;
@@ -188,14 +223,17 @@
       margin: 0 0 1.2mm 0;
       line-height: 1.2;
     }
-    /* Inline avatar (option B) -- never overlaid on the photo. */
+    /* Inline avatar (option B) -- never overlaid on the photo.
+       Border color is tier-driven (see _tier_marker in router): newcomers
+       get gray, legends get gold. Always present so the tier signal is
+       subtle but inescapable. Color is set inline per-card via style="...". */
     .avatar-inline {
       width: 6mm; height: 6mm;
       border-radius: 50%;
       vertical-align: middle;
       margin-right: 1.2mm;
       object-fit: cover;
-      border: 0.2mm solid #d1d5db;
+      border: 0.4mm solid #64748b;   /* default; overridden inline by tier_marker.accent */
     }
     .avatar-fallback {
       display: inline-block;
@@ -209,7 +247,26 @@
       font-size: 6pt;
       text-align: center;
       line-height: 6mm;
-      border: 0.2mm solid #a5b4fc;
+      border: 0.4mm solid #64748b;   /* default; overridden inline by tier_marker.accent */
+    }
+
+    /* Tier chip beside the byline -- only renders for ACTIVE+ owners. The
+       Newcomer's silence here is the point: bragging about being new
+       isn't a thing. The chip carries the tier label in tier-accent color
+       on a faint translucent background that reads well on light + dark
+       cover photos. */
+    .tier-chip {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 1.5mm;
+      padding: 0.3mm 1.2mm;
+      border-radius: 0.8mm;
+      font-size: 6pt;
+      font-weight: 700;
+      letter-spacing: 0.3pt;
+      background: rgba(255, 255, 255, 0.7);
+      border: 0.2mm solid currentColor;
+      /* color is set inline from tier_marker.accent */
     }
     .schedule { font-size: 8pt; color: #1a1a1a; margin: 0; font-weight: 600; }
 
@@ -267,6 +324,13 @@
 </head>
 <body>
   <div class="sheet">
+    {# Banksy watermark -- runs through the dead-center gutters where the
+       cutter will pass. Surviving fragments end up as micro-type along the
+       cut edges of each card, authenticating it as a genuine LP print. #}
+    {% if watermark %}
+    <div class="watermark-gutter">{{ watermark }}</div>
+    <div class="watermark-vertical">{{ watermark }}</div>
+    {% endif %}
     {% for n in range(1, 5) %}
     <div class="card c{{ n }}">
       {# Background wash -- only rendered when we have a cover image. #}
@@ -307,11 +371,14 @@
               {% if byline %}
               <div class="byline">
                 {% if avatar_url %}
-                <img class="avatar-inline" src="{{ avatar_url }}" alt="">
+                <img class="avatar-inline" src="{{ avatar_url }}" alt="" style="border-color: {{ tier_marker.accent }};">
                 {% else %}
-                <span class="avatar-fallback">{{ (byline[0] | upper) if byline else "·" }}</span>
+                <span class="avatar-fallback" style="border-color: {{ tier_marker.accent }};">{{ (byline[0] | upper) if byline else "·" }}</span>
                 {% endif %}
                 {{ byline }}
+                {% if tier_marker.chip %}
+                <span class="tier-chip" style="color: {{ tier_marker.accent }};">{{ tier_marker.chip }}</span>
+                {% endif %}
               </div>
               {% endif %}
               {# Schedule line only renders for events (schedule_text=None for other types). #}

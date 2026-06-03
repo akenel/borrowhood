@@ -36,7 +36,7 @@ from sqlalchemy.orm import selectinload
 from src.database import get_db
 from src.models.item import BHItem, BHItemMedia, MediaType
 from src.models.listing import BHListing, ListingType
-from src.models.user import BHUser
+from src.models.user import BadgeTier, BHUser
 from src.routers.pages._helpers import templates
 
 router = APIRouter(prefix="/api/v1/listings", tags=["locandina"])
@@ -75,6 +75,32 @@ def _public_base(request: Request) -> str:
     if netloc:
         return f"{scheme}://{netloc}"
     return PUBLIC_BASE_DEFAULT
+
+
+def _render_watermark(listing: BHListing, public_base: str) -> str:
+    """Render the cryptic sheet-level watermark Angel calls the Banksy mark.
+
+    Format:  LP . YYYY-MM-DD . <hash4>
+
+    The hash4 is the first 4 hex chars of SHA1(public_base + listing.id +
+    listing.updated_at). Three properties matter:
+      - Reproducible: same card re-rendered same day = same hash. Print twice,
+        you can prove they're the same print run.
+      - Cheap to verify: a future /verify/<hash> endpoint can answer "yes,
+        this is a real La Piazza card rendered on date X by listing Y."
+      - Cryptic but not secret: anyone CAN reverse it given inputs; the
+        point is anti-fraud authentication ("is this card a real LP card
+        or a phishing knock-off?"), not protecting the inputs.
+
+    Uses listing.updated_at (NOT NOW()) so re-renders of an unchanged card
+    are stable. Falls back to the listing.id if updated_at is missing.
+    """
+    import hashlib
+    seed = f"{public_base}|{listing.id}|{listing.updated_at or listing.id}"
+    h4 = hashlib.sha1(seed.encode("utf-8")).hexdigest()[:4]
+    # Date stable per-listing: use updated_at if present, else "----".
+    date_str = listing.updated_at.strftime("%Y-%m-%d") if listing.updated_at else "----"
+    return f"LP · {date_str} · {h4}"
 
 
 def _is_staging(request: Request) -> bool:
@@ -169,6 +195,46 @@ def _byline(owner: BHUser | None) -> str:
     if name and city:
         return f"{name} · {city}"
     return name or city
+
+
+# Tier-light identity palette (Block 5d, Angel's "Leonardo card vs newcomer
+# card should LOOK different" rule). Each tier carries:
+#   - a `slug` for the CSS class (.tier-newcomer, .tier-legend, ...)
+#   - an `accent` color for the avatar ring
+#   - a `chip` label (None = don't show a chip)
+#
+# NEWCOMER intentionally has no chip -- not bragging about being new is part
+# of the welcome. ACTIVE gets a humble chip; TRUSTED+ get progressively
+# more presence; LEGEND gets the apex gold + a star.
+TIER_PALETTE: dict[BadgeTier, dict] = {
+    BadgeTier.NEWCOMER: {"slug": "newcomer", "accent": "#64748b", "chip": None,             "chip_label_it": None},
+    BadgeTier.ACTIVE:   {"slug": "active",   "accent": "#0d9488", "chip": "ACTIVE",         "chip_label_it": "ATTIVO"},
+    BadgeTier.TRUSTED:  {"slug": "trusted",  "accent": "#4338ca", "chip": "TRUSTED",        "chip_label_it": "FIDATO"},
+    BadgeTier.PILLAR:   {"slug": "pillar",   "accent": "#7c3aed", "chip": "◆ PILLAR",       "chip_label_it": "◆ PILASTRO"},
+    BadgeTier.LEGEND:   {"slug": "legend",   "accent": "#b45309", "chip": "✦ LEGEND",       "chip_label_it": "✦ LEGGENDA"},
+}
+
+
+def _tier_marker(owner: BHUser | None, lang: str) -> dict:
+    """Return {slug, accent, chip} for the owner's tier-light identity.
+
+    Used to:
+      - colour the avatar ring (always rendered, even for Newcomers, so the
+        tier signal is subtle but ever-present)
+      - render a small chip beside the byline (ACTIVE+ only -- Newcomers
+        don't brag about being new)
+
+    Falls back to the Newcomer palette if the owner has no tier (shouldn't
+    happen with the schema default, but safety).
+    """
+    tier = (owner.badge_tier if owner else None) or BadgeTier.NEWCOMER
+    pal = TIER_PALETTE.get(tier, TIER_PALETTE[BadgeTier.NEWCOMER])
+    chip = pal["chip_label_it"] if lang == "it" else pal["chip"]
+    return {
+        "slug": pal["slug"],
+        "accent": pal["accent"],
+        "chip": chip,
+    }
 
 
 def _type_badge(listing: BHListing, lang: str) -> dict:
@@ -400,7 +466,9 @@ async def generate_locandina(
         ),
         "type_badge": _type_badge(listing, lang),
         "data_ribbon": _data_ribbon(listing, lang),
+        "tier_marker": _tier_marker(owner, lang),
         "is_staging": _is_staging(request),
+        "watermark": _render_watermark(listing, public_base),
         "lang": lang,
     }
 
