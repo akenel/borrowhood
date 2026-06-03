@@ -50,11 +50,19 @@ from src.models.listing import BHListing, ListingStatus, ListingType
 from src.models.user import BHUser
 
 
-# Pollinations URL pattern -- generates a deterministic, public, free image.
-# Same provider La Piazza uses elsewhere; loads fast in browser PDF viewers.
-def pollinations(prompt: str, w: int = 800, h: int = 600) -> str:
-    safe = prompt.replace(" ", "+")
-    return f"https://image.pollinations.ai/prompt/{safe}?width={w}&height={h}&nologo=true"
+# Image sources for stress-test cards.
+# Pollinations (used in earlier draft) is now monetized via USDC-on-Base
+# payments and returns HTTP 402 + JSON error to anonymous callers, which
+# WeasyPrint silently swallows -- the cards rendered with blank gradient
+# placeholders. Switched to Unsplash (stable photo IDs, instant CDN, real
+# JPEGs) for cover photos, plus picsum.photos for the avatar (any real
+# JPEG proves the avatar slot wires correctly).
+def unsplash(photo_id: str, w: int = 800, h: int = 600) -> str:
+    return f"https://images.unsplash.com/photo-{photo_id}?w={w}&h={h}&fit=crop&q=80"
+
+
+def picsum(seed: str, size: int = 256) -> str:
+    return f"https://picsum.photos/seed/{seed}/{size}/{size}"
 
 
 TEST_CASES = [
@@ -71,7 +79,8 @@ TEST_CASES = [
         "name": "Caffè al Tramonto",
         "description": "Un caffè al tramonto al porto. Vieni a parlare. Tutti benvenuti.",
         "schedule_summary": "Ogni giovedì 19:00",
-        "cover_url": pollinations("sunset coffee on harbor in trapani sicily, golden hour, italian seaside"),
+        # Unsplash: espresso cup at golden hour
+        "cover_url": unsplash("1495474472287-4d71bcdd2085"),
         "label": "T2 -- short desc (white space) + has cover",
     },
     {
@@ -84,7 +93,8 @@ TEST_CASES = [
             "prenota in anticipo per assicurarti un cavalletto."
         ),
         "schedule_summary": "Sabato 14 giugno, 15:00–18:00",
-        "cover_url": pollinations("watercolor painting workshop outdoor piazza, sunny italian afternoon, art easels"),
+        # Unsplash: watercolor paint palette
+        "cover_url": unsplash("1547826039-bfc35e0f1ea8"),
         "label": "T3 -- ~220 char desc (Goldilocks)",
     },
     {
@@ -105,7 +115,8 @@ TEST_CASES = [
             "Posti limitati a 25. Iscrizione obbligatoria via WhatsApp."
         ),
         "schedule_summary": "Sabato 28 giugno, 09:30–17:30",
-        "cover_url": pollinations("entrepreneurship workshop italy small business owner local market, warm lighting"),
+        # Unsplash: business meeting / small-shop owner
+        "cover_url": unsplash("1556761175-5973dc0f32e7"),
         "label": "T4 -- 900+ char desc (truncation/Ollama stress)",
     },
 ]
@@ -128,10 +139,15 @@ async def find_owner(db: AsyncSession) -> Optional[BHUser]:
 
 async def ensure_avatar(db: AsyncSession, user: BHUser) -> bool:
     """Make sure the test owner has an avatar so we can verify avatar rendering.
-    Returns True if we set one, False if it was already present."""
-    if user.avatar_url:
+    Returns True if we set one, False if it was already present.
+    Force-replace if the existing URL is Pollinations (HTTP 402 since June 2026)."""
+    existing = user.avatar_url or ""
+    if existing and "pollinations" not in existing.lower():
         return False
-    user.avatar_url = pollinations(f"portrait of {user.display_name} italian small business owner smiling, soft natural light, square", 256, 256)
+    # picsum.photos -- deterministic by seed, real JPEG, no rate limit.
+    # Slug the display_name so re-runs return the same image.
+    seed = (user.display_name or "owner").lower().replace(" ", "-").replace("ò", "o")
+    user.avatar_url = picsum(seed, 256)
     return True
 
 
