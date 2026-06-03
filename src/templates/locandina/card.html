@@ -1,0 +1,93 @@
+{# A6-ish event card -- 4-up on A4 landscape, 5mm sheet margin, 6mm gutters.
+
+   Geometry math (kept in the source so a future reader doesn't have to re-derive):
+     A4 landscape   = 297 x 210 mm
+     usable area    = (297 - 2*5)   x (210 - 2*5)   = 287 x 200 mm
+     each card      = (287 - 6) / 2 x (200 - 6) / 2 = 140.5 x 97 mm
+   That's slightly smaller than true A6 (148x105) but it fits cleanly with the
+   tolerance margins the spec calls for. The four cards are IDENTICAL --
+   owner prints, cuts on the dashed cross with scissors, gets 4 flyers.
+
+   WeasyPrint caveats we respect here:
+     - @page sets paper size (NOT body/html dimensions).
+     - margin: 0 on @page; we manage all whitespace in body padding.
+     - flexbox is supported; CSS grid is partial -- so we use flex-wrap + gap.
+     - mm units throughout -- never px in print CSS.
+#}<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="utf-8">
+  <title>Locandina</title>
+  <style>
+    @page { size: A4 landscape; margin: 0; }
+    body { margin: 0; padding: 0; font-family: "Helvetica", "Arial", sans-serif; color: #1a1a1a; }
+    .sheet {
+      width: 297mm; height: 210mm;
+      padding: 5mm;
+      box-sizing: border-box;
+      display: flex; flex-wrap: wrap;
+      gap: 6mm;
+    }
+    .card {
+      width: 140.5mm; height: 97mm;
+      box-sizing: border-box;
+      border: 0.3mm dashed #cccccc;
+      padding: 4mm;
+      display: flex;
+      gap: 4mm;
+      page-break-inside: avoid;
+      overflow: hidden;
+    }
+    /* Square cover-photo block; object-fit:cover handles portrait or landscape sources. */
+    .photo {
+      flex: 0 0 85mm;
+      width: 85mm; height: 85mm;
+      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+      border: 0.2mm solid #d1d5db;
+      display: flex; align-items: center; justify-content: center;
+      color: #9ca3af; font-size: 8pt;
+    }
+    .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .info { flex: 1 1 auto; display: flex; flex-direction: column; min-width: 0; }
+    .info h1 { font-size: 14pt; line-height: 1.15; margin: 0 0 2mm 0; font-weight: 700; }
+    .schedule { font-size: 9pt; color: #374151; margin: 0 0 1.5mm 0; }
+    .byline   { font-size: 8pt; color: #6b7280; margin: 0 0 auto 0; }
+    .qr-row {
+      display: flex; align-items: flex-end; gap: 3mm; margin-top: 3mm;
+    }
+    .qr {
+      flex: 0 0 18mm;
+      width: 18mm; height: 18mm;
+      background: repeating-linear-gradient(
+        45deg, #000 0 0.6mm, transparent 0.6mm 1.2mm
+      ), #ffffff;
+      border: 0.2mm solid #1a1a1a;
+    }
+    .qr-meta { display: flex; flex-direction: column; min-width: 0; }
+    .scan-me { font-size: 7.5pt; font-weight: 600; color: #1a1a1a; }
+    .url     { font-size: 7pt; color: #6b7280; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    {# Four identical cards. WeasyPrint copies the same content into each cell. #}
+    {% for _ in range(4) %}
+    <div class="card">
+      <div class="photo">{# Block-3 will render <img src="..."> here. Block-2: gradient placeholder. #}cover photo</div>
+      <div class="info">
+        <h1>{{ title }}</h1>
+        <p class="schedule">{{ schedule_summary }}</p>
+        <p class="byline">{{ byline }}</p>
+        <div class="qr-row">
+          <div class="qr">{# Block-3: real QR PNG embedded as data: URI. Block-2: hatched placeholder. #}</div>
+          <div class="qr-meta">
+            <span class="scan-me">{{ scan_me }}</span>
+            <span class="url">{{ url_canonical }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</body>
+</html>
