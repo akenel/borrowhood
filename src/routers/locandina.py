@@ -77,6 +77,38 @@ def _public_base(request: Request) -> str:
     return PUBLIC_BASE_DEFAULT
 
 
+# Bruce Lee Easter egg quotes (bonus #11 from the spec). Each listing
+# deterministically picks one based on its id hash so the same card always
+# carries the same quote -- reproducible, collectable, brand-coherent.
+# Curated for printability: short (<= 65 chars), Eastern philosophy, applicable
+# to the kind of work La Piazza members do (skill, patience, water, fire).
+BRUCE_LEE_QUOTES: tuple[str, ...] = (
+    "Be water, my friend.",
+    "Empty your cup so that it may be filled.",
+    "Do not pray for an easy life; pray for the strength to endure.",
+    "Knowing is not enough, we must apply.",
+    "If you spend too much time thinking, you'll never get it done.",
+    "Mistakes are always forgivable, if one has the courage to admit them.",
+    "Absorb what is useful, discard what is useless.",
+    "Take no thought of who is right or wrong. Produce greater results.",
+    "A goal is not always meant to be reached, often it serves as something to aim at.",
+    "The successful warrior is the average man, with laser-like focus.",
+    "Showing off is the fool's idea of glory.",
+    "I fear not the man who has practiced 10,000 kicks once.",
+    "Real living is living for others.",
+    "Notice that the stiffest tree is most easily cracked, while the bamboo bends with the wind.",
+)
+
+
+def _pick_bruce_quote(listing: BHListing) -> str:
+    """Deterministic Bruce Lee quote pick based on listing id hash.
+    Same listing -> same quote across renders, so collectors can chase variants."""
+    import hashlib
+    seed = hashlib.sha1(str(listing.id).encode("utf-8")).digest()
+    idx = seed[0] % len(BRUCE_LEE_QUOTES)
+    return BRUCE_LEE_QUOTES[idx]
+
+
 def _render_watermark(listing: BHListing, public_base: str) -> str:
     """Render the cryptic sheet-level watermark Angel calls the Banksy mark.
 
@@ -417,6 +449,7 @@ async def generate_locandina(
     listing_id: UUID,
     request: Request,
     lang: str = Query("en", pattern="^(en|it)$"),
+    style: str = Query("classic", pattern="^(classic|museum)$"),
     db: AsyncSession = Depends(get_db),
 ):
     """Render an A6-ish share card (4-up on A4 landscape) as a downloadable PDF.
@@ -469,6 +502,12 @@ async def generate_locandina(
         "tier_marker": _tier_marker(owner, lang),
         "is_staging": _is_staging(request),
         "watermark": _render_watermark(listing, public_base),
+        # Bonus #11 -- Bruce Lee quote, deterministic per-listing, always rendered
+        # but in micro-type along the gutter edge. Fans find them on closer look.
+        "bruce_quote": _pick_bruce_quote(listing),
+        # Bonus #12 -- ?style=museum strips chrome (badge / ribbon / scan-me text)
+        # for owners who want the gallery-print look. is_museum=True hides those.
+        "is_museum": (style == "museum"),
         "lang": lang,
     }
 

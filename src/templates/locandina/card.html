@@ -118,6 +118,57 @@
       pointer-events: none;
     }
 
+    /* Bruce Lee quote -- micro-type along the very bottom edge of the sheet,
+       below the bottom row of cards (in the 5mm bottom margin). Deterministic
+       per-listing so fans can chase variants. Italics, gray, small enough
+       to be Easter-egg material but readable to anyone looking. */
+    .bruce-quote {
+      position: absolute;
+      top: 206.5mm;
+      left: 5mm;
+      width: 287mm;
+      height: 3mm;
+      text-align: center;
+      font-family: "Georgia", "Times New Roman", serif;
+      font-style: italic;
+      font-size: 4.5pt;
+      letter-spacing: 0.2pt;
+      color: #9ca3af;
+      line-height: 3mm;
+      pointer-events: none;
+    }
+    /* And a second copy at the very top edge of the sheet, mirroring the
+       Banksy-via-Tell symmetry: two arrows, top and bottom, both quotes
+       are the same (one shot, one verify -- the second arrow proves the first). */
+    .bruce-quote-top {
+      position: absolute;
+      top: 0.5mm;
+      left: 5mm;
+      width: 287mm;
+      height: 3mm;
+      text-align: center;
+      font-family: "Georgia", "Times New Roman", serif;
+      font-style: italic;
+      font-size: 4.5pt;
+      letter-spacing: 0.2pt;
+      color: #9ca3af;
+      line-height: 3mm;
+      pointer-events: none;
+    }
+
+    /* Museum mode -- ?style=museum strips chrome down to the pure object.
+       Hides: type badge, ribbon, scan-me text + URL. Keeps: photo, title,
+       byline (clean), QR, watermark, bruce quote. Dieter Rams approved. */
+    .museum .type-badge,
+    .museum .ribbon,
+    .museum .scan-me,
+    .museum .url,
+    .museum .tier-chip {
+      display: none !important;
+    }
+    /* Museum mode bumps the description block to fill freed space. */
+    .museum .description { height: 24mm; }
+
     /* Background wash: cover image full-bleed at 12% opacity. */
     .bg-wash {
       position: absolute;
@@ -323,13 +374,21 @@
   </style>
 </head>
 <body>
-  <div class="sheet">
+  <div class="sheet{% if is_museum %} museum{% endif %}">
     {# Banksy watermark -- runs through the dead-center gutters where the
        cutter will pass. Surviving fragments end up as micro-type along the
        cut edges of each card, authenticating it as a genuine LP print. #}
     {% if watermark %}
     <div class="watermark-gutter">{{ watermark }}</div>
     <div class="watermark-vertical">{{ watermark }}</div>
+    {% endif %}
+    {# Bruce Lee quote -- top edge AND bottom edge of the sheet. Wilhelm Tell
+       symmetry: two arrows. The quote is deterministic per-listing so collectors
+       can chase variants across owners and the same card always carries the
+       same wisdom. #}
+    {% if bruce_quote %}
+    <div class="bruce-quote-top">— {{ bruce_quote }} — Bruce Lee</div>
+    <div class="bruce-quote">— {{ bruce_quote }} — Bruce Lee</div>
     {% endif %}
     {% for n in range(1, 5) %}
     <div class="card c{{ n }}">
