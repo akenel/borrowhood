@@ -325,6 +325,95 @@ def _cover_url(item: BHItem) -> str | None:
     return None
 
 
+def _tag_chips(item: BHItem, max_chips: int = 5) -> list[str]:
+    """Split item.tags (comma-separated text) into a clean list of chip labels.
+
+    The card has room for 4-5 chips at the top; clip to that to avoid wrapping
+    into the description slot. Trim, dedupe, drop empties.
+    """
+    raw = (item.tags or "").strip()
+    if not raw:
+        return []
+    seen: set[str] = set()
+    chips: list[str] = []
+    # Split on comma OR semicolon (some old seeds used ; -- be tolerant).
+    for part in raw.replace(";", ",").split(","):
+        chip = part.strip()
+        if not chip:
+            continue
+        key = chip.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        chips.append(chip)
+        if len(chips) >= max_chips:
+            break
+    return chips
+
+
+# Attribute keys we surface on the card as Grandma-context hints. Keyed by
+# category group; falls back to nothing if the category isn't in the map.
+# Display labels are bilingual; the VALUE comes from item.attributes as-is.
+ATTRIBUTE_HINTS: dict[str, list[tuple[str, str, str]]] = {
+    # group -> list of (json_key, EN label, IT label)
+    "events": [
+        ("skill_level",      "level",       "livello"),
+        ("age_requirement",  "ages",        "età"),
+        ("what_to_bring",    "bring",       "porta"),
+    ],
+    "vehicles": [
+        ("year",             "year",        "anno"),
+        ("fuel_type",        "fuel",        "carburante"),
+        ("transmission",     "trans",       "cambio"),
+    ],
+    "property": [
+        ("bedrooms",         "br",          "loc"),
+        ("bathrooms",        "ba",          "bagni"),
+        ("floor_area_sqm",   "m²",     "m²"),
+    ],
+}
+
+
+def _grandma_hints(item: BHItem, lang: str) -> list[str]:
+    """Pull a few item.attributes into short display strings so a viewer who
+    doesn't know La Piazza can still parse what kind of thing this is.
+
+    Examples produced:
+        events:    "level Beginner", "bring brushes", "ages 18+"
+        vehicles:  "year 2020", "fuel diesel"
+        property:  "br 3", "ba 2", "m² 95"
+
+    Falls back to empty list when the item has no attributes or the category
+    has no hint mapping. Pure formatting -- no API calls, no DB writes.
+    """
+    attrs = item.attributes or {}
+    if not isinstance(attrs, dict) or not attrs:
+        return []
+    category = (item.category or "").lower()
+    # Resolve which group this category belongs to.
+    from src.models.item import CATEGORY_GROUPS
+    group = None
+    for grp_name, cats in CATEGORY_GROUPS.items():
+        if category in cats:
+            group = grp_name
+            break
+    hints_def = ATTRIBUTE_HINTS.get(group or "", [])
+    out: list[str] = []
+    for key, en_label, it_label in hints_def:
+        val = attrs.get(key)
+        if val is None or val == "" or val is False:
+            continue
+        label = it_label if lang == "it" else en_label
+        # Truncate long string values so they don't break the ribbon.
+        sval = str(val).strip()
+        if len(sval) > 18:
+            sval = sval[:15].rstrip() + "..."
+        out.append(f"{label} {sval}")
+        if len(out) >= 3:
+            break
+    return out
+
+
 def _byline(owner: BHUser | None) -> str:
     """Storefront/display name + city -- 'Nic's Dojo · Trapani'."""
     if not owner:
@@ -647,7 +736,16 @@ async def generate_locandina(
             else "Scan for full details — opens on La Piazza"
         ),
         "type_badge": _type_badge(listing, lang),
-        "data_ribbon": _data_ribbon(listing, lang),
+        # Phase 1.5 Grandma context (2026-06-04): item.tags become a chip row
+        # above the description; item.attributes (skill_level, what_to_bring,
+        # condition, etc.) get appended to the data ribbon as small hints so
+        # a viewer who doesn't know La Piazza can parse the listing at first
+        # glance. Both sourced from existing DB columns -- no new schema.
+        "data_ribbon": " · ".join(filter(None, [
+            _data_ribbon(listing, lang),
+            *_grandma_hints(item, lang),
+        ])),
+        "tag_chips": _tag_chips(item),
         "tier_marker": _tier_marker(owner, lang),
         "is_staging": _is_staging(request),
         "watermark": _render_watermark(listing, public_base),
