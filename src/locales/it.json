@@ -605,6 +605,8 @@
     "event_end": "Data e Ora Fine",
     "event_venue": "Nome del Luogo",
     "event_address": "Indirizzo",
+    "no_date_warning_title": "Imposta una data o il tuo evento resta nascosto",
+    "no_date_warning_body": "Gli eventi senza data di inizio sono nascosti dal calendario eventi e dalla pagina /discover finché non la compili. Aggiungi una data qui sotto per renderlo visibile.",
     "capacity": "Capienza",
     "attendees": "Partecipanti",
     "event_subtitle": "Laboratorio, concerto, incontro",

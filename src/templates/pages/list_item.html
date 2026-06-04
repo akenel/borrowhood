@@ -1416,6 +1416,22 @@
                             {% if ltype == 'event' %}
                             <!-- Event details -->
                             <div class="space-y-3">
+                                <!-- BL-####/Bug #45 -- Angel created an EVENT with no event_start and it
+                                     silently disappeared from /discover + /events calendar (the route
+                                     filters event_start IS NOT NULL). Warn the owner inline so they
+                                     know what they need to do. Bilingual: keep this short, the form
+                                     is already dense. -->
+                                <div x-show="!listingPrices['event'].event_start"
+                                     x-cloak
+                                     class="flex items-start gap-2 p-3 bg-amber-50 border border-amber-300 rounded-lg text-amber-900 text-sm">
+                                    <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"/>
+                                    </svg>
+                                    <div>
+                                        <strong class="block">{{ t('events.no_date_warning_title') }}</strong>
+                                        <span>{{ t('events.no_date_warning_body') }}</span>
+                                    </div>
+                                </div>
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
                                         <label class="block text-xs text-gray-500 mb-1">{{ t('events.event_start') }}</label>

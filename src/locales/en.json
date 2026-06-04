@@ -605,6 +605,8 @@
     "event_end": "End Date & Time",
     "event_venue": "Venue Name",
     "event_address": "Address",
+    "no_date_warning_title": "Set a date or your event stays hidden",
+    "no_date_warning_body": "Events without a start date are hidden from the events calendar and the /discover page until you fill this in. Add a date below to make it discoverable.",
     "capacity": "Capacity",
     "attendees": "Attendees",
     "event_subtitle": "Workshop, concert, meetup",
