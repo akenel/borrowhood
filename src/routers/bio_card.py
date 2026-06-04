@@ -169,16 +169,13 @@ async def _bio_data_ribbon(user: BHUser, lang: str, db: AsyncSession) -> str:
     """
     parts: list[str] = []
 
-    # Location chip. ◉ (U+25C9 FISHEYE) reads as a map-pin at small sizes
-    # and -- unlike 📍 -- renders in the container's default DejaVu/Liberation
-    # fonts. WeasyPrint silently drops emoji codepoints when no emoji font is
-    # installed, so we stick to Geometric Shapes (U+25A0-U+25FF) glyphs only.
+    # Location chip. 📍 (U+1F4CD ROUND PUSHPIN) renders via the
+    # fonts-noto-color-emoji package installed in the container Dockerfile.
     loc_bits = [p for p in (user.city, user.country_code) if p]
     if loc_bits:
-        parts.append("◉ " + ", ".join(loc_bits))
+        parts.append("📍 " + ", ".join(loc_bits))
 
-    # Listings count chip. ▤ (U+25A4 SQUARE WITH HORIZONTAL FILL) reads as
-    # "list lines" -- same Geometric Shapes block, same reliable rendering.
+    # Listings count chip. 📋 (U+1F4CB CLIPBOARD) -- same Noto Color Emoji font.
     count_q = await db.execute(
         select(func.count()).select_from(BHItem).where(
             BHItem.owner_id == user.id,
@@ -191,7 +188,7 @@ async def _bio_data_ribbon(user: BHUser, lang: str, db: AsyncSession) -> str:
             label = "annuncio" if item_count == 1 else "annunci"
         else:
             label = "listing" if item_count == 1 else "listings"
-        parts.append(f"▤ {item_count} {label}")
+        parts.append(f"📋 {item_count} {label}")
 
     # Member-since chip
     if user.created_at:
