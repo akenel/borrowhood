@@ -149,12 +149,21 @@ def _bio_byline(user: BHUser) -> str:
 
 
 def _bio_data_ribbon(user: BHUser, lang: str) -> str:
-    """The bio card's type-aware data strip. Priority: tagline > languages > tier."""
-    if user.tagline:
-        # Tagline is the owner's chosen one-liner -- highest priority signal.
-        return user.tagline.strip()
-    # No tagline -- pull from member metadata.
+    """The bio card's type-aware data strip.
+
+    Priority: languages > location + member-since.
+
+    DRY rule (2026-06-04): tagline is already rendered in the schedule slot
+    under the byline; the ribbon must surface DIFFERENT info. Showing tagline
+    twice (schedule + ribbon) wasted vertical space and felt cheap.
+    """
     parts: list[str] = []
+    langs = list(getattr(user, "languages", None) or [])
+    if langs:
+        codes = [str(getattr(l, "language_code", "") or "").upper() for l in langs]
+        codes = [c for c in codes if c]
+        if codes:
+            parts.append("🌐 " + " · ".join(codes[:5]))
     if user.country_code:
         parts.append(f"📍 {user.country_code}")
     if user.created_at:
@@ -234,7 +243,9 @@ async def generate_bio_card(
 ):
     """Render a member's bio card (4-up on A4 landscape) as a downloadable PDF."""
     result = await db.execute(
-        select(BHUser).where(BHUser.id == user_id)
+        select(BHUser)
+        .options(selectinload(BHUser.languages))
+        .where(BHUser.id == user_id)
     )
     user = result.scalar_one_or_none()
     if not user or user.deleted_at is not None:
