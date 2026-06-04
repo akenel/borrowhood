@@ -22,6 +22,13 @@ email-validator==2.2.0
 # Templates
 jinja2==3.1.5
 
+# PDF generation for Locandina (printable A6 event flyers, 4-up on A4 landscape).
+# WeasyPrint renders Jinja-templated HTML to PDF server-side (no headless Chrome).
+# Needs libpango / libpangocairo / libgdk-pixbuf / libffi-dev system libs -- see
+# Dockerfile. qrcode produces the per-event QR PNG embedded in the card.
+weasyprint==63.1
+qrcode[pil]==8.0
+
 # Utilities
 python-slugify==8.0.4
 python-multipart==0.0.20

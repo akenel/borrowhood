@@ -46,6 +46,24 @@ async def at_username_redirect(username: str, db: AsyncSession = Depends(get_db)
     return RedirectResponse(url=f"/workshop/{user.slug}", status_code=302)
 
 
+@router.get("/u/{slug}", response_class=HTMLResponse)
+async def u_slug_redirect(slug: str, db: AsyncSession = Depends(get_db)):
+    """/u/<slug> short URL -- the QR target on printed Bio postcards.
+
+    Kept short so the printed QR-target line under the QR code stays
+    readable (`staging.lapiazza.app/u/angel-hq` fits, `/workshop/angel-hq`
+    crowds the column). Redirects to the canonical /workshop/<slug>
+    page so existing cards never bit-rot.
+    """
+    from starlette.responses import RedirectResponse
+    result = await db.execute(
+        select(BHUser).where(BHUser.slug == slug, BHUser.deleted_at.is_(None))
+    )
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return RedirectResponse(url=f"/workshop/{user.slug}", status_code=302)
+
 
 @router.get("/workshop/{slug}", response_class=HTMLResponse)
 async def workshop_profile(slug: str, request: Request,

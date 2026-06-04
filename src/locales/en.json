@@ -605,6 +605,8 @@
     "event_end": "End Date & Time",
     "event_venue": "Venue Name",
     "event_address": "Address",
+    "no_date_warning_title": "Set a date or your event stays hidden",
+    "no_date_warning_body": "Events without a start date are hidden from the events calendar and the /discover page until you fill this in. Add a date below to make it discoverable.",
     "capacity": "Capacity",
     "attendees": "Attendees",
     "event_subtitle": "Workshop, concert, meetup",
@@ -1441,5 +1443,9 @@
     "view": "View",
     "add_listing": "Add listing",
     "confirm_delete_item": "Delete this item permanently? This cannot be undone."
+  },
+  "locandina": {
+    "print_card_button": "Print Locandina — Opens an A4 PDF with 4 identical cards. Cut at the center crosshair to get 4 printable handouts.",
+    "print_bio_card_button": "Print Bio Card — Opens an A4 PDF with 4 identical member cards. Cut at the center crosshair to get 4 handouts."
   }
 }

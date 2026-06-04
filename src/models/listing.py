@@ -119,6 +119,20 @@ class BHListing(BHBase, Base):
     event_address: Mapped[Optional[str]] = mapped_column(String(500)) # Full address
     event_link: Mapped[Optional[str]] = mapped_column(String(1000))   # Online event URL (Zoom/Meet/YouTube)
 
+    # Human-readable evergreen schedule line for the printed Locandina ("Ogni
+    # giovedi 20:00 fino al 1 dicembre"). A full RRULE recurrence engine is
+    # deliberately deferred; owner types this verbatim and the flyer prints it.
+    schedule_summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    # Ollama-compressed Locandina description (Block 4, 2026-06-04). When
+    # item.description > 250 chars the Locandina router calls Ollama Turbo to
+    # compress it into a 200-250 char card-ready hook; the result is cached
+    # here so we don't recompress on every PDF re-render. Invalidated when
+    # item.description changes (owner edit clears this column). Owner can
+    # also override this on the preview page (future). NULL = not yet
+    # generated OR description <= 250 chars (verbatim used instead).
+    locandina_summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
     # Version for optimistic locking (Rule 28)
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 

@@ -3,9 +3,26 @@ FROM python:3.12-slim AS base
 WORKDIR /app
 
 # System dependencies
+# - curl: healthcheck
+# - libpango / libpangocairo / libgdk-pixbuf / libffi-dev: WeasyPrint runtime (renders the Locandina A6 cards to PDF)
+# - poppler-utils: ships pdftoppm, used to rasterise the WeasyPrint PDF to PNG for the mobile-friendly preview
+# - fonts-noto-color-emoji: real color emoji glyphs (📍 📋 etc) for WeasyPrint
+#   bio-card / locandina ribbons. Without this font installed, emoji codepoints
+#   silently drop in the PDF -- Angel caught it on staging 2026-06-04. Pairs
+#   with fonts-dejavu-core (default sans + symbol fallback) and
+#   fonts-noto-core (broader CJK / Latin coverage for owner-typed content).
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libgdk-pixbuf-2.0-0 \
+    libffi-dev \
+    poppler-utils \
+    fonts-noto-color-emoji \
+    fonts-noto-core \
+    fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/* \
+    && fc-cache -f
 
 # Python dependencies
 COPY requirements.txt .

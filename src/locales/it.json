@@ -605,6 +605,8 @@
     "event_end": "Data e Ora Fine",
     "event_venue": "Nome del Luogo",
     "event_address": "Indirizzo",
+    "no_date_warning_title": "Imposta una data o il tuo evento resta nascosto",
+    "no_date_warning_body": "Gli eventi senza data di inizio sono nascosti dal calendario eventi e dalla pagina /discover finché non la compili. Aggiungi una data qui sotto per renderlo visibile.",
     "capacity": "Capienza",
     "attendees": "Partecipanti",
     "event_subtitle": "Laboratorio, concerto, incontro",
@@ -1441,5 +1443,9 @@
     "view": "Vedi",
     "add_listing": "Aggiungi annuncio",
     "confirm_delete_item": "Eliminare definitivamente questo articolo? Non puoi annullare."
+  },
+  "locandina": {
+    "print_card_button": "Stampa Locandina — Apre un PDF A4 con 4 cartoline identiche. Taglia al crocino centrale per ottenere 4 cartoline da distribuire.",
+    "print_bio_card_button": "Stampa Biglietto — Apre un PDF A4 con 4 biglietti membro identici. Taglia al crocino centrale per ottenere 4 cartoline."
   }
 }

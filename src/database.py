@@ -144,6 +144,23 @@ async def run_migrations():
         # 2026-05-28: structured "Share address" message attachment. Lives in JSONB
         # so we never put a plaintext address in message.body (redactable + safer).
         "ALTER TABLE bh_message ADD COLUMN IF NOT EXISTS body_meta JSONB",
+        # 2026-06-02: Locandina (printed event flyer) needs a human-readable
+        # schedule line ("Ogni giovedi 20:00 fino al 1 dicembre"). A full RRULE
+        # recurrence engine is deliberately deferred; the owner types the summary
+        # and the card prints it verbatim. Truthful, evergreen, zero date math.
+        "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS schedule_summary TEXT",
+        # Locandina Block 4 (2026-06-04): Ollama-Turbo compressed description
+        # for the printable A6 share card. When item.description > 250 chars,
+        # the Locandina router calls Ollama to compress into a 200-250 char
+        # card-ready hook; the result is cached here so we don't recompress
+        # on every PDF re-render. NULL means "not generated yet OR description
+        # <= 250 (verbatim in use)".
+        "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS locandina_summary TEXT",
+        # Bio postcard Block 5g (2026-06-04): same pattern for user.bio.
+        # Bio cards have a wider description slot (300-500 chars target)
+        # because the avatar/banner takes less width than the photo
+        # block on a Locandina, freeing room for prose.
+        "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS bio_card_summary TEXT",
     ]
     # ALTER TYPE ... ADD VALUE -- SQLAlchemy uses enum .name (UPPERCASE) for PG enums
     enum_migrations = [

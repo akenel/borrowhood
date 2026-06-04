@@ -108,8 +108,34 @@ async def google_verification():
 
 
 @router.get("/robots.txt", response_class=Response)
-async def robots_txt():
-    """Robots.txt for search engine crawlers."""
+async def robots_txt(request: Request):
+    """Robots.txt -- env-aware. Prod welcomes crawlers; staging tells everyone
+    to go away.
+
+    Why env-aware: staging.lapiazza.app shipped with the SAME robots.txt as
+    prod, so search engines indexed staging content and bots scraped the
+    whole catalog (May 29 spike: 2,325 views in one day on staging vs the
+    usual single-digits). Staging is a test fabric and must not be in
+    Google. Detect via request hostname rather than env var so prod-hosted
+    one-off staging mirrors are covered too.
+    """
+    host = (request.url.hostname or "").lower()
+    is_staging = host.startswith("staging.") or "staging" in host
+
+    if is_staging:
+        # Belt and braces -- noindex header on the file itself plus a body
+        # that locks the front door.
+        content = (
+            "# Staging environment -- no crawler should be here.\n"
+            "User-agent: *\n"
+            "Disallow: /\n"
+        )
+        return Response(
+            content=content,
+            media_type="text/plain",
+            headers={"X-Robots-Tag": "noindex, nofollow"},
+        )
+
     content = """User-agent: *
 Allow: /
 Disallow: /api/
