@@ -37,11 +37,11 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, StreamingResponse
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from src.database import get_db
+from src.models.item import BHItem
 from src.models.user import BadgeTier, BHUser, WorkshopType
 from src.routers.pages._helpers import templates
 # Reuse the rendering primitives from the locandina module -- single source of
@@ -148,30 +148,52 @@ def _bio_byline(user: BHUser) -> str:
     return city or ""
 
 
-def _bio_data_ribbon(user: BHUser, lang: str) -> str:
-    """The bio card's type-aware data strip.
+async def _bio_data_ribbon(user: BHUser, lang: str, db: AsyncSession) -> str:
+    """The bio card's data strip -- town-square energy.
 
-    Priority: languages > location + member-since.
+    Format: 📍 city, country · N listings · since YEAR
 
-    DRY rule (2026-06-04): tagline is already rendered in the schedule slot
-    under the byline; the ribbon must surface DIFFERENT info. Showing tagline
-    twice (schedule + ribbon) wasted vertical space and felt cheap.
+    Why these three (2026-06-04, replacing the languages-list version):
+    - LOCATION answers "where to find them" -- the town-square brand promise.
+    - LISTING COUNT is a credibility / activity signal that earns trust at
+      a glance ("this person actually does things here").
+    - MEMBER-SINCE is a vintage marker -- the longer they've been around,
+      the more weight the card carries.
+
+    Dropped: languages list. Angel called it on staging -- "EN · DE · FR · IT"
+    is low-information next to the identity already conveyed by tagline +
+    title + workshop badge. Each chip in the ribbon has to earn its space.
+
+    DRY rule: tagline is rendered in the schedule slot under the byline; the
+    ribbon never repeats it.
     """
     parts: list[str] = []
-    langs = list(getattr(user, "languages", None) or [])
-    if langs:
-        codes = [str(getattr(l, "language_code", "") or "").upper() for l in langs]
-        codes = [c for c in codes if c]
-        if codes:
-            parts.append("🌐 " + " · ".join(codes[:5]))
-    if user.country_code:
-        parts.append(f"📍 {user.country_code}")
+
+    # Location chip
+    loc_bits = [p for p in (user.city, user.country_code) if p]
+    if loc_bits:
+        parts.append("📍 " + ", ".join(loc_bits))
+
+    # Listings count chip -- count owner's non-deleted items
+    count_q = await db.execute(
+        select(func.count()).select_from(BHItem).where(
+            BHItem.owner_id == user.id,
+            BHItem.deleted_at.is_(None),
+        )
+    )
+    item_count = int(count_q.scalar() or 0)
+    if item_count > 0:
+        if lang == "it":
+            label = "annuncio" if item_count == 1 else "annunci"
+        else:
+            label = "listing" if item_count == 1 else "listings"
+        parts.append(f"📋 {item_count} {label}")
+
+    # Member-since chip
     if user.created_at:
         year = user.created_at.year
-        if lang == "it":
-            parts.append(f"membro dal {year}")
-        else:
-            parts.append(f"member since {year}")
+        parts.append(f"dal {year}" if lang == "it" else f"since {year}")
+
     return " · ".join(parts)
 
 
@@ -243,9 +265,7 @@ async def generate_bio_card(
 ):
     """Render a member's bio card (4-up on A4 landscape) as a downloadable PDF."""
     result = await db.execute(
-        select(BHUser)
-        .options(selectinload(BHUser.languages))
-        .where(BHUser.id == user_id)
+        select(BHUser).where(BHUser.id == user_id)
     )
     user = result.scalar_one_or_none()
     if not user or user.deleted_at is not None:
@@ -296,7 +316,7 @@ async def generate_bio_card(
             else "Scan for the full profile — opens on La Piazza"
         ),
         "type_badge": _workshop_badge(user, lang),
-        "data_ribbon": _bio_data_ribbon(user, lang),
+        "data_ribbon": await _bio_data_ribbon(user, lang, db),
         "tier_marker": _bio_tier_marker(user, lang),
         "is_staging": _is_staging(request),
         # Watermark + Bruce-Lee both keyed on user identity (not listing) so the
