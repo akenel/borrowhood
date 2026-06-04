@@ -156,6 +156,11 @@ async def run_migrations():
         # on every PDF re-render. NULL means "not generated yet OR description
         # <= 250 (verbatim in use)".
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS locandina_summary TEXT",
+        # Bio postcard Block 5g (2026-06-04): same pattern for user.bio.
+        # Bio cards have a wider description slot (300-500 chars target)
+        # because the avatar/banner takes less width than the photo
+        # block on a Locandina, freeing room for prose.
+        "ALTER TABLE bh_user ADD COLUMN IF NOT EXISTS bio_card_summary TEXT",
     ]
     # ALTER TYPE ... ADD VALUE -- SQLAlchemy uses enum .name (UPPERCASE) for PG enums
     enum_migrations = [

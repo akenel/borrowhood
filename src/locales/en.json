@@ -1443,5 +1443,9 @@
     "view": "View",
     "add_listing": "Add listing",
     "confirm_delete_item": "Delete this item permanently? This cannot be undone."
+  },
+  "locandina": {
+    "print_card_button": "Print Locandina (A4, 4 cards)",
+    "print_bio_card_button": "Print Bio Card (A4, 4 cards)"
   }
 }

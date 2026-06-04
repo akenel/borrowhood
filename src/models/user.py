@@ -86,6 +86,13 @@ class BHUser(BHBase, Base):
     workshop_type: Mapped[Optional[WorkshopType]] = mapped_column(Enum(WorkshopType))
     tagline: Mapped[Optional[str]] = mapped_column(String(200))
     bio: Mapped[Optional[str]] = mapped_column(Text)
+
+    # Bio postcard Ollama cache (Block 5g, 2026-06-04). When user.bio > 250
+    # chars the bio-card endpoint calls Ollama Turbo to compress to a
+    # 300-500 char card-ready blurb; the result is cached here so we don't
+    # recompress on every PDF re-render. Invalidated when user.bio changes
+    # (owner edit clears this). Editable on preview page (future).
+    bio_card_summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     avatar_url: Mapped[Optional[str]] = mapped_column(String(2000))
     banner_url: Mapped[Optional[str]] = mapped_column(String(500))
     # Featured video -- YouTube / Vimeo / TikTok URL, embedded on workshop page

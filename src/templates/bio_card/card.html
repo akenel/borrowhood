@@ -1,0 +1,516 @@
+{# A6-ish UNIVERSAL share card -- 4-up on A4 landscape, 5mm sheet margin,
+   10mm middle gutters (= 2 x sheet margin).
+
+   Universal as of Block 5b: prints for ANY ListingType (event, raffle,
+   giveaway, rental, sale, service, training, auction, commission, offer).
+   The skeleton is constant; two regions vary by type:
+     - TYPE BADGE (top-right corner) -- color + label per type
+     - DATA RIBBON (between description and QR) -- type-aware fields
+   See lp-locandina-universal-share-artifact memory for the why.
+
+   GEOMETRY MATH (Block 5c: 5mm sheet edges + 10mm middle gutters)
+
+   The double-edge gutter rule: when N cards share a cut line, the gutter
+   between them must equal 2 x the per-card border. Otherwise, after cutting,
+   the cards get an asymmetric border (5mm on the outer edges, 3mm on the cut
+   edge) which screams "amateur." Cutting DEAD CENTER of the 10mm gutter
+   gives each card a clean SYMMETRIC 5mm frame on every side.
+
+     A4 landscape   = 297 x 210 mm
+     sheet edges    = 5mm on each side
+     middle gutters = 10mm horizontal AND 10mm vertical (= 2 x edge)
+     each card      = (297 - 2*5 - 10) / 2 x (210 - 2*5 - 10) / 2
+                    = (297 - 20) / 2 x (210 - 20) / 2
+                    = 138.5 x 95 mm
+     card positions (top, left):
+       c1 = (5,   5)
+       c2 = (5,   153.5)   <- 5 + 138.5 + 10 = 153.5
+       c3 = (110, 5)       <- 5 + 95 + 10 = 110
+       c4 = (110, 153.5)
+
+   Cutting:
+     1 horizontal cut through y=105mm (dead center of the 10mm vertical gutter)
+     1 vertical cut through x=148.5mm (dead center of the 10mm horizontal gutter)
+     -> 4 cards, each with a clean 5mm white frame on all sides.
+
+   Inside-card vertical regions (87mm usable after 4mm padding top+bottom):
+     header  = 42mm  (photo + title + byline-with-avatar + schedule)
+     desc    = 16mm  (description block, see DESC_LIMIT in router) -- was 18mm
+     ribbon  =  6mm  (type-aware data strip)
+     qr-row  = 23mm  (real QR + scan-me + URL)
+     total   = 87mm
+
+   The info-cell reserves padding-right: 22mm so a long title can't collide
+   with the type badge that sits in the top-right corner.
+
+   Block 3 design rules (still in effect):
+     - Avatar INLINE with byline (option B). Never overlaid on the photo.
+     - Background wash = cover image at 12% opacity, full-bleed.
+     - Description: verbatim if <=250 chars, stub-truncated otherwise.
+
+   WeasyPrint caveats we respect here:
+     - @page sets paper size (NOT body/html dimensions).
+     - margin: 0 on @page; we manage all whitespace in body padding.
+     - CSS grid is partial in WeasyPrint -- avoided.
+     - mm units throughout -- never px in print CSS.
+     - Absolute positioning for outer card boxes, CSS tables for inside-card.
+
+   Future Block 6 idea: the 10mm gutter is real estate, not waste --
+   watermark, crop marks, "Made on La Piazza" microcopy, timestamps.
+#}<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="utf-8">
+  <title>Locandina</title>
+  <style>
+    @page { size: A4 landscape; margin: 0; }
+    html, body { margin: 0; padding: 0; }
+    body { font-family: "Helvetica", "Arial", sans-serif; color: #1a1a1a; }
+    .sheet {
+      position: relative;
+      width: 297mm; height: 210mm;
+      overflow: hidden;
+    }
+    .card {
+      position: absolute;
+      width: 138.5mm; height: 95mm;
+      box-sizing: border-box;
+      border: 0.3mm dashed #cccccc;   /* card edge marker (cut is 5mm OUTSIDE this, in the gutter middle) */
+      overflow: hidden;
+    }
+    .card.c1 { top: 5mm;   left: 5mm;     }
+    .card.c2 { top: 5mm;   left: 153.5mm; }
+    .card.c3 { top: 110mm; left: 5mm;     }
+    .card.c4 { top: 110mm; left: 153.5mm; }
+
+    /* Cutting tick marks -- small ticks at the exact cut points so the cutter
+       knows WHERE to cut without measuring. Two horizontal ticks at y=105mm
+       on left + right sheet edges, two vertical ticks at x=148.5mm on top +
+       bottom sheet edges, and a small crosshair at the dead-center
+       intersection. Angel's spec 2026-06-04 morning. */
+    .tick-top, .tick-bottom {
+      position: absolute;
+      left: 147.5mm;   /* x=148.5mm cut, tick 2mm long centered */
+      width: 2mm;
+      height: 0.4mm;
+      background: #6b7280;
+    }
+    .tick-top    { top: 0.5mm; }
+    .tick-bottom { top: 208.5mm; }
+    .tick-left, .tick-right {
+      position: absolute;
+      top: 104mm;      /* y=105mm cut, tick 2mm tall centered */
+      width: 2mm;
+      height: 2mm;
+      background: transparent;
+      border-top: 0.4mm solid #6b7280;
+      box-sizing: border-box;
+    }
+    .tick-left  { left: 0.5mm; top: 104.8mm; height: 0.4mm; width: 2mm; background: #6b7280; }
+    .tick-right { left: 294.5mm; top: 104.8mm; height: 0.4mm; width: 2mm; background: #6b7280; }
+    .tick-cross-h, .tick-cross-v {
+      position: absolute;
+      background: #6b7280;
+    }
+    .tick-cross-h { top: 104.8mm; left: 145.5mm; width: 6mm; height: 0.4mm; }
+    .tick-cross-v { top: 102mm;   left: 148.3mm; width: 0.4mm; height: 6mm; }
+
+    /* Banksy watermark + Bruce Lee quote -- PER CARD, INSIDE the card's print
+       area in the top + bottom padding zones. The previous version put them
+       in the sheet gutters where the cutter slices, so each card ended up
+       with half a watermark and a bisected quote (Angel caught this 2026-06-03).
+       Print-fraud rule: any authentication mark MUST survive the cut intact
+       on every individual card. Place it inside the print area; never in
+       gutters that get bisected.
+
+       The watermark text per card includes a "1/4 .. 4/4" position suffix
+       so when a single card is found in the wild, you can tell it came
+       from a 4-up sheet -- bonus traceability + the sheet position becomes
+       part of the verifiable fingerprint. */
+    .card-bruce {
+      position: absolute;
+      top: 0.8mm;
+      left: 3mm;
+      width: 132.5mm;
+      height: 2mm;
+      z-index: 2;
+      text-align: center;
+      font-family: "Georgia", "Times New Roman", serif;
+      font-style: italic;
+      font-size: 4pt;
+      letter-spacing: 0.1pt;
+      color: #9ca3af;
+      line-height: 2mm;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .card-watermark {
+      position: absolute;
+      bottom: 0.8mm;
+      left: 3mm;
+      width: 132.5mm;
+      height: 2mm;
+      z-index: 2;
+      text-align: center;
+      font-family: "Courier New", monospace;
+      font-size: 4.5pt;
+      letter-spacing: 0.6pt;
+      color: #9ca3af;
+      line-height: 2mm;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    /* Museum mode -- ?style=museum strips chrome down to the pure object.
+       Hides: type badge, ribbon, scan-me text + URL. Keeps: photo, title,
+       byline (clean), QR, watermark, bruce quote. Dieter Rams approved. */
+    .museum .type-badge,
+    .museum .ribbon,
+    .museum .scan-me,
+    .museum .url,
+    .museum .tier-chip {
+      display: none !important;
+    }
+    /* Museum mode bumps the description block to fill freed space. */
+    .museum .description { height: 24mm; }
+
+    /* Background wash: cover image full-bleed at 12% opacity. */
+    .bg-wash {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.12;
+      z-index: 0;
+    }
+
+    /* Staging stamp -- big diagonal "STAGING . DO NOT DISTRIBUTE" across the
+       entire card. Only rendered when is_staging=True. The point: even if
+       a tester accidentally hands a staging-rendered card to a real user,
+       the stamp screams "test card" so nobody confuses it with prod. */
+    .staging-stamp {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 3;
+      pointer-events: none;
+      display: table;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .staging-stamp .staging-stamp-inner {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: center;
+    }
+    /* Two-line stamp -- STAGING huge so the word does the work; DO NOT
+       DISTRIBUTE small underneath telling you why. Both rotated together
+       at +22deg (customs-stamp direction). Border wraps the whole block.
+       Angel's v2 design 2026-06-04 -- previous single-line version was
+       too quiet; he annotated "STAGING" big over the card. */
+    .staging-stamp-block {
+      display: inline-block;
+      transform: rotate(22deg);
+      font-family: "Courier New", monospace;
+      font-weight: 900;
+      color: rgba(220, 38, 38, 0.60);
+      text-shadow:
+         0.3mm  0.3mm 0 rgba(255,255,255,0.85),
+        -0.3mm -0.3mm 0 rgba(255,255,255,0.85);
+      border: 0.7mm solid rgba(220, 38, 38, 0.60);
+      padding: 1.5mm 3mm;
+      box-sizing: border-box;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .staging-stamp-big {
+      font-size: 26pt;
+      letter-spacing: 1.2mm;
+      line-height: 1;
+    }
+    .staging-stamp-small {
+      font-size: 8pt;
+      letter-spacing: 0.4mm;
+      line-height: 1;
+      margin-top: 1.2mm;
+    }
+
+    /* Type badge -- top-right corner, color per ListingType.
+       Sits above the bg-wash and the content layer. */
+    .type-badge {
+      position: absolute;
+      top: 3mm; right: 3mm;
+      z-index: 2;
+      padding: 1mm 2.2mm;
+      border-radius: 1mm;
+      color: #ffffff;
+      font-size: 6.5pt;
+      font-weight: 700;
+      letter-spacing: 0.3pt;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+
+    /* Content layer -- everything readable sits above the wash. */
+    .card-content {
+      position: relative;
+      z-index: 1;
+      padding: 4mm;
+      width: 100%; height: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Header row: cover photo (left) + title/byline/schedule (right).
+       Card is 95mm tall - 8mm padding = 87mm usable: 42+16+6+23=87mm. */
+    .header { display: table; width: 100%; height: 42mm; }
+    .header-row { display: table-row; }
+    .photo-cell {
+      display: table-cell;
+      width: 42mm;
+      vertical-align: top;
+    }
+    .photo {
+      width: 42mm; height: 42mm;
+      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+      border: 0.2mm solid #d1d5db;
+      box-sizing: border-box;
+      text-align: center; color: #9ca3af; font-size: 7pt;
+      overflow: hidden;
+    }
+    .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo .placeholder { display: block; margin-top: 18mm; }
+    .info-cell {
+      display: table-cell;
+      vertical-align: top;
+      padding-left: 3mm;
+      padding-right: 22mm;   /* reserve room for the type badge */
+    }
+    .title {
+      font-size: 10pt;
+      line-height: 1.15;
+      margin: 0 0 1.5mm 0;
+      font-weight: 700;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+    .byline {
+      font-size: 8pt;
+      color: #374151;
+      margin: 0 0 1.2mm 0;
+      line-height: 1.2;
+    }
+    /* Inline avatar (option B) -- never overlaid on the photo.
+       Border color is tier-driven (see _tier_marker in router): newcomers
+       get gray, legends get gold. Always present so the tier signal is
+       subtle but inescapable. Color is set inline per-card via style="...". */
+    .avatar-inline {
+      width: 6mm; height: 6mm;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 1.2mm;
+      object-fit: cover;
+      border: 0.4mm solid #64748b;   /* default; overridden inline by tier_marker.accent */
+    }
+    .avatar-fallback {
+      display: inline-block;
+      width: 6mm; height: 6mm;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 1.2mm;
+      background: #c7d2fe;
+      color: #1e3a8a;
+      font-weight: 700;
+      font-size: 6pt;
+      text-align: center;
+      line-height: 6mm;
+      border: 0.4mm solid #64748b;   /* default; overridden inline by tier_marker.accent */
+    }
+
+    /* Tier chip beside the byline -- only renders for ACTIVE+ owners. The
+       Newcomer's silence here is the point: bragging about being new
+       isn't a thing. The chip carries the tier label in tier-accent color
+       on a faint translucent background that reads well on light + dark
+       cover photos. */
+    .tier-chip {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 1.5mm;
+      padding: 0.3mm 1.2mm;
+      border-radius: 0.8mm;
+      font-size: 6pt;
+      font-weight: 700;
+      letter-spacing: 0.3pt;
+      background: rgba(255, 255, 255, 0.7);
+      border: 0.2mm solid currentColor;
+      /* color is set inline from tier_marker.accent */
+    }
+    .schedule { font-size: 8pt; color: #1a1a1a; margin: 0; font-weight: 600; }
+
+    /* Description block -- 16mm slot, content clipped if it overflows. */
+    .description {
+      height: 16mm;
+      margin-top: 2mm;
+      font-size: 7.5pt;
+      line-height: 1.3;
+      color: #1a1a1a;
+      overflow: hidden;
+      text-align: justify;
+    }
+
+    /* Data ribbon -- type-aware 1-line strip between desc and QR.
+       Bordered top + bottom for visual separation, slightly shaded. */
+    .ribbon {
+      height: 6mm;
+      margin-top: 1mm;
+      padding: 0.6mm 1mm;
+      box-sizing: border-box;
+      border-top: 0.2mm solid #d1d5db;
+      border-bottom: 0.2mm solid #d1d5db;
+      background: rgba(255, 255, 255, 0.6);
+      font-size: 7.5pt;
+      font-weight: 600;
+      color: #1a1a1a;
+      line-height: 1.2;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .ribbon.empty {
+      visibility: hidden;     /* keep the height so QR row stays at bottom */
+    }
+
+    /* QR row at the bottom. */
+    .qr-row { display: table; width: 100%; height: 23mm; }
+    .qr-row .qr-cell {
+      display: table-cell;
+      vertical-align: bottom;
+      width: 22mm;
+    }
+    .qr-row .qr-cell img {
+      width: 22mm; height: 22mm; display: block;
+    }
+    .qr-row .meta-cell {
+      display: table-cell;
+      vertical-align: bottom;
+      padding-left: 2.5mm;
+    }
+    .scan-me { font-size: 7.5pt; font-weight: 600; color: #1a1a1a; display: block; }
+    .url     { font-size: 7pt; color: #6b7280; word-break: break-all; display: block; margin-top: 0.5mm; }
+  </style>
+</head>
+<body>
+  <div class="sheet{% if is_museum %} museum{% endif %}">
+    {# Cutting ticks -- exact cut spots. Cut horizontally where the left/right
+       ticks meet (y=105mm); cut vertically where the top/bottom ticks meet
+       (x=148.5mm). The center crosshair confirms the intersection. #}
+    <div class="tick-top"></div>
+    <div class="tick-bottom"></div>
+    <div class="tick-left"></div>
+    <div class="tick-right"></div>
+    <div class="tick-cross-h"></div>
+    <div class="tick-cross-v"></div>
+
+    {% for n in range(1, 5) %}
+    <div class="card c{{ n }}">
+      {# Background wash -- only rendered when we have a cover image. #}
+      {% if cover_url %}
+      <img class="bg-wash" src="{{ cover_url }}" alt="">
+      {% endif %}
+
+      {# Bruce Lee quote -- PER CARD, top of card's print area. Survives the
+         cut intact on each individual card. Deterministic per listing. #}
+      {% if bruce_quote %}
+      <div class="card-bruce">— {{ bruce_quote }} — Bruce Lee</div>
+      {% endif %}
+
+      {# Banksy watermark -- PER CARD, bottom of card's print area, with
+         "n/4" sheet-position suffix. Survives the cut; each card now carries
+         a complete, verifiable LP fingerprint. Anti-fraud authentication. #}
+      {% if watermark %}
+      <div class="card-watermark">{{ watermark }} &middot; {{ n }}/4</div>
+      {% endif %}
+
+      {# Staging stamp -- diagonal "STAGING DO NOT DISTRIBUTE" across the card,
+         z-index above content so it's unmissable. Only on staging-rendered cards. #}
+      {% if is_staging %}
+      <div class="staging-stamp">
+        <div class="staging-stamp-inner">
+          <div class="staging-stamp-block">
+            <div class="staging-stamp-big">STAGING</div>
+            <div class="staging-stamp-small">DO NOT DISTRIBUTE</div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      {# Type badge -- top-right corner, color per ListingType. #}
+      {% if type_badge and type_badge.label %}
+      <div class="type-badge" style="background-color: {{ type_badge.color }};">
+        {{ type_badge.label }}
+      </div>
+      {% endif %}
+
+      <div class="card-content">
+        {# Header: photo + title/byline/schedule #}
+        <div class="header">
+          <div class="header-row">
+            <div class="photo-cell">
+              <div class="photo">
+                {% if cover_url %}
+                <img src="{{ cover_url }}" alt="">
+                {% else %}
+                <span class="placeholder">member photo</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="info-cell">
+              <div class="title">{{ title }}</div>
+              {% if byline %}
+              <div class="byline">
+                {% if avatar_url %}
+                <img class="avatar-inline" src="{{ avatar_url }}" alt="" style="border-color: {{ tier_marker.accent }};">
+                {% else %}
+                <span class="avatar-fallback" style="border-color: {{ tier_marker.accent }};">{{ (byline[0] | upper) if byline else "·" }}</span>
+                {% endif %}
+                {{ byline }}
+                {% if tier_marker.chip %}
+                <span class="tier-chip" style="color: {{ tier_marker.accent }};">{{ tier_marker.chip }}</span>
+                {% endif %}
+              </div>
+              {% endif %}
+              {# Bio card variant: tagline replaces the schedule line. The member's
+                 own one-line elevator pitch carries the same visual weight as an
+                 event's date/time on a Locandina. #}
+              {% if tagline %}
+              <div class="schedule">{{ tagline }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {# Description block -- verbatim (<=250) or stub-truncated. #}
+        <div class="description">
+          {{ description }}
+        </div>
+
+        {# Data ribbon -- type-aware 1-line strip. Hidden but height-preserved when empty. #}
+        <div class="ribbon {% if not data_ribbon %}empty{% endif %}">
+          {{ data_ribbon }}
+        </div>
+
+        {# QR + URL footer #}
+        <div class="qr-row">
+          <div class="qr-cell">
+            <img src="{{ qr_data_uri }}" alt="QR code">
+          </div>
+          <div class="meta-cell">
+            <span class="scan-me">{{ scan_me }}</span>
+            <span class="url">{{ url_display }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</body>
+</html>
