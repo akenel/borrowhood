@@ -1445,7 +1445,7 @@
     "confirm_delete_item": "Eliminare definitivamente questo articolo? Non puoi annullare."
   },
   "locandina": {
-    "print_card_button": "Stampa Locandina (A4, 4 cartoline)",
-    "print_bio_card_button": "Stampa Biglietto (A4, 4 cartoline)"
+    "print_card_button": "Stampa Locandina — Apre un PDF A4 con 4 cartoline identiche. Taglia al crocino centrale per ottenere 4 cartoline da distribuire.",
+    "print_bio_card_button": "Stampa Biglietto — Apre un PDF A4 con 4 biglietti membro identici. Taglia al crocino centrale per ottenere 4 cartoline."
   }
 }

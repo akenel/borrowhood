@@ -1445,7 +1445,7 @@
     "confirm_delete_item": "Delete this item permanently? This cannot be undone."
   },
   "locandina": {
-    "print_card_button": "Print Locandina (A4, 4 cards)",
-    "print_bio_card_button": "Print Bio Card (A4, 4 cards)"
+    "print_card_button": "Print Locandina — Opens an A4 PDF with 4 identical cards. Cut at the center crosshair to get 4 printable handouts.",
+    "print_bio_card_button": "Print Bio Card — Opens an A4 PDF with 4 identical member cards. Cut at the center crosshair to get 4 handouts."
   }
 }

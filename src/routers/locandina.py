@@ -435,11 +435,15 @@ def _byline(owner: BHUser | None) -> str:
 # of the welcome. ACTIVE gets a humble chip; TRUSTED+ get progressively
 # more presence; LEGEND gets the apex gold + a star.
 TIER_PALETTE: dict[BadgeTier, dict] = {
-    BadgeTier.NEWCOMER: {"slug": "newcomer", "accent": "#64748b", "chip": None,             "chip_label_it": None},
-    BadgeTier.ACTIVE:   {"slug": "active",   "accent": "#0d9488", "chip": "ACTIVE",         "chip_label_it": "ATTIVO"},
-    BadgeTier.TRUSTED:  {"slug": "trusted",  "accent": "#4338ca", "chip": "TRUSTED",        "chip_label_it": "FIDATO"},
-    BadgeTier.PILLAR:   {"slug": "pillar",   "accent": "#7c3aed", "chip": "◆ PILLAR",       "chip_label_it": "◆ PILASTRO"},
-    BadgeTier.LEGEND:   {"slug": "legend",   "accent": "#b45309", "chip": "✦ LEGEND",       "chip_label_it": "✦ LEGGENDA"},
+    # `wash` = bg-wash opacity per tier. Newcomers stay at 0.12 (subtle);
+    # higher tiers crank up because they earned the visual weight (Angel,
+    # 2026-06-04). LEGEND sits at 0.20 so the cover photo really shows
+    # through behind the content.
+    BadgeTier.NEWCOMER: {"slug": "newcomer", "accent": "#64748b", "chip": None,             "chip_label_it": None,       "wash": 0.12},
+    BadgeTier.ACTIVE:   {"slug": "active",   "accent": "#0d9488", "chip": "ACTIVE",         "chip_label_it": "ATTIVO",   "wash": 0.14},
+    BadgeTier.TRUSTED:  {"slug": "trusted",  "accent": "#4338ca", "chip": "TRUSTED",        "chip_label_it": "FIDATO",   "wash": 0.16},
+    BadgeTier.PILLAR:   {"slug": "pillar",   "accent": "#7c3aed", "chip": "◆ PILLAR",       "chip_label_it": "◆ PILASTRO", "wash": 0.18},
+    BadgeTier.LEGEND:   {"slug": "legend",   "accent": "#b45309", "chip": "✦ LEGEND",       "chip_label_it": "✦ LEGGENDA", "wash": 0.20},
 }
 
 
@@ -462,6 +466,7 @@ def _tier_marker(owner: BHUser | None, lang: str) -> dict:
         "slug": pal["slug"],
         "accent": pal["accent"],
         "chip": chip,
+        "wash": pal.get("wash", 0.12),
     }
 
 

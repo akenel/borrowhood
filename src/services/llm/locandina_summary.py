@@ -32,17 +32,49 @@ def _build_prompt(
     target_min: int,
     target_max: int,
 ) -> str:
-    """Compose the compression prompt for Ollama. Plain text output, no JSON."""
-    lang_name = "Italian" if lang == "it" else "English"
-    story_block = f"\n\nAdditional context (the story):\n{story.strip()}" if story and story.strip() else ""
+    """Compose the compression prompt for Ollama. Plain text output, no JSON.
+
+    Block 4.1 (2026-06-04): tightened Italian adherence. Earlier prompts let
+    Gemma3:12b silently revert to English when asked to write in Italian --
+    the model interpreted "Italian" as an option not a requirement. Fix:
+    state the language THREE times (header, mid-instruction, closing reminder)
+    and include a one-shot Italian example when lang=it so the model has a
+    style anchor in the target language.
+    """
+    is_it = lang == "it"
+    if is_it:
+        lang_header = "IMPORTANTE: La risposta DEVE essere in italiano. NON usare l'inglese."
+        lang_mid = "Scrivi tutta la risposta in italiano corretto, anche se la descrizione originale è in inglese."
+        lang_close = "Ripeto: rispondi SOLO in italiano."
+        oneshot = (
+            "\n\nEsempio di stile (per riferimento, non da copiare):\n"
+            "Originale: 'A three-day workshop in the Studio Ghibli tradition. "
+            "Hand-drawn animation backgrounds, watercolor on cell-vinyl, the rhythm of "
+            "breathing into a frame. I will teach you the wind in Totoros field. Bring patience.'\n"
+            "Riassunto in italiano: 'Tre giorni di workshop nella tradizione Studio Ghibli. "
+            "Sfondi animati a mano, acquerello su cell-vinile, il ritmo di respirare in un fotogramma. "
+            "Ti insegno il vento dei campi di Totoro. Porta pazienza.'"
+        )
+    else:
+        lang_header = "Write the output in English."
+        lang_mid = "Use natural, present-tense English. Active voice."
+        lang_close = ""
+        oneshot = ""
+
+    story_block = (
+        f"\n\nAdditional context (the story):\n{story.strip()}"
+        if story and story.strip() else ""
+    )
     return (
+        f"{lang_header}\n"
         f"You are compressing an event/listing description for a printable A6 postcard.\n"
-        f"Write the output in {lang_name}.\n"
+        f"{lang_mid}\n"
         f"Target: between {target_min} and {target_max} characters total.\n"
         f"Keep the hook, the value proposition, who it's for, and what they walk away with.\n"
         f"Drop redundancy, hedging, and meta-commentary. Active voice, present tense.\n"
         f"Do NOT include preamble, quotes, brackets, hashtags, or JSON. Reply with only the\n"
-        f"compressed description as plain prose.\n\n"
+        f"compressed description as plain prose.\n"
+        f"{lang_close}{oneshot}\n\n"
         f"Original description:\n{description.strip()}"
         f"{story_block}"
     )

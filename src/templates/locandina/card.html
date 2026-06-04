@@ -439,9 +439,11 @@
 
     {% for n in range(1, 5) %}
     <div class="card c{{ n }}">
-      {# Background wash -- only rendered when we have a cover image. #}
+      {# Background wash -- only rendered when we have a cover image. Opacity
+         is tier-driven (set inline from tier_marker.wash): newcomers get
+         a subtle 12%, legends crank to 20% so the photo really pulls weight. #}
       {% if cover_url %}
-      <img class="bg-wash" src="{{ cover_url }}" alt="">
+      <img class="bg-wash" src="{{ cover_url }}" alt="" style="opacity: {{ tier_marker.wash }};">
       {% endif %}
 
       {# Bruce Lee quote -- PER CARD, top of card's print area. Survives the
