@@ -149,6 +149,13 @@ async def run_migrations():
         # recurrence engine is deliberately deferred; the owner types the summary
         # and the card prints it verbatim. Truthful, evergreen, zero date math.
         "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS schedule_summary TEXT",
+        # Locandina Block 4 (2026-06-04): Ollama-Turbo compressed description
+        # for the printable A6 share card. When item.description > 250 chars,
+        # the Locandina router calls Ollama to compress into a 200-250 char
+        # card-ready hook; the result is cached here so we don't recompress
+        # on every PDF re-render. NULL means "not generated yet OR description
+        # <= 250 (verbatim in use)".
+        "ALTER TABLE bh_listing ADD COLUMN IF NOT EXISTS locandina_summary TEXT",
     ]
     # ALTER TYPE ... ADD VALUE -- SQLAlchemy uses enum .name (UPPERCASE) for PG enums
     enum_migrations = [

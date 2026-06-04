@@ -22,11 +22,14 @@ Later blocks wire:
 """
 
 import base64
+import logging
 import os
 from io import BytesIO
 from uuid import UUID
 
 import qrcode
+
+logger = logging.getLogger(__name__)
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select
@@ -192,21 +195,54 @@ def _qr_data_uri(target_url: str) -> str:
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode("ascii")
 
 
-def _description_short(item: BHItem) -> str:
+async def _description_short(
+    item: BHItem,
+    listing: BHListing,
+    lang: str,
+    db: AsyncSession,
+) -> str:
     """Return the description block contents.
 
-    Block 3 rules (from feedback-locandina-description-block memory):
-      - description <= DESC_LIMIT chars: verbatim.
-      - description >  DESC_LIMIT chars: truncated stub (Block 4 swaps in
-        Ollama Turbo compression).
-      - description NULL: empty string (the slot collapses gracefully).
+    Rules (from feedback-locandina-description-block memory + Block 4):
+      1. listing.locandina_summary set (cache hit): use it verbatim.
+      2. description <= DESC_LIMIT chars: verbatim (no AI needed).
+      3. description > DESC_LIMIT chars: call Ollama Turbo to compress to
+         200-250 chars, cache on listing.locandina_summary, return.
+      4. Ollama unreachable / fails: fall back to truncation stub.
+      5. description NULL: empty string (the slot collapses gracefully).
     """
+    # Cache hit -- owner already has an AI summary or hand-edited version.
+    if listing.locandina_summary and listing.locandina_summary.strip():
+        return listing.locandina_summary.strip()
+
     desc = (item.description or "").strip()
     if not desc:
         return ""
     if len(desc) <= DESC_LIMIT:
         return desc
-    # Block-4 STUB. Replace with _ollama_generate(desc + story) once wired.
+
+    # Cache miss + over the limit: call Ollama Turbo.
+    from src.services.llm.locandina_summary import generate_locandina_summary
+    summary = await generate_locandina_summary(
+        description=desc,
+        story=(item.story or None),
+        lang=lang,
+        target_min=200,
+        target_max=DESC_LIMIT,
+    )
+    if summary:
+        # Cache for future renders. Commit immediately so concurrent re-renders
+        # don't re-spend Ollama calls. Owner-edit path will clear/overwrite.
+        listing.locandina_summary = summary
+        try:
+            await db.commit()
+            await db.refresh(listing)
+        except Exception as e:
+            # Cache write failed -- still serve the summary for this render.
+            logger.warning("locandina_summary cache write failed: %s", e)
+        return summary
+
+    # Ollama unreachable / failed -- last-resort truncation stub.
     return desc[: DESC_LIMIT - 3].rstrip() + "..."
 
 
@@ -489,7 +525,7 @@ async def generate_locandina(
         "byline": _byline(owner),
         "avatar_url": (owner.avatar_url if owner else None),
         "cover_url": cover_url,
-        "description": _description_short(item),
+        "description": await _description_short(item, listing, lang, db),
         "qr_data_uri": _qr_data_uri(qr_target),
         "url_display": f"{display_host}/items/{item.slug}",
         "scan_me": (
