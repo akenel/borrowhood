@@ -434,6 +434,7 @@ def _data_ribbon(listing: BHListing, lang: str) -> str:
         "day": "giorno" if is_it else "day",
         "days": "giorni" if is_it else "days",
         "hour": "ora" if is_it else "hour",
+        "session": "sessione" if is_it else "session",
         "person": "persona" if is_it else "person",
         "people": "persone" if is_it else "people",
         "draw": "Estrazione" if is_it else "Draw",
@@ -442,8 +443,26 @@ def _data_ribbon(listing: BHListing, lang: str) -> str:
         "from": "Da" if is_it else "From",
         "mto": "Su commissione" if is_it else "Made to order",
         "make_offer": "Fai un'offerta" if is_it else "Make an offer",
+        "group_off": "sconto gruppo" if is_it else "group off",
         "venue": None,  # rendered without prefix
     }
+
+    # Helper -- format a price + price_unit cleanly. "€18/session", "€15/day",
+    # "€20/hour", "€50/person", or just "€120" for flat/sale.
+    def _price_with_unit(price, unit_raw: str | None, default_unit: str = "session") -> str:
+        if price is None:
+            return ""
+        unit = (unit_raw or "").lower()
+        unit_map = {
+            "per_hour":    f"/{t['hour']}",
+            "per_day":     f"/{t['day']}",
+            "per_session": f"/{t['session']}",
+            "per_person":  f"/{t['person']}",
+            "flat":        "",
+            "negotiable":  "",
+        }
+        suffix = unit_map.get(unit, f"/{t[default_unit]}" if default_unit in t else "")
+        return f"{_euro(price)}{suffix}"
 
     if lt == ListingType.EVENT:
         # Prefer real event_start over schedule_summary in the ribbon -- the
@@ -458,8 +477,10 @@ def _data_ribbon(listing: BHListing, lang: str) -> str:
             parts.append(f"{t['max']} {listing.max_participants} {label}")
         if _is_free(listing):
             parts.append(t["free"])
+        elif listing.per_person_rate:
+            parts.append(f"{_euro(listing.per_person_rate)}/{t['person']}")
         elif listing.price:
-            parts.append(_euro(listing.price))
+            parts.append(_price_with_unit(listing.price, listing.price_unit, "person"))
 
     elif lt == ListingType.RAFFLE:
         if listing.price:
@@ -472,14 +493,7 @@ def _data_ribbon(listing: BHListing, lang: str) -> str:
 
     elif lt == ListingType.RENT:
         if listing.price:
-            unit = (listing.price_unit or "per_day").lower()
-            unit_label = {
-                "per_day": f"/{t['day']}",
-                "per_hour": f"/{t['hour']}",
-                "flat": "",
-                "negotiable": "",
-            }.get(unit, "")
-            parts.append(f"{_euro(listing.price)}{unit_label}")
+            parts.append(_price_with_unit(listing.price, listing.price_unit, "day"))
         if listing.deposit:
             parts.append(f"{_euro(listing.deposit)} {t['deposit']}")
         if listing.min_rental_days:
@@ -494,15 +508,11 @@ def _data_ribbon(listing: BHListing, lang: str) -> str:
         if _is_free(listing):
             parts.append(t["free"])
         elif listing.price:
-            unit = (listing.price_unit or "per_hour").lower()
-            unit_label = {
-                "per_hour": f"/{t['hour']}",
-                "per_day": f"/{t['day']}",
-                "flat": "",
-            }.get(unit, "")
-            parts.append(f"{_euro(listing.price)}{unit_label}")
+            parts.append(_price_with_unit(listing.price, listing.price_unit, "hour"))
         if listing.minimum_charge:
             parts.append(f"{t['min']} {_euro(listing.minimum_charge)}")
+        if listing.group_discount_pct:
+            parts.append(f"-{int(listing.group_discount_pct)}% {t['group_off']}")
 
     elif lt == ListingType.TRAINING:
         if _is_free(listing):
@@ -510,10 +520,12 @@ def _data_ribbon(listing: BHListing, lang: str) -> str:
         elif listing.per_person_rate:
             parts.append(f"{_euro(listing.per_person_rate)}/{t['person']}")
         elif listing.price:
-            parts.append(_euro(listing.price))
+            parts.append(_price_with_unit(listing.price, listing.price_unit, "session"))
         if listing.max_participants:
             label = t["person"] if listing.max_participants == 1 else t["people"]
             parts.append(f"{t['max']} {listing.max_participants} {label}")
+        if listing.group_discount_pct:
+            parts.append(f"-{int(listing.group_discount_pct)}% {t['group_off']}")
 
     elif lt == ListingType.AUCTION:
         if listing.starting_bid:

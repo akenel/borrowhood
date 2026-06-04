@@ -83,6 +83,38 @@
     .card.c3 { top: 110mm; left: 5mm;     }
     .card.c4 { top: 110mm; left: 153.5mm; }
 
+    /* Cutting tick marks -- small ticks at the exact cut points so the cutter
+       knows WHERE to cut without measuring. Two horizontal ticks at y=105mm
+       on left + right sheet edges, two vertical ticks at x=148.5mm on top +
+       bottom sheet edges, and a small crosshair at the dead-center
+       intersection. Angel's spec 2026-06-04 morning. */
+    .tick-top, .tick-bottom {
+      position: absolute;
+      left: 147.5mm;   /* x=148.5mm cut, tick 2mm long centered */
+      width: 2mm;
+      height: 0.4mm;
+      background: #6b7280;
+    }
+    .tick-top    { top: 0.5mm; }
+    .tick-bottom { top: 208.5mm; }
+    .tick-left, .tick-right {
+      position: absolute;
+      top: 104mm;      /* y=105mm cut, tick 2mm tall centered */
+      width: 2mm;
+      height: 2mm;
+      background: transparent;
+      border-top: 0.4mm solid #6b7280;
+      box-sizing: border-box;
+    }
+    .tick-left  { left: 0.5mm; top: 104.8mm; height: 0.4mm; width: 2mm; background: #6b7280; }
+    .tick-right { left: 294.5mm; top: 104.8mm; height: 0.4mm; width: 2mm; background: #6b7280; }
+    .tick-cross-h, .tick-cross-v {
+      position: absolute;
+      background: #6b7280;
+    }
+    .tick-cross-h { top: 104.8mm; left: 145.5mm; width: 6mm; height: 0.4mm; }
+    .tick-cross-v { top: 102mm;   left: 148.3mm; width: 0.4mm; height: 6mm; }
+
     /* Banksy watermark + Bruce Lee quote -- PER CARD, INSIDE the card's print
        area in the top + bottom padding zones. The previous version put them
        in the sheet gutters where the cutter slices, so each card ended up
@@ -368,6 +400,16 @@
 </head>
 <body>
   <div class="sheet{% if is_museum %} museum{% endif %}">
+    {# Cutting ticks -- exact cut spots. Cut horizontally where the left/right
+       ticks meet (y=105mm); cut vertically where the top/bottom ticks meet
+       (x=148.5mm). The center crosshair confirms the intersection. #}
+    <div class="tick-top"></div>
+    <div class="tick-bottom"></div>
+    <div class="tick-left"></div>
+    <div class="tick-right"></div>
+    <div class="tick-cross-h"></div>
+    <div class="tick-cross-v"></div>
+
     {% for n in range(1, 5) %}
     <div class="card c{{ n }}">
       {# Background wash -- only rendered when we have a cover image. #}
