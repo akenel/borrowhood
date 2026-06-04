@@ -51,6 +51,77 @@ router = APIRouter(prefix="/api/v1/listings", tags=["locandina"])
 PUBLIC_BASE_DEFAULT = "https://lapiazza.app"
 
 
+async def _preflight_validate(
+    cover_url: str | None,
+    avatar_url: str | None,
+    qr_target: str,
+    strict: bool,
+) -> list[str]:
+    """Chuck Norris validator -- run BEFORE WeasyPrint to catch silent fails.
+
+    Returns a list of human-readable failure strings. Empty list = OK to render.
+
+    Checks (all parallel via asyncio.gather to stay fast):
+      1. cover_url (if set) returns HTTP 200 + image/* content-type
+      2. avatar_url (if set) returns HTTP 200 + image/* content-type
+      3. qr_target resolves (HEAD or GET 200 / redirect)
+
+    Codifies the second-arrow lesson at the API layer. The Pollinations 402,
+    the env-URL 404, the staging stamp clipped text -- all silent fails that
+    a pre-flight check would have caught before serving a broken PDF.
+
+    Honors the "lean hard but don't fail closed silently" rule
+    ([[feedback-lean-hard-on-ollama-summarization]]): in strict=False mode
+    (default for prod), failures are warnings -- the PDF still renders with
+    fallback placeholders. In strict=True (override via ?strict=1), failures
+    return 503 with the list. Use strict in CI / pre-deploy smoke tests.
+    """
+    import asyncio
+    import httpx
+    failures: list[str] = []
+
+    async def check_image(label: str, url: str | None) -> None:
+        if not url:
+            return
+        try:
+            async with httpx.AsyncClient(timeout=8.0, follow_redirects=True) as client:
+                # HEAD first (cheap); some CDNs reject HEAD so fall back to GET range.
+                try:
+                    resp = await client.head(url)
+                except httpx.HTTPError:
+                    resp = await client.get(url, headers={"Range": "bytes=0-1"})
+                if resp.status_code >= 400:
+                    failures.append(f"{label}: HTTP {resp.status_code} from {url[:80]}")
+                    return
+                ctype = (resp.headers.get("content-type") or "").lower()
+                if not ctype.startswith("image/"):
+                    failures.append(
+                        f"{label}: content-type '{ctype[:40]}' is not image/* "
+                        f"(silent-fail trap; URL: {url[:60]})"
+                    )
+        except Exception as e:
+            failures.append(f"{label}: fetch failed -- {type(e).__name__}: {str(e)[:80]}")
+
+    async def check_qr_target() -> None:
+        try:
+            async with httpx.AsyncClient(timeout=8.0, follow_redirects=False, verify=False) as client:
+                resp = await client.head(qr_target)
+                if resp.status_code >= 500:
+                    failures.append(f"qr_target: HTTP {resp.status_code} -- public item page broken")
+                # 404 on the QR target IS a real problem (printed cards lead to dead pages)
+                elif resp.status_code == 404:
+                    failures.append(f"qr_target: 404 -- printed QR will land on a dead page")
+        except Exception as e:
+            failures.append(f"qr_target: fetch failed -- {type(e).__name__}: {str(e)[:80]}")
+
+    await asyncio.gather(
+        check_image("cover_url", cover_url),
+        check_image("avatar_url", avatar_url),
+        check_qr_target(),
+    )
+    return failures
+
+
 def _public_base(request: Request) -> str:
     """Origin the locandina's QR + URL line point to.
 
@@ -486,6 +557,7 @@ async def generate_locandina(
     request: Request,
     lang: str = Query("en", pattern="^(en|it)$"),
     style: str = Query("classic", pattern="^(classic|museum)$"),
+    strict: int = Query(0, ge=0, le=1),
     db: AsyncSession = Depends(get_db),
 ):
     """Render an A6-ish share card (4-up on A4 landscape) as a downloadable PDF.
@@ -514,6 +586,35 @@ async def generate_locandina(
     cover_url = _cover_url(item)
     public_base = _public_base(request)
     qr_target = f"{public_base}/items/{item.slug}"
+
+    # Chuck Norris pre-flight gate (Block 5e, 2026-06-04). Validates external
+    # URLs return real images and the QR target isn't a 404 BEFORE we burn
+    # WeasyPrint cycles + serve a half-rendered PDF. In strict=1 mode (CI /
+    # pre-deploy smoke), failures return 503 with the list. In default mode,
+    # failures log warnings and the PDF renders with whatever fell through
+    # (Block 3's placeholder gradient + monogram fallback are designed for
+    # exactly this case).
+    avatar_url = owner.avatar_url if owner else None
+    preflight_failures = await _preflight_validate(
+        cover_url=cover_url,
+        avatar_url=avatar_url,
+        qr_target=qr_target,
+        strict=bool(strict),
+    )
+    if preflight_failures:
+        if strict:
+            from fastapi.responses import JSONResponse
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "detail": "Locandina pre-flight failed",
+                    "failures": preflight_failures,
+                    "listing_id": str(listing.id),
+                    "item_slug": item.slug,
+                },
+            )
+        for f in preflight_failures:
+            logger.warning("locandina pre-flight (non-strict): %s", f)
 
     # The displayed URL line below the QR drops the scheme for visual
     # cleanliness: "staging.lapiazza.app/items/<slug>" or "lapiazza.app/...".
