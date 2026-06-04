@@ -169,26 +169,38 @@
     .staging-stamp .staging-stamp-inner {
       display: table-cell;
       vertical-align: middle;
-      /* +22deg = top-left to bottom-right, the customs-stamp direction.
-         (Was -22deg = bottom-left to top-right, which read backwards.)
-         Angel called the fix 2026-06-03 evening. */
+      text-align: center;
+    }
+    /* Two-line stamp -- STAGING huge so the word does the work; DO NOT
+       DISTRIBUTE small underneath telling you why. Both rotated together
+       at +22deg (customs-stamp direction). Border wraps the whole block.
+       Angel's v2 design 2026-06-04 -- previous single-line version was
+       too quiet; he annotated "STAGING" big over the card. */
+    .staging-stamp-block {
+      display: inline-block;
       transform: rotate(22deg);
       font-family: "Courier New", monospace;
       font-weight: 900;
-      /* 11pt fits "STAGING . TEST . DO NOT DISTRIBUTE" end-to-end across the
-         rotated diagonal of a 138.5x95mm card. Larger = clipped at the edges
-         (the previous 18pt cut off the "BUTE" of DISTRIBUTE -- Angel: "you
-         can't even read the know"). */
-      letter-spacing: 0.4mm;
-      font-size: 11pt;
-      color: rgba(220, 38, 38, 0.55);    /* red, semi-transparent */
+      color: rgba(220, 38, 38, 0.60);
       text-shadow:
          0.3mm  0.3mm 0 rgba(255,255,255,0.85),
         -0.3mm -0.3mm 0 rgba(255,255,255,0.85);
-      border: 0.5mm solid rgba(220, 38, 38, 0.55);
-      padding: 0.8mm 1.5mm;
+      border: 0.7mm solid rgba(220, 38, 38, 0.60);
+      padding: 1.5mm 3mm;
       box-sizing: border-box;
       white-space: nowrap;
+      text-align: center;
+    }
+    .staging-stamp-big {
+      font-size: 26pt;
+      letter-spacing: 1.2mm;
+      line-height: 1;
+    }
+    .staging-stamp-small {
+      font-size: 8pt;
+      letter-spacing: 0.4mm;
+      line-height: 1;
+      margin-top: 1.2mm;
     }
 
     /* Type badge -- top-right corner, color per ListingType.
@@ -380,7 +392,12 @@
          z-index above content so it's unmissable. Only on staging-rendered cards. #}
       {% if is_staging %}
       <div class="staging-stamp">
-        <div class="staging-stamp-inner">STAGING&nbsp;&nbsp;TEST&nbsp;&nbsp;DO&nbsp;NOT&nbsp;DISTRIBUTE</div>
+        <div class="staging-stamp-inner">
+          <div class="staging-stamp-block">
+            <div class="staging-stamp-big">STAGING</div>
+            <div class="staging-stamp-small">DO NOT DISTRIBUTE</div>
+          </div>
+        </div>
       </div>
       {% endif %}
 
