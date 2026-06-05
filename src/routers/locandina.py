@@ -151,6 +151,37 @@ def _public_base(request: Request) -> str:
     return PUBLIC_BASE_DEFAULT
 
 
+def _absolute_image_url(url: str | None, public_base: str) -> str | None:
+    """Promote a relative /static/... URL to a fully-qualified URL for WeasyPrint.
+
+    User uploads land at `/static/uploads/avatars/X.png` etc -- relative paths.
+    WeasyPrint resolves images via urllib, which needs a real scheme+host.
+    Without one it logs "Relative URI reference without a base URI" and leaves
+    the image slot empty: no exception, no 5xx, just a silent blank in the
+    printed card.
+
+    Discovered post-prod-ship 2026-06-05 via log scan:
+        11 users on prod had relative-URL avatars  -> empty bio-card avatar
+        390 items on prod had relative-URL covers  -> empty Locandina cover
+    Cards still returned HTTP 200 (smoke test passed) but every real user
+    upload printed blank.
+
+    Pass-through rules:
+      - None / empty -> None
+      - already-absolute (http://, https://) -> unchanged
+      - data: URIs (the QR code etc.) -> unchanged
+      - leading "/" -> public_base + url
+      - bare path -> public_base + "/" + url (defensive)
+    """
+    if not url:
+        return None
+    if url.startswith(("http://", "https://", "data:")):
+        return url
+    if url.startswith("/"):
+        return f"{public_base}{url}"
+    return f"{public_base}/{url}"
+
+
 # Bruce Lee Easter egg quotes (bonus #11 from the spec). Each listing
 # deterministically picks one based on its id hash so the same card always
 # carries the same quote -- reproducible, collectable, brand-coherent.
@@ -689,9 +720,12 @@ async def generate_locandina(
         raise HTTPException(status_code=404, detail="Listing has no item")
 
     owner: BHUser | None = item.owner
-    cover_url = _cover_url(item)
     public_base = _public_base(request)
     qr_target = f"{public_base}/items/{item.slug}"
+    # Absolutize image URLs so WeasyPrint can resolve user-uploaded /static/...
+    # paths (see _absolute_image_url docstring -- silent blank-image bug).
+    cover_url = _absolute_image_url(_cover_url(item), public_base)
+    avatar_url = _absolute_image_url(owner.avatar_url if owner else None, public_base)
 
     # Chuck Norris pre-flight gate (Block 5e, 2026-06-04). Validates external
     # URLs return real images and the QR target isn't a 404 BEFORE we burn
@@ -700,7 +734,6 @@ async def generate_locandina(
     # failures log warnings and the PDF renders with whatever fell through
     # (Block 3's placeholder gradient + monogram fallback are designed for
     # exactly this case).
-    avatar_url = owner.avatar_url if owner else None
     preflight_failures = await _preflight_validate(
         cover_url=cover_url,
         avatar_url=avatar_url,
@@ -730,7 +763,7 @@ async def generate_locandina(
         "title": item.name,
         "schedule_text": _schedule_text(listing, lang),
         "byline": _byline(owner),
-        "avatar_url": (owner.avatar_url if owner else None),
+        "avatar_url": avatar_url,
         "cover_url": cover_url,
         "description": await _description_short(item, listing, lang, db),
         "qr_data_uri": _qr_data_uri(qr_target),

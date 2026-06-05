@@ -51,6 +51,7 @@ from src.routers.pages._helpers import templates
 from src.routers.locandina import (
     DESC_LIMIT,
     TIER_PALETTE,
+    _absolute_image_url,
     _is_staging,
     _pick_bruce_quote,
     _preflight_validate,
@@ -272,13 +273,16 @@ async def generate_bio_card(
     if not user or user.deleted_at is not None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    cover_url = _bio_cover_url(user)
     public_base = _public_base(request)
     qr_target = f"{public_base}/u/{user.slug}"
+    # Absolutize image URLs so WeasyPrint can resolve user-uploaded /static/...
+    # paths. Real prod users had relative avatars + banners -> empty image
+    # slots in the printed PDF (see _absolute_image_url docstring).
+    cover_url = _absolute_image_url(_bio_cover_url(user), public_base)
+    avatar_url = _absolute_image_url(user.avatar_url, public_base)
 
     # Pre-flight (Chuck Norris) -- validate image URLs and QR resolution
     # before WeasyPrint burns cycles + a half-rendered PDF goes out.
-    avatar_url = user.avatar_url
     preflight_failures = await _preflight_validate(
         cover_url=cover_url,
         avatar_url=avatar_url,
