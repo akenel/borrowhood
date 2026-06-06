@@ -233,6 +233,10 @@
                                 <p class="text-xs text-gray-300 mt-1 leading-relaxed">{{ t('nav_tips.events_body') }}</p>
                             </div>
                         </div>
+                        <!-- The Workshop — the bridge to La Bottega (the maker's bench) -->
+                        <a href="https://bottega.lapiazza.app/compute/bottega" class="text-gray-600 hover:text-rose-600 hover:bg-rose-50 px-3 py-2 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-1.5 whitespace-nowrap" title="Make things — CV → profile, posters, playlists, ask a master">
+                            🔧 {% if lang == 'it' %}Bottega{% else %}Workshop{% endif %}
+                        </a>
                         {% if not user %}
                         <div class="relative" x-data="{ tip: false, timer: null }"
                              @mouseenter="timer = setTimeout(() => tip = true, 350)"
