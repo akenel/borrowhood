@@ -39,7 +39,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ og_title or t('app.name') }}">
     <meta name="twitter:description" content="{{ og_description or t('home.hero_subtitle') }}">
-    <meta name="twitter:image" content="{{ og_image or 'https://lapiazza.app/static/images/og-default.png' }}">
+    <meta name="twitter:image" content="{{ og_image or ('https://staging-bottega.lapiazza.app/og/lapiazza-og-v3.png' if environment == 'staging' else 'https://bottega.lapiazza.app/og/lapiazza-og-v3.png') }}">
     <meta name="twitter:image:alt" content="{{ og_title or t('app.name') }}">
 
     <!-- PWA -->
