@@ -32,8 +32,8 @@ async def demo_login_page(
     token: Optional[dict] = Depends(get_current_user_token),
     db: AsyncSession = Depends(get_db),
 ):
-    """One-click demo login page. Debug mode only."""
-    if not settings.debug:
+    """One-click demo login page. Enabled in non-prod (staging/dev) + debug."""
+    if not settings.debug and settings.environment == "prod":
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Not found")
 

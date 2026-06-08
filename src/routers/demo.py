@@ -29,7 +29,7 @@ async def demo_login(data: DemoLoginRequest):
 
     Debug-only endpoint. Returns 403 in production.
     """
-    if not settings.debug:
+    if not settings.debug and settings.environment == "prod":
         raise HTTPException(status_code=403, detail="Demo login disabled in production")
 
     token_url = (
