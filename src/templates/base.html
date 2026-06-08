@@ -21,7 +21,7 @@
        og:image="None" (literal string), which made Twitter/FB skip preview. #}
     <meta property="og:title" content="{{ og_title or t('app.name') }}">
     <meta property="og:description" content="{{ og_description or t('home.hero_subtitle') }}">
-    <meta property="og:image" content="{{ og_image or 'https://lapiazza.app/static/images/og-default.png' }}">
+    <meta property="og:image" content="{{ og_image or ('https://staging-bottega.lapiazza.app/og/lapiazza-og-v3.png' if environment == 'staging' else 'https://bottega.lapiazza.app/og/lapiazza-og-v3.png') }}">
     {# BL-177: declare og:image dimensions ONLY when known.
        - No og_image set -> using og-default.png fallback (1200x630, we know it)
        - og_image set without explicit width/height -> user upload, dimensions vary;
