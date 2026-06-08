@@ -195,8 +195,8 @@ def create_app() -> FastAPI:
     app.include_router(locandina.router)
     app.include_router(bio_card.router)
 
-    # Demo login (debug only)
-    if settings.debug:
+    # Demo login (non-prod: debug or staging/dev) -- the 16-user switcher for UAT
+    if settings.debug or settings.environment != "prod":
         from src.routers import demo
         app.include_router(demo.router)
 
