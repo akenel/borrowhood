@@ -168,6 +168,16 @@
         Skip to content
     </a>
 
+    <!-- Door: in-app browsers (WhatsApp/IG/FB) block Google sign-in -> nudge to open in a real browser -->
+    <div id="lp-webview-banner" class="hidden bg-orange-900 text-white text-sm font-semibold text-center px-8 py-2.5 relative">
+        📲 To sign in with Google, open in your browser: tap <b class="text-orange-300">⋮</b> → <b class="text-orange-300">"Open in Chrome / Safari"</b>. Or sign up with email 👇
+        <span id="lp-webview-x" class="absolute right-3 top-2 text-orange-300 cursor-pointer font-bold">✕</span>
+    </div>
+    <script>(function(){var ua=navigator.userAgent||'';
+      if(/(WhatsApp|Instagram|FBAN|FBAV|FB_IAB|Line\/|MicroMessenger|GSA\/)/i.test(ua)){
+        var b=document.getElementById('lp-webview-banner');if(b){b.classList.remove('hidden');
+          var x=document.getElementById('lp-webview-x');if(x)x.onclick=function(){b.classList.add('hidden');};}}})();</script>
+
     {% if environment and environment != 'prod' %}
     <!-- Environment badge (staging/dev): impossible to miss -->
     <div class="bg-amber-500 text-black text-xs font-bold text-center py-1 tracking-wide">
