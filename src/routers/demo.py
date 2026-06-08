@@ -37,16 +37,18 @@ async def demo_login(data: DemoLoginRequest):
         f"/protocol/openid-connect/token"
     )
 
+    form = {
+        "grant_type": "password",
+        "client_id": settings.kc_client_id,
+        "username": data.username,
+        "password": data.password,
+    }
+    # confidential client (e.g. borrowhood-web in the unified realm) needs its secret
+    secret = getattr(settings, "kc_client_secret", None)
+    if secret:
+        form["client_secret"] = secret
     async with httpx.AsyncClient(verify=False) as client:
-        resp = await client.post(
-            token_url,
-            data={
-                "grant_type": "password",
-                "client_id": settings.kc_client_id,
-                "username": data.username,
-                "password": data.password,
-            },
-        )
+        resp = await client.post(token_url, data=form)
 
     if resp.status_code != 200:
         detail = "Login failed"
