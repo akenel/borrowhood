@@ -176,6 +176,22 @@ async def create_item(
     db.add(item)
     await db.flush()
 
+    # Safety scan: off-platform funnels / scam phrasing -> auto-file a PENDING report into the
+    # moderation queue. Content heuristics only; NEVER blocks creation (wrapped, fail-open).
+    try:
+        from src.services.safety_scan import scan_listing
+        _flags = scan_listing(data.name, data.description, getattr(data, "story", "") or "")
+        if _flags:
+            import logging as _lg
+            _lg.getLogger("bh.safety").warning("listing %s auto-flagged: %s", item.id, _flags)
+            from src.models.report import BHReport, ReportReason, ReportStatus
+            db.add(BHReport(
+                reporter_id=user.id, entity_type="item", entity_id=item.id,
+                reason=ReportReason.SCAM, status=ReportStatus.PENDING,
+                detail="AUTO-FLAGGED by safety scan (not a user report): " + "; ".join(_flags)))
+    except Exception:  # noqa: BLE001 -- a safety scan must never break listing creation
+        pass
+
     # Check and award badges (e.g., FIRST_LISTING, SUPER_LENDER)
     from src.services.badges import check_and_award_badges
     await check_and_award_badges(db, user.id)
