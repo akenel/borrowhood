@@ -271,8 +271,8 @@
 
                 <!-- Right side -->
                 <div class="flex items-center gap-2 flex-shrink-0">
-                    <!-- Language dropdown -->
-                    <div class="relative hidden lg:block" x-data="{ langOpen: false }">
+                    <!-- Language dropdown (hold until xl: so the full nav has room at ~1024 and doesn't overlap) -->
+                    <div class="relative hidden xl:block" x-data="{ langOpen: false }">
                         <button @click="langOpen = !langOpen"
                                 class="flex items-center gap-1.5 px-2.5 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 rounded-lg hover:bg-gray-50 transition-colors min-h-[44px]">
                             <span class="text-base leading-none">{% if lang == 'it' %}&#127470;&#127481;{% else %}&#127468;&#127463;{% endif %}</span>
