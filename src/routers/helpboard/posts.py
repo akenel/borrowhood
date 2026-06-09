@@ -169,6 +169,23 @@ async def create_post(
     db.add(post)
     await db.commit()
 
+    # Safety scan: off-platform funnels / scam phrasing -> auto-file a PENDING report into moderation.
+    # Content heuristics only; NEVER blocks the post (wrapped, fail-open).
+    try:
+        from src.services.safety_scan import scan_listing
+        _flags = scan_listing(data.title or "", data.body or "")
+        if _flags:
+            import logging as _lg
+            _lg.getLogger("bh.safety").warning("help-post %s auto-flagged: %s", post.id, _flags)
+            from src.models.report import BHReport, ReportReason, ReportStatus
+            db.add(BHReport(
+                reporter_id=user.id, entity_type="help_post", entity_id=post.id,
+                reason=ReportReason.SCAM, status=ReportStatus.PENDING,
+                detail="AUTO-FLAGGED by safety scan (not a user report): " + "; ".join(_flags)))
+            await db.commit()
+    except Exception:  # noqa: BLE001 -- a safety scan must never break post creation
+        pass
+
     # Reload with relationships
     result = await db.execute(
         select(BHHelpPost).where(BHHelpPost.id == post.id).options(*POST_EAGER)
