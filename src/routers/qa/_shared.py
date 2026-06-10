@@ -1,6 +1,7 @@
 """Shared router instances, templates, and helpers for qa/ package."""
 
 import logging
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Request
@@ -13,6 +14,9 @@ logger = logging.getLogger("bh.qa_router")
 router = APIRouter(prefix="/api/v1/testing", tags=["QA Testing"])
 html_router = APIRouter(tags=["QA Testing - Web UI"])
 templates = Jinja2Templates(directory="src/templates")
+# Mirror the pages templates: 'now'/'now_utc' globals (base.html seasonal logic) -- else QA pages 500.
+templates.env.globals["now"] = datetime.now
+templates.env.globals["now_utc"] = lambda: datetime.now(timezone.utc)
 
 
 def _ctx(request: Request, token: Optional[dict] = None, **kwargs) -> dict:
