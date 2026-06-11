@@ -11,7 +11,7 @@
         <span class="mx-2">/</span>
         <a href="/members" class="hover:text-indigo-600">{{ t('nav.members') }}</a>
         <span class="mx-2">/</span>
-        <span class="text-gray-900">{{ workshop.workshop_name or workshop.display_name }}</span>
+        <span class="text-gray-900">{{ workshop.display_name }}</span>
         {% if user %}
         <span class="ml-auto text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium">{{ user.get('name', user.get('preferred_username', '')) }}</span>
         {% endif %}
@@ -30,12 +30,13 @@
         <div class="px-6 pb-6 -mt-12 md:-mt-16">
             <div class="flex flex-col sm:flex-row sm:items-end sm:space-x-6">
                 <!-- Avatar -->
-                <div class="w-24 h-24 md:w-32 md:h-32 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center">
-                    {% if workshop.avatar_url %}
-                    <img src="{{ workshop.avatar_url }}" alt="{{ workshop.display_name }}" class="w-full h-full rounded-full object-cover">
-                    {% else %}
-                    <span class="text-3xl md:text-4xl font-bold text-indigo-600">{{ workshop.display_name[0] }}</span>
-                    {% endif %}
+                <div class="w-24 h-24 md:w-32 md:h-32 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
+                    {# Avatar: real photo -> generated pixel-art face (no photo / dangling URL) -> initials. Never a broken 404. #}
+                    {% set pixelface = 'https://api.dicebear.com/9.x/pixel-art/svg?seed=' + (workshop.slug | urlencode) %}
+                    <img src="{{ workshop.avatar_url or pixelface }}" alt="{{ workshop.display_name }}" data-fallback="{{ pixelface }}"
+                         onerror="if(!this.dataset.tried){this.dataset.tried=1;this.src=this.dataset.fallback}else{this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'}"
+                         class="w-full h-full rounded-full object-cover">
+                    <span class="hidden w-full h-full rounded-full items-center justify-center text-3xl md:text-4xl font-bold text-indigo-600">{{ workshop.display_name[0] }}</span>
                 </div>
 
                 <!-- Name + meta -->
@@ -45,6 +46,12 @@
                             <h1 class="text-2xl font-bold text-gray-900">
                                 {{ workshop.workshop_name or workshop.display_name }}
                             </h1>
+                            {% if workshop.workshop_name and workshop.workshop_name != workshop.display_name %}
+                            <p class="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                {{ workshop.display_name }}
+                            </p>
+                            {% endif %}
                             {% if workshop.tagline %}
                             <p class="text-gray-500 mt-1">{{ workshop.tagline }}</p>
                             {% endif %}
@@ -556,6 +563,16 @@
 
             <!-- Contact -->
             <div class="bg-white rounded-lg border border-gray-200 p-6 space-y-3">
+                {# The door: Square storefront -> Workshop. Consult this master live (legends only). #}
+                {% if workshop.badge_tier.value == 'legend' %}
+                <a id="lp-consult-link" href="https://bottega.lapiazza.app/compute/legends?ask={{ workshop.display_name | urlencode }}"
+                   class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold rounded-lg hover:from-amber-600 hover:to-amber-700 focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all min-h-[44px] shadow-sm">
+                    <span class="text-lg leading-none">🔮</span>
+                    {% if lang == 'it' %}Consulta {{ workshop.display_name }}{% else %}Consult {{ workshop.display_name }}{% endif %}
+                </a>
+                <p class="text-[11px] text-gray-400 text-center -mt-1">{% if lang == 'it' %}Entra nel Laboratorio e fai una domanda{% else %}Step into the Workshop and ask a question{% endif %}</p>
+                <script>(function(){if(location.hostname.indexOf('staging')<0)return;var a=document.getElementById('lp-consult-link');if(a)a.href=a.href.replace('bottega.lapiazza.app','staging-bottega.lapiazza.app');})();</script>
+                {% endif %}
                 {% if user and user.id != workshop.id %}
                 <!-- In-app message (always available for logged-in users) -->
                 <a href="/messages?to={{ workshop.id }}"
