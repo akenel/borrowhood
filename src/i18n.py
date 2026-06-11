@@ -103,3 +103,24 @@ def detect_language(
 
     # 4. Default
     return DEFAULT_LANGUAGE
+
+
+def lang_cookie_domain(host: Optional[str]) -> Optional[str]:
+    """Cookie domain so bh_lang crosses subdomains (lapiazza.app <-> bottega.lapiazza.app).
+    Real lapiazza.app hosts -> '.lapiazza.app'; localhost/helix.local/IP -> None (host-only, dev-safe)."""
+    if not host:
+        return None
+    h = host.split(":")[0].lower()  # strip port
+    if h == "lapiazza.app" or h.endswith(".lapiazza.app"):
+        return ".lapiazza.app"
+    return None
+
+
+def write_lang_cookie(response, lang: str, host: Optional[str] = None) -> None:
+    """Persist the language choice. On lapiazza.app the cookie is cross-subdomain, so the locale
+    follows the user from the Square into the Workshop (Bottega); host-only everywhere else (dev)."""
+    kwargs = {"max_age": 365 * 24 * 3600, "samesite": "lax", "path": "/"}
+    domain = lang_cookie_domain(host)
+    if domain:
+        kwargs["domain"] = domain
+    response.set_cookie("bh_lang", lang, **kwargs)

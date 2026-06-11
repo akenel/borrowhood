@@ -7,7 +7,7 @@ from typing import Optional
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
 
-from src.i18n import detect_language, get_translator, SUPPORTED_LANGUAGES
+from src.i18n import detect_language, get_translator, SUPPORTED_LANGUAGES, write_lang_cookie
 
 logger = logging.getLogger("bh.qa_router")
 
@@ -44,5 +44,6 @@ def _render(template_name: str, ctx: dict, status_code: int = 200):
     lang = ctx.get("lang", "en")
     response = templates.TemplateResponse(template_name, ctx, status_code=status_code)
     if set_cookie:
-        response.set_cookie("bh_lang", lang, max_age=365 * 24 * 3600, samesite="lax")
+        req = ctx.get("request")
+        write_lang_cookie(response, lang, req.headers.get("host") if req else None)
     return response
