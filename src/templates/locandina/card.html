@@ -174,6 +174,15 @@
     /* Museum mode bumps the description block to fill freed space. */
     .museum .description { height: 24mm; }
 
+    /* Edition caption -- gallery-style line for art pieces ("EDITION 1 of 200" /
+       "ORIGINAL 1 of 1 No 003"). Sits under the byline; uppercase + letterspaced =
+       gallery wall label. Deliberately NOT in the museum-hide list above: edition
+       is core to an art object, so it shows in both classic and museum styles. */
+    .edition {
+      font-size: 7pt; font-weight: 700; letter-spacing: 0.09em;
+      text-transform: uppercase; color: #8B0000; margin-top: 1mm; line-height: 1.2;
+    }
+
     /* Background wash: cover image full-bleed at 12% opacity. */
     .bg-wash {
       position: absolute;
@@ -510,6 +519,11 @@
               {# Schedule line only renders for events (schedule_text=None for other types). #}
               {% if schedule_text %}
               <div class="schedule">{{ schedule_text }}</div>
+              {% endif %}
+              {# Edition caption -- art pieces only (item.attributes.edition). Gallery
+                 wall-label style; renders in classic + museum. Collapses when absent. #}
+              {% if edition_ribbon %}
+              <div class="edition">{{ edition_ribbon }}</div>
               {% endif %}
             </div>
           </div>

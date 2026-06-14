@@ -688,6 +688,52 @@ def _schedule_text(listing: BHListing, lang: str) -> str | None:
     return "Programma da definire" if lang == "it" else "Schedule TBD"
 
 
+def _edition_ribbon(item: BHItem, lang: str) -> str | None:
+    """Gallery caption for art pieces: "ORIGINAL · 1 of 1 · № 003" or "EDITION · 1 of 200".
+
+    Reads item.attributes["edition"] -- NO schema change. This is the
+    registry-free path for the first art drop (decide-per-piece edition model,
+    2026-06-14); the Edition Registry build formalizes per-copy records later.
+    The QR already points at the permanent item URL, so the same printed card
+    upgrades to the verify page for free when the registry ships.
+
+    Shape (in item.attributes):
+        {"edition": {"type": "original", "catalog_no": "003"}}
+        {"edition": {"type": "edition",  "number": 1, "total": 200}}
+
+    Returns None when the item carries no edition data -- the caption collapses,
+    so every non-art listing is completely unaffected. Renders in BOTH classic
+    and museum styles (edition is core to an art object, not chrome).
+    """
+    attrs = item.attributes or {}
+    if not isinstance(attrs, dict):
+        return None
+    ed = attrs.get("edition")
+    if not isinstance(ed, dict):
+        return None
+    is_it = lang == "it"
+    of = "di" if is_it else "of"
+    etype = str(ed.get("type") or "").lower()
+    if etype == "original":
+        parts = ["ORIGINALE" if is_it else "ORIGINAL", f"1 {of} 1"]
+        cat = ed.get("catalog_no") or ed.get("catalog")
+        if cat not in (None, ""):
+            parts.append(f"№ {str(cat).strip()}")
+        return " · ".join(parts)
+    if etype == "edition":
+        label = "EDIZIONE" if is_it else "EDITION"
+        num, tot = ed.get("number"), ed.get("total")
+        try:
+            if num and tot:
+                return f"{label} · {int(num)} {of} {int(tot)}"
+            if tot:
+                return f"{label} · 1 {of} {int(tot)}"
+        except (ValueError, TypeError):
+            return label
+        return label
+    return None
+
+
 @router.get("/{listing_id}/locandina.pdf")
 async def generate_locandina(
     listing_id: UUID,
@@ -762,6 +808,7 @@ async def generate_locandina(
     ctx = {
         "title": item.name,
         "schedule_text": _schedule_text(listing, lang),
+        "edition_ribbon": _edition_ribbon(item, lang),
         "byline": _byline(owner),
         "avatar_url": avatar_url,
         "cover_url": cover_url,
