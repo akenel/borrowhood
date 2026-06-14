@@ -89,7 +89,7 @@
             <div class="divide-y divide-gray-100">
                 <template x-for="m in members" :key="m.slug">
                     <div class="flex items-center gap-3 py-2.5">
-                        <img :src="m.avatar || '/static/images/avatar-default.svg'" @error="$el.src='/static/images/avatar-default.svg'" class="w-9 h-9 rounded-full object-cover bg-gray-100 flex-shrink-0">
+                        <img :src="m.avatar || window.lpAvatar(m.name)" @error="$el.src=window.lpAvatar(m.name)" class="w-9 h-9 rounded-full object-cover bg-gray-100 flex-shrink-0">
                         <div class="flex-1 min-w-0">
                             <a :href="'/workshop/' + m.slug" class="font-semibold text-gray-900 hover:text-indigo-600 truncate block" x-text="m.name"></a>
                             <div class="text-xs text-gray-500"><span x-text="m.views"></span> view<span x-show="m.views>1">s</span> · last <span x-text="ago(m.last_seen)"></span></div>
@@ -828,7 +828,7 @@
                                             <img :src="review.reviewer_avatar" class="w-8 h-8 rounded-full object-cover" :alt="review.reviewer_name">
                                         </template>
                                         <template x-if="!review.reviewer_avatar">
-                                            <span class="text-xs font-medium text-gray-500" x-text="(review.reviewer_name || '?').charAt(0).toUpperCase()"></span>
+                                            <img :src="window.lpAvatar(review.reviewer_name)" class="w-8 h-8 rounded-full object-cover" :alt="review.reviewer_name">
                                         </template>
                                     </div>
                                     <div>
@@ -1703,9 +1703,7 @@
                     {% if item.owner.avatar_url %}
                     <img src="{{ item.owner.avatar_url }}" alt="{{ item.owner.display_name }}" class="w-12 h-12 rounded-full object-cover">
                     {% else %}
-                    <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
-                        <span class="text-lg font-bold text-indigo-600">{{ item.owner.display_name[0] }}</span>
-                    </div>
+                    <img src="/api/v1/avatar/{{ item.owner.display_name | urlencode }}.svg" alt="{{ item.owner.display_name }}" class="w-12 h-12 rounded-full object-cover">
                     {% endif %}
                     <div>
                         <p class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
@@ -2329,7 +2327,7 @@
                             {% if item.owner.avatar_url %}
                             <img src="{{ item.owner.avatar_url }}" alt="{{ item.owner.display_name }}" class="w-10 h-10 rounded-full object-cover">
                             {% else %}
-                            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">{{ item.owner.display_name[0] | upper }}</div>
+                            <img src="/api/v1/avatar/{{ item.owner.display_name | urlencode }}.svg" alt="{{ item.owner.display_name }}" class="w-10 h-10 rounded-full object-cover">
                             {% endif %}
                             <div>
                                 <p class="text-sm font-semibold text-gray-900">{{ item.owner.display_name }}</p>

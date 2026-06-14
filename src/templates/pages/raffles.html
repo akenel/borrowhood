@@ -199,12 +199,7 @@
                     <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
                         <!-- Organizer -->
                         <a :href="r.organizer_slug ? '/workshop/' + r.organizer_slug : '#'" class="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity" @click.stop>
-                            <template x-if="r.organizer_avatar">
-                                <img :src="r.organizer_avatar" class="w-8 h-8 rounded-full object-cover ring-2 ring-amber-200 flex-shrink-0">
-                            </template>
-                            <template x-if="!r.organizer_avatar">
-                                <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-bold ring-2 ring-amber-200 flex-shrink-0" x-text="(r.organizer_name || '?')[0]"></div>
-                            </template>
+                            <img :src="r.organizer_avatar || window.lpAvatar(r.organizer_name)" class="w-8 h-8 rounded-full object-cover ring-2 ring-amber-200 flex-shrink-0">
                             <div class="min-w-0">
                                 <p class="text-sm font-semibold text-gray-900 truncate" x-text="r.organizer_name || 'Organizer'"></p>
                                 <p class="text-[10px] text-gray-400">{% if lang == 'it' %}Organizzatore{% else %}Organizer{% endif %}</p>

@@ -1248,12 +1248,7 @@
                                     <a :href="'/workshop/' + fav.favorite_user.slug" class="block p-6">
                                         <div class="flex items-start space-x-4">
                                             <div class="w-14 h-14 rounded-full flex-shrink-0 flex items-center justify-center bg-gray-100">
-                                                <template x-if="fav.favorite_user.avatar_url">
-                                                    <img :src="fav.favorite_user.avatar_url" :alt="fav.favorite_user.display_name" class="w-14 h-14 rounded-full object-cover">
-                                                </template>
-                                                <template x-if="!fav.favorite_user.avatar_url">
-                                                    <span class="text-xl font-bold text-gray-500" x-text="fav.favorite_user.display_name[0]"></span>
-                                                </template>
+                                                <img :src="fav.favorite_user.avatar_url || window.lpAvatar(fav.favorite_user.display_name)" :alt="fav.favorite_user.display_name" class="w-14 h-14 rounded-full object-cover">
                                             </div>
                                             <div class="flex-1 min-w-0">
                                                 <h3 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors truncate" x-text="fav.favorite_user.display_name"></h3>

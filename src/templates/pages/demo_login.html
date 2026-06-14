@@ -72,10 +72,9 @@
                      class="w-12 h-12 rounded-full flex-shrink-0 object-cover border-2"
                      style="border-color: {% if du.color == 'amber' %}#FDE68A{% elif du.color == 'purple' %}#E9D5FF{% elif du.color == 'emerald' %}#A7F3D0{% elif du.color == 'blue' %}#BFDBFE{% else %}#E5E7EB{% endif %};">
                 {% else %}
-                <div class="w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center text-lg font-bold"
-                     style="{{ badge_styles[du.badge] }}">
-                    {{ du.display_name[0] }}
-                </div>
+                <img src="/api/v1/avatar/{{ du.display_name | urlencode }}.svg" alt="{{ du.display_name }}"
+                     class="w-12 h-12 rounded-full flex-shrink-0 object-cover border-2"
+                     style="border-color: {% if du.color == 'amber' %}#FDE68A{% elif du.color == 'purple' %}#E9D5FF{% elif du.color == 'emerald' %}#A7F3D0{% elif du.color == 'blue' %}#BFDBFE{% else %}#E5E7EB{% endif %};">
                 {% endif %}
 
                 <div class="flex-1 min-w-0">

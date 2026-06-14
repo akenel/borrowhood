@@ -213,7 +213,7 @@
                             {% if member.avatar_url %}
                             <img src="{{ member.avatar_url }}" alt="{{ member.display_name }}" class="w-14 h-14 rounded-full object-cover">
                             {% else %}
-                            <span class="text-xl font-bold text-{{ badge_color }}-600">{{ member.display_name[0] | upper }}</span>
+                            <img src="/api/v1/avatar/{{ member.display_name | urlencode }}.svg" alt="{{ member.display_name }}" class="w-14 h-14 rounded-full object-cover">
                             {% endif %}
                         </div>
                         <div class="flex-1 min-w-0">

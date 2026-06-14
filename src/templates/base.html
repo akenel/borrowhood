@@ -76,6 +76,16 @@
         }
     </script>
 
+    <script>
+        // One source of truth for the "no photo" avatar (server: services/avatar.py).
+        // Deterministic generative SVG per name -- same person, same mark, everywhere.
+        // Used by every Alpine :src fallback so we never show a bare letter again.
+        window.lpAvatar = function (seed) {
+            var s = (seed == null ? '' : String(seed)).trim();
+            return '/api/v1/avatar/' + encodeURIComponent(s || 'anon') + '.svg';
+        };
+    </script>
+
     <!-- Regular CSS: mobile readability + prose styles -->
     <style>
         [x-cloak] { display: none !important; }
@@ -390,8 +400,9 @@
                                 aria-label="{{ t('nav.profile') }}"
                                 class="flex items-center gap-2 p-1 pr-2 rounded-lg hover:bg-gray-50 transition-colors min-h-[44px]">
                             <div class="w-9 h-9 rounded-full bg-indigo-100 ring-2 ring-indigo-200 hover:ring-indigo-400 transition-all relative overflow-hidden flex items-center justify-center flex-shrink-0">
-                                <span class="text-sm font-bold text-indigo-600" data-fallback="{{ user.get('preferred_username', '?')[0] | upper }}" x-text="u ? (u.display_name||'?')[0] : $el.dataset.fallback"></span>
-                                <img x-show="u && u.avatar_url" :src="u ? u.avatar_url : ''" @error="$el.style.display='none'" class="absolute inset-0 w-full h-full object-cover rounded-full">
+                                <img :src="(u && u.avatar_url) ? u.avatar_url : window.lpAvatar(u ? (u.display_name || u.username) : '{{ user.get('preferred_username','') }}')"
+                                     @error="$el.src=window.lpAvatar(u ? (u.display_name || u.username) : '{{ user.get('preferred_username','') }}')"
+                                     class="absolute inset-0 w-full h-full object-cover rounded-full">
                             </div>
                             {# Logged-in display name -- visible on sm+ so users always know
                                which account they are on without having to open the dropdown.

@@ -132,7 +132,7 @@
                         <span x-text="idx + 1"></span>
                     </div>
                     <!-- Avatar -->
-                    <img :src="user.avatar_url || '/static/images/avatars/default.svg'" :alt="user.display_name"
+                    <img :src="user.avatar_url || window.lpAvatar(user.display_name)" :alt="user.display_name"
                          class="w-10 h-10 rounded-full object-cover border-2"
                          :class="idx === 0 ? 'border-amber-400' : idx === 1 ? 'border-gray-300' : idx === 2 ? 'border-orange-400' : 'border-gray-200'">
                     <!-- Info -->
@@ -173,7 +173,7 @@
                     <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
                         <svg class="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 23c-3.866 0-7-3.134-7-7 0-3 2-5.5 4-8.5.667-1 1.167-1.833 1.5-2.5.333.667.833 1.5 1.5 2.5 2 3 4 5.5 4 8.5 0 3.866-3.134 7-7 7z"/></svg>
                     </div>
-                    <img :src="user.avatar_url || '/static/images/avatars/default.svg'" class="w-10 h-10 rounded-full object-cover border-2 border-amber-200 flex-shrink-0">
+                    <img :src="user.avatar_url || window.lpAvatar(user.display_name)" class="w-10 h-10 rounded-full object-cover border-2 border-amber-200 flex-shrink-0">
                     <div class="flex-1 min-w-0">
                         <span class="font-semibold text-gray-900 truncate block" x-text="user.display_name"></span>
                     </div>
@@ -200,7 +200,7 @@
                          :class="idx === 0 ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-500'">
                         <span x-text="idx + 1"></span>
                     </div>
-                    <img :src="host.avatar_url || '/static/images/avatars/default.svg'" class="w-10 h-10 rounded-full object-cover border-2 border-indigo-200 flex-shrink-0">
+                    <img :src="host.avatar_url || window.lpAvatar(host.display_name)" class="w-10 h-10 rounded-full object-cover border-2 border-indigo-200 flex-shrink-0">
                     <div class="flex-1 min-w-0">
                         <span class="font-semibold text-gray-900 truncate block" x-text="host.display_name"></span>
                     </div>

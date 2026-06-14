@@ -350,9 +350,7 @@
                         {% if raffle.organizer and raffle.organizer.avatar_url %}
                         <img src="{{ raffle.organizer.avatar_url }}" class="w-10 h-10 rounded-full object-cover ring-2 ring-amber-200">
                         {% else %}
-                        <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold ring-2 ring-amber-200">
-                            {{ (raffle.organizer.display_name or '?')[0] | upper if raffle.organizer else '?' }}
-                        </div>
+                        <img src="/api/v1/avatar/{{ (raffle.organizer.display_name if raffle.organizer else 'anon') | urlencode }}.svg" class="w-10 h-10 rounded-full object-cover ring-2 ring-amber-200">
                         {% endif %}
                         <div>
                             <a href="/workshop/{{ raffle.organizer.slug if raffle.organizer else '' }}" class="text-sm font-semibold text-gray-900 hover:text-indigo-600">
