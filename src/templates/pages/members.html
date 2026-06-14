@@ -210,11 +210,7 @@
                     <!-- Header: avatar + name + workshop + tagline -->
                     <div class="flex items-start gap-3">
                         <div class="w-14 h-14 rounded-full flex-shrink-0 flex items-center justify-center bg-{{ badge_color }}-100 ring-2 ring-{{ badge_color }}-200 overflow-hidden">
-                            {% if member.avatar_url %}
-                            <img src="{{ member.avatar_url }}" alt="{{ member.display_name }}" class="w-14 h-14 rounded-full object-cover">
-                            {% else %}
-                            <img src="/api/v1/avatar/{{ member.display_name | urlencode }}.svg" alt="{{ member.display_name }}" class="w-14 h-14 rounded-full object-cover">
-                            {% endif %}
+                            {{ avatar(member.display_name, member.avatar_url, "w-14 h-14") }}
                         </div>
                         <div class="flex-1 min-w-0">
                             <h3 class="text-base font-bold text-gray-900 group-hover:text-indigo-600 transition-colors truncate">{{ member.display_name }}</h3>

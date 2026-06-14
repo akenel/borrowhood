@@ -61,13 +61,7 @@
                 <div class="relative group flex-shrink-0"
                      x-data="{ uploading: false }"
                      >
-                    {% if profile_user and profile_user.avatar_url %}
-                    <img src="{{ profile_user.avatar_url }}" alt="{{ profile_user.display_name }}"
-                         class="w-20 h-20 rounded-full bg-white border-4 border-white shadow-lg object-cover">
-                    {% else %}
-                    <img src="/api/v1/avatar/{{ (profile_user.display_name if profile_user else user.get('given_name', 'anon')) | urlencode }}.svg" alt="avatar"
-                         class="w-20 h-20 rounded-full bg-white border-4 border-white shadow-lg object-cover">
-                    {% endif %}
+                    {{ avatar((profile_user.display_name if profile_user else user.get('given_name', 'anon')), (profile_user.avatar_url if profile_user else None), "w-20 h-20 bg-white border-4 border-white shadow-lg") }}
                     {% if is_owner %}
                     <!-- Upload avatar button (always visible, works on touch) -->
                     <label class="absolute -bottom-1 -right-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-1.5 cursor-pointer shadow-md transition-colors"

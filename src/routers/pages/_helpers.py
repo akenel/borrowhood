@@ -36,6 +36,14 @@ templates.env.globals["now_utc"] = lambda: datetime.now(timezone.utc)
 from src.config import settings as _settings
 templates.env.globals["environment"] = _settings.environment
 
+# The ONE avatar component (components/_avatar.html). Registered global, so every
+# page can call {{ avatar(name, src, classes) }} with no import. Defined once;
+# change the avatar everywhere by changing that file. Kills the "check all the
+# seals" duplication that made tonight's avatar work a 14-file edit.
+templates.env.globals["avatar"] = templates.env.get_template(
+    "components/_avatar.html"
+).module.avatar
+
 
 def _last_seen(dt, lang="en"):
     """Human-readable 'last seen' from a datetime."""

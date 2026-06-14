@@ -67,15 +67,8 @@
                 style="border-color: {% if du.color == 'amber' %}#FDE68A{% elif du.color == 'purple' %}#E9D5FF{% elif du.color == 'emerald' %}#A7F3D0{% elif du.color == 'blue' %}#BFDBFE{% else %}#E5E7EB{% endif %};">
             <div class="flex items-start space-x-4">
                 <!-- Avatar -->
-                {% if du.avatar %}
-                <img src="{{ du.avatar }}" alt="{{ du.display_name }}"
-                     class="w-12 h-12 rounded-full flex-shrink-0 object-cover border-2"
-                     style="border-color: {% if du.color == 'amber' %}#FDE68A{% elif du.color == 'purple' %}#E9D5FF{% elif du.color == 'emerald' %}#A7F3D0{% elif du.color == 'blue' %}#BFDBFE{% else %}#E5E7EB{% endif %};">
-                {% else %}
-                <img src="/api/v1/avatar/{{ du.display_name | urlencode }}.svg" alt="{{ du.display_name }}"
-                     class="w-12 h-12 rounded-full flex-shrink-0 object-cover border-2"
-                     style="border-color: {% if du.color == 'amber' %}#FDE68A{% elif du.color == 'purple' %}#E9D5FF{% elif du.color == 'emerald' %}#A7F3D0{% elif du.color == 'blue' %}#BFDBFE{% else %}#E5E7EB{% endif %};">
-                {% endif %}
+                {% set _bc = '#FDE68A' if du.color == 'amber' else '#E9D5FF' if du.color == 'purple' else '#A7F3D0' if du.color == 'emerald' else '#BFDBFE' if du.color == 'blue' else '#E5E7EB' %}
+                {{ avatar(du.display_name, du.avatar, "w-12 h-12 flex-shrink-0 border-2", "border-color: " ~ _bc) }}
 
                 <div class="flex-1 min-w-0">
                     <h3 class="font-semibold text-gray-900">{{ du.display_name }}</h3>

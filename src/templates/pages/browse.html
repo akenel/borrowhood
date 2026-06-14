@@ -478,11 +478,7 @@
                     {% if item.owner %}
                     <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
                         <a href="/workshop/{{ item.owner.slug }}" class="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity" @click.stop>
-                            {% if item.owner.avatar_url %}
-                            <img src="{{ item.owner.avatar_url }}" alt="{{ item.owner.display_name }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-indigo-100 flex-shrink-0">
-                            {% else %}
-                            <img src="/api/v1/avatar/{{ item.owner.display_name | urlencode }}.svg" alt="{{ item.owner.display_name }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-indigo-100 flex-shrink-0">
-                            {% endif %}
+                            {{ avatar(item.owner.display_name, item.owner.avatar_url, "w-8 h-8 ring-2 ring-indigo-100 flex-shrink-0") }}
                             <div class="min-w-0">
                                 <p class="text-sm font-semibold text-gray-900 truncate">{{ item.owner.display_name }}</p>
                                 {% if item.owner.languages %}

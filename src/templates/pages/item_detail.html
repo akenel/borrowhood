@@ -1700,11 +1700,7 @@
             <div class="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">{{ t('item.listed_by') }}</h3>
                 <a href="/workshop/{{ item.owner.slug }}" class="flex items-center space-x-3 group">
-                    {% if item.owner.avatar_url %}
-                    <img src="{{ item.owner.avatar_url }}" alt="{{ item.owner.display_name }}" class="w-12 h-12 rounded-full object-cover">
-                    {% else %}
-                    <img src="/api/v1/avatar/{{ item.owner.display_name | urlencode }}.svg" alt="{{ item.owner.display_name }}" class="w-12 h-12 rounded-full object-cover">
-                    {% endif %}
+                    {{ avatar(item.owner.display_name, item.owner.avatar_url, "w-12 h-12") }}
                     <div>
                         <p class="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
                             {{ item.owner.workshop_name or item.owner.display_name }}
@@ -2324,11 +2320,7 @@
                         <!-- Who you're reviewing -->
                         {% if item.owner %}
                         <div class="mb-4 p-3 bg-gray-50 rounded-lg flex items-center gap-3">
-                            {% if item.owner.avatar_url %}
-                            <img src="{{ item.owner.avatar_url }}" alt="{{ item.owner.display_name }}" class="w-10 h-10 rounded-full object-cover">
-                            {% else %}
-                            <img src="/api/v1/avatar/{{ item.owner.display_name | urlencode }}.svg" alt="{{ item.owner.display_name }}" class="w-10 h-10 rounded-full object-cover">
-                            {% endif %}
+                            {{ avatar(item.owner.display_name, item.owner.avatar_url, "w-10 h-10") }}
                             <div>
                                 <p class="text-sm font-semibold text-gray-900">{{ item.owner.display_name }}</p>
                                 <p class="text-xs text-gray-500">{{ item.owner.workshop_name or item.owner.tagline or '' }}</p>

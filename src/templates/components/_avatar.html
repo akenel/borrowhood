@@ -1,0 +1,18 @@
+{# The ONE server-side avatar. Real photo if present, else our generative mark
+   (services/avatar.py via /api/v1/avatar/{seed}.svg) -- and if a real photo URL
+   404s, onerror drops to the same generative mark. Never a bare letter, never an
+   external service. Registered as a global in pages/_helpers.py, so it's just
+   {{ avatar(...) }} in any page -- no import needed. Client-rendered (Alpine)
+   lists use window.lpAvatar() in base.html: the same contract, the other context.
+
+   Usage:  {{ avatar(user.display_name, user.avatar_url, "w-14 h-14") }}
+           {{ avatar(u.display_name, u.avatar_url, "w-8 h-8 ring-2 ring-indigo-100") }}
+
+   Change the avatar everywhere -> change it HERE, once. That is the whole point.
+#}
+{% macro avatar(name, src=None, classes="w-10 h-10", style="") -%}
+{%- set gen = "/api/v1/avatar/" ~ (name | default("anon", true) | urlencode) ~ ".svg" -%}
+<img src="{{ src or gen }}" alt="{{ name | default('avatar', true) }}"
+     onerror="this.onerror=null;this.src='{{ gen }}'"
+     class="{{ classes }} rounded-full object-cover"{% if style %} style="{{ style }}"{% endif %}>
+{%- endmacro %}
