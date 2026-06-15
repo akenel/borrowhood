@@ -50,3 +50,27 @@ jobs:
 
       - name: Run tests
         run: python -m pytest tests/ -v --tb=short
+
+      # The gate that tells you when it breaks. A green CI that fails silent is
+      # how this suite stayed red for 5+ days (#147). On ANY failed run, ping
+      # Telegram so a red build can't become wallpaper again. Secrets:
+      # TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID (set via `gh secret set`).
+      - name: Alert Telegram on failure
+        if: failure()
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$TG_TOKEN" ] || [ -z "$TG_CHAT" ]; then
+            echo "Telegram secrets not set — skipping alert"; exit 0
+          fi
+          SHORT=$(echo "$GITHUB_SHA" | cut -c1-7)
+          TEXT=$(printf '🔴 <b>BorrowHood CI failed</b>\nbranch <code>%s</code> · commit <code>%s</code>\nby %s\n%s' \
+            "$GITHUB_REF_NAME" "$SHORT" "$GITHUB_ACTOR" "$RUN_URL")
+          curl -sS "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            --data-urlencode chat_id="${TG_CHAT}" \
+            --data-urlencode parse_mode="HTML" \
+            --data-urlencode disable_web_page_preview="true" \
+            --data-urlencode "text=${TEXT}" >/dev/null \
+            && echo "Telegram alert sent"
