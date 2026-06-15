@@ -1,5 +1,6 @@
 """Static/utility pages: demo-login, terms, legal, robots, sitemap."""
 
+import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
@@ -25,6 +26,39 @@ from ._helpers import (
 )
 
 router = APIRouter(tags=["pages"])
+
+logger = logging.getLogger(__name__)
+
+
+async def _kc_existing_usernames() -> Optional[set]:
+    """Usernames that actually exist in the app's Keycloak realm, lowercased.
+
+    Returns None if KC is unreachable so callers fall back to their full list
+    (the demo page must never hard-break just because KC is down). Only used by
+    the demo-login page, which is non-prod (404 in prod), so the master-realm
+    admin creds here are the dev/staging ones (helix_pass everywhere)."""
+    import httpx
+    try:
+        async with httpx.AsyncClient(timeout=4.0) as client:
+            tok = await client.post(
+                "http://keycloak:8080/realms/master/protocol/openid-connect/token",
+                data={"grant_type": "password", "client_id": "admin-cli",
+                      "username": "helix_user", "password": "helix_pass"},
+            )
+            if tok.status_code != 200:
+                return None
+            admin = tok.json()["access_token"]
+            resp = await client.get(
+                f"http://keycloak:8080/admin/realms/{settings.kc_realm}/users",
+                params={"max": 2000, "briefRepresentation": "true"},
+                headers={"Authorization": f"Bearer {admin}"},
+            )
+            if resp.status_code != 200:
+                return None
+            return {(u.get("username") or "").lower() for u in resp.json()}
+    except Exception as e:  # noqa: BLE001 -- never break the page on KC hiccups
+        logger.warning("demo-login: KC username check failed (%s); showing full list", e)
+        return None
 
 @router.get("/demo-login", response_class=HTMLResponse)
 async def demo_login_page(
@@ -55,6 +89,13 @@ async def demo_login_page(
         {"username": "anne", "display_name": "Anne Muthoni", "workshop": None, "roles": "qa-tester", "badge": "active", "color": "blue", "avatar": f"{_av}/anne.svg"},
         {"username": "nicolo", "display_name": "Nicol\u00f2 Roccamena", "workshop": "Nic's Dojo", "roles": "ambassador, lender", "badge": "active", "color": "rose", "avatar": f"{_av}/nicolo.svg"},
     ]
+
+    # Self-correcting cast (#146): only show personas that can actually log in,
+    # i.e. exist in Keycloak. Stops the hardcoded list drifting ahead of the realm
+    # (phantom users used to 401 on click). Falls back to the full list if KC is down.
+    kc_users = await _kc_existing_usernames()
+    if kc_users is not None:
+        demo_users = [du for du in demo_users if du["username"].lower() in kc_users]
 
     # Use real avatar_url from DB so demo login matches profile pages
     emails = [f"{du['username']}@borrowhood.local" for du in demo_users]
