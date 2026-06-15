@@ -129,13 +129,16 @@ async def test_calendar_api_returns_events(db_client):
 
 @pytest.mark.asyncio
 async def test_members_trust_score_has_label(db_client):
-    """Trust score renders with visible 'Trust score:' label, not bare '15%'."""
+    """Trust score renders with an accessible label + a % value, not a bare
+    number. De-brittled (#147): assert STRUCTURE, not exact copy — the label
+    moved from inline 'Trust score: NN%' to a title= tooltip on a coloured badge."""
     resp = await db_client.get("/members?sort=trust")
     html = resp.text
-    # Must have label + colon + %
     import re
-    # Matches "Trust score: 15%" or "Trust score: 88%" etc.
-    assert re.search(r"Trust score:\s*\d+%", html), "Trust score label missing"
+    # A trust-labelled element (tooltip) ...
+    assert re.search(r'title="[^"]*[Tt]rust[^"]*"', html), "Trust score label missing"
+    # ... and a percentage value rendered on the page.
+    assert re.search(r">\s*\d+%\s*<", html), "Trust score percentage missing"
 
 
 # ── Home page ──
@@ -143,11 +146,11 @@ async def test_members_trust_score_has_label(db_client):
 
 @pytest.mark.asyncio
 async def test_home_hero_has_concierge_teaser(db_client):
-    """Home hero shows AI Concierge teaser link."""
+    """Home surfaces the AI Concierge. De-brittled (#147): assert the feature is
+    present (brand name or its route), not a specific tagline that churns."""
     resp = await db_client.get("/")
     html = resp.text
-    # Either EN or IT teaser copy
-    assert "Ask our AI" in html or "chiedi all'AI" in html
+    assert "AI Concierge" in html or "/concierge" in html
 
 
 @pytest.mark.asyncio

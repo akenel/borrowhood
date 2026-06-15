@@ -239,16 +239,24 @@ class TestOgDefaultImageFallback:
     the fallback must be a real 1200x630 share card -- platforms reject
     or hide images smaller than ~600x300."""
 
-    def test_base_html_og_image_falls_back_to_og_default_png(self):
-        assert "/static/images/og-default.png" in BASE_HTML, (
-            "base.html must reference /static/images/og-default.png as the "
-            "OG image fallback (was icon-192.png which is too small for "
-            "platform previews)"
+    def test_base_html_og_image_is_preview_sized_not_favicon(self):
+        """OG image must be a real preview-sized card, never the 192x192 favicon.
+        De-brittled (#147): assert the BEHAVIOUR (a big La Piazza card + known
+        1200x630 dims), not one hardcoded filename — the card evolved from
+        og-default.png to the env-aware lapiazza-og v3 card."""
+        import re
+        m = re.search(r'<meta property="og:image" content="([^"]+)"', BASE_HTML)
+        assert m, "base.html must declare an og:image meta tag"
+        og_image = m.group(1)
+        assert "icon-192" not in og_image, (
+            "og:image must not be the 192x192 favicon -- too small for "
+            "Facebook/LinkedIn/Twitter preview cards"
         )
-        assert "icon-192.png" not in BASE_HTML.split("<meta")[1].split("</head>")[0], (
-            "OG image fallback must NOT use icon-192.png anymore -- 192x192 "
-            "is too small for Facebook/LinkedIn/Twitter preview cards"
+        assert re.search(r"(lapiazza-og|og-default)", og_image), (
+            "og:image should be the La Piazza preview card"
         )
+        # the fallback's known dimensions must be declared (1200x630)
+        assert "1200" in BASE_HTML and "630" in BASE_HTML
 
     def test_og_image_dimensions_only_declared_when_known(self):
         """BL-177: don't LIE about dimensions. Hardcoded 1200x630 was wrong

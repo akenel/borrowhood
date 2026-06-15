@@ -266,17 +266,20 @@ async def test_homepage_returns_200(db_client):
 
 @pytest.mark.asyncio
 async def test_homepage_has_quick_start(db_client):
-    """Homepage has the quick-start funnel for logged-out users."""
+    """Logged-out homepage offers a clear funnel. De-brittled (#147): the anon
+    hero now drives the two-path funnel (Browse + Log in); the old '60 seconds'
+    strip moved to a logged-in-only block. Assert the funnel paths exist."""
     resp = await db_client.get("/")
     assert resp.status_code == 200
-    assert "60 seconds" in resp.text or "60 secondi" in resp.text
+    assert "/browse" in resp.text and "/login" in resp.text
 
 
 @pytest.mark.asyncio
 async def test_homepage_has_sign_in_cta(db_client):
-    """Homepage has Sign In as the primary CTA for logged-out users."""
+    """Homepage gives logged-out users a login path. De-brittled (#147): assert
+    the login route, not the old '/auth/login' path (the route is now /login)."""
     resp = await db_client.get("/")
-    assert "/auth/login" in resp.text
+    assert "/login" in resp.text
 
 
 # ── Lockbox returns null not 404 ──
