@@ -91,6 +91,11 @@ async def seed_database(db: AsyncSession) -> dict:
     user_map = {}  # slug -> user object
     listing_map = {}  # item_slug -> first listing object
 
+    # Representative trust scores by tier so fresh-seeded envs (CI/staging/dev)
+    # render a meaningful /members?sort=trust instead of an all-null tie. Real
+    # prod scores accrue from activity; this just gives the seed realistic data. (#147)
+    _trust_by_tier = {"legend": 92, "pillar": 78, "trusted": 60, "active": 42, "newcomer": 18}
+
     # Create users
     for u in data["users"]:
         user = BHUser(
@@ -117,6 +122,7 @@ async def seed_database(db: AsyncSession) -> dict:
             offers_repair=u.get("offers_repair", False),
             account_status=AccountStatus.ACTIVE,
             badge_tier=_enum_val(BadgeTier, u.get("badge_tier", "newcomer")),
+            trust_score=u.get("trust_score", _trust_by_tier.get(u.get("badge_tier", "newcomer"), 25)),
         )
         db.add(user)
         await db.flush()
