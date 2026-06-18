@@ -23,8 +23,11 @@ Later blocks wire:
 
 import base64
 import logging
+import mimetypes
 import os
 from io import BytesIO
+from pathlib import Path
+from urllib.parse import urlparse
 from uuid import UUID
 
 import qrcode
@@ -180,6 +183,34 @@ def _absolute_image_url(url: str | None, public_base: str) -> str | None:
     if url.startswith("/"):
         return f"{public_base}{url}"
     return f"{public_base}/{url}"
+
+
+# WeasyPrint resolves <img> URLs by itself. The absolute URLs above point back at
+# THIS app's /static -- which means WeasyPrint makes an HTTP round-trip to the same
+# (single-worker) process that's busy inside write_pdf serving this very request.
+# The worker can't answer its own call -> ~10s read timeout per image -> the cover +
+# avatar silently blank (HTTP 200, no 5xx). A self-request deadlock; pre-flight passes
+# (async, before the render) but the render dies. (Diagnosed on prod 2026-06-17.)
+#
+# Fix: serve our own /static/... assets straight from local disk so WeasyPrint never
+# touches the network. Faster, scheme/host-independent, and immune to the deadlock.
+# Anything else (a genuinely external image, a data: URI) falls through to the default.
+mimetypes.add_type("image/webp", ".webp")  # some boxes lack this -> .webp served as text/plain -> rejected
+_STATIC_ROOT = Path(__file__).resolve().parents[1] / "static"   # /app/src/static
+
+
+def _local_url_fetcher(url: str):
+    """url_fetcher for WeasyPrint: map our own /static/<path> to a disk read; else default."""
+    from weasyprint import default_url_fetcher  # local import: keep weasyprint lazy (see route)
+    if not url.startswith("data:"):
+        path = urlparse(url).path
+        if path.startswith("/static/"):
+            candidate = _STATIC_ROOT / path[len("/static/"):]
+            if candidate.is_file():
+                mime, _ = mimetypes.guess_type(str(candidate))
+                return {"string": candidate.read_bytes(),
+                        "mime_type": mime or "application/octet-stream"}
+    return default_url_fetcher(url)
 
 
 # Bruce Lee Easter egg quotes (bonus #11 from the spec). Each listing
@@ -848,7 +879,8 @@ async def generate_locandina(
     # WeasyPrint imported at call-time so missing system libs surface a clear
     # error on the first request rather than at module import / app boot.
     from weasyprint import HTML  # noqa: WPS433
-    pdf_bytes = HTML(string=html).write_pdf()
+    # url_fetcher reads our own /static assets from disk -> no self-HTTP deadlock (cover/avatar blank).
+    pdf_bytes = HTML(string=html, url_fetcher=_local_url_fetcher).write_pdf()
 
     filename = f"locandina-{item.slug}.pdf"
     return StreamingResponse(
