@@ -10,6 +10,8 @@
 
 **Last tested:** borrowhood April 6, 2026 -- PASSED (328 users, 813 items). banco_prod restore drill
 runs and passes nightly (decrypt+restore, row counts matched — see `/opt/backups/banco/backup.log`).
+**banco_prod offsite + KeePass key VERIFIED July 1, 2026** — decrypted an offsite Drive/laptop blob with
+the KeePass passphrase → valid `PostgreSQL database dump`. Full DR pair proven (ciphertext ↔ key).
 
 ---
 
