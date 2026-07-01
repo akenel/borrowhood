@@ -253,12 +253,14 @@ encrypted at rest, restore-drilled nightly, and copied offsite to Google Drive.
 
 ## 🔑 The Encryption Key — WITHOUT IT THE OFFSITE BACKUPS ARE BRICKS
 
-- Lives on the box at `/root/.banco-backup-key` (root-only), **65 bytes**, fingerprint
-  sha256[:16] = `4de994a0ef02fd82`.
-- A **copy MUST be in the KeePass kdbx** (which is itself on Drive). The Drive blobs are AES256
-  ciphertext — with no key, they are unrecoverable. Key in kdbx + ciphertext on Drive = the DR pair.
-- gpg uses **only the first line** of the key file. If you re-create the key from KeePass, it must
-  reproduce that first line exactly (watch for trailing newlines).
+- Lives on the box at `/root/.banco-backup-key` (root-only). The file is **65 bytes = a
+  64-character passphrase + a trailing newline**.
+- gpg uses **only the first line** (the **64 chars**, no newline). The fingerprint of THAT value —
+  the one your KeePass copy must match — is **sha256[:16] = `40a186b8c701f205`**. (The whole-file
+  hash `4de994a0ef02fd82` includes the newline and is NOT what gpg uses — don't verify against it.)
+- A **copy of the exact 64 chars MUST be in the KeePass kdbx** (which is itself on Drive). The Drive
+  blobs are AES256 ciphertext — with no key, they are unrecoverable. Key in kdbx + ciphertext on
+  Drive = the DR pair. Get the value with `ssh root@46.62.138.218 'head -1 /root/.banco-backup-key | tr -d "\n"; echo'`.
 - **PROVE it works — see "Verify your KeePass key" at the bottom. Do this at least once.**
 
 ## Quick Reference (Banco)
