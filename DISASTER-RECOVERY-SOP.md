@@ -6,12 +6,48 @@
 >   restore-drilled, and **copied offsite to Google Drive**. Different restore path (you must
 >   **decrypt** first). *(jump to [PART 2 — BANCO](#part-2--banco-banco_prod))*
 >
-> If the box is dead and you need the SHOP back, you want **PART 2, Scenario B3**.
+> **If EVERYTHING is gone (laptop + server): start at [🔥 SCENARIO 0](#-scenario-0--total-loss-rebuild-from-google-drive-on-any-computer).**
+> If just the box is dead and you need the SHOP back: **PART 2, Scenario B3**.
 
 **Last tested:** borrowhood April 6, 2026 -- PASSED (328 users, 813 items). banco_prod restore drill
 runs and passes nightly (decrypt+restore, row counts matched — see `/opt/backups/banco/backup.log`).
 **banco_prod offsite + KeePass key VERIFIED July 1, 2026** — decrypted an offsite Drive/laptop blob with
 the KeePass passphrase → valid `PostgreSQL database dump`. Full DR pair proven (ciphertext ↔ key).
+
+---
+
+# 🔥 SCENARIO 0 — TOTAL LOSS: rebuild from Google Drive on ANY computer
+
+**When:** laptop gone AND server gone. This is the Fishbowl card — start here. It routes you to the
+detailed steps below; don't try to remember them, just follow the arrows.
+
+**Everything you need is on Google Drive (account `angel.kenel@gmail.com`).** The ONLY two things
+that are NOT on Drive: your **KeePass master password** (in your head) and internet access.
+
+```
+Drive layout you're recovering from:
+  HelixNet-DR/KeePass-Helix-DB.kdbx        ← the keys to everything (auto-synced hourly)
+  HelixNet-DB-Backups/banco/*.sql.gz.gpg   ← the encrypted Banco database (auto-synced hourly)
+```
+
+1. **Get to Drive.** Any computer → https://drive.google.com → sign in as `angel.kenel@gmail.com`.
+   *(Use the web UI — a fresh machine won't have rclone set up, and you don't need it.)*
+2. **Get the keys.** Download `HelixNet-DR/KeePass-Helix-DB.kdbx`. Install KeePassXC (keepassxc.org),
+   open it, **unlock with your master password.** You now hold every secret — including the
+   `.banco-backup-key` entry (the 64-char passphrase that decrypts the DB backups).
+3. **Get the data.** Download the newest blob from `HelixNet-DB-Backups/banco/` —
+   `banco_prod_YYYYMMDD_HHMM.sql.gz.gpg`.
+4. **Stand up a server.** Any host with Docker → follow **PART 1 · Scenario 3, steps 1–5**
+   (Docker, clone repo, start Postgres). Recreate the app's `.env` from the secrets now in KeePass.
+5. **Restore Banco.** Create the DB, then **PART 2 · Scenario B3, steps 3–5** — `gpg` decrypt the
+   blob with the key from KeePass → `gunzip` → restore into `banco_prod`.
+6. **Go live.** Point DNS (`banco.lapiazza.app`) at the new IP → verify `curl https://banco.lapiazza.app/api/v1/health`.
+7. **Re-arm the nets.** Put the key back at `/root/.banco-backup-key`, restore the `0 3 * * *` backup
+   cron, and re-point the laptop offsite pull (see `scripts/ops/README.md`). You're back — and protected again.
+
+> **The one thing no script can save: your KeePass master password.** It's the root of the whole
+> chain — lose it and the kdbx is an unopenable box. Keep it recoverable by you, and for the true
+> worst case, by someone you trust (a sealed note, a trusted person). Back up the master, not just the box.
 
 ---
 
