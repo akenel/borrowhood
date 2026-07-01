@@ -1,6 +1,19 @@
-# Disaster Recovery SOP -- La Piazza (BorrowHood)
+# Disaster Recovery SOP -- La Piazza (BorrowHood) + Banco
 
-**Last tested:** April 6, 2026 -- PASSED (328 users, 813 items, all rows matched)
+> **This box runs TWO production databases. This SOP covers BOTH.**
+> - **PART 1 — `borrowhood`** (La Piazza): hourly, plaintext gzip, `/opt/backups/borrowhood/`. *(below)*
+> - **PART 2 — `banco_prod`** (Banco POS — the DB Felix's shop runs on): daily, **GPG-encrypted**,
+>   restore-drilled, and **copied offsite to Google Drive**. Different restore path (you must
+>   **decrypt** first). *(jump to [PART 2 — BANCO](#part-2--banco-banco_prod))*
+>
+> If the box is dead and you need the SHOP back, you want **PART 2, Scenario B3**.
+
+**Last tested:** borrowhood April 6, 2026 -- PASSED (328 users, 813 items). banco_prod restore drill
+runs and passes nightly (decrypt+restore, row counts matched — see `/opt/backups/banco/backup.log`).
+
+---
+
+# PART 1 — BORROWHOOD (La Piazza)
 
 ---
 
@@ -216,5 +229,161 @@ ssh root@46.62.138.218
 
 ---
 
+---
+
+# PART 2 — BANCO (`banco_prod`)
+
+**This is the POS database Felix's shop runs on. It is handled differently from borrowhood:**
+encrypted at rest, restore-drilled nightly, and copied offsite to Google Drive.
+
+## How Banco Backups Work
+
+- **Nightly** cron on Hetzner: `0 3 * * *` → `/opt/backups/banco_backup.sh`
+- Full Postgres dump of `banco_prod`, gzipped, then **GPG-encrypted (AES256)** — dumps hold
+  customer PII, so they are ciphertext at rest.
+- **Verified restore drill every night:** the fresh blob is DECRYPTED, restored into a throwaway
+  DB, and row counts (`transactions`/`products`/`line_items`) are compared. A backup that won't
+  decrypt-and-restore fails loudly.
+- **30 encrypted blobs** kept on the box: `/opt/backups/banco/banco_prod_*.sql.gz.gpg` (~1 MB each)
+- Log: `/opt/backups/banco/backup.log`
+- **OFFSITE:** `scripts/ops/banco_offsite_pull.py` (laptop `@hourly`) pulls the blobs box→laptop
+  (`~/backups/banco-offsite/`, sha256-verified) then `rclone copy` → **Google Drive**
+  `ecolution-gdrive:HelixNet-DB-Backups/banco` (MD5-verified). So Banco backups live in
+  **3 places: box + laptop + Drive** — the same Drive as this SOP and the kdbx.
+
+## 🔑 The Encryption Key — WITHOUT IT THE OFFSITE BACKUPS ARE BRICKS
+
+- Lives on the box at `/root/.banco-backup-key` (root-only), **65 bytes**, fingerprint
+  sha256[:16] = `4de994a0ef02fd82`.
+- A **copy MUST be in the KeePass kdbx** (which is itself on Drive). The Drive blobs are AES256
+  ciphertext — with no key, they are unrecoverable. Key in kdbx + ciphertext on Drive = the DR pair.
+- gpg uses **only the first line** of the key file. If you re-create the key from KeePass, it must
+  reproduce that first line exactly (watch for trailing newlines).
+- **PROVE it works — see "Verify your KeePass key" at the bottom. Do this at least once.**
+
+## Quick Reference (Banco)
+
+```bash
+# Check banco backup health (box)
+ssh root@46.62.138.218 "ls -lh /opt/backups/banco/*.sql.gz.gpg | tail -5; tail -5 /opt/backups/banco/backup.log"
+
+# Check the offsite copies (laptop)
+cat ~/backups/banco-offsite/STATUS.txt
+rclone lsf ecolution-gdrive:HelixNet-DB-Backups/banco | tail -5
+```
+
+---
+
+## SCENARIO B1: Test the Banco Backup (Safe -- No Downtime)
+
+**When:** Monthly, or anytime you're nervous. **Risk:** ZERO (throwaway DB). This mirrors the
+automatic nightly drill — run it by hand to see it pass with your own eyes.
+
+```bash
+ssh root@46.62.138.218
+KEY=/root/.banco-backup-key
+FILE=$(ls -t /opt/backups/banco/banco_prod_*.sql.gz.gpg | head -1)
+echo "Testing: $FILE"
+
+# 1. throwaway DB
+docker exec postgres psql -U helix_user -d postgres -c "CREATE DATABASE banco_dr_test OWNER helix_user;"
+
+# 2. DECRYPT -> gunzip -> restore  (the extra decrypt step vs borrowhood)
+gpg --batch --quiet --decrypt --passphrase-file "$KEY" "$FILE" | gunzip \
+  | docker exec -i postgres psql -U helix_user -d banco_dr_test
+
+# 3. compare row counts to production
+docker exec postgres psql -U helix_user -d banco_dr_test -c "SELECT count(*) FROM transactions;"
+docker exec postgres psql -U helix_user -d banco_prod    -c "SELECT count(*) FROM transactions;"
+
+# 4. counts match = SUCCESS. clean up:
+docker exec postgres psql -U helix_user -d postgres -c "DROP DATABASE banco_dr_test;"
+```
+
+---
+
+## SCENARIO B2: Banco DB Corrupted -- Restore on the Box
+
+**When:** `banco_prod` is corrupted / a bad query wrecked it, but the box is alive.
+**Downtime:** ~2 minutes. **⚠ Back up the current state first if you possibly can.**
+
+```bash
+ssh root@46.62.138.218
+KEY=/root/.banco-backup-key
+
+# 1. stop the Banco app (prevent new writes)
+docker stop helix-platform-banco
+
+# 2. pick the latest GOOD encrypted backup (from BEFORE the damage)
+ls -lh /opt/backups/banco/banco_prod_*.sql.gz.gpg | tail -10
+FILE=/opt/backups/banco/banco_prod_XXXXXXXX_XXXX.sql.gz.gpg
+
+# 3. drop + recreate
+docker exec postgres psql -U helix_user -d postgres -c "DROP DATABASE banco_prod;"
+docker exec postgres psql -U helix_user -d postgres -c "CREATE DATABASE banco_prod OWNER helix_user;"
+
+# 4. decrypt -> restore
+gpg --batch --quiet --decrypt --passphrase-file "$KEY" "$FILE" | gunzip \
+  | docker exec -i postgres psql -U helix_user -d banco_prod
+
+# 5. restart + verify
+docker start helix-platform-banco
+sleep 5 && curl -s https://banco.lapiazza.app/api/v1/health
+docker exec postgres psql -U helix_user -d banco_prod -c "SELECT count(*) FROM transactions;"
+```
+
+---
+
+## SCENARIO B3: Box is DEAD -- Restore Banco from Google Drive
+
+**When:** Hetzner is gone. This is the scenario P5 exists for — the encrypted backups are safe on
+Drive, and you rebuild on a new server. **You need the KeePass kdbx (for the encryption key).**
+
+```bash
+# --- on any machine with internet ---
+# 1. Get the kdbx from Google Drive, open in KeePass, find the ".banco-backup-key" entry.
+
+# 2. Download the latest Banco backup from Drive (rclone, or the Drive web UI):
+rclone copy ecolution-gdrive:HelixNet-DB-Backups/banco ./banco-restore \
+  --include "*.sql.gz.gpg" --max-age 2d      # newest blob(s)
+cd banco-restore && ls -t *.sql.gz.gpg | head -1
+
+# 3. Stand up the new server: follow PART 1 Scenario 3 steps 1-5 (Docker, clone repo, start postgres),
+#    then create the DB:
+docker exec postgres psql -U helix_user -d postgres -c "CREATE DATABASE banco_prod OWNER helix_user;"
+
+# 4. DECRYPT with the key from KeePass (paste the passphrase at the prompt), then restore:
+gpg --output banco_prod.sql.gz --decrypt banco_prod_XXXXXXXX_XXXX.sql.gz.gpg
+gunzip -c banco_prod.sql.gz | docker exec -i postgres psql -U helix_user -d banco_prod
+
+# 5. Start the Banco app + point DNS (banco.lapiazza.app) at the new IP, then verify:
+curl https://banco.lapiazza.app/api/v1/health
+```
+
+**Also re-arm the safety nets on the new box:** copy `banco_backup.sh` to `/opt/backups/`, restore
+the `0 3 * * *` cron, drop the key back to `/root/.banco-backup-key` (from KeePass), and re-point
+the laptop offsite pull. See `scripts/ops/README.md`.
+
+---
+
+## ✅ Verify your KeePass key (DO THIS ONCE — the seal check)
+
+The offsite backups are only as good as the key in your kdbx. **Prove your KeePass copy actually
+decrypts a real blob** — don't assume the 65-byte box key and your KeePass entry match.
+
+```bash
+# On the LAPTOP (has an offsite blob already). Paste the passphrase from KeePass at the gpg prompt —
+# it is never typed into a command or shown on screen:
+FILE=$(ls -t ~/backups/banco-offsite/*.sql.gz.gpg | head -1)
+gpg --decrypt "$FILE" 2>/dev/null | gunzip 2>/dev/null | head -c 120; echo
+
+# ✅ CORRECT KEY  -> you see SQL, e.g.  "-- PostgreSQL database dump"
+# ❌ WRONG KEY    -> gpg errors ("decryption failed: Bad session key") or you see nothing.
+#                   The KeePass value does NOT match the box key — fix it before trusting the offsite.
+```
+
+---
+
 *"If one seal fails, check all the seals."*
 *Test your backups. The backup you don't test is the backup that doesn't work.*
+*The DR key you never decrypted with is the key that doesn't work either.*
