@@ -13,7 +13,7 @@
           <!-- header: the wolf -->
           <tr>
             <td align="center" style="background:#8B0000; padding:28px 24px 20px;">
-              <img src="https://staging-banco.lapiazza.app/static/lapiazza-wolf.png" width="72" height="72" alt="La Piazza" style="display:block; border:0; border-radius:10px; background:#ffffff;">
+              <img src="https://banco.lapiazza.app/static/lapiazza-wolf.png" width="72" height="72" alt="La Piazza" style="display:block; border:0; border-radius:10px; background:#ffffff;">
               <div style="color:#ffffff; font-size:20px; font-weight:bold; letter-spacing:1px; margin-top:12px;">La Piazza</div>
               <div style="color:#f2d6d6; font-size:12px; margin-top:2px;">Banco &middot; Point of Sale</div>
             </td>
