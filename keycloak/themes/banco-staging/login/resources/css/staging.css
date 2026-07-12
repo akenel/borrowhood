@@ -1,0 +1,49 @@
+/* ============================================================================
+   Banco STAGING login skin — layered on top of banco.css.
+   Blue = release rehearsal. The middle ground between amber sandbox and green prod:
+   real-ish data, but a dress rehearsal — so it gets its own unmistakable coat.
+   ============================================================================ */
+
+/* Cool blue wash over the green */
+.login-pf body, body.login-pf, body {
+    background:
+        radial-gradient(1100px 520px at 50% -8%, rgba(59,130,246,0.20) 0%, transparent 60%),
+        radial-gradient(900px 700px at 85% 110%, rgba(30,58,138,0.34) 0%, transparent 55%),
+        linear-gradient(160deg, #061021 0%, #0a1830 45%, #0b1c38 100%) !important;
+}
+
+/* Diagonal STAGING corner ribbon */
+body::before {
+    content: 'STAGING';
+    position: fixed;
+    top: 34px;
+    left: -58px;
+    transform: rotate(-45deg);
+    background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
+    color: #05122e;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 4px;
+    text-align: center;
+    padding: 9px 72px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+    z-index: 99999;
+    pointer-events: none;
+}
+
+/* Retint gold accents toward blue */
+.kc-logo-text::before { border-color: rgba(96,165,250,0.6) !important; box-shadow: 0 0 0 4px rgba(96,165,250,0.12), 0 10px 30px rgba(0,0,0,0.5) !important; }
+.kc-logo-text::after { color: #e6efff !important; }
+#kc-header-wrapper::after {
+    content: 'STAGING · release rehearsal' !important;
+    color: #93c5fd !important;
+}
+.pf-v5-c-login__main { border-color: rgba(96,165,250,0.35) !important; }
+.pf-v5-c-form-control:focus { border-color: rgba(96,165,250,0.75) !important; box-shadow: 0 0 0 3px rgba(96,165,250,0.22) !important; }
+.pf-v5-c-button.pf-m-primary {
+    background: linear-gradient(180deg, #93c5fd 0%, #3b82f6 100%) !important;
+    color: #05122e !important;
+    box-shadow: 0 8px 22px rgba(59,130,246,0.32) !important;
+}
+.pf-v5-c-button.pf-m-primary:hover { background: linear-gradient(180deg, #a9d2fd 0%, #2f76ea 100%) !important; }
