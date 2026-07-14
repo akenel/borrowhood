@@ -2,7 +2,23 @@
    Banco SANDBOX login skin — layered on top of banco.css.
    Purpose: make it IMPOSSIBLE to confuse the sandbox login with production.
    Amber ribbon + amber tint + a "test environment" subtitle.
+
+   Restate the :root tokens and banco.css re-tints itself — emblem ring, inputs,
+   focus, reveal button, links, locale menu and primary button all follow.
+   (The old .kc-logo-text rules here were dead: keycloak.v2 emits no such element.)
    ============================================================================ */
+
+:root {
+    --banco-accent:      #f59e0b;              /* amber */
+    --banco-accent-lite: #fcd34d;
+    --banco-accent-rgb:  245, 158, 11;
+    --banco-ink:         #201400;
+    --banco-heading:     #ffe9b8;
+    --banco-card:        rgba(28, 20, 6, 0.82);
+    --banco-field-solid: #2a1f0c;
+    --banco-base:        #1a1206;
+    --banco-subtitle:    'Sandbox \00B7 test environment';
+}
 
 /* Amber wash over the green so the whole screen reads "not prod" at a glance */
 .login-pf body, body.login-pf, body {
@@ -11,6 +27,15 @@
         radial-gradient(900px 700px at 85% 110%, rgba(120,72,20,0.30) 0%, transparent 55%),
         linear-gradient(160deg, #1a1206 0%, #22180a 45%, #26190a 100%) !important;
 }
+
+/* Emblem disc: the parent bakes a green gradient behind the wolf — warm it up */
+#kc-header-wrapper::before {
+    background: url('../img/wolf-logo.png') center/70% no-repeat,
+                radial-gradient(circle at 50% 40%, #3a2a12 0%, #241806 100%) !important;
+}
+
+/* Locale menu panel matches the amber card */
+.pf-v5-c-select__menu { background: #241806 !important; }
 
 /* Diagonal SANDBOX corner ribbon — fixed, always on top */
 body::before {
@@ -31,18 +56,3 @@ body::before {
     z-index: 99999;
     pointer-events: none;
 }
-
-/* Retint the gold accents toward amber (emblem ring, inputs, buttons) */
-.kc-logo-text::before { border-color: rgba(245,158,11,0.6) !important; box-shadow: 0 0 0 4px rgba(245,158,11,0.12), 0 10px 30px rgba(0,0,0,0.5) !important; }
-.kc-logo-text::after { color: #ffe9b8 !important; }
-#kc-header-wrapper::after {
-    content: 'SANDBOX · test environment' !important;
-    color: #fbbf24 !important;
-}
-.pf-v5-c-login__main { border-color: rgba(245,158,11,0.35) !important; }
-.pf-v5-c-form-control:focus { border-color: rgba(245,158,11,0.7) !important; box-shadow: 0 0 0 3px rgba(245,158,11,0.2) !important; }
-.pf-v5-c-button.pf-m-primary {
-    background: linear-gradient(180deg, #fcd34d 0%, #f59e0b 100%) !important;
-    box-shadow: 0 8px 22px rgba(245,158,11,0.3) !important;
-}
-.pf-v5-c-button.pf-m-primary:hover { background: linear-gradient(180deg, #fde08a 0%, #ea8f08 100%) !important; }

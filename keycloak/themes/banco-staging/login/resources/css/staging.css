@@ -2,7 +2,23 @@
    Banco STAGING login skin — layered on top of banco.css.
    Blue = release rehearsal. The middle ground between amber sandbox and green prod:
    real-ish data, but a dress rehearsal — so it gets its own unmistakable coat.
+
+   Restate the :root tokens and banco.css re-tints itself — emblem ring, inputs,
+   focus, reveal button, links, locale menu and primary button all follow.
+   (The old .kc-logo-text rules here were dead: keycloak.v2 emits no such element.)
    ============================================================================ */
+
+:root {
+    --banco-accent:      #3b82f6;              /* blue */
+    --banco-accent-lite: #93c5fd;
+    --banco-accent-rgb:  96, 165, 250;
+    --banco-ink:         #05122e;
+    --banco-heading:     #e6efff;
+    --banco-card:        rgba(9, 20, 40, 0.82);
+    --banco-field-solid: #12233f;
+    --banco-base:        #061021;
+    --banco-subtitle:    'Staging \00B7 release rehearsal';
+}
 
 /* Cool blue wash over the green */
 .login-pf body, body.login-pf, body {
@@ -11,6 +27,15 @@
         radial-gradient(900px 700px at 85% 110%, rgba(30,58,138,0.34) 0%, transparent 55%),
         linear-gradient(160deg, #061021 0%, #0a1830 45%, #0b1c38 100%) !important;
 }
+
+/* Emblem disc: the parent bakes a green gradient behind the wolf — cool it down */
+#kc-header-wrapper::before {
+    background: url('../img/wolf-logo.png') center/70% no-repeat,
+                radial-gradient(circle at 50% 40%, #16305c 0%, #0a1830 100%) !important;
+}
+
+/* Locale menu panel matches the blue card */
+.pf-v5-c-select__menu { background: #0a1830 !important; }
 
 /* Diagonal STAGING corner ribbon */
 body::before {
@@ -31,19 +56,3 @@ body::before {
     z-index: 99999;
     pointer-events: none;
 }
-
-/* Retint gold accents toward blue */
-.kc-logo-text::before { border-color: rgba(96,165,250,0.6) !important; box-shadow: 0 0 0 4px rgba(96,165,250,0.12), 0 10px 30px rgba(0,0,0,0.5) !important; }
-.kc-logo-text::after { color: #e6efff !important; }
-#kc-header-wrapper::after {
-    content: 'STAGING · release rehearsal' !important;
-    color: #93c5fd !important;
-}
-.pf-v5-c-login__main { border-color: rgba(96,165,250,0.35) !important; }
-.pf-v5-c-form-control:focus { border-color: rgba(96,165,250,0.75) !important; box-shadow: 0 0 0 3px rgba(96,165,250,0.22) !important; }
-.pf-v5-c-button.pf-m-primary {
-    background: linear-gradient(180deg, #93c5fd 0%, #3b82f6 100%) !important;
-    color: #05122e !important;
-    box-shadow: 0 8px 22px rgba(59,130,246,0.32) !important;
-}
-.pf-v5-c-button.pf-m-primary:hover { background: linear-gradient(180deg, #a9d2fd 0%, #2f76ea 100%) !important; }

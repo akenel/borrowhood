@@ -1,10 +1,40 @@
 /* ============================================================================
    Banco — head-shop login theme (Artemis Store).
    Dark, premium, green + gold. Self-contained (no external assets/hotlinks).
-   Parent: keycloak.v2 (PatternFly v5). Layout rules mirror the lapiazza theme;
-   colours + background + header are the head-shop restyle.
-   The SANDBOX variant (banco-sbx) adds a ribbon on top of this.
+   Parent: keycloak.v2 (PatternFly v5).
+
+   PATTERNFLY v5 CONTRACT — read before editing:
+   `pf-v5-c-form-control` is on a <span> WRAPPER; the real <input> is a CHILD
+   with its own `color: var(--pf-v5-c-form-control--Color)`. Setting `color:` on
+   the wrapper does NOT reach the input. PF also forces LIGHT-theme tokens inside
+   form controls (--pf-v5-global--Color--100 -> #151515), so an unstyled input on
+   our dark card renders near-black text on near-black glass — invisible.
+   => Drive the --pf-v5-c-form-control--* TOKENS, not raw properties.
+   Same trap on: the reveal button (pf-m-control), the locale select, and focus
+   state (the wrapper is a <span> — use :focus-within; `:focus` can never match).
+
+   Accent colours are tokens on :root so the sandbox/staging skins only restate
+   the tokens instead of re-declaring every rule.
    ============================================================================ */
+
+:root {
+    --banco-accent:      #d4af37;              /* gold */
+    --banco-accent-lite: #e9cf7e;
+    --banco-accent-rgb:  212, 175, 55;
+    --banco-ink:         #10251a;              /* text ON the accent button */
+    --banco-text:        #f2f6f3;              /* primary text on dark */
+    --banco-muted:       #d7e4dc;              /* labels */
+    --banco-heading:     #f4e9c8;
+    --banco-card:        rgba(9, 24, 16, 0.82);
+    --banco-field:       rgba(255, 255, 255, 0.06);
+    --banco-field-solid: #16291d;              /* opaque twin of --banco-field, for autofill */
+    --banco-base:        #06140d;              /* page base, must be opaque */
+    --banco-subtitle:    'Artemis Store \00B7 Luzern';
+}
+
+/* ===== PAGE BASE: paint html too, or a tall/scrolled page shows a white band ===== */
+html { background-color: var(--banco-base) !important; }
+html, body { min-height: 100% !important; }
 
 /* ===== LAYOUT: center everything ===== */
 .pf-v5-c-login {
@@ -40,46 +70,41 @@
     background-attachment: fixed !important;
 }
 
-/* ===== HEADER: wolf emblem + Banco wordmark + Artemis Store ===== */
+/* ===== HEADER: wolf emblem + realm wordmark + store subtitle =====
+   keycloak.v2 renders ONLY `<div id="kc-header-wrapper">{realm displayName}</div>`.
+   There is NO .kc-logo-text element (that belonged to the old v1 theme), so the
+   emblem hangs off the wrapper's ::before and the realm name gets an explicit
+   colour — it is a raw text node and defaults to BLACK on our dark background. */
 #kc-header { width: 100% !important; text-align: center !important; }
 #kc-header-wrapper {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     padding-top: 48px;
     padding-bottom: 6px;
     text-align: center;
+    color: var(--banco-heading) !important;
+    font-size: 34px !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px !important;
+    line-height: 1.2 !important;
+    text-shadow: 0 2px 12px rgba(var(--banco-accent-rgb), 0.25);
 }
-.kc-logo-text {
-    background-image: none !important;
-    font-size: 0 !important;
-    width: auto !important;
-    height: auto !important;
-}
-.kc-logo-text::before {
+#kc-header-wrapper::before {
     content: '';
     display: block;
     width: 104px;
     height: 104px;
     margin: 0 auto 14px;
-    background: url('../img/wolf-logo.png') center/70% no-repeat, radial-gradient(circle at 50% 40%, #123a24 0%, #0a2415 100%);
+    background: url('../img/wolf-logo.png') center/70% no-repeat,
+                radial-gradient(circle at 50% 40%, #123a24 0%, #0a2415 100%);
     border-radius: 50%;
-    border: 2px solid rgba(212,175,55,0.55);
-    box-shadow: 0 0 0 4px rgba(212,175,55,0.10), 0 10px 30px rgba(0,0,0,0.5);
-}
-.kc-logo-text::after {
-    content: 'Banco';
-    display: block;
-    font-size: 34px;
-    font-weight: 800;
-    color: #f4e9c8;
-    text-align: center;
-    letter-spacing: 1px;
-    text-shadow: 0 2px 12px rgba(212,175,55,0.25);
+    border: 2px solid rgba(var(--banco-accent-rgb), 0.55);
+    box-shadow: 0 0 0 4px rgba(var(--banco-accent-rgb), 0.10), 0 10px 30px rgba(0,0,0,0.5);
 }
 #kc-header-wrapper::after {
-    content: 'Artemis Store · Luzern';
+    content: var(--banco-subtitle);
     display: block;
     font-size: 12px;
-    color: rgba(212,175,55,0.85);
+    color: rgba(var(--banco-accent-rgb), 0.85);
     text-align: center;
     margin-top: 5px;
     font-weight: 600;
@@ -89,53 +114,157 @@
 
 /* ===== CARD: dark glass with a gold hairline ===== */
 .pf-v5-c-login__main {
-    background: rgba(9, 24, 16, 0.82) !important;
+    background: var(--banco-card) !important;
     backdrop-filter: blur(6px) !important;
-    border: 1px solid rgba(212,175,55,0.25) !important;
+    border: 1px solid rgba(var(--banco-accent-rgb), 0.25) !important;
     border-radius: 16px !important;
     box-shadow: 0 18px 50px rgba(0,0,0,0.55) !important;
     padding: 8px 6px 14px !important;
 }
-.pf-v5-c-login__main-header .pf-v5-c-title { font-size: 26px !important; font-weight: 700 !important; color: #f4e9c8 !important; }
+.pf-v5-c-login__main-header .pf-v5-c-title {
+    font-size: 26px !important;
+    font-weight: 700 !important;
+    color: var(--banco-heading) !important;
+}
 
-/* labels + inputs — readable on dark */
-.pf-v5-c-form__label-text { font-size: 15px !important; font-weight: 500 !important; color: #d7e4dc !important; }
+/* ===== LABELS ===== */
+.pf-v5-c-form__label-text {
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    color: var(--banco-muted) !important;
+}
+
+/* ===== INPUTS — the whole point. Drive PF's TOKENS, not raw properties. ===== */
 .pf-v5-c-form-control {
+    /* the child <input> reads its colour from this token */
+    --pf-v5-c-form-control--Color: var(--banco-text);
+    --pf-v5-c-form-control--BackgroundColor: var(--banco-field);
+    --pf-v5-c-form-control--FontSize: 16px;
+    --pf-v5-c-form-control--m-placeholder--Color: rgba(242, 246, 243, 0.45);
+    --pf-v5-c-form-control--m-placeholder--child--Color: rgba(242, 246, 243, 0.45);
+    /* PF paints its OWN ::before/::after borders over ours — retint them rather
+       than fight them, else you get a pale double-box and a blue focus underline */
+    --pf-v5-c-form-control--before--BorderTopColor: rgba(var(--banco-accent-rgb), 0.25);
+    --pf-v5-c-form-control--before--BorderRightColor: rgba(var(--banco-accent-rgb), 0.25);
+    --pf-v5-c-form-control--before--BorderLeftColor: rgba(var(--banco-accent-rgb), 0.25);
+    --pf-v5-c-form-control--after--BorderBottomColor: rgba(var(--banco-accent-rgb), 0.25);
+    --pf-v5-c-form-control--hover--after--BorderBottomColor: var(--banco-accent);
+    --pf-v5-c-form-control--focus--after--BorderBottomColor: var(--banco-accent);
+    --pf-v5-c-form-control__toggle-icon--Color: var(--banco-accent-lite);
+    --pf-v5-c-form-control__icon--Color: var(--banco-accent-lite);
+
+    min-height: 48px !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+}
+/* Belt and braces: hit the child input directly. PF gives it an explicit
+   `color:` declaration, so inheritance from the wrapper never reaches it. */
+.pf-v5-c-form-control > input,
+.pf-v5-c-form-control > select,
+.pf-v5-c-form-control > textarea {
+    color: var(--banco-text) !important;
+    -webkit-text-fill-color: var(--banco-text) !important;
+    caret-color: var(--banco-accent-lite) !important;
+    background-color: transparent !important;
     font-size: 16px !important;
     padding: 12px 14px !important;
-    min-height: 48px !important;
-    background: rgba(255,255,255,0.06) !important;
-    border: 1px solid rgba(212,175,55,0.25) !important;
-    color: #f2f6f3 !important;
-    border-radius: 10px !important;
 }
-.pf-v5-c-form-control:focus {
-    border-color: rgba(212,175,55,0.7) !important;
-    box-shadow: 0 0 0 3px rgba(212,175,55,0.18) !important;
+/* Chrome force-paints autofilled fields white-bg/black-text. Override with an inset shadow. */
+.pf-v5-c-form-control > input:-webkit-autofill,
+.pf-v5-c-form-control > input:-webkit-autofill:hover,
+.pf-v5-c-form-control > input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--banco-text) !important;
+    -webkit-box-shadow: 0 0 0 1000px var(--banco-field-solid) inset !important;
+    caret-color: var(--banco-accent-lite) !important;
+}
+/* The wrapper is a <span> — it can never match :focus. PF uses :focus-within. */
+.pf-v5-c-form-control:focus-within {
+    box-shadow: 0 0 0 3px rgba(var(--banco-accent-rgb), 0.18) !important;
 }
 
-/* ===== BUTTONS: gold ===== */
+/* ===== PASSWORD REVEAL BUTTON (pf-m-control renders as a WHITE box) ===== */
+.pf-v5-c-input-group,
+.pf-v5-c-input-group__item { background: transparent !important; }
+.pf-v5-c-button.pf-m-control {
+    background: var(--banco-field) !important;
+    color: var(--banco-accent-lite) !important;
+    border: 1px solid rgba(var(--banco-accent-rgb), 0.25) !important;
+    border-radius: 10px !important;
+    min-height: 48px !important;
+}
+.pf-v5-c-button.pf-m-control:hover {
+    background: rgba(var(--banco-accent-rgb), 0.16) !important;
+    color: var(--banco-accent) !important;
+}
+.pf-v5-c-button.pf-m-control::before,
+.pf-v5-c-button.pf-m-control::after { border: none !important; }
+
+/* ===== PRIMARY BUTTON: accent ===== */
 .pf-v5-c-button.pf-m-primary {
     font-size: 16px !important;
     min-height: 48px !important;
     font-weight: 700 !important;
     letter-spacing: 0.3px !important;
     border-radius: 10px !important;
-    color: #10251a !important;
-    background: linear-gradient(180deg, #e9cf7e 0%, #d4af37 100%) !important;
+    color: var(--banco-ink) !important;
+    background: linear-gradient(180deg, var(--banco-accent-lite) 0%, var(--banco-accent) 100%) !important;
     border: none !important;
-    box-shadow: 0 8px 22px rgba(212,175,55,0.28) !important;
+    box-shadow: 0 8px 22px rgba(var(--banco-accent-rgb), 0.28) !important;
 }
-.pf-v5-c-button.pf-m-primary:hover {
-    background: linear-gradient(180deg, #f0d98d 0%, #c9a52c 100%) !important;
-}
+.pf-v5-c-button.pf-m-primary:hover { filter: brightness(1.06) !important; }
 
-/* links + footer on dark */
-.pf-v5-c-login__main-footer-links a, #kc-registration span, #kc-registration a, #kc-info a {
+/* ===== LINKS — "Forgot Password?" is NOT inside #kc-form-options; it is a
+   SIBLING of it, in .login-pf-settings. It was falling back to PatternFly's
+   default blue (3.2:1 on our dark card). Cover every link in the card. ===== */
+.pf-v5-c-login__main a,
+.pf-v5-c-login__main-footer-links a,
+.pf-v5-c-login__main-footer-band a,
+.login-pf-settings a,
+#kc-form-options a,
+#kc-registration span, #kc-registration a,
+#kc-info a {
+    color: var(--banco-accent-lite) !important;
+}
+.pf-v5-c-login__main a:hover,
+.login-pf-settings a:hover,
+#kc-info a:hover { color: var(--banco-accent) !important; }
+
+#kc-form-options, #kc-form-options span, .pf-v5-c-check__label {
+    color: var(--banco-muted) !important;
     font-size: 14px !important;
-    color: #e9cf7e !important;
 }
 
-/* language selector (Keycloak i18n dropdown) — keep it visible on dark */
-#kc-locale, #kc-locale ul, .pf-v5-c-dropdown__toggle { color: #e9cf7e !important; }
-#kc-locale a { color: #e9cf7e !important; }
+/* ===== LOCALE SELECT (4-lang switcher) — PF renders a WHITE pill + white menu ===== */
+.pf-v5-c-select__toggle {
+    background: var(--banco-field) !important;
+    border: 1px solid rgba(var(--banco-accent-rgb), 0.3) !important;
+    border-radius: 8px !important;
+}
+.pf-v5-c-select__toggle,
+.pf-v5-c-select__toggle-text,
+.pf-v5-c-select__toggle-arrow { color: var(--banco-accent-lite) !important; }
+.pf-v5-c-select__menu {
+    background: #0d2417 !important;
+    border: 1px solid rgba(var(--banco-accent-rgb), 0.3) !important;
+    border-radius: 8px !important;
+}
+.pf-v5-c-select__menu-item {
+    background: transparent !important;
+    color: var(--banco-text) !important;
+}
+.pf-v5-c-select__menu-item:hover,
+.pf-v5-c-select__menu-item.pf-m-selected {
+    background: rgba(var(--banco-accent-rgb), 0.18) !important;
+    color: var(--banco-accent-lite) !important;
+}
+
+/* ===== ALERTS (wrong password, expired session) — must read on dark ===== */
+.pf-v5-c-alert {
+    background: rgba(0, 0, 0, 0.38) !important;
+    border: 1px solid rgba(var(--banco-accent-rgb), 0.3) !important;
+    border-radius: 10px !important;
+}
+.pf-v5-c-alert__title,
+.pf-v5-c-alert__description { color: var(--banco-text) !important; }
+.pf-v5-c-form__helper-text,
+.pf-v5-c-helper-text__item-text { color: #ffb4a8 !important; }
