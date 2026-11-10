@@ -141,3 +141,13 @@
 #kc-social-providers a {
     border-radius: 8px !important;
 }
+
+/* Keycloak 26.8 (2026-11-10): the social buttons now carry an <img> logo, and this theme replaces
+   Keycloak's own styles, so nothing sized it — Google/Facebook rendered at ~408px, GitHub at 0x0. */
+#kc-social-providers a img {
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px;
+    flex: 0 0 20px;
+    object-fit: contain;
+}
